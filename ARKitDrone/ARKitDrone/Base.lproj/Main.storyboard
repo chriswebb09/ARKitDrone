@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13526" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BV1-FR-VrT">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13524"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tXr-a1-R10">
+            <objects>
+                <viewController id="BV1-FR-VrT" customClass="ViewController" customModule="ARKitDrone" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="B67-67-9bp">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Mxk-Jk-sLR" customClass="DroneSceneView" customModule="ARKitDrone" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                            </arscnView>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="695-oX-4xd">
+                                <rect key="frame" x="16" y="150" width="321" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="29" id="uzv-5Q-U5Q"/>
+                                </constraints>
+                                <connections>
+                                    <action selector="altitudeValueChanged:" destination="BV1-FR-VrT" eventType="valueChanged" id="PUD-QX-coQ"/>
+                                </connections>
+                            </slider>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eb8-gC-cz3">
+                                <rect key="frame" x="147" y="383" width="60" height="60"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="jqI-aO-fFR"/>
+                                </constraints>
+                                <state key="normal" title="Button" image="up"/>
+                                <connections>
+                                    <action selector="forwardButtonTapped:" destination="BV1-FR-VrT" eventType="touchUpInside" id="8P7-3a-Mcc"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BxG-8y-q2n">
+                                <rect key="frame" x="147" y="567" width="60" height="60"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="Jb8-We-IaL"/>
+                                </constraints>
+                                <state key="normal" title="Button" image="down"/>
+                                <connections>
+                                    <action selector="reverseButtonTapped:" destination="BV1-FR-VrT" eventType="touchUpInside" id="DfZ-7Q-I00"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sHX-0g-SlU">
+                                <rect key="frame" x="58" y="463" width="60" height="60"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button" image="left"/>
+                                <connections>
+                                    <action selector="leftButtonTapped:" destination="BV1-FR-VrT" eventType="touchUpInside" id="5eW-EO-xUF"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qnO-5w-cdt">
+                                <rect key="frame" x="235" y="463" width="60" height="60"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button" image="right"/>
+                                <connections>
+                                    <action selector="rightButtonTapped:" destination="BV1-FR-VrT" eventType="touchUpInside" id="hUK-fd-YFr"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="Mxk-Jk-sLR" firstAttribute="top" secondItem="B67-67-9bp" secondAttribute="top" id="8rF-sE-8iI"/>
+                            <constraint firstItem="695-oX-4xd" firstAttribute="centerX" secondItem="BxG-8y-q2n" secondAttribute="centerX" id="C70-Fc-2bp"/>
+                            <constraint firstItem="Mxk-Jk-sLR" firstAttribute="bottom" secondItem="dw2-tW-vDk" secondAttribute="bottom" id="G8U-wR-EOX"/>
+                            <constraint firstAttribute="bottom" secondItem="eb8-gC-cz3" secondAttribute="bottom" constant="224" id="KzC-FB-Slo"/>
+                            <constraint firstItem="695-oX-4xd" firstAttribute="centerX" secondItem="eb8-gC-cz3" secondAttribute="centerX" id="Rje-g9-Wa7"/>
+                            <constraint firstItem="695-oX-4xd" firstAttribute="top" secondItem="dw2-tW-vDk" secondAttribute="top" constant="130" id="Tqh-OP-bDc"/>
+                            <constraint firstItem="dw2-tW-vDk" firstAttribute="trailing" secondItem="695-oX-4xd" secondAttribute="trailing" constant="40" id="UcX-FF-18X"/>
+                            <constraint firstItem="Mxk-Jk-sLR" firstAttribute="leading" secondItem="B67-67-9bp" secondAttribute="leading" id="Vsp-8c-kuS"/>
+                            <constraint firstAttribute="trailing" secondItem="Mxk-Jk-sLR" secondAttribute="trailing" id="Z6Z-de-Hqm"/>
+                            <constraint firstItem="dw2-tW-vDk" firstAttribute="bottom" secondItem="BxG-8y-q2n" secondAttribute="bottom" constant="40" id="iZ5-xp-aIQ"/>
+                            <constraint firstItem="eb8-gC-cz3" firstAttribute="leading" secondItem="BxG-8y-q2n" secondAttribute="leading" id="jRR-qq-IIk"/>
+                            <constraint firstItem="695-oX-4xd" firstAttribute="leading" secondItem="dw2-tW-vDk" secondAttribute="leading" constant="18" id="m2v-ZP-CHH"/>
+                            <constraint firstItem="eb8-gC-cz3" firstAttribute="leading" secondItem="dw2-tW-vDk" secondAttribute="leading" constant="147" id="zIf-iA-7bu"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="dw2-tW-vDk"/>
+                    </view>
+                    <connections>
+                        <outlet property="altitudeSlider" destination="695-oX-4xd" id="b7W-Z2-0Vx"/>
+                        <outlet property="forwardButton" destination="eb8-gC-cz3" id="5zF-Wn-bqx"/>
+                        <outlet property="leftButton" destination="sHX-0g-SlU" id="GZb-yl-FuQ"/>
+                        <outlet property="reverseButton" destination="BxG-8y-q2n" id="jnu-FD-esq"/>
+                        <outlet property="rightButton" destination="qnO-5w-cdt" id="yLg-Sh-xvl"/>
+                        <outlet property="sceneView" destination="Mxk-Jk-sLR" id="m7r-mg-0Em"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="136.80000000000001" y="133.5832083958021"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="down" width="512" height="512"/>
+        <image name="left" width="512" height="512"/>
+        <image name="right" width="512" height="512"/>
+        <image name="up" width="512" height="512"/>
+    </resources>
+</document>
