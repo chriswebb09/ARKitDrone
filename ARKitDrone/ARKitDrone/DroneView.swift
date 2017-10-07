@@ -19,7 +19,7 @@ class DroneSceneView: ARSCNView {
     var rotorL: SCNNode!
     
     func setupDrone() {
-        scene = SCNScene(named: "Drone_dae.dae")!
+        scene = SCNScene(named: "art.scnassets/Drone.scn")!
         scene.rootNode.childNodes[0].transform = SCNMatrix4Mult(scene.rootNode.childNodes[0].transform, SCNMatrix4MakeRotation(Float(Double.pi) / 2, 1, 0, 0))
         chassisNode = scene.rootNode.childNode(withName: "helicopter", recursively: false)
         blade1Node = chassisNode?.childNode(withName: "Rotor_R_2", recursively: true)

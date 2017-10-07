@@ -13,7 +13,6 @@
 		A7AE72C51F888EF500B015D3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72C31F888EF500B015D3 /* Main.storyboard */; };
 		A7AE72C71F888EF500B015D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72C61F888EF500B015D3 /* Assets.xcassets */; };
 		A7AE72CA1F888EF500B015D3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72C81F888EF500B015D3 /* LaunchScreen.storyboard */; };
-		A7AE72D21F888F7800B015D3 /* Drone_dae.dae in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72D11F888F7800B015D3 /* Drone_dae.dae */; };
 		A7AE72D41F88900600B015D3 /* DroneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AE72D31F88900600B015D3 /* DroneView.swift */; };
 /* End PBXBuildFile section */
 
@@ -26,7 +25,6 @@
 		A7AE72C61F888EF500B015D3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A7AE72C91F888EF500B015D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A7AE72CB1F888EF500B015D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A7AE72D11F888F7800B015D3 /* Drone_dae.dae */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml.dae; path = Drone_dae.dae; sourceTree = "<group>"; };
 		A7AE72D31F88900600B015D3 /* DroneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DroneView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -62,7 +60,6 @@
 			children = (
 				A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */,
 				A7AE72D31F88900600B015D3 /* DroneView.swift */,
-				A7AE72D11F888F7800B015D3 /* Drone_dae.dae */,
 				A7AE72BF1F888EF500B015D3 /* art.scnassets */,
 				A7AE72C11F888EF500B015D3 /* ViewController.swift */,
 				A7AE72C31F888EF500B015D3 /* Main.storyboard */,
@@ -136,7 +133,6 @@
 				A7AE72CA1F888EF500B015D3 /* LaunchScreen.storyboard in Resources */,
 				A7AE72C71F888EF500B015D3 /* Assets.xcassets in Resources */,
 				A7AE72C51F888EF500B015D3 /* Main.storyboard in Resources */,
-				A7AE72D21F888F7800B015D3 /* Drone_dae.dae in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
