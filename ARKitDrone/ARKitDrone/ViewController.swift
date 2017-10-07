@@ -59,6 +59,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
         sceneView.setupDrone()
+        altitudeSlider.value = sceneView.scene.rootNode.childNodes[0].position.y
     }
     
     override func viewWillAppear(_ animated: Bool) {

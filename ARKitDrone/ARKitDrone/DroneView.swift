@@ -20,12 +20,17 @@ class DroneSceneView: ARSCNView {
     
     func setupDrone() {
         scene = SCNScene(named: "Drone_dae.dae")!
-        scene.rootNode.childNodes[0].transform = SCNMatrix4Mult(scene.rootNode.childNodes[0].transform, SCNMatrix4MakeRotation(Float(Double.pi) / 4, 1, 0, 0))
+        scene.rootNode.childNodes[0].transform = SCNMatrix4Mult(scene.rootNode.childNodes[0].transform, SCNMatrix4MakeRotation(Float(Double.pi) / 2, 1, 0, 0))
         chassisNode = scene.rootNode.childNode(withName: "helicopter", recursively: false)
         blade1Node = chassisNode?.childNode(withName: "Rotor_R_2", recursively: true)
         blade2Node = chassisNode?.childNode(withName: "Rotor_L_2", recursively: true)
         rotorR = blade1Node?.childNode(withName: "Rotor_R", recursively: true)
         rotorL = blade2Node?.childNode(withName: "Rotor_L", recursively: true)
+        styleDrone()
+        spinBlades()
+    }
+    
+    func styleDrone() {
         let bodyMaterial = SCNMaterial()
         bodyMaterial.diffuse.contents = UIColor.black
         chassisNode.geometry?.materials = [bodyMaterial]
@@ -38,7 +43,9 @@ class DroneSceneView: ARSCNView {
         blade2Node.geometry?.materials = [rotorMaterial]
         rotorR.geometry?.materials = [bladeMaterial]
         rotorL.geometry?.materials = [bladeMaterial]
-        scene.rootNode.childNodes[0].transform = SCNMatrix4Mult(scene.rootNode.childNodes[0].transform, SCNMatrix4MakeRotation(Float(Double.pi) / 4, 1, 0, 0))
+    }
+    
+    func spinBlades() {
         let rotate = SCNAction.rotateBy(x: 0, y: 0, z: 200, duration: 0.5)
         let moveSequence = SCNAction.sequence([rotate])
         let moveLoop = SCNAction.repeatForever(moveSequence)
