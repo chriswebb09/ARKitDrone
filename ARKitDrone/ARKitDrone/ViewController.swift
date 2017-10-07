@@ -10,7 +10,7 @@ import UIKit
 import SceneKit
 import ARKit
 
-class ViewController: UIViewController, ARSCNViewDelegate {
+class ViewController: UIViewController {
     
     @IBOutlet weak var altitudeSlider: UISlider! {
         didSet {
@@ -70,9 +70,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         super.viewWillDisappear(animated)
         sceneView.session.pause()
     }
-    
-    // MARK: - ARSCNViewDelegate
-    
+}
+
+ // MARK: - ARSCNViewDelegate
+
+extension ViewController: ARSCNViewDelegate {
+   
     @IBAction func altitudeValueChanged(_ sender: Any) {
         guard let slider = sender as? UISlider else { return }
         sceneView.changeAltitude(value: slider.value)
