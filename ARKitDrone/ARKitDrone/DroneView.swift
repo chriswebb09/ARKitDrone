@@ -11,8 +11,7 @@ import SceneKit
 
 class DroneSceneView: ARSCNView {
     
-    var anchors: [ARAnchor] = []
-    var chassisNode: SCNNode!
+    var helicopterNode: SCNNode!
     var blade1Node: SCNNode!
     var blade2Node: SCNNode!
     var rotorR: SCNNode!
@@ -20,10 +19,11 @@ class DroneSceneView: ARSCNView {
     
     func setupDrone() {
         scene = SCNScene(named: "art.scnassets/Drone.scn")!
-        scene.rootNode.childNodes[0].transform = SCNMatrix4Mult(scene.rootNode.childNodes[0].transform, SCNMatrix4MakeRotation(Float(Double.pi) / 2, 1, 0, 0))
-        chassisNode = scene.rootNode.childNode(withName: "helicopter", recursively: false)
-        blade1Node = chassisNode?.childNode(withName: "Rotor_R_2", recursively: true)
-        blade2Node = chassisNode?.childNode(withName: "Rotor_L_2", recursively: true)
+        helicopterNode = scene.rootNode.childNode(withName: "helicopter", recursively: false)
+        helicopterNode.transform = SCNMatrix4Mult(helicopterNode.transform, SCNMatrix4MakeRotation(Float(Double.pi) / 2, 1, 0, 0))
+        helicopterNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, helicopterNode.position.z - 1)
+        blade1Node = helicopterNode?.childNode(withName: "Rotor_R_2", recursively: true)
+        blade2Node = helicopterNode?.childNode(withName: "Rotor_L_2", recursively: true)
         rotorR = blade1Node?.childNode(withName: "Rotor_R", recursively: true)
         rotorL = blade2Node?.childNode(withName: "Rotor_L", recursively: true)
         styleDrone()
@@ -33,7 +33,7 @@ class DroneSceneView: ARSCNView {
     func styleDrone() {
         let bodyMaterial = SCNMaterial()
         bodyMaterial.diffuse.contents = UIColor.black
-        chassisNode.geometry?.materials = [bodyMaterial]
+        helicopterNode.geometry?.materials = [bodyMaterial]
         scene.rootNode.geometry?.materials = [bodyMaterial]
         let bladeMaterial = SCNMaterial()
         bladeMaterial.diffuse.contents = UIColor.gray
@@ -56,7 +56,7 @@ class DroneSceneView: ARSCNView {
     func moveLeft() {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.5
-        scene.rootNode.childNodes[0].position = SCNVector3(scene.rootNode.childNodes[0].position.x - 0.5, scene.rootNode.childNodes[0].position.y, scene.rootNode.childNodes[0].position.z)
+        helicopterNode.position = SCNVector3(helicopterNode.position.x - 0.5, helicopterNode.position.y, helicopterNode.position.z)
         blade2Node.runAction(SCNAction.rotateBy(x: 0.3, y: -0.1, z: 0, duration: 1.5))
         blade1Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0, z: 0, duration: 1.5))
         SCNTransaction.commit()
@@ -68,7 +68,7 @@ class DroneSceneView: ARSCNView {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.5
         print(scene.rootNode.childNodes[0].position)
-        scene.rootNode.childNodes[0].position = SCNVector3(scene.rootNode.childNodes[0].position.x + 0.5, scene.rootNode.childNodes[0].position.y, scene.rootNode.childNodes[0].position.z)
+        helicopterNode.position = SCNVector3(helicopterNode.position.x + 0.5, helicopterNode.position.y, helicopterNode.position.z)
         blade2Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0, z: 0, duration: 1.5))
         blade1Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0.1, z: 0, duration: 1.5))
         SCNTransaction.commit()
@@ -79,7 +79,7 @@ class DroneSceneView: ARSCNView {
     func moveForward() {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.5
-        scene.rootNode.childNodes[0].position = SCNVector3(scene.rootNode.childNodes[0].position.x, scene.rootNode.childNodes[0].position.y, scene.rootNode.childNodes[0].position.z - 0.5)
+        helicopterNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, helicopterNode.position.z - 0.5)
         blade2Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0, z: 0, duration: 1.5))
         blade1Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0, z: 0, duration: 1.5))
         SCNTransaction.commit()
@@ -90,7 +90,7 @@ class DroneSceneView: ARSCNView {
     func reverse() {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.5
-        scene.rootNode.childNodes[0].position = SCNVector3(scene.rootNode.childNodes[0].position.x, scene.rootNode.childNodes[0].position.y, scene.rootNode.childNodes[0].position.z + 0.5)
+        helicopterNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, helicopterNode.position.z + 0.5)
         blade2Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0, z: 0, duration: 1.5))
         blade1Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0, z: 0, duration: 1.5))
         SCNTransaction.commit()
@@ -101,7 +101,7 @@ class DroneSceneView: ARSCNView {
     func changeAltitude(value: Float) {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.5
-        scene.rootNode.childNodes[0].position = SCNVector3(scene.rootNode.childNodes[0].position.x, value, scene.rootNode.childNodes[0].position.z)
+        helicopterNode.position = SCNVector3(helicopterNode.position.x, value, helicopterNode.position.z)
         SCNTransaction.commit()
     }
 }
