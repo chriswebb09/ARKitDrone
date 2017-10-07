@@ -11,13 +11,15 @@ import SceneKit
 import ARKit
 
 class ViewController: UIViewController, ARSCNViewDelegate {
-
+    
     @IBOutlet weak var altitudeSlider: UISlider! {
         didSet {
             altitudeSlider.transform =  CGAffineTransform(rotationAngle: -CGFloat.pi/2)
         }
     }
+    
     @IBOutlet weak var sceneView: DroneSceneView!
+    
     @IBOutlet weak var forwardButton: UIButton! {
         didSet {
             let image = forwardButton.imageView?.image?.withRenderingMode(.alwaysTemplate)
@@ -25,6 +27,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             forwardButton.tintColor = .white
         }
     }
+    
     @IBOutlet weak var reverseButton: UIButton! {
         didSet {
             let image = reverseButton.imageView?.image?.withRenderingMode(.alwaysTemplate)
@@ -32,6 +35,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             reverseButton.tintColor = .white
         }
     }
+    
     @IBOutlet weak var rightButton: UIButton! {
         didSet {
             let image = rightButton.imageView?.image?.withRenderingMode(.alwaysTemplate)
@@ -39,6 +43,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             rightButton.tintColor = .white
         }
     }
+    
     @IBOutlet weak var leftButton: UIButton! {
         didSet {
             let image = leftButton.imageView?.image?.withRenderingMode(.alwaysTemplate)
@@ -49,10 +54,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         // Set the view's delegate
         sceneView.delegate = self
-        
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
         sceneView.setupDrone()
@@ -60,36 +63,20 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
-
         // Run the view's session
         sceneView.session.run(configuration)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
         // Pause the view's session
         sceneView.session.pause()
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Release any cached data, images, etc that aren't in use.
-    }
-
     // MARK: - ARSCNViewDelegate
     
-/*
-    // Override to create and configure nodes for anchors added to the view's session.
-    func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-        let node = SCNNode()
-     
-        return node
-    }
-*/
     @IBAction func altitudeValueChanged(_ sender: Any) {
         guard let slider = sender as? UISlider else { return }
         sceneView.changeAltitude(value: slider.value)
@@ -100,9 +87,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     @IBAction func rightButtonTapped(_ sender: Any) {
-       sceneView.moveRight()
+        sceneView.moveRight()
     }
-   
+    
     @IBAction func reverseButtonTapped(_ sender: Any) {
         sceneView.reverse()
     }
@@ -112,17 +99,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func session(_ session: ARSession, didFailWithError error: Error) {
-        // Present an error message to the user
-        
+        print(error.localizedDescription)
     }
     
     func sessionWasInterrupted(_ session: ARSession) {
-        // Inform the user that the session has been interrupted, for example, by presenting an overlay
-        
+        print("Session was interrupted.")
     }
     
     func sessionInterruptionEnded(_ session: ARSession) {
-        // Reset tracking and/or remove existing anchors if consistent tracking is required
-        
+        print("Session interruption has ended.")
     }
 }

@@ -13,10 +13,8 @@ class DroneSceneView: ARSCNView {
     
     var anchors: [ARAnchor] = []
     var chassisNode: SCNNode!
-    
     var blade1Node: SCNNode!
     var blade2Node: SCNNode!
-    
     var rotorR: SCNNode!
     var rotorL: SCNNode!
     
