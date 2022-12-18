@@ -11,7 +11,7 @@
 		945B16AD294EB34800482E14 /* JoystickSKScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945B16AC294EB34800482E14 /* JoystickSKScene.swift */; };
 		A7AE72BE1F888EF500B015D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */; };
 		A7AE72C01F888EF500B015D3 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72BF1F888EF500B015D3 /* art.scnassets */; };
-		A7AE72C21F888EF500B015D3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AE72C11F888EF500B015D3 /* ViewController.swift */; };
+		A7AE72C21F888EF500B015D3 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AE72C11F888EF500B015D3 /* GameViewController.swift */; };
 		A7AE72C51F888EF500B015D3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72C31F888EF500B015D3 /* Main.storyboard */; };
 		A7AE72C71F888EF500B015D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72C61F888EF500B015D3 /* Assets.xcassets */; };
 		A7AE72CA1F888EF500B015D3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72C81F888EF500B015D3 /* LaunchScreen.storyboard */; };
@@ -24,7 +24,7 @@
 		A7AE72BA1F888EF500B015D3 /* ARKitDrone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARKitDrone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A7AE72BF1F888EF500B015D3 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
-		A7AE72C11F888EF500B015D3 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		A7AE72C11F888EF500B015D3 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		A7AE72C41F888EF500B015D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		A7AE72C61F888EF500B015D3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A7AE72C91F888EF500B015D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -65,7 +65,7 @@
 				A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */,
 				A7AE72D31F88900600B015D3 /* DroneView.swift */,
 				A7AE72BF1F888EF500B015D3 /* art.scnassets */,
-				A7AE72C11F888EF500B015D3 /* ViewController.swift */,
+				A7AE72C11F888EF500B015D3 /* GameViewController.swift */,
 				945B16AA294E9F5B00482E14 /* Joystick.swift */,
 				945B16AC294EB34800482E14 /* JoystickSKScene.swift */,
 				A7AE72C31F888EF500B015D3 /* Main.storyboard */,
@@ -151,7 +151,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				945B16AD294EB34800482E14 /* JoystickSKScene.swift in Sources */,
-				A7AE72C21F888EF500B015D3 /* ViewController.swift in Sources */,
+				A7AE72C21F888EF500B015D3 /* GameViewController.swift in Sources */,
 				A7AE72D41F88900600B015D3 /* DroneView.swift in Sources */,
 				A7AE72BE1F888EF500B015D3 /* AppDelegate.swift in Sources */,
 				945B16AB294E9F5B00482E14 /* Joystick.swift in Sources */,

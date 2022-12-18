@@ -20,7 +20,7 @@ class DroneSceneView: ARSCNView {
     func setupDrone() {
         scene = SCNScene(named: "art.scnassets/Drone.scn")!
         helicopterNode = scene.rootNode.childNode(withName: "helicopter", recursively: false)
-        helicopterNode.transform = SCNMatrix4Mult(helicopterNode.transform, SCNMatrix4MakeRotation(Float(Double.pi) / 2, 1, 0, 0))
+        //helicopterNode.transform = SCNMatrix4Mult(helicopterNode.transform, SCNMatrix4MakeRotation(Float(Double.pi) / 2, 1, 0, 0))
         helicopterNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, helicopterNode.position.z - 1)
         blade1Node = helicopterNode?.childNode(withName: "Rotor_R_2", recursively: true)
         blade2Node = helicopterNode?.childNode(withName: "Rotor_L_2", recursively: true)
@@ -69,22 +69,22 @@ class DroneSceneView: ARSCNView {
         SCNTransaction.animationDuration = 0.5
         print(scene.rootNode.childNodes[0].position)
         helicopterNode.position = SCNVector3(helicopterNode.position.x + value, helicopterNode.position.y, helicopterNode.position.z)
-        blade2Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0, z: 0, duration: 1.5))
-        blade1Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0.1, z: 0, duration: 1.5))
+//        blade2Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0, z: 0, duration: 1.5))
+//        blade1Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0.1, z: 0, duration: 1.5))
         SCNTransaction.commit()
-        blade2Node.runAction(SCNAction.rotateBy(x: -0.3, y: 0, z: 0, duration: 0.25))
-        blade1Node.runAction(SCNAction.rotateBy(x: -0.3, y: -0.1, z: 0, duration: 0.25))
+//        blade2Node.runAction(SCNAction.rotateBy(x: -0.3, y: 0, z: 0, duration: 0.25))
+//        blade1Node.runAction(SCNAction.rotateBy(x: -0.3, y: -0.1, z: 0, duration: 0.25))
     }
     
     func moveForward(value: Float) {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.5
         helicopterNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, helicopterNode.position.z - value)
-        blade2Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0, z: 0, duration: 1.5))
-        blade1Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0, z: 0, duration: 1.5))
+//        blade2Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0, z: 0, duration: 1.5))
+//        blade1Node.runAction(SCNAction.rotateBy(x: 0.3, y: 0, z: 0, duration: 1.5))
         SCNTransaction.commit()
-        blade2Node.runAction(SCNAction.rotateBy(x: -0.3, y: 0, z: 0, duration: 0.25))
-        blade1Node.runAction(SCNAction.rotateBy(x: -0.3, y: 0, z: 0, duration: 0.25))
+//        blade2Node.runAction(SCNAction.rotateBy(x: -0.3, y: 0, z: 0, duration: 0.25))
+//        blade1Node.runAction(SCNAction.rotateBy(x: -0.3, y: 0, z: 0, duration: 0.25))
     }
     
     func reverse(value: Float) {

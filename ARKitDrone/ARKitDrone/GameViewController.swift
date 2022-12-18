@@ -11,7 +11,7 @@ import SceneKit
 import ARKit
 import SpriteKit
 
-class ViewController: UIViewController {
+class GameViewController: UIViewController {
     
     lazy var padView: SKView = {
         let view = SKView(frame: CGRect(x: 20, y: 500, width: 350, height: 250))
@@ -35,6 +35,7 @@ class ViewController: UIViewController {
         let scene = JoystickSKScene()
         scene.point = CGPoint(x: 0, y: 0)
         scene.size = CGSize(width: 500, height: 400)
+        scene.joystickDelegate = self
         padView.presentScene(scene)
         padView.ignoresSiblingOrder = true
     }
@@ -54,7 +55,7 @@ class ViewController: UIViewController {
 
 // MARK: - ARSCNViewDelegate
 
-extension ViewController: ARSCNViewDelegate {
+extension GameViewController: ARSCNViewDelegate {
 
     func session(_ session: ARSession, didFailWithError error: Error) {
         print(error.localizedDescription)
@@ -67,4 +68,18 @@ extension ViewController: ARSCNViewDelegate {
     func sessionInterruptionEnded(_ session: ARSession) {
         print("Session interruption has ended.")
     }
+}
+
+extension GameViewController: JoystickSKSceneDelegate {
+    func update(velocity: Float) {
+        let scaled = velocity * 0.0009
+        sceneView.moveForward(value: scaled)
+    }
+    
+    func update(altitude: Float) {
+        var scaled = altitude * 0.009
+        sceneView.changeAltitude(value: scaled)
+    }
+    
+    
 }
