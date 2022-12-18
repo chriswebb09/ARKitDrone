@@ -9,55 +9,34 @@
 import UIKit
 import SceneKit
 import ARKit
+import SpriteKit
 
 class ViewController: UIViewController {
     
-    @IBOutlet weak var altitudeSlider: UISlider! {
-        didSet {
-            altitudeSlider.transform =  CGAffineTransform(rotationAngle: -CGFloat.pi/2)
-        }
-    }
+    lazy var padView: SKView = {
+        let view = SKView(frame: CGRect(x: 20, y: 500, width: 350, height: 250))
+        view.isMultipleTouchEnabled = true
+        view.backgroundColor = .clear
+        return view
+    }()
     
     @IBOutlet weak var sceneView: DroneSceneView!
-    
-    @IBOutlet weak var forwardButton: UIButton! {
-        didSet {
-            let image = forwardButton.imageView?.image?.withRenderingMode(.alwaysTemplate)
-            forwardButton.setImage(image, for: .normal)
-            forwardButton.tintColor = .white
-        }
-    }
-    
-    @IBOutlet weak var reverseButton: UIButton! {
-        didSet {
-            let image = reverseButton.imageView?.image?.withRenderingMode(.alwaysTemplate)
-            reverseButton.setImage(image, for: .normal)
-            reverseButton.tintColor = .white
-        }
-    }
-    
-    @IBOutlet weak var rightButton: UIButton! {
-        didSet {
-            let image = rightButton.imageView?.image?.withRenderingMode(.alwaysTemplate)
-            rightButton.setImage(image, for: .normal)
-            rightButton.tintColor = .white
-        }
-    }
-    
-    @IBOutlet weak var leftButton: UIButton! {
-        didSet {
-            let image = leftButton.imageView?.image?.withRenderingMode(.alwaysTemplate)
-            leftButton.setImage(image, for: .normal)
-            leftButton.tintColor = .white
-        }
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         sceneView.delegate = self
         sceneView.showsStatistics = true
         sceneView.setupDrone()
-        altitudeSlider.value = sceneView.scene.rootNode.childNodes[0].position.y
+        sceneView.addSubview(padView)
+        setupPadScene()
+    }
+    
+    func setupPadScene() {
+        let scene = JoystickSKScene()
+        scene.point = CGPoint(x: 0, y: 0)
+        scene.size = CGSize(width: 500, height: 400)
+        padView.presentScene(scene)
+        padView.ignoresSiblingOrder = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -70,33 +49,13 @@ class ViewController: UIViewController {
         super.viewWillDisappear(animated)
         sceneView.session.pause()
     }
+    
 }
 
- // MARK: - ARSCNViewDelegate
+// MARK: - ARSCNViewDelegate
 
 extension ViewController: ARSCNViewDelegate {
-   
-    @IBAction func altitudeValueChanged(_ sender: Any) {
-        guard let slider = sender as? UISlider else { return }
-        sceneView.changeAltitude(value: slider.value)
-    }
-    
-    @IBAction func forwardButtonTapped(_ sender: Any) {
-        sceneView.moveForward()
-    }
-    
-    @IBAction func rightButtonTapped(_ sender: Any) {
-        sceneView.moveRight()
-    }
-    
-    @IBAction func reverseButtonTapped(_ sender: Any) {
-        sceneView.reverse()
-    }
-    
-    @IBAction func leftButtonTapped(_ sender: Any) {
-        sceneView.moveLeft()
-    }
-    
+
     func session(_ session: ARSession, didFailWithError error: Error) {
         print(error.localizedDescription)
     }
