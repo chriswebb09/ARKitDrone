@@ -12,6 +12,7 @@ import SpriteKit
 protocol JoystickSKSceneDelegate: AnyObject {
     func update(velocity: Float)
     func update(altitude: Float)
+    func update(sides: Float)
 }
 
 class JoystickSKScene: SKScene {
@@ -51,6 +52,7 @@ class JoystickSKScene: SKScene {
     override func update(_ currentTime: CFTimeInterval) {
         if joystick.velocity.x != 0 || joystick.velocity.y != 0 {
             joystickDelegate?.update(velocity: Float(joystick.velocity.y))
+            joystickDelegate?.update(sides: Float(joystick.velocity.x))
         }
         
         if joystick2.velocity.x != 0 || joystick2.velocity.y != 0 {

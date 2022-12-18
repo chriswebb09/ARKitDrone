@@ -72,14 +72,18 @@ extension GameViewController: ARSCNViewDelegate {
 
 extension GameViewController: JoystickSKSceneDelegate {
     func update(velocity: Float) {
-        let scaled = velocity * 0.0009
+        let scaled = velocity * 0.0006
         sceneView.moveForward(value: scaled)
     }
     
     func update(altitude: Float) {
-        var scaled = altitude * 0.009
+        let scaled = altitude * 0.009
         sceneView.changeAltitude(value: scaled)
     }
     
+    func update(sides: Float) {
+        let scaled = sides * 0.0005
+        sceneView.moveSide(value: scaled)
+    }
     
 }
