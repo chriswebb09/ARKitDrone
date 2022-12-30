@@ -56,7 +56,7 @@ class GameViewController: UIViewController {
 // MARK: - ARSCNViewDelegate
 
 extension GameViewController: ARSCNViewDelegate {
-
+    
     func session(_ session: ARSession, didFailWithError error: Error) {
         print(error.localizedDescription)
     }
@@ -72,18 +72,20 @@ extension GameViewController: ARSCNViewDelegate {
 
 extension GameViewController: JoystickSKSceneDelegate {
     func update(velocity: Float) {
-        let scaled = velocity * 0.0006
+        let scaled = (-1 * velocity) * 0.006
         sceneView.moveForward(value: scaled)
     }
     
     func update(altitude: Float) {
-        let scaled = altitude * 0.009
+        let scaled = (-1 * altitude) * 0.009
         sceneView.changeAltitude(value: scaled)
     }
     
     func update(sides: Float) {
-        let scaled = sides * 0.0005
+        let scaled = (-1 * sides) * 0.00005
         sceneView.moveSide(value: scaled)
     }
-    
 }
+
+
+
