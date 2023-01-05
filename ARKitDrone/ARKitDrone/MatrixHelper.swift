@@ -42,21 +42,6 @@ class MatrixHelper {
         let transformMatrix = simd_mul(rotationMatrix, translationMatrix)
         return simd_mul(matrix, transformMatrix)
     }
-    
-    static func eulerToQuaternion(pitch: Double, roll: Double, yaw: Double) -> SCNQuaternion {
-        let cy: CGFloat = cos(CGFloat(yaw) * 0.5);
-        let sy: CGFloat = sin(CGFloat(yaw) * 0.5);
-        let cr: CGFloat = cos(CGFloat(roll) * 0.5);
-        let sr: CGFloat = sin(CGFloat(roll) * 0.5);
-        let cp: CGFloat = cos(CGFloat(pitch) * 0.5);
-        let sp: CGFloat = sin(CGFloat(pitch) * 0.5);
-        var quaternion: SCNQuaternion = SCNQuaternion()
-        quaternion.w = Float(cy * cr * cp + sy * sr * sp)
-        quaternion.x = Float(cy * sr * cp - sy * cr * sp)
-        quaternion.y = Float(cy * cr * sp + sy * sr * cp)
-        quaternion.z = Float(sy * cr * cp - cy * sr * sp)
-        return quaternion
-    }
 }
 
 extension BinaryInteger {

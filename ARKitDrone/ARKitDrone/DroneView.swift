@@ -12,44 +12,16 @@ import SceneKit
 class DroneSceneView: ARSCNView {
     
     var helicopterNode: SCNNode!
-    var modelNode: SCNNode!
     var parentModelNode: SCNNode!
-    var geom: SCNNode!
-    var helicopterNode2: SCNNode!
-    // var blade1Node: SCNNode!
-    //var blade2Node: SCNNode!
     var rotor: SCNNode!
     var rotor2: SCNNode!
-    var rotorTurn: SCNNode!
-    var pale1: SCNNode!
-    var pale2: SCNNode!
-    //  var rotorL: SCNNode!
     
     func setupDrone() {
         scene = SCNScene(named: "art.scnassets/Apache2.scn")!
         parentModelNode = scene.rootNode.childNode(withName: "grpApache", recursively: true)
-       // geom = parentModelNode?.childNode(withName: "Body", recursively: true)
-       // helicopterNode2 = geom?.childNode(withName: "Helicopter", recursively: true)
-//        modelNode = geom?.childNode(withName: "Heli10", recursively: true)
         helicopterNode = parentModelNode?.childNode(withName: "Body", recursively: true)
         rotor = helicopterNode?.childNode(withName: "FrontRotor", recursively: true)
         rotor2 = helicopterNode?.childNode(withName: "TailRotor", recursively: true)
-//        pale2 = rotor2?.childNode(withName: "Pale2", recursively: true)
-//        rotorTurn = rotor?.childNode(withName: "RotorTurn", recursively: true)
-//        pale1 = rotorTurn?.childNode(withName: "Pale1", recursively: true)
-        
-        
-////        scene = SCNScene(named: "art.scnassets/Helicopter.scn")!
-//        parentModelNode = scene.rootNode.childNode(withName: "Helicopter", recursively: false)
-//        geom = parentModelNode?.childNode(withName: "Geom", recursively: true)
-//        helicopterNode2 = geom?.childNode(withName: "Helicopter", recursively: true)
-//        modelNode = geom?.childNode(withName: "Heli10", recursively: true)
-//        helicopterNode = modelNode?.childNode(withName: "Model", recursively: true)
-//        rotor = helicopterNode?.childNode(withName: "Rotor", recursively: true)
-//        rotor2 = helicopterNode?.childNode(withName: "Rotor2", recursively: true)
-//        pale2 = rotor2?.childNode(withName: "Pale2", recursively: true)
-//        rotorTurn = rotor?.childNode(withName: "RotorTurn", recursively: true)
-//        pale1 = rotorTurn?.childNode(withName: "Pale1", recursively: true)
         parentModelNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, -20)
         spinBlades()
     }
@@ -59,7 +31,7 @@ class DroneSceneView: ARSCNView {
         let moveSequence = SCNAction.sequence([rotate])
         let moveLoop = SCNAction.repeatForever(moveSequence)
         rotor2.runAction(moveLoop)
-        //rotor.
+        
         let rotate2 = SCNAction.rotateBy(x: 0, y: 0, z: 20, duration: 0.5)
         let moveSequence2 = SCNAction.sequence([rotate2])
         let moveLoop2 = SCNAction.repeatForever(moveSequence2)
@@ -71,24 +43,10 @@ class DroneSceneView: ARSCNView {
             print(value)
         }
         SCNTransaction.begin()
-        
         let (x, y, z, w) = angleConversion(x: 0, y:0, z:  value * Float(Double.pi), w: 0)
         helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
         SCNTransaction.commit()
- //       SCNTransaction.begin()
-//        SCNTransaction.animationDuration = 0.5
-//        var x = helicopterNode.position.x
-//        var z = helicopterNode.position.z
-//        let len = (x*x + z*z).squareRoot()
-//        x = x / len
-//        z = z / len
-//        var theta = acos(x * -0.487 + z * 0.873)
-//        theta = 2.0 * Float.pi - theta
-//        let angle = (Float.pi + theta) * -(Float.pi / 8)
-//        let s = sin(angle)
-//        let c = cos(angle)
-//        helicopterNode.rotate(by: SCNQuaternion(x: 0, y: Float(s), z: 0, w: Float(c)), aroundTarget: scene.rootNode.position)
-//        SCNTransaction.commit()
+
     }
     
     func moveForward(value: Float) {
@@ -104,6 +62,8 @@ class DroneSceneView: ARSCNView {
         helicopterNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, helicopterNode.position.z + value)
         SCNTransaction.commit()
     }
+    
+// https://developer.apple.com/forums/thread/651614?answerId=616792022#616792022
     
     func angleConversion(x: Float, y: Float, z: Float, w: Float) -> (Float, Float, Float, Float) {
         let c1 = cos( x / 2 )
