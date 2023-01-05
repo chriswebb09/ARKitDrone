@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		945B16AB294E9F5B00482E14 /* Joystick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945B16AA294E9F5B00482E14 /* Joystick.swift */; };
 		945B16AD294EB34800482E14 /* JoystickSKScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945B16AC294EB34800482E14 /* JoystickSKScene.swift */; };
-		9462BBC02966B0F4002BBEE3 /* FocusSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9462BBBF2966B0F4002BBEE3 /* FocusSquare.swift */; };
-		9462BBC22966B465002BBEE3 /* VirtualObjectARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9462BBC12966B465002BBEE3 /* VirtualObjectARView.swift */; };
 		9485FA17295EBE42008407B2 /* MatrixHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9485FA16295EBE42008407B2 /* MatrixHelper.swift */; };
 		A7AE72BE1F888EF500B015D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */; };
 		A7AE72C01F888EF500B015D3 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72BF1F888EF500B015D3 /* art.scnassets */; };
@@ -24,8 +22,6 @@
 /* Begin PBXFileReference section */
 		945B16AA294E9F5B00482E14 /* Joystick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joystick.swift; sourceTree = "<group>"; };
 		945B16AC294EB34800482E14 /* JoystickSKScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoystickSKScene.swift; sourceTree = "<group>"; };
-		9462BBBF2966B0F4002BBEE3 /* FocusSquare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSquare.swift; sourceTree = "<group>"; };
-		9462BBC12966B465002BBEE3 /* VirtualObjectARView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualObjectARView.swift; sourceTree = "<group>"; };
 		9485FA16295EBE42008407B2 /* MatrixHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixHelper.swift; sourceTree = "<group>"; };
 		A7AE72BA1F888EF500B015D3 /* ARKitDrone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARKitDrone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -73,8 +69,6 @@
 				9485FA16295EBE42008407B2 /* MatrixHelper.swift */,
 				A7AE72BF1F888EF500B015D3 /* art.scnassets */,
 				A7AE72C11F888EF500B015D3 /* GameViewController.swift */,
-				9462BBC12966B465002BBEE3 /* VirtualObjectARView.swift */,
-				9462BBBF2966B0F4002BBEE3 /* FocusSquare.swift */,
 				945B16AA294E9F5B00482E14 /* Joystick.swift */,
 				945B16AC294EB34800482E14 /* JoystickSKScene.swift */,
 				A7AE72C31F888EF500B015D3 /* Main.storyboard */,
@@ -159,9 +153,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9462BBC22966B465002BBEE3 /* VirtualObjectARView.swift in Sources */,
 				9485FA17295EBE42008407B2 /* MatrixHelper.swift in Sources */,
-				9462BBC02966B0F4002BBEE3 /* FocusSquare.swift in Sources */,
 				945B16AD294EB34800482E14 /* JoystickSKScene.swift in Sources */,
 				A7AE72C21F888EF500B015D3 /* GameViewController.swift in Sources */,
 				A7AE72D41F88900600B015D3 /* DroneView.swift in Sources */,

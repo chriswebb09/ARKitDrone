@@ -20,14 +20,15 @@ class GameViewController: UIViewController {
         return view
     }()
     
-    let updateQueue = DispatchQueue(label: "com.example.apple-samplecode.arkitexample.serialSceneKitQueue")
+    private var planeId: Int = 0
     
-    /// Convenience accessor for the session owned by ARSCNView.
+    var objectPlaced: Bool = false
+    
+    let updateQueue = DispatchQueue(label: "com.arkit.drone")
+    
     var session: ARSession {
         return sceneView.session
     }
-    
-    var focusSquare = FocusSquare()
     
     @IBOutlet weak var sceneView: DroneSceneView!
     
@@ -48,10 +49,12 @@ class GameViewController: UIViewController {
     
     func setupTracking() {
         let configuration = ARWorldTrackingConfiguration()
-        configuration.planeDetection = [.horizontal, .vertical]
-        if #available(iOS 12.0, *) {
-            configuration.environmentTexturing = .automatic
+        configuration.planeDetection = .vertical
+        let sceneReconstruction: ARWorldTrackingConfiguration.SceneReconstruction = .meshWithClassification
+        if ARWorldTrackingConfiguration.supportsSceneReconstruction(sceneReconstruction) {
+            configuration.sceneReconstruction = sceneReconstruction
         }
+        sceneView.delegate = self
         session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
@@ -68,34 +71,12 @@ class GameViewController: UIViewController {
         super.viewWillDisappear(animated)
         sceneView.session.pause()
     }
-    
-    // MARK: - Focus Square
-
-    func updateFocusSquare(isObjectVisible: Bool) {
-        // Perform ray casting only when ARKit tracking is in a good state.
-        if let camera = session.currentFrame?.camera, case .normal = camera.trackingState, let query = sceneView.getRaycastQuery(), let result = sceneView.castRay(for: query).first {
-            updateQueue.async {
-                self.sceneView.scene.rootNode.addChildNode(self.focusSquare)
-                self.focusSquare.state = .detecting(raycastResult: result, camera: camera)
-            }
-        } else {
-            updateQueue.async {
-                self.focusSquare.state = .initializing
-                self.sceneView.pointOfView?.addChildNode(self.focusSquare)
-            }
-        }
-    }
 }
 
 // MARK: - ARSCNViewDelegate
 
-extension GameViewController: ARSCNViewDelegate {
+extension GameViewController: ARSCNViewDelegate, ARSessionDelegate {
     
-    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        DispatchQueue.main.async {
-            self.updateFocusSquare(isObjectVisible: true)
-        }
-    }
     
     func session(_ session: ARSession, didFailWithError error: Error) {
         print(error.localizedDescription)
@@ -127,7 +108,4 @@ extension GameViewController: JoystickSKSceneDelegate {
     }
 }
 
-extension GameViewController: ARSessionDelegate {
-    
-}
 

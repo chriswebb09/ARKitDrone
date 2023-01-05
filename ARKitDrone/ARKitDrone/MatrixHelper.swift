@@ -10,6 +10,7 @@
 import Foundation
 import GLKit
 import SceneKit
+import ARKit
 
 class MatrixHelper {
     
@@ -164,7 +165,7 @@ extension float4x4 {
     /**
      Treats matrix as a (right-hand column-major convention) transform matrix
      and factors out the translation component of the transform.
-    */
+     */
     var translation: SIMD3<Float> {
         get {
             let translation = columns.3
@@ -177,7 +178,7 @@ extension float4x4 {
     
     /**
      Factors out the orientation component of the transform.
-    */
+     */
     var orientation: simd_quatf {
         return simd_quaternion(self)
     }
@@ -192,3 +193,4 @@ extension float4x4 {
         columns.2.z = scale
     }
 }
+

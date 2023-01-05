@@ -31,7 +31,6 @@ class DroneSceneView: ARSCNView {
         let moveSequence = SCNAction.sequence([rotate])
         let moveLoop = SCNAction.repeatForever(moveSequence)
         rotor2.runAction(moveLoop)
-        
         let rotate2 = SCNAction.rotateBy(x: 0, y: 0, z: 20, duration: 0.5)
         let moveSequence2 = SCNAction.sequence([rotate2])
         let moveLoop2 = SCNAction.repeatForever(moveSequence2)
@@ -45,6 +44,7 @@ class DroneSceneView: ARSCNView {
         SCNTransaction.begin()
         let (x, y, z, w) = angleConversion(x: 0, y:0, z:  value * Float(Double.pi), w: 0)
         helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
+        
         SCNTransaction.commit()
 
     }
@@ -52,7 +52,8 @@ class DroneSceneView: ARSCNView {
     func moveForward(value: Float) {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.25
-        helicopterNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y + value, helicopterNode.position.z)
+        helicopterNode.localTranslate(by: SCNVector3(x: 0, y: value, z: 0))
+
         SCNTransaction.commit()
     }
     
