@@ -40,7 +40,7 @@ class Joystick : SKNode {
         
         self.isUserInteractionEnabled = true
     }
-
+    
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -57,7 +57,7 @@ class Joystick : SKNode {
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
             let touchPoint: CGPoint = (touch as AnyObject).location(in: self)
-
+            
             if self.isTracking == true && sqrtf(powf((Float(touchPoint.x) - Float(self.thumbNode.position.x)), 2) + powf((Float(touchPoint.y) - Float(self.thumbNode.position.y)), 2)) < Float(self.thumbNode.size.width) {
                 if sqrtf(powf((Float(touchPoint.x) - Float(self.anchorPointInPoints().x)), 2) + powf((Float(touchPoint.y) - Float(self.anchorPointInPoints().y)), 2)) <= Float(self.thumbNode.size.width) {
                     let moveDifference: CGPoint = CGPointMake(touchPoint.x - self.anchorPointInPoints().x, touchPoint.y - self.anchorPointInPoints().y)
@@ -83,7 +83,7 @@ class Joystick : SKNode {
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.resetVelocity()
     }
- 
+    
     func resetVelocity() {
         self.isTracking = false
         self.velocity = CGPointZero

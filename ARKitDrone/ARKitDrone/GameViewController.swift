@@ -19,13 +19,7 @@ class GameViewController: UIViewController {
         view.backgroundColor = .clear
         return view
     }()
-    
-    private var planeId: Int = 0
-    
-    var objectPlaced: Bool = false
-    
-    let updateQueue = DispatchQueue(label: "com.arkit.drone")
-    
+
     var session: ARSession {
         return sceneView.session
     }
@@ -59,7 +53,7 @@ class GameViewController: UIViewController {
     }
     
     func setupPadScene() {
-        let scene = JoystickSKScene()
+        let scene = JoystickScene()
         scene.point = CGPoint(x: 0, y: 0)
         scene.size = CGSize(width: 500, height: 400)
         scene.joystickDelegate = self
@@ -91,7 +85,7 @@ extension GameViewController: ARSCNViewDelegate, ARSessionDelegate {
     }
 }
 
-extension GameViewController: JoystickSKSceneDelegate {
+extension GameViewController: JoystickSceneDelegate {
     func update(velocity: Float) {
         let scaled = -(velocity) * 0.5
         sceneView.moveForward(value: scaled)
@@ -105,6 +99,10 @@ extension GameViewController: JoystickSKSceneDelegate {
     func update(sides: Float) {
         let scaled = (sides) * 0.00025
         sceneView.moveSide(value: scaled)
+    }
+    
+    func update(moveSides: Float) {
+        
     }
 }
 
