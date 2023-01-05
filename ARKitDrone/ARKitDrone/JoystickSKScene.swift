@@ -51,12 +51,19 @@ class JoystickSKScene: SKScene {
     
     override func update(_ currentTime: CFTimeInterval) {
         if joystick.velocity.x != 0 || joystick.velocity.y != 0 {
-            joystickDelegate?.update(velocity: Float(joystick.velocity.y))
-            joystickDelegate?.update(sides: Float(joystick.velocity.x))
+            if abs(joystick.velocity.x) < abs(joystick.velocity.y) {
+                joystickDelegate?.update(velocity: Float(joystick.velocity.y))
+            } else {
+                joystickDelegate?.update(sides: Float(joystick.velocity.x))
+            }
+           // joystickDelegate?.update(velocity: Float(joystick.velocity.y))
+           
         }
         
         if joystick2.velocity.x != 0 || joystick2.velocity.y != 0 {
             joystickDelegate?.update(altitude: Float(joystick2.velocity.y))
+           // joystickDelegate?.update(velocity: <#T##Float#>)
+            //joystickDelegate?.update(ve: Float(joystick2.velocity.y))
         }
     }
     

@@ -10,6 +10,7 @@
 import Foundation
 import GLKit
 import SceneKit
+import ARKit
 
 class MatrixHelper {
     
@@ -42,21 +43,6 @@ class MatrixHelper {
         let transformMatrix = simd_mul(rotationMatrix, translationMatrix)
         return simd_mul(matrix, transformMatrix)
     }
-    
-    static func eulerToQuaternion(pitch: Double, roll: Double, yaw: Double) -> SCNQuaternion {
-        let cy: CGFloat = cos(CGFloat(yaw) * 0.5);
-        let sy: CGFloat = sin(CGFloat(yaw) * 0.5);
-        let cr: CGFloat = cos(CGFloat(roll) * 0.5);
-        let sr: CGFloat = sin(CGFloat(roll) * 0.5);
-        let cp: CGFloat = cos(CGFloat(pitch) * 0.5);
-        let sp: CGFloat = sin(CGFloat(pitch) * 0.5);
-        var quaternion: SCNQuaternion = SCNQuaternion()
-        quaternion.w = Float(cy * cr * cp + sy * sr * sp)
-        quaternion.x = Float(cy * sr * cp - sy * cr * sp)
-        quaternion.y = Float(cy * cr * sp + sy * sr * cp)
-        quaternion.z = Float(sy * cr * cp - cy * sr * sp)
-        return quaternion
-    }
 }
 
 extension BinaryInteger {
@@ -65,6 +51,17 @@ extension BinaryInteger {
         CGFloat(self) * .pi / 180
     }
     
+}
+
+extension Double {
+    
+    var degreesToRadians: Self {
+        self * .pi / 180
+    }
+    
+    var radiansToDegrees: Self {
+        self * 180 / .pi
+    }
 }
 
 extension FloatingPoint {
@@ -115,14 +112,9 @@ extension SCNVector3 {
 }
 
 extension float4x4 {
+    
     public func toMatrix() -> SCNMatrix4 {
         return SCNMatrix4(self)
-    }
-    
-    public var translation: SCNVector3 {
-        get {
-            return SCNVector3Make(columns.3.x, columns.3.y, columns.3.z)
-        }
     }
     
     public var translation4: SCNVector4 {
@@ -165,6 +157,40 @@ extension SCNVector4 {
 extension SCNMatrix4 {
     public func toSimd() -> float4x4 {
         return float4x4(self)
+    }
+}
+
+
+extension float4x4 {
+    /**
+     Treats matrix as a (right-hand column-major convention) transform matrix
+     and factors out the translation component of the transform.
+     */
+    var translation: SIMD3<Float> {
+        get {
+            let translation = columns.3
+            return [translation.x, translation.y, translation.z]
+        }
+        set(newValue) {
+            columns.3 = [newValue.x, newValue.y, newValue.z, columns.3.w]
+        }
+    }
+    
+    /**
+     Factors out the orientation component of the transform.
+     */
+    var orientation: simd_quatf {
+        return simd_quaternion(self)
+    }
+    
+    /**
+     Creates a transform matrix with a uniform scale factor in all directions.
+     */
+    init(uniformScale scale: Float) {
+        self = matrix_identity_float4x4
+        columns.0.x = scale
+        columns.1.y = scale
+        columns.2.z = scale
     }
 }
 

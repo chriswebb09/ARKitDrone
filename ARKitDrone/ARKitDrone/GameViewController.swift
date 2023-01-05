@@ -20,15 +20,42 @@ class GameViewController: UIViewController {
         return view
     }()
     
+    private var planeId: Int = 0
+    
+    var objectPlaced: Bool = false
+    
+    let updateQueue = DispatchQueue(label: "com.arkit.drone")
+    
+    var session: ARSession {
+        return sceneView.session
+    }
+    
     @IBOutlet weak var sceneView: DroneSceneView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         sceneView.delegate = self
-        sceneView.showsStatistics = true
+        sceneView.session.delegate = self
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        UIApplication.shared.isIdleTimerDisabled = true
         sceneView.setupDrone()
         sceneView.addSubview(padView)
         setupPadScene()
+        setupTracking()
+    }
+    
+    func setupTracking() {
+        let configuration = ARWorldTrackingConfiguration()
+        configuration.planeDetection = .vertical
+        let sceneReconstruction: ARWorldTrackingConfiguration.SceneReconstruction = .meshWithClassification
+        if ARWorldTrackingConfiguration.supportsSceneReconstruction(sceneReconstruction) {
+            configuration.sceneReconstruction = sceneReconstruction
+        }
+        sceneView.delegate = self
+        session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
     func setupPadScene() {
@@ -40,22 +67,16 @@ class GameViewController: UIViewController {
         padView.ignoresSiblingOrder = true
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        let configuration = ARWorldTrackingConfiguration()
-        sceneView.session.run(configuration)
-    }
-    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         sceneView.session.pause()
     }
-    
 }
 
 // MARK: - ARSCNViewDelegate
 
-extension GameViewController: ARSCNViewDelegate {
+extension GameViewController: ARSCNViewDelegate, ARSessionDelegate {
+    
     
     func session(_ session: ARSession, didFailWithError error: Error) {
         print(error.localizedDescription)
@@ -72,20 +93,19 @@ extension GameViewController: ARSCNViewDelegate {
 
 extension GameViewController: JoystickSKSceneDelegate {
     func update(velocity: Float) {
-        let scaled = (-1 * velocity) * 0.006
+        let scaled = -(velocity) * 0.5
         sceneView.moveForward(value: scaled)
     }
     
     func update(altitude: Float) {
-        let scaled = (-1 * altitude) * 0.009
+        let scaled = -(altitude) * 0.5
         sceneView.changeAltitude(value: scaled)
     }
     
     func update(sides: Float) {
-        let scaled = (-1 * sides) * 0.00005
+        let scaled = (sides) * 0.00025
         sceneView.moveSide(value: scaled)
     }
 }
-
 
 
