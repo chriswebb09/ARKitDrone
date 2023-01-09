@@ -32,12 +32,9 @@ class Joystick : SKNode {
     init(thumbNode: SKSpriteNode = SKSpriteNode(imageNamed: "joystick.png"), backdropNode: SKSpriteNode = SKSpriteNode(imageNamed: "dpad.png")) {
         self.thumbNode = thumbNode
         self.backdropNode = backdropNode
-        
         super.init()
-        
         self.addChild(self.backdropNode)
         self.addChild(self.thumbNode)
-        
         self.isUserInteractionEnabled = true
     }
     

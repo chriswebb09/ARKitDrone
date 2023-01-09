@@ -48,13 +48,16 @@ class JoystickScene: SKScene {
             if abs(joystick.velocity.x) < abs(joystick.velocity.y) {
                 joystickDelegate?.update(velocity: Float(joystick.velocity.y))
             } else {
-                joystickDelegate?.update(sides: Float(joystick.velocity.x))
+                joystickDelegate?.update(rotate: Float(joystick.velocity.x))
             }
         }
         
         if joystick2.velocity.x != 0 || joystick2.velocity.y != 0 {
-            joystickDelegate?.update(altitude: Float(joystick2.velocity.y))
-            joystickDelegate?.update(moveSides: Float(joystick2.velocity.x))
+            if abs(joystick2.velocity.x) < abs(joystick2.velocity.y) {
+                joystickDelegate?.update(altitude: Float(joystick2.velocity.y))
+            } else {
+                joystickDelegate?.update(sides: Float(joystick2.velocity.x))
+            }
         }
     }
 }
