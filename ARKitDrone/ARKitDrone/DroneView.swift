@@ -17,7 +17,7 @@ class DroneSceneView: ARSCNView {
     var rotor2: SCNNode!
     
     func setupDrone() {
-        scene = SCNScene(named: "art.scnassets/Apache2.scn")!
+        scene = SCNScene(named: "art.scnassets/Apache.scn")!
         parentModelNode = scene.rootNode.childNode(withName: "grpApache", recursively: true)
         helicopterNode = parentModelNode?.childNode(withName: "Body", recursively: true)
         rotor = helicopterNode?.childNode(withName: "FrontRotor", recursively: true)
@@ -37,23 +37,20 @@ class DroneSceneView: ARSCNView {
         rotor.runAction(moveLoop2)
     }
     
-    func moveSide(value: Float) {
+    func rotate(value: Float) {
         if (value > 0.5) || (value < -0.5) {
             print(value)
         }
         SCNTransaction.begin()
         let (x, y, z, w) = angleConversion(x: 0, y:0, z:  value * Float(Double.pi), w: 0)
         helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
-        
         SCNTransaction.commit()
-
     }
     
     func moveForward(value: Float) {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.25
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y: value, z: 0))
-
         SCNTransaction.commit()
     }
     
@@ -61,10 +58,50 @@ class DroneSceneView: ARSCNView {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.25
         helicopterNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, helicopterNode.position.z + value)
+        let (x, y, z, w) = angleConversion(x: 0.001 * Float(Double.pi), y:0, z: 0 , w: 0)
+        helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
+        SCNTransaction.completionBlock = { [self] in
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = 0.25
+            let (x, y, z, w) = angleConversion(x: -0.001 * Float(Double.pi), y:0, z: 0 , w: 0)
+            helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
+            SCNTransaction.commit()
+        }
         SCNTransaction.commit()
     }
     
-// https://developer.apple.com/forums/thread/651614?answerId=616792022#616792022
+    
+    func moveSides(value: Float) {
+        SCNTransaction.begin()
+        SCNTransaction.animationDuration = 0.25
+        helicopterNode.localTranslate(by: SCNVector3(x: value, y: 0, z: 0))
+        if abs(value) != value {
+            let (x, y, z, w) = angleConversion(x: 0, y: -0.002 * Float(Double.pi), z: 0 , w: 0)
+            helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
+        } else {
+            let (x, y, z, w) = angleConversion(x: 0, y: 0.002 * Float(Double.pi), z: 0 , w: 0)
+            helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
+        }
+        SCNTransaction.completionBlock = { [self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: { [self] in
+                SCNTransaction.begin()
+                SCNTransaction.animationDuration = 0.25
+                print(value)
+                if abs(value) != value {
+                    let (x, y, z, w) = angleConversion(x: 0, y: 0.002 * Float(Double.pi), z: 0 , w: 0)
+                    helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
+                } else {
+                    let (x, y, z, w) = angleConversion(x: 0, y: -0.002 * Float(Double.pi), z: 0 , w: 0)
+                    helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
+                }
+                
+                SCNTransaction.commit()
+            })
+        }
+        SCNTransaction.commit()
+    }
+    
+    // https://developer.apple.com/forums/thread/651614?answerId=616792022#616792022
     
     func angleConversion(x: Float, y: Float, z: Float, w: Float) -> (Float, Float, Float, Float) {
         let c1 = cos( x / 2 )

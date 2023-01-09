@@ -11,6 +11,6 @@ import Foundation
 protocol JoystickSceneDelegate: AnyObject {
     func update(velocity: Float)
     func update(altitude: Float)
+    func update(rotate: Float)
     func update(sides: Float)
-    func update(moveSides: Float)
 }

@@ -87,7 +87,7 @@ extension GameViewController: ARSCNViewDelegate, ARSessionDelegate {
 
 extension GameViewController: JoystickSceneDelegate {
     func update(velocity: Float) {
-        let scaled = -(velocity) * 0.5
+        let scaled = (velocity) * 0.5
         sceneView.moveForward(value: scaled)
     }
     
@@ -96,13 +96,14 @@ extension GameViewController: JoystickSceneDelegate {
         sceneView.changeAltitude(value: scaled)
     }
     
-    func update(sides: Float) {
-        let scaled = (sides) * 0.00025
-        sceneView.moveSide(value: scaled)
+    func update(rotate: Float) {
+        let scaled = (rotate) * 0.00025
+        sceneView.rotate(value: scaled)
     }
     
-    func update(moveSides: Float) {
-        
+    func update(sides: Float) {
+        let scaled = -(sides) * 0.5
+        sceneView.moveSides(value: scaled)
     }
 }
 
