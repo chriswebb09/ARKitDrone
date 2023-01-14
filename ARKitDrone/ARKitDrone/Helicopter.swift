@@ -11,6 +11,15 @@ import ARKit
 
 class Helicopter {
     
+    struct LocalConstants {
+        static let parentModelName = "grpApache"
+        static let bodyName = "Body"
+        static let frontRotorName = "FrontRotor"
+        static let tailRotorName = "TailRotor"
+        static let missile1 = "Missile1"
+        static let audioFileName = "audio.m4a"
+    }
+    
     var helicopterNode: SCNNode!
     var parentModelNode: SCNNode!
     var missile: SCNNode!
@@ -19,11 +28,11 @@ class Helicopter {
     var particle: SCNParticleSystem!
     
     func setup(with scene: SCNScene) {
-        parentModelNode = scene.rootNode.childNode(withName: "grpApache", recursively: true)
-        helicopterNode = parentModelNode?.childNode(withName: "Body", recursively: true)
-        rotor = helicopterNode?.childNode(withName: "FrontRotor", recursively: true)
-        rotor2 = helicopterNode?.childNode(withName: "TailRotor", recursively: true)
-        missile = helicopterNode?.childNode(withName: "Missile1", recursively: false)
+        parentModelNode = scene.rootNode.childNode(withName: LocalConstants.parentModelName, recursively: true)
+        helicopterNode = parentModelNode?.childNode(withName: LocalConstants.bodyName, recursively: true)
+        rotor = helicopterNode?.childNode(withName: LocalConstants.frontRotorName, recursively: true)
+        rotor2 = helicopterNode?.childNode(withName: LocalConstants.tailRotorName, recursively: true)
+        missile = helicopterNode?.childNode(withName: LocalConstants.missile1, recursively: false)
         parentModelNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, -20)
         let first =  missile.childNodes.first!
         particle = first.particleSystems![0]
@@ -40,7 +49,7 @@ class Helicopter {
         let moveSequence2 = SCNAction.sequence([rotate2])
         let moveLoop2 = SCNAction.repeatForever(moveSequence2)
         rotor.runAction(moveLoop2)
-        let source = SCNAudioSource(fileNamed: "audio.m4a")
+        let source = SCNAudioSource(fileNamed: LocalConstants.audioFileName)
         source?.volume += 50
         let action = SCNAction.playAudio(source!, waitForCompletion: true)
         let action2 = SCNAction.repeatForever(action)
@@ -52,7 +61,7 @@ class Helicopter {
             print(value)
         }
         SCNTransaction.begin()
-        let (x, y, z, w) = angleConversion(x: 0, y:0, z:  value * Float(Double.pi), w: 0)
+        let (x, y, z, w) = SCNQuaternion.angleConversion(x: 0, y:0, z:  value * Float(Double.pi), w: 0)
         helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
         SCNTransaction.commit()
     }
@@ -76,12 +85,12 @@ class Helicopter {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.25
         helicopterNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, helicopterNode.position.z + value)
-        let (x, y, z, w) = angleConversion(x: 0.001 * Float(Double.pi), y:0, z: 0 , w: 0)
+        let (x, y, z, w) = SCNQuaternion.angleConversion(x: 0.001 * Float(Double.pi), y:0, z: 0 , w: 0)
         helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
         SCNTransaction.completionBlock = { [self] in
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 0.25
-            let (x, y, z, w) = angleConversion(x: -0.001 * Float(Double.pi), y:0, z: 0 , w: 0)
+            let (x, y, z, w) = SCNQuaternion.angleConversion(x: -0.001 * Float(Double.pi), y:0, z: 0 , w: 0)
             helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
             SCNTransaction.commit()
         }
@@ -94,10 +103,10 @@ class Helicopter {
         SCNTransaction.animationDuration = 0.25
         helicopterNode.localTranslate(by: SCNVector3(x: value, y: 0, z: 0))
         if abs(value) != value {
-            let (x, y, z, w) = angleConversion(x: 0, y: -0.002 * Float(Double.pi), z: 0 , w: 0)
+            let (x, y, z, w) = SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float(Double.pi), z: 0 , w: 0)
             helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
         } else {
-            let (x, y, z, w) = angleConversion(x: 0, y: 0.002 * Float(Double.pi), z: 0 , w: 0)
+            let (x, y, z, w) = SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float(Double.pi), z: 0 , w: 0)
             helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
         }
         SCNTransaction.completionBlock = { [self] in
@@ -106,10 +115,10 @@ class Helicopter {
                 SCNTransaction.animationDuration = 0.25
                 print(value)
                 if abs(value) != value {
-                    let (x, y, z, w) = angleConversion(x: 0, y: 0.002 * Float(Double.pi), z: 0 , w: 0)
+                    let (x, y, z, w) = SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float(Double.pi), z: 0 , w: 0)
                     helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
                 } else {
-                    let (x, y, z, w) = angleConversion(x: 0, y: -0.002 * Float(Double.pi), z: 0 , w: 0)
+                    let (x, y, z, w) = SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float(Double.pi), z: 0 , w: 0)
                     helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
                 }
                 
@@ -117,21 +126,5 @@ class Helicopter {
             })
         }
         SCNTransaction.commit()
-    }
-    
-    // https://developer.apple.com/forums/thread/651614?answerId=616792022#616792022
-    
-    func angleConversion(x: Float, y: Float, z: Float, w: Float) -> (Float, Float, Float, Float) {
-        let c1 = cos( x / 2 )
-        let c2 = cos( y / 2 )
-        let c3 = cos( z / 2 )
-        let s1 = sin( x / 2 )
-        let s2 = sin( y / 2 )
-        let s3 = sin( z / 2 )
-        let xF = s1 * c2 * c3 + c1 * s2 * s3
-        let yF = c1 * s2 * c3 - s1 * c2 * s3
-        let zF = c1 * c2 * s3 + s1 * s2 * c3
-        let wF = c1 * c2 * c3 - s1 * s2 * s3
-        return (xF, yF, zF, wF)
     }
 }

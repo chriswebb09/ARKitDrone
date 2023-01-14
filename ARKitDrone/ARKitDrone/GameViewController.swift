@@ -19,11 +19,11 @@ class GameViewController: UIViewController {
         view.backgroundColor = .clear
         return view
     }()
-
+    
     var session: ARSession {
         return sceneView.session
     }
-  
+    
     @IBOutlet weak var sceneView: DroneSceneView!
     
     override func viewDidLoad() {
