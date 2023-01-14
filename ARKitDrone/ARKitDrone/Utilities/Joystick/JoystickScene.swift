@@ -10,20 +10,16 @@
 import SpriteKit
 
 class JoystickScene: SKScene {
-    
     weak var joystickDelegate: JoystickSceneDelegate?
+    
+    var stickNum: Int = 0
     var velocity: Float = 0
+    
     var point = CGPoint(x: 0, y: 0)
     
     lazy var joystick: Joystick = {
         var joystick = Joystick()
-        joystick.position = CGPointMake(70, 250)
-        return joystick
-    }()
-    
-    lazy var joystick2: Joystick = {
-        var joystick = Joystick()
-        joystick.position = CGPointMake(400, 100)
+        joystick.position = CGPointMake(90, 85)
         return joystick
     }()
     
@@ -37,25 +33,16 @@ class JoystickScene: SKScene {
     }
     
     func setupJoystick() {
-        self.addChild(joystick)
+        addChild(joystick)
         joystick.delegate = self
-        self.addChild(joystick2)
     }
     
     override func update(_ currentTime: CFTimeInterval) {
         if joystick.velocity.x != 0 || joystick.velocity.y != 0 {
             if abs(joystick.velocity.x) < abs(joystick.velocity.y) {
-                joystickDelegate?.update(velocity: Float(joystick.velocity.y))
+                joystickDelegate?.update(yValue: Float(joystick.velocity.y), stickNum: stickNum)
             } else {
-                joystickDelegate?.update(rotate: Float(joystick.velocity.x))
-            }
-        }
-        
-        if joystick2.velocity.x != 0 || joystick2.velocity.y != 0 {
-            if abs(joystick2.velocity.x) < abs(joystick2.velocity.y) {
-                joystickDelegate?.update(altitude: Float(joystick2.velocity.y))
-            } else {
-                joystickDelegate?.update(sides: Float(joystick2.velocity.x))
+                joystickDelegate?.update(xValue: Float(joystick.velocity.x), stickNum: stickNum)
             }
         }
     }
@@ -63,6 +50,6 @@ class JoystickScene: SKScene {
 
 extension JoystickScene: JoystickDelegate {
     func tapped() {
-        joystickDelegate?.shoot()
+        joystickDelegate?.tapped()
     }
 }

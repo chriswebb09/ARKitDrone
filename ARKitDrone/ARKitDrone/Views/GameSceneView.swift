@@ -18,10 +18,14 @@ class GameSceneView: ARSCNView {
         self.droneSceneView = DroneSceneView(frame: UIScreen.main.bounds)
         self.droneSceneView.setup(scene: scene)
     }
+}
+
+extension GameSceneView: HelicopterCapable {
     
     func setup(scene: SCNScene) {
         droneSceneView.setup(scene: scene)
     }
+    
     func rotate(value: Float) {
         droneSceneView.rotate(value: value)
     }
