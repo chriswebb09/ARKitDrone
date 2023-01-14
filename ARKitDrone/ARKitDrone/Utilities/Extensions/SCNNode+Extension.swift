@@ -9,6 +9,7 @@
 import SceneKit
 
 extension SCNNode {
+    
     var width: Float {
         (boundingBox.max.x - boundingBox.min.x) * scale.x
     }

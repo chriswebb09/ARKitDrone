@@ -9,7 +9,9 @@
 import SceneKit
 
 extension SCNMatrix4 {
+    
     public func toSimd() -> float4x4 {
         return float4x4(self)
     }
+    
 }
