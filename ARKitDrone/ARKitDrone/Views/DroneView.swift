@@ -39,6 +39,4 @@ class DroneSceneView: ARSCNView {
     }
 }
 
-func nodeWithModelName(_ modelName: String) -> SCNNode {
-    return SCNScene(named: modelName)!.rootNode.clone()
-}
+
