@@ -9,24 +9,14 @@
 import Foundation
 import SpriteKit
 
-protocol JoystickDelegate: AnyObject {
-    func tapped()
-}
-
 class Joystick : SKNode {
     
     let kThumbSpringBackDuration: Double =  0.3
-    
     let backdropNode, thumbNode: SKSpriteNode
-    
     var isTracking: Bool = false
-    
     var velocity: CGPoint = CGPointMake(0, 0)
-    
     var travelLimit: CGPoint = CGPointMake(0, 0)
-    
     var angularVelocity: CGFloat = 0.0
-    
     var size: Float = 0.0
     
     func anchorPointInPoints() -> CGPoint {
@@ -54,15 +44,12 @@ class Joystick : SKNode {
             if self.isTracking == false && CGRectContainsPoint(self.thumbNode.frame, touchPoint) {
                 self.isTracking = true
             }
-
         }
     }
-    
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
             let touchPoint: CGPoint = (touch as AnyObject).location(in: self)
-            
             if self.isTracking == true && sqrtf(powf((Float(touchPoint.x) - Float(self.thumbNode.position.x)), 2) + powf((Float(touchPoint.y) - Float(self.thumbNode.position.y)), 2)) < Float(self.thumbNode.size.width) {
                 if sqrtf(powf((Float(touchPoint.x) - Float(self.anchorPointInPoints().x)), 2) + powf((Float(touchPoint.y) - Float(self.anchorPointInPoints().y)), 2)) <= Float(self.thumbNode.size.width) {
                     let moveDifference: CGPoint = CGPointMake(touchPoint.x - self.anchorPointInPoints().x, touchPoint.y - self.anchorPointInPoints().y)
@@ -82,7 +69,6 @@ class Joystick : SKNode {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-      
         if velocity.x == 0 && velocity.y == 0 {
             delegate?.tapped()
         }

@@ -12,9 +12,7 @@ import SpriteKit
 class JoystickScene: SKScene {
     
     weak var joystickDelegate: JoystickSceneDelegate?
-    
     var velocity: Float = 0
-    
     var point = CGPoint(x: 0, y: 0)
     
     lazy var joystick: Joystick = {
@@ -67,6 +65,4 @@ extension JoystickScene: JoystickDelegate {
     func tapped() {
         joystickDelegate?.shoot()
     }
-    
-    
 }
