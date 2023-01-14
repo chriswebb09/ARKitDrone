@@ -14,6 +14,15 @@
 		94CCC8EB2972D14600F7D17F /* audio.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 94CCC8EA2972D14600F7D17F /* audio.m4a */; };
 		94CCC8EE2972D46400F7D17F /* Missile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC8ED2972D46400F7D17F /* Missile.swift */; };
 		94CCC8F02972D97700F7D17F /* JoystickDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC8EF2972D97700F7D17F /* JoystickDelegate.swift */; };
+		94CCC8F52972E37500F7D17F /* SCNQuaternion+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC8F42972E37500F7D17F /* SCNQuaternion+Extension.swift */; };
+		94CCC8F72972E38F00F7D17F /* SCNVector3+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC8F62972E38F00F7D17F /* SCNVector3+Extension.swift */; };
+		94CCC8F92972E3B200F7D17F /* SCNMatrix4+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC8F82972E3B200F7D17F /* SCNMatrix4+Extension.swift */; };
+		94CCC8FB2972E3E600F7D17F /* SCNNode+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC8FA2972E3E600F7D17F /* SCNNode+Extension.swift */; };
+		94CCC8FD2972E40200F7D17F /* SCNVector4+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC8FC2972E40200F7D17F /* SCNVector4+Extension.swift */; };
+		94CCC8FF2972E43500F7D17F /* FloatingPoint+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC8FE2972E43500F7D17F /* FloatingPoint+Extension.swift */; };
+		94CCC9012972E44A00F7D17F /* Double+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC9002972E44A00F7D17F /* Double+Extension.swift */; };
+		94CCC9032972E47000F7D17F /* float4x4+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC9022972E47000F7D17F /* float4x4+extension.swift */; };
+		94CCC9052972E49600F7D17F /* BinaryInteger+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC9042972E49600F7D17F /* BinaryInteger+Extension.swift */; };
 		94E5448F29672EE200158DA2 /* JoystickSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E5448E29672EE200158DA2 /* JoystickSceneDelegate.swift */; };
 		A7AE72BE1F888EF500B015D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */; };
 		A7AE72C01F888EF500B015D3 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72BF1F888EF500B015D3 /* art.scnassets */; };
@@ -32,6 +41,15 @@
 		94CCC8EA2972D14600F7D17F /* audio.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = audio.m4a; sourceTree = "<group>"; };
 		94CCC8ED2972D46400F7D17F /* Missile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Missile.swift; sourceTree = "<group>"; };
 		94CCC8EF2972D97700F7D17F /* JoystickDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoystickDelegate.swift; sourceTree = "<group>"; };
+		94CCC8F42972E37500F7D17F /* SCNQuaternion+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNQuaternion+Extension.swift"; sourceTree = "<group>"; };
+		94CCC8F62972E38F00F7D17F /* SCNVector3+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNVector3+Extension.swift"; sourceTree = "<group>"; };
+		94CCC8F82972E3B200F7D17F /* SCNMatrix4+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNMatrix4+Extension.swift"; sourceTree = "<group>"; };
+		94CCC8FA2972E3E600F7D17F /* SCNNode+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNNode+Extension.swift"; sourceTree = "<group>"; };
+		94CCC8FC2972E40200F7D17F /* SCNVector4+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNVector4+Extension.swift"; sourceTree = "<group>"; };
+		94CCC8FE2972E43500F7D17F /* FloatingPoint+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FloatingPoint+Extension.swift"; sourceTree = "<group>"; };
+		94CCC9002972E44A00F7D17F /* Double+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Extension.swift"; sourceTree = "<group>"; };
+		94CCC9022972E47000F7D17F /* float4x4+extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "float4x4+extension.swift"; sourceTree = "<group>"; };
+		94CCC9042972E49600F7D17F /* BinaryInteger+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BinaryInteger+Extension.swift"; sourceTree = "<group>"; };
 		94E5448E29672EE200158DA2 /* JoystickSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoystickSceneDelegate.swift; sourceTree = "<group>"; };
 		A7AE72BA1F888EF500B015D3 /* ARKitDrone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARKitDrone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -55,6 +73,68 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		94CCC8F12972E34500F7D17F /* Joystick */ = {
+			isa = PBXGroup;
+			children = (
+				945B16AA294E9F5B00482E14 /* Joystick.swift */,
+				94CCC8EF2972D97700F7D17F /* JoystickDelegate.swift */,
+				945B16AC294EB34800482E14 /* JoystickScene.swift */,
+				94E5448E29672EE200158DA2 /* JoystickSceneDelegate.swift */,
+			);
+			path = Joystick;
+			sourceTree = "<group>";
+		};
+		94CCC8F22972E35400F7D17F /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				94CCC8F12972E34500F7D17F /* Joystick */,
+				9485FA16295EBE42008407B2 /* MatrixHelper.swift */,
+				94CCC9082972E4D800F7D17F /* Extensions */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		94CCC8F32972E36100F7D17F /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				941706D82972A5F400CB0308 /* Helicopter.swift */,
+				94CCC8ED2972D46400F7D17F /* Missile.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		94CCC9062972E4B700F7D17F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A7AE72D31F88900600B015D3 /* DroneView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		94CCC9072972E4BF00F7D17F /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				A7AE72C11F888EF500B015D3 /* GameViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		94CCC9082972E4D800F7D17F /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				94CCC9042972E49600F7D17F /* BinaryInteger+Extension.swift */,
+				94CCC9022972E47000F7D17F /* float4x4+extension.swift */,
+				94CCC9002972E44A00F7D17F /* Double+Extension.swift */,
+				94CCC8FE2972E43500F7D17F /* FloatingPoint+Extension.swift */,
+				94CCC8FC2972E40200F7D17F /* SCNVector4+Extension.swift */,
+				94CCC8FA2972E3E600F7D17F /* SCNNode+Extension.swift */,
+				94CCC8F82972E3B200F7D17F /* SCNMatrix4+Extension.swift */,
+				94CCC8F62972E38F00F7D17F /* SCNVector3+Extension.swift */,
+				94CCC8F42972E37500F7D17F /* SCNQuaternion+Extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		A7AE72B11F888EF500B015D3 = {
 			isa = PBXGroup;
 			children = (
@@ -76,16 +156,11 @@
 			children = (
 				94CCC8EA2972D14600F7D17F /* audio.m4a */,
 				A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */,
-				A7AE72D31F88900600B015D3 /* DroneView.swift */,
-				941706D82972A5F400CB0308 /* Helicopter.swift */,
-				94CCC8ED2972D46400F7D17F /* Missile.swift */,
-				9485FA16295EBE42008407B2 /* MatrixHelper.swift */,
+				94CCC9062972E4B700F7D17F /* Views */,
+				94CCC8F32972E36100F7D17F /* Models */,
+				94CCC8F22972E35400F7D17F /* Utilities */,
 				A7AE72BF1F888EF500B015D3 /* art.scnassets */,
-				A7AE72C11F888EF500B015D3 /* GameViewController.swift */,
-				945B16AA294E9F5B00482E14 /* Joystick.swift */,
-				94CCC8EF2972D97700F7D17F /* JoystickDelegate.swift */,
-				945B16AC294EB34800482E14 /* JoystickScene.swift */,
-				94E5448E29672EE200158DA2 /* JoystickSceneDelegate.swift */,
+				94CCC9072972E4BF00F7D17F /* Controllers */,
 				A7AE72C31F888EF500B015D3 /* Main.storyboard */,
 				A7AE72C61F888EF500B015D3 /* Assets.xcassets */,
 				A7AE72C81F888EF500B015D3 /* LaunchScreen.storyboard */,
@@ -171,13 +246,22 @@
 			files = (
 				9485FA17295EBE42008407B2 /* MatrixHelper.swift in Sources */,
 				945B16AD294EB34800482E14 /* JoystickScene.swift in Sources */,
+				94CCC8F52972E37500F7D17F /* SCNQuaternion+Extension.swift in Sources */,
+				94CCC8F72972E38F00F7D17F /* SCNVector3+Extension.swift in Sources */,
+				94CCC9012972E44A00F7D17F /* Double+Extension.swift in Sources */,
 				941706D92972A5F400CB0308 /* Helicopter.swift in Sources */,
+				94CCC8F92972E3B200F7D17F /* SCNMatrix4+Extension.swift in Sources */,
 				A7AE72C21F888EF500B015D3 /* GameViewController.swift in Sources */,
+				94CCC9052972E49600F7D17F /* BinaryInteger+Extension.swift in Sources */,
 				94CCC8F02972D97700F7D17F /* JoystickDelegate.swift in Sources */,
+				94CCC9032972E47000F7D17F /* float4x4+extension.swift in Sources */,
+				94CCC8FB2972E3E600F7D17F /* SCNNode+Extension.swift in Sources */,
 				94CCC8EE2972D46400F7D17F /* Missile.swift in Sources */,
+				94CCC8FD2972E40200F7D17F /* SCNVector4+Extension.swift in Sources */,
 				A7AE72D41F88900600B015D3 /* DroneView.swift in Sources */,
 				A7AE72BE1F888EF500B015D3 /* AppDelegate.swift in Sources */,
 				94E5448F29672EE200158DA2 /* JoystickSceneDelegate.swift in Sources */,
+				94CCC8FF2972E43500F7D17F /* FloatingPoint+Extension.swift in Sources */,
 				945B16AB294E9F5B00482E14 /* Joystick.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
