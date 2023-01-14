@@ -13,8 +13,8 @@ class DroneSceneView: ARSCNView {
     
     var helicopter = Helicopter()
     
-    func setup() {
-        scene = SCNScene(named: "art.scnassets/Apache.scn")!
+    func setup(scene: SCNScene) {
+        //self.scene = SCNScene(named: "art.scnassets/Apache.scn")!
         helicopter.setup(with: scene)
     }
     func rotate(value: Float) {
@@ -32,7 +32,6 @@ class DroneSceneView: ARSCNView {
     func changeAltitude(value: Float) {
         helicopter.changeAltitude(value: value)
     }
-    
     
     func moveSides(value: Float) {
         helicopter.moveSides(value: value)

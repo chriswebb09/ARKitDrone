@@ -28,7 +28,8 @@ class Helicopter {
     var particle: SCNParticleSystem!
     
     func setup(with scene: SCNScene) {
-        parentModelNode = scene.rootNode.childNode(withName: LocalConstants.parentModelName, recursively: true)
+        let tempScene = SCNScene.nodeWithModelName("art.scnassets/Apache.scn")
+        parentModelNode = tempScene.childNode(withName: LocalConstants.parentModelName, recursively: true)
         helicopterNode = parentModelNode?.childNode(withName: LocalConstants.bodyName, recursively: true)
         rotor = helicopterNode?.childNode(withName: LocalConstants.frontRotorName, recursively: true)
         rotor2 = helicopterNode?.childNode(withName: LocalConstants.tailRotorName, recursively: true)
@@ -38,6 +39,7 @@ class Helicopter {
         particle = first.particleSystems![0]
         particle.birthRate = 0
         spinBlades()
+        scene.rootNode.addChildNode(tempScene)
     }
     
     func spinBlades() {

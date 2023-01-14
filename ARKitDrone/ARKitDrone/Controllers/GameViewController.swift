@@ -24,7 +24,7 @@ class GameViewController: UIViewController {
         return sceneView.session
     }
     
-    @IBOutlet weak var sceneView: DroneSceneView!
+    @IBOutlet weak var sceneView: GameSceneView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,7 +39,6 @@ class GameViewController: UIViewController {
         sceneView.addSubview(padView)
         setupPadScene()
         setupTracking()
-        
     }
     
     func setupTracking() {
@@ -86,6 +85,7 @@ extension GameViewController: ARSCNViewDelegate, ARSessionDelegate {
 }
 
 extension GameViewController: JoystickSceneDelegate {
+    
     func shoot() {
         sceneView.shootMissile()
     }

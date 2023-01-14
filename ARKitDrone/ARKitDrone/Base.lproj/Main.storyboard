@@ -11,7 +11,7 @@
         <scene sceneID="kPk-e3-87z">
             <objects>
                 <viewController id="N4K-bi-vWI" customClass="GameViewController" customModule="ARKitDrone" customModuleProvider="target" sceneMemberID="viewController">
-                    <arscnView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="P2L-Jv-yis" customClass="DroneSceneView" customModule="ARKitDrone" customModuleProvider="target">
+                    <arscnView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="P2L-Jv-yis" customClass="GameSceneView" customModule="ARKitDrone" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     </arscnView>
