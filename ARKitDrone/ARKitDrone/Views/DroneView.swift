@@ -6,6 +6,7 @@
 //  Copyright © 2017 Christopher Webb-Orenstein. All rights reserved.
 //
 
+import Foundation
 import ARKit
 import SceneKit
 
@@ -14,9 +15,9 @@ class DroneSceneView: ARSCNView {
     var helicopter = Helicopter()
     
     func setup(scene: SCNScene) {
-        //self.scene = SCNScene(named: "art.scnassets/Apache.scn")!
         helicopter.setup(with: scene)
     }
+    
     func rotate(value: Float) {
         helicopter.rotate(value: value)
     }

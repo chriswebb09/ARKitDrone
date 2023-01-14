@@ -18,6 +18,7 @@ class Helicopter {
         static let tailRotorName = "TailRotor"
         static let missile1 = "Missile1"
         static let audioFileName = "audio.m4a"
+        static let activeEmitterRate: CGFloat = 1000
     }
     
     var helicopterNode: SCNNode!
@@ -59,12 +60,9 @@ class Helicopter {
     }
     
     func rotate(value: Float) {
-        if (value > 0.5) || (value < -0.5) {
-            print(value)
-        }
         SCNTransaction.begin()
-        let (x, y, z, w) = SCNQuaternion.angleConversion(x: 0, y:0, z:  value * Float(Double.pi), w: 0)
-        helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
+        let locationRotation = SCNQuaternion.getQuaternion(from: SCNQuaternion.angleConversion(x: 0, y:0, z:  value * Float(Double.pi), w: 0))
+        helicopterNode.localRotate(by: locationRotation)
         SCNTransaction.commit()
     }
     
@@ -76,7 +74,7 @@ class Helicopter {
     }
     
     func shootMissile() {
-        particle.birthRate = 1000
+        particle.birthRate = LocalConstants.activeEmitterRate
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 1
         missile.localTranslate(by: SCNVector3(x: 0, y: 4000, z: 0))
@@ -87,13 +85,12 @@ class Helicopter {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.25
         helicopterNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, helicopterNode.position.z + value)
-        let (x, y, z, w) = SCNQuaternion.angleConversion(x: 0.001 * Float(Double.pi), y:0, z: 0 , w: 0)
-        helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
+        helicopterNode.localRotate(by: SCNQuaternion.getQuaternion(from: SCNQuaternion.angleConversion(x: 0.001 * Float(Double.pi), y:0, z: 0 , w: 0)))
         SCNTransaction.completionBlock = { [self] in
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 0.25
-            let (x, y, z, w) = SCNQuaternion.angleConversion(x: -0.001 * Float(Double.pi), y:0, z: 0 , w: 0)
-            helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
+            let localRotation = SCNQuaternion.getQuaternion(from: SCNQuaternion.angleConversion(x: -0.001 * Float(Double.pi), y:0, z: 0 , w: 0))
+            helicopterNode.localRotate(by: localRotation)
             SCNTransaction.commit()
         }
         SCNTransaction.commit()
@@ -105,25 +102,23 @@ class Helicopter {
         SCNTransaction.animationDuration = 0.25
         helicopterNode.localTranslate(by: SCNVector3(x: value, y: 0, z: 0))
         if abs(value) != value {
-            let (x, y, z, w) = SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float(Double.pi), z: 0 , w: 0)
-            helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
+            let localRotation = SCNQuaternion.getQuaternion(from: SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float(Double.pi), z: 0 , w: 0))
+            helicopterNode.localRotate(by: localRotation)
         } else {
-            let (x, y, z, w) = SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float(Double.pi), z: 0 , w: 0)
-            helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
+            let localRotation = SCNQuaternion.getQuaternion(from: SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float(Double.pi), z: 0 , w: 0))
+            helicopterNode.localRotate(by: localRotation)
         }
         SCNTransaction.completionBlock = { [self] in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: { [self] in
                 SCNTransaction.begin()
                 SCNTransaction.animationDuration = 0.25
-                print(value)
                 if abs(value) != value {
-                    let (x, y, z, w) = SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float(Double.pi), z: 0 , w: 0)
-                    helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
+                    let localRotation = SCNQuaternion.getQuaternion(from:SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float(Double.pi), z: 0 , w: 0))
+                    helicopterNode.localRotate(by: localRotation)
                 } else {
-                    let (x, y, z, w) = SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float(Double.pi), z: 0 , w: 0)
-                    helicopterNode.localRotate(by: SCNQuaternion(x, y, z, w))
+                    let localRotation = SCNQuaternion.getQuaternion(from:SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float(Double.pi), z: 0 , w: 0))
+                    helicopterNode.localRotate(by: localRotation)
                 }
-                
                 SCNTransaction.commit()
             })
         }
