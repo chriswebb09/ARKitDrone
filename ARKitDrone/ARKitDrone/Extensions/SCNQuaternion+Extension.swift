@@ -24,4 +24,8 @@ extension SCNQuaternion {
         let wF = c1 * c2 * c3 - s1 * s2 * s3
         return (xF, yF, zF, wF)
     }
+    
+    static func getQuaternion(from angleConversion: (Float, Float, Float, Float)) -> SCNQuaternion {
+        return SCNQuaternion(angleConversion.0, angleConversion.1, angleConversion.2, angleConversion.3)
+    }
 }

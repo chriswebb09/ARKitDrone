@@ -91,9 +91,8 @@
 		94CCC8F22972E35400F7D17F /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				94CCC8F12972E34500F7D17F /* Joystick */,
 				9485FA16295EBE42008407B2 /* MatrixHelper.swift */,
-				94CCC9082972E4D800F7D17F /* Extensions */,
+				94CCC8F12972E34500F7D17F /* Joystick */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -162,11 +161,12 @@
 			children = (
 				94CCC8EA2972D14600F7D17F /* audio.m4a */,
 				A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */,
+				94CCC9072972E4BF00F7D17F /* Controllers */,
 				94CCC9062972E4B700F7D17F /* Views */,
 				94CCC8F32972E36100F7D17F /* Models */,
+				94CCC9082972E4D800F7D17F /* Extensions */,
 				94CCC8F22972E35400F7D17F /* Utilities */,
 				A7AE72BF1F888EF500B015D3 /* art.scnassets */,
-				94CCC9072972E4BF00F7D17F /* Controllers */,
 				A7AE72C31F888EF500B015D3 /* Main.storyboard */,
 				A7AE72C61F888EF500B015D3 /* Assets.xcassets */,
 				A7AE72C81F888EF500B015D3 /* LaunchScreen.storyboard */,
