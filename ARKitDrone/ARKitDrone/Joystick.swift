@@ -53,8 +53,10 @@ class Joystick : SKNode {
             let thumbWidth = Float(self.thumbNode.size.width)
             let anchorPointsY = self.anchorPointInPoints().y
             let anchorPointsX = self.anchorPointInPoints().x
+            let thumbTouchX = Float(touchPoint.x) - Float(self.thumbNode.position.x)
+            let thumbTouchY = Float(touchPoint.y) - Float(self.thumbNode.position.y)
             if self.isTracking == true &&
-                sqrtf(powf((Float(touchPoint.x) - Float(self.thumbNode.position.x)), 2) + powf((Float(touchPoint.y) - Float(self.thumbNode.position.y)), 2)) < thumbWidth {
+                sqrtf(powf((thumbTouchX), 2) + powf((thumbTouchY), 2)) < thumbWidth {
                 if sqrtf(powf((Float(touchPoint.x) - Float(anchorPointsX)), 2) + powf((Float(touchPoint.y) - Float(anchorPointsY)), 2)) <= thumbWidth {
                     let moveDifferenceX = touchPoint.x - anchorPointsX
                     let moveDifferenceY = touchPoint.y - anchorPointsY
