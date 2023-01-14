@@ -7,9 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		941706D92972A5F400CB0308 /* Helicopter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941706D82972A5F400CB0308 /* Helicopter.swift */; };
 		945B16AB294E9F5B00482E14 /* Joystick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945B16AA294E9F5B00482E14 /* Joystick.swift */; };
 		945B16AD294EB34800482E14 /* JoystickScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945B16AC294EB34800482E14 /* JoystickScene.swift */; };
 		9485FA17295EBE42008407B2 /* MatrixHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9485FA16295EBE42008407B2 /* MatrixHelper.swift */; };
+		94CCC8EB2972D14600F7D17F /* audio.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 94CCC8EA2972D14600F7D17F /* audio.m4a */; };
+		94CCC8EE2972D46400F7D17F /* Missile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC8ED2972D46400F7D17F /* Missile.swift */; };
 		94E5448F29672EE200158DA2 /* JoystickSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E5448E29672EE200158DA2 /* JoystickSceneDelegate.swift */; };
 		A7AE72BE1F888EF500B015D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */; };
 		A7AE72C01F888EF500B015D3 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72BF1F888EF500B015D3 /* art.scnassets */; };
@@ -21,9 +24,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		941706D82972A5F400CB0308 /* Helicopter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helicopter.swift; sourceTree = "<group>"; };
 		945B16AA294E9F5B00482E14 /* Joystick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joystick.swift; sourceTree = "<group>"; };
 		945B16AC294EB34800482E14 /* JoystickScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoystickScene.swift; sourceTree = "<group>"; };
 		9485FA16295EBE42008407B2 /* MatrixHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixHelper.swift; sourceTree = "<group>"; };
+		94CCC8EA2972D14600F7D17F /* audio.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = audio.m4a; sourceTree = "<group>"; };
+		94CCC8ED2972D46400F7D17F /* Missile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Missile.swift; sourceTree = "<group>"; };
 		94E5448E29672EE200158DA2 /* JoystickSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoystickSceneDelegate.swift; sourceTree = "<group>"; };
 		A7AE72BA1F888EF500B015D3 /* ARKitDrone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARKitDrone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -66,8 +72,11 @@
 		A7AE72BC1F888EF500B015D3 /* ARKitDrone */ = {
 			isa = PBXGroup;
 			children = (
+				94CCC8EA2972D14600F7D17F /* audio.m4a */,
 				A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */,
 				A7AE72D31F88900600B015D3 /* DroneView.swift */,
+				941706D82972A5F400CB0308 /* Helicopter.swift */,
+				94CCC8ED2972D46400F7D17F /* Missile.swift */,
 				9485FA16295EBE42008407B2 /* MatrixHelper.swift */,
 				A7AE72BF1F888EF500B015D3 /* art.scnassets */,
 				A7AE72C11F888EF500B015D3 /* GameViewController.swift */,
@@ -144,6 +153,7 @@
 			files = (
 				A7AE72C01F888EF500B015D3 /* art.scnassets in Resources */,
 				A7AE72CA1F888EF500B015D3 /* LaunchScreen.storyboard in Resources */,
+				94CCC8EB2972D14600F7D17F /* audio.m4a in Resources */,
 				A7AE72C71F888EF500B015D3 /* Assets.xcassets in Resources */,
 				A7AE72C51F888EF500B015D3 /* Main.storyboard in Resources */,
 			);
@@ -158,7 +168,9 @@
 			files = (
 				9485FA17295EBE42008407B2 /* MatrixHelper.swift in Sources */,
 				945B16AD294EB34800482E14 /* JoystickScene.swift in Sources */,
+				941706D92972A5F400CB0308 /* Helicopter.swift in Sources */,
 				A7AE72C21F888EF500B015D3 /* GameViewController.swift in Sources */,
+				94CCC8EE2972D46400F7D17F /* Missile.swift in Sources */,
 				A7AE72D41F88900600B015D3 /* DroneView.swift in Sources */,
 				A7AE72BE1F888EF500B015D3 /* AppDelegate.swift in Sources */,
 				94E5448F29672EE200158DA2 /* JoystickSceneDelegate.swift in Sources */,

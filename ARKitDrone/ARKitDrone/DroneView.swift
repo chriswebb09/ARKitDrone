@@ -13,16 +13,22 @@ class DroneSceneView: ARSCNView {
     
     var helicopterNode: SCNNode!
     var parentModelNode: SCNNode!
+    var missile: SCNNode!
     var rotor: SCNNode!
     var rotor2: SCNNode!
-    
+    var particle: SCNParticleSystem!
+
     func setupDrone() {
         scene = SCNScene(named: "art.scnassets/Apache.scn")!
         parentModelNode = scene.rootNode.childNode(withName: "grpApache", recursively: true)
         helicopterNode = parentModelNode?.childNode(withName: "Body", recursively: true)
         rotor = helicopterNode?.childNode(withName: "FrontRotor", recursively: true)
         rotor2 = helicopterNode?.childNode(withName: "TailRotor", recursively: true)
+        missile = helicopterNode?.childNode(withName: "Missile1", recursively: false)
         parentModelNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, -20)
+        let first =  missile.childNodes.first!
+        particle = first.particleSystems![0]
+        particle.birthRate = 0
         spinBlades()
     }
     
@@ -35,6 +41,12 @@ class DroneSceneView: ARSCNView {
         let moveSequence2 = SCNAction.sequence([rotate2])
         let moveLoop2 = SCNAction.repeatForever(moveSequence2)
         rotor.runAction(moveLoop2)
+        
+        let source = SCNAudioSource(fileNamed: "audio.m4a")
+        source?.volume += 50
+        let action = SCNAction.playAudio(source!, waitForCompletion: true)
+        let action2 = SCNAction.repeatForever(action)
+        helicopterNode.runAction(action2)
     }
     
     func rotate(value: Float) {
@@ -51,6 +63,14 @@ class DroneSceneView: ARSCNView {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.25
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y: value, z: 0))
+        SCNTransaction.commit()
+    }
+    
+    func shootMissile() {
+        particle.birthRate = 1000
+        SCNTransaction.begin()
+        SCNTransaction.animationDuration = 1
+        missile.localTranslate(by: SCNVector3(x: 0, y: 4000, z: 0))
         SCNTransaction.commit()
     }
     
@@ -116,4 +136,10 @@ class DroneSceneView: ARSCNView {
         let wF = c1 * c2 * c3 - s1 * s2 * s3
         return (xF, yF, zF, wF)
     }
+    
+    
+}
+
+func nodeWithModelName(_ modelName: String) -> SCNNode {
+    return SCNScene(named: modelName)!.rootNode.clone()
 }

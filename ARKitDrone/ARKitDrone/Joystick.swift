@@ -9,6 +9,10 @@
 import Foundation
 import SpriteKit
 
+protocol JoystickDelegate: AnyObject {
+    func tapped()
+}
+
 class Joystick : SKNode {
     
     let kThumbSpringBackDuration: Double =  0.3
@@ -29,6 +33,8 @@ class Joystick : SKNode {
         return CGPointMake(0, 0)
     }
     
+    weak var delegate: JoystickDelegate?
+    
     init(thumbNode: SKSpriteNode = SKSpriteNode(imageNamed: "joystick.png"), backdropNode: SKSpriteNode = SKSpriteNode(imageNamed: "dpad.png")) {
         self.thumbNode = thumbNode
         self.backdropNode = backdropNode
@@ -48,8 +54,10 @@ class Joystick : SKNode {
             if self.isTracking == false && CGRectContainsPoint(self.thumbNode.frame, touchPoint) {
                 self.isTracking = true
             }
+
         }
     }
+    
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
@@ -74,6 +82,10 @@ class Joystick : SKNode {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+      
+        if velocity.x == 0 && velocity.y == 0 {
+            delegate?.tapped()
+        }
         self.resetVelocity()
     }
     

@@ -40,6 +40,7 @@ class JoystickScene: SKScene {
     
     func setupJoystick() {
         self.addChild(joystick)
+        joystick.delegate = self
         self.addChild(joystick2)
     }
     
@@ -60,4 +61,12 @@ class JoystickScene: SKScene {
             }
         }
     }
+}
+
+extension JoystickScene: JoystickDelegate {
+    func tapped() {
+        joystickDelegate?.shoot()
+    }
+    
+    
 }
