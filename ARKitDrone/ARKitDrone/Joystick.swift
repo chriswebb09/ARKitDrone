@@ -11,7 +11,7 @@ import SpriteKit
 
 class Joystick : SKNode {
     
-    let kThumbSpringBackDuration: Double =  0.3
+    let kThumbSpringBack: Double =  0.3
     let backdropNode, thumbNode: SKSpriteNode
     var isTracking: Bool = false
     var velocity: CGPoint = CGPointMake(0, 0)
@@ -19,7 +19,7 @@ class Joystick : SKNode {
     var angularVelocity: CGFloat = 0.0
     var size: Float = 0.0
     
-    func anchorPointInPoints() -> CGPoint {
+    func anchorPoint() -> CGPoint {
         return CGPointMake(0, 0)
     }
     
@@ -41,7 +41,8 @@ class Joystick : SKNode {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
             let touchPoint: CGPoint = (touch as AnyObject).location(in: self)
-            if self.isTracking == false && CGRectContainsPoint(self.thumbNode.frame, touchPoint) {
+            let containsPoint = CGRectContainsPoint(self.thumbNode.frame, touchPoint)
+            if self.isTracking == false && containsPoint {
                 self.isTracking = true
             }
         }
@@ -50,37 +51,37 @@ class Joystick : SKNode {
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
             let touchPoint: CGPoint = (touch as AnyObject).location(in: self)
-            let thumbWidth = Float(self.thumbNode.size.width)
-            let anchorPointsY = self.anchorPointInPoints().y
-            let anchorPointsX = self.anchorPointInPoints().x
-            let thumbTouchX = Float(touchPoint.x) - Float(self.thumbNode.position.x)
-            let thumbTouchY = Float(touchPoint.y) - Float(self.thumbNode.position.y)
-            if self.isTracking == true &&
+            let thumbWidth = Float(thumbNode.size.width)
+            let anchorPointsY = anchorPoint().y
+            let anchorPointsX = anchorPoint().x
+            let thumbTouchX = Float(touchPoint.x) - Float(thumbNode.position.x)
+            let thumbTouchY = Float(touchPoint.y) - Float(thumbNode.position.y)
+            if isTracking == true &&
                 sqrtf(powf((thumbTouchX), 2) + powf((thumbTouchY), 2)) < thumbWidth {
-                var factorA = powf((Float(touchPoint.x) - Float(anchorPointsX)), 2)
-                var factorB = powf((Float(touchPoint.y) - Float(anchorPointsY)), 2)
+                let factorA = powf((Float(touchPoint.x) - Float(anchorPointsX)), 2)
+                let factorB = powf((Float(touchPoint.y) - Float(anchorPointsY)), 2)
                 if sqrtf(factorA + factorB) <= thumbWidth {
                     let moveDifferenceX = touchPoint.x - anchorPointsX
                     let moveDifferenceY = touchPoint.y - anchorPointsY
                     let moveDifference: CGPoint = CGPointMake(moveDifferenceX, moveDifferenceY)
                     let updatedThumbPositionX = anchorPointsX + moveDifference.x
                     let updatedThumbPositionY = anchorPointsY + moveDifference.y
-                    self.thumbNode.position = CGPointMake(updatedThumbPositionX, updatedThumbPositionY)
+                    thumbNode.position = CGPointMake(updatedThumbPositionX, updatedThumbPositionY)
                 } else {
                     let vX: Double = Double(touchPoint.x) - Double(anchorPointsX)
                     let vY: Double = Double(touchPoint.y) - Double(anchorPointsY)
                     let magV: Double = sqrt(vX*vX + vY*vY)
                     let aX: Double = Double(anchorPointsX) + vX / magV * Double(thumbWidth)
                     let aY: Double = Double(anchorPointsY) + vY / magV * Double(thumbWidth)
-                    self.thumbNode.position = CGPointMake(CGFloat(aX), CGFloat(aY))
+                    thumbNode.position = CGPointMake(CGFloat(aX), CGFloat(aY))
                 }
             }
-            let velocityX = self.thumbNode.position.x - anchorPointsX
-            let velocityY = self.thumbNode.position.y - anchorPointsY
-            self.velocity = CGPointMake(velocityX, velocityY)
-            let angularVelocityX = self.thumbNode.position.x - anchorPointsX
-            let angularVelocityY = self.thumbNode.position.y - anchorPointsY
-            self.angularVelocity = -atan2(angularVelocityX, angularVelocityY)
+            let velocityX = thumbNode.position.x - anchorPointsX
+            let velocityY = thumbNode.position.y - anchorPointsY
+            velocity = CGPointMake(velocityX, velocityY)
+            let angularVelocityX = thumbNode.position.x - anchorPointsX
+            let angularVelocityY = thumbNode.position.y - anchorPointsY
+            angularVelocity = -atan2(angularVelocityX, angularVelocityY)
         }
     }
     
@@ -88,18 +89,18 @@ class Joystick : SKNode {
         if velocity.x == 0 && velocity.y == 0 {
             delegate?.tapped()
         }
-        self.resetVelocity()
+        resetVelocity()
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.resetVelocity()
+        resetVelocity()
     }
     
     func resetVelocity() {
-        self.isTracking = false
-        self.velocity = CGPointZero
-        let easeOut: SKAction = SKAction.move(to: self.anchorPointInPoints(), duration: kThumbSpringBackDuration)
+        isTracking = false
+        velocity = CGPointZero
+        let easeOut: SKAction = SKAction.move(to: anchorPoint(), duration: kThumbSpringBack)
         easeOut.timingMode = SKActionTimingMode.easeOut
-        self.thumbNode.run(easeOut)
+        thumbNode.run(easeOut)
     }
 }
