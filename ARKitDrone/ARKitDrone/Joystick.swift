@@ -50,21 +50,33 @@ class Joystick : SKNode {
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
             let touchPoint: CGPoint = (touch as AnyObject).location(in: self)
-            if self.isTracking == true && sqrtf(powf((Float(touchPoint.x) - Float(self.thumbNode.position.x)), 2) + powf((Float(touchPoint.y) - Float(self.thumbNode.position.y)), 2)) < Float(self.thumbNode.size.width) {
-                if sqrtf(powf((Float(touchPoint.x) - Float(self.anchorPointInPoints().x)), 2) + powf((Float(touchPoint.y) - Float(self.anchorPointInPoints().y)), 2)) <= Float(self.thumbNode.size.width) {
-                    let moveDifference: CGPoint = CGPointMake(touchPoint.x - self.anchorPointInPoints().x, touchPoint.y - self.anchorPointInPoints().y)
-                    self.thumbNode.position = CGPointMake(self.anchorPointInPoints().x + moveDifference.x, self.anchorPointInPoints().y + moveDifference.y)
+            let thumbWidth = Float(self.thumbNode.size.width)
+            let anchorPointsY = self.anchorPointInPoints().y
+            let anchorPointsX = self.anchorPointInPoints().x
+            if self.isTracking == true &&
+                sqrtf(powf((Float(touchPoint.x) - Float(self.thumbNode.position.x)), 2) + powf((Float(touchPoint.y) - Float(self.thumbNode.position.y)), 2)) < thumbWidth {
+                if sqrtf(powf((Float(touchPoint.x) - Float(anchorPointsX)), 2) + powf((Float(touchPoint.y) - Float(anchorPointsY)), 2)) <= thumbWidth {
+                    let moveDifferenceX = touchPoint.x - anchorPointsX
+                    let moveDifferenceY = touchPoint.y - anchorPointsY
+                    let moveDifference: CGPoint = CGPointMake(moveDifferenceX, moveDifferenceY)
+                    let updatedThumbPositionX = anchorPointsX + moveDifference.x
+                    let updatedThumbPositionY = anchorPointsY + moveDifference.y
+                    self.thumbNode.position = CGPointMake(updatedThumbPositionX, updatedThumbPositionY)
                 } else {
-                    let vX: Double = Double(touchPoint.x) - Double(self.anchorPointInPoints().x)
-                    let vY: Double = Double(touchPoint.y) - Double(self.anchorPointInPoints().y)
+                    let vX: Double = Double(touchPoint.x) - Double(anchorPointsX)
+                    let vY: Double = Double(touchPoint.y) - Double(anchorPointsY)
                     let magV: Double = sqrt(vX*vX + vY*vY)
-                    let aX: Double = Double(self.anchorPointInPoints().x) + vX / magV * Double(self.thumbNode.size.width)
-                    let aY: Double = Double(self.anchorPointInPoints().y) + vY / magV * Double(self.thumbNode.size.width)
+                    let aX: Double = Double(anchorPointsX) + vX / magV * Double(thumbWidth)
+                    let aY: Double = Double(anchorPointsY) + vY / magV * Double(thumbWidth)
                     self.thumbNode.position = CGPointMake(CGFloat(aX), CGFloat(aY))
                 }
             }
-            self.velocity = CGPointMake(((self.thumbNode.position.x - self.anchorPointInPoints().x)), ((self.thumbNode.position.y - self.anchorPointInPoints().y)))
-            self.angularVelocity = -atan2(self.thumbNode.position.x - self.anchorPointInPoints().x, self.thumbNode.position.y - self.anchorPointInPoints().y)
+            let velocityX = self.thumbNode.position.x - anchorPointsX
+            let velocityY = self.thumbNode.position.y - anchorPointsY
+            self.velocity = CGPointMake(velocityX, velocityY)
+            let angularVelocityX = self.thumbNode.position.x - anchorPointsX
+            let angularVelocityY = self.thumbNode.position.y - anchorPointsY
+            self.angularVelocity = -atan2(angularVelocityX, angularVelocityY)
         }
     }
     
