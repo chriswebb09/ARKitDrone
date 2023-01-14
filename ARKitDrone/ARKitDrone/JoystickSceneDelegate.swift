@@ -13,4 +13,5 @@ protocol JoystickSceneDelegate: AnyObject {
     func update(altitude: Float)
     func update(rotate: Float)
     func update(sides: Float)
+    func shoot() 
 }
