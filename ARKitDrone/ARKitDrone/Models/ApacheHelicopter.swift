@@ -34,14 +34,14 @@ class ApacheHelicopter {
     var helicopterNode: SCNNode!
     var parentModelNode: SCNNode!
     
-    var missile: SCNNode!
-    var missile2: SCNNode!
-    var missile3: SCNNode!
-    var missile4: SCNNode!
-    var missile5: SCNNode!
-    var missile6: SCNNode!
-    var missile7: SCNNode!
-    var missile8: SCNNode!
+    var missile: Missile = Missile(num: 1)
+    var missile2: Missile = Missile(num: 2)
+    var missile3: Missile = Missile(num: 3)
+    var missile4: Missile = Missile(num: 4)
+    var missile5: Missile = Missile(num: 5)
+    var missile6: Missile = Missile(num: 6)
+    var missile7: Missile = Missile(num: 7)
+    var missile8: Missile = Missile(num: 8)
     
     var rotor: SCNNode!
     var rotor2: SCNNode!
@@ -49,25 +49,7 @@ class ApacheHelicopter {
     var front: SCNNode!
     var frontIR: SCNNode!
     
-    var particle: SCNParticleSystem!
-    var particle2: SCNParticleSystem!
-    var particle3: SCNParticleSystem!
-    var particle4: SCNParticleSystem!
-    var particle5: SCNParticleSystem!
-    var particle6: SCNParticleSystem!
-    var particle7: SCNParticleSystem!
-    var particle8: SCNParticleSystem!
-    
     var missilesArmed: Bool = false
-    
-    var missile1Fired: Bool = false
-    var missile2Fired: Bool = false
-    var missile3Fired: Bool = false
-    var missile4Fired: Bool = false
-    var missile5Fired: Bool = false
-    var missile6Fired: Bool = false
-    var missile7Fired: Bool = false
-    var missile8Fired: Bool = false
     
     func setup(with scene: SCNScene) {
         let tempScene = SCNScene.nodeWithModelName(LocalConstants.sceneName)
@@ -78,14 +60,14 @@ class ApacheHelicopter {
         frontIR = front.childNode(withName: "FrontIR", recursively: true)
         rotor = helicopterNode?.childNode(withName: LocalConstants.frontRotorName, recursively: true)
         rotor2 = helicopterNode?.childNode(withName: LocalConstants.tailRotorName, recursively: true)
-        missile8 = helicopterNode?.childNode(withName: LocalConstants.missile1, recursively: true)
-        missile2 = helicopterNode?.childNode(withName: LocalConstants.missile2, recursively: true)
-        missile3 = helicopterNode?.childNode(withName: LocalConstants.missile3, recursively: true)
-        missile4 = helicopterNode?.childNode(withName: LocalConstants.missile4, recursively: true)
-        missile5 = helicopterNode?.childNode(withName: LocalConstants.missile5, recursively: true)
-        missile6 = helicopterNode?.childNode(withName: LocalConstants.missile6, recursively: true)
-        missile7 = helicopterNode?.childNode(withName: LocalConstants.missile7, recursively: true)
-        missile8 = helicopterNode?.childNode(withName: LocalConstants.missile8, recursively: true)
+        missile.node = helicopterNode?.childNode(withName: LocalConstants.missile1, recursively: true)
+        missile2.node = helicopterNode?.childNode(withName: LocalConstants.missile2, recursively: true)
+        missile3.node = helicopterNode?.childNode(withName: LocalConstants.missile3, recursively: true)
+        missile4.node = helicopterNode?.childNode(withName: LocalConstants.missile4, recursively: true)
+        missile5.node = helicopterNode?.childNode(withName: LocalConstants.missile5, recursively: true)
+        missile6.node = helicopterNode?.childNode(withName: LocalConstants.missile6, recursively: true)
+        missile7.node = helicopterNode?.childNode(withName: LocalConstants.missile7, recursively: true)
+        missile8.node = helicopterNode?.childNode(withName: LocalConstants.missile8, recursively: true)
         parentModelNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, -20)
         hud.position = SCNVector3(x: helicopterNode.position.x + 0.6, y: helicopterNode.position.y, z: helicopterNode.position.z)
         frontIR.pivot = SCNMatrix4MakeTranslation(12.0, 0, 8.0)
@@ -95,35 +77,15 @@ class ApacheHelicopter {
     }
     
     func hideEmitter() {
-        let first =  missile8.childNodes.first!
-        particle = first.particleSystems![0]
-        particle.birthRate = 0
-        
-        let second =  missile2.childNodes.first!
-        particle2 = second.particleSystems![0]
-        particle2.birthRate = 0
-        
-        let third =  missile3.childNodes.first!
-        particle3 = third.particleSystems![0]
-        particle3.birthRate = 0
-        
-        let fourth =  missile4.childNodes.first!
-        particle4 = fourth.particleSystems![0]
-        particle4.birthRate = 0
-        
-        let fifth =  missile5.childNodes.first!
-        particle5 = fifth.particleSystems![0]
-        particle5.birthRate = 0
-        
-        let sixth =  missile6.childNodes.first!
-        particle6 = sixth.particleSystems![0]
-        particle6.birthRate = 0
-        
-        let seventh =  missile7.childNodes.first!
-        particle7 = seventh.particleSystems![0]
-        particle7.birthRate = 0
+        missile.setParticle()
+        missile2.setParticle()
+        missile3.setParticle()
+        missile4.setParticle()
+        missile5.setParticle()
+        missile6.setParticle()
+        missile7.setParticle()
+        missile8.setParticle()
     }
-    
     
     func spinBlades() {
         let rotate = SCNAction.rotateBy(x: 30, y: 0, z: 0, duration: 0.5)
@@ -180,64 +142,62 @@ class ApacheHelicopter {
         if missilesArmed == false {
             return
         }
-        if missile1Fired == false {
-            particle.birthRate = LocalConstants.activeEmitterRate
+        if missile.fired == false {
+            missile.particle.birthRate = LocalConstants.activeEmitterRate
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 2
-            missile8.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            missile.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
             SCNTransaction.commit()
-            missile1Fired = true
-        } else if missile2Fired == false {
-            particle2.birthRate = LocalConstants.activeEmitterRate
+            missile.fired = true
+        } else if missile2.fired == false {
+            missile2.particle.birthRate = LocalConstants.activeEmitterRate
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 2
-            missile2.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            missile2.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
             SCNTransaction.commit()
-            missile2Fired = true
-        } else if missile3Fired == false {
-            particle3.birthRate = LocalConstants.activeEmitterRate
+            missile2.fired = true
+        } else if missile3.fired == false {
+            missile3.particle.birthRate = LocalConstants.activeEmitterRate
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 2
             missile3.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
             SCNTransaction.commit()
-            missile4Fired = true
-        } else if missile4Fired == false {
-            particle4.birthRate = LocalConstants.activeEmitterRate
+            missile3.fired = true
+        } else if missile4.fired == false {
+            missile4.particle.birthRate = LocalConstants.activeEmitterRate
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 2
-            missile4.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            missile4.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
             SCNTransaction.commit()
-            missile4Fired = true
-        }
-        
-        if missile5Fired == false {
-            particle5.birthRate = LocalConstants.activeEmitterRate
+            missile4.fired = true
+        } else if missile5.fired == false {
+            missile5.particle.birthRate = LocalConstants.activeEmitterRate
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 2
-            missile5.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            missile5.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
             SCNTransaction.commit()
-            missile5Fired = true
-        } else if missile6Fired == false {
-            particle6.birthRate = LocalConstants.activeEmitterRate
+            missile5.fired = true
+        } else if missile6.fired == false {
+            missile6.particle.birthRate = LocalConstants.activeEmitterRate
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 2
-            missile6.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            missile6.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
             SCNTransaction.commit()
-            missile6Fired = true
-        } else if missile7Fired == false {
-            particle7.birthRate = LocalConstants.activeEmitterRate
+            missile6.fired = true
+        } else if missile7.fired == false {
+            missile7.particle.birthRate = LocalConstants.activeEmitterRate
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 2
-            missile7.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            missile7.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
             SCNTransaction.commit()
-            missile7Fired = true
-        } else if missile8Fired == false {
-            particle8.birthRate = LocalConstants.activeEmitterRate
+            missile7.fired = true
+        } else if missile8.fired == false {
+            missile8.particle.birthRate = LocalConstants.activeEmitterRate
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 2
-            missile8.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            missile8.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
             SCNTransaction.commit()
-            missile8Fired = true
+            missile8.fired = true
         }
     }
     
