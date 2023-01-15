@@ -37,4 +37,8 @@ class DroneSceneView: ARSCNView {
     func moveSides(value: Float) {
         helicopter.moveSides(value: value)
     }
+    
+    func armMissile() {
+        helicopter.armMissile()
+    }
 }

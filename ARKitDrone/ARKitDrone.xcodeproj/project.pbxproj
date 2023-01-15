@@ -10,6 +10,7 @@
 		941706D92972A5F400CB0308 /* ApacheHelicopter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941706D82972A5F400CB0308 /* ApacheHelicopter.swift */; };
 		945B16AB294E9F5B00482E14 /* Joystick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945B16AA294E9F5B00482E14 /* Joystick.swift */; };
 		945B16AD294EB34800482E14 /* JoystickScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945B16AC294EB34800482E14 /* JoystickScene.swift */; };
+		9470AE472974001A00A55134 /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9470AE462974001A00A55134 /* MenuViewController.swift */; };
 		9485FA17295EBE42008407B2 /* MatrixHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9485FA16295EBE42008407B2 /* MatrixHelper.swift */; };
 		94CCC8EB2972D14600F7D17F /* audio.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 94CCC8EA2972D14600F7D17F /* audio.m4a */; };
 		94CCC8EE2972D46400F7D17F /* Missile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC8ED2972D46400F7D17F /* Missile.swift */; };
@@ -42,6 +43,7 @@
 		941706D82972A5F400CB0308 /* ApacheHelicopter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApacheHelicopter.swift; sourceTree = "<group>"; };
 		945B16AA294E9F5B00482E14 /* Joystick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joystick.swift; sourceTree = "<group>"; };
 		945B16AC294EB34800482E14 /* JoystickScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoystickScene.swift; sourceTree = "<group>"; };
+		9470AE462974001A00A55134 /* MenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
 		9485FA16295EBE42008407B2 /* MatrixHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixHelper.swift; sourceTree = "<group>"; };
 		94CCC8EA2972D14600F7D17F /* audio.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = audio.m4a; sourceTree = "<group>"; };
 		94CCC8ED2972D46400F7D17F /* Missile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Missile.swift; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				A7AE72C11F888EF500B015D3 /* GameViewController.swift */,
+				9470AE462974001A00A55134 /* MenuViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 				94CCC8EE2972D46400F7D17F /* Missile.swift in Sources */,
 				94CCC9102972F43200F7D17F /* HelicopterCapable.swift in Sources */,
 				94CCC90A2972E54000F7D17F /* SCNScene+Extension.swift in Sources */,
+				9470AE472974001A00A55134 /* MenuViewController.swift in Sources */,
 				94CCC9122972FFB500F7D17F /* DeviceOrientation.swift in Sources */,
 				94CCC8FD2972E40200F7D17F /* SCNVector4+Extension.swift in Sources */,
 				A7AE72D41F88900600B015D3 /* DroneView.swift in Sources */,

@@ -14,27 +14,45 @@ import simd
 class ApacheHelicopter {
     
     struct LocalConstants {
+        static let sceneName = "art.scnassets/Apache.scn"
         static let parentModelName = "grpApache"
         static let bodyName = "Body"
         static let frontRotorName = "FrontRotor"
         static let tailRotorName = "TailRotor"
         static let missile1 = "Missile1"
+        static let missile2 = "Missile2"
+        static let missile3 = "Missile3"
+        static let missile4 = "Missile4"
+        static let missile5 = "Missile5"
+        static let missile6 = "Missile6"
+        static let missile7 = "Missile7"
+        static let missile8 = "Missile8"
         static let audioFileName = "audio.m4a"
         static let activeEmitterRate: CGFloat = 1000
     }
     
     var helicopterNode: SCNNode!
     var parentModelNode: SCNNode!
-    var missile: SCNNode!
+    
+    var missile: Missile = Missile(num: 1)
+    var missile2: Missile = Missile(num: 2)
+    var missile3: Missile = Missile(num: 3)
+    var missile4: Missile = Missile(num: 4)
+    var missile5: Missile = Missile(num: 5)
+    var missile6: Missile = Missile(num: 6)
+    var missile7: Missile = Missile(num: 7)
+    var missile8: Missile = Missile(num: 8)
+    
     var rotor: SCNNode!
     var rotor2: SCNNode!
     var hud: SCNNode!
     var front: SCNNode!
     var frontIR: SCNNode!
-    var particle: SCNParticleSystem!
+    
+    var missilesArmed: Bool = false
     
     func setup(with scene: SCNScene) {
-        let tempScene = SCNScene.nodeWithModelName("art.scnassets/Apache.scn")
+        let tempScene = SCNScene.nodeWithModelName(LocalConstants.sceneName)
         hud = tempScene.childNode(withName: "hud", recursively: false)
         parentModelNode = tempScene.childNode(withName: LocalConstants.parentModelName, recursively: true)
         helicopterNode = parentModelNode?.childNode(withName: LocalConstants.bodyName, recursively: true)
@@ -42,15 +60,31 @@ class ApacheHelicopter {
         frontIR = front.childNode(withName: "FrontIR", recursively: true)
         rotor = helicopterNode?.childNode(withName: LocalConstants.frontRotorName, recursively: true)
         rotor2 = helicopterNode?.childNode(withName: LocalConstants.tailRotorName, recursively: true)
-        missile = helicopterNode?.childNode(withName: LocalConstants.missile1, recursively: false)
+        missile.node = helicopterNode?.childNode(withName: LocalConstants.missile1, recursively: true)
+        missile2.node = helicopterNode?.childNode(withName: LocalConstants.missile2, recursively: true)
+        missile3.node = helicopterNode?.childNode(withName: LocalConstants.missile3, recursively: true)
+        missile4.node = helicopterNode?.childNode(withName: LocalConstants.missile4, recursively: true)
+        missile5.node = helicopterNode?.childNode(withName: LocalConstants.missile5, recursively: true)
+        missile6.node = helicopterNode?.childNode(withName: LocalConstants.missile6, recursively: true)
+        missile7.node = helicopterNode?.childNode(withName: LocalConstants.missile7, recursively: true)
+        missile8.node = helicopterNode?.childNode(withName: LocalConstants.missile8, recursively: true)
         parentModelNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, -20)
         hud.position = SCNVector3(x: helicopterNode.position.x + 0.6, y: helicopterNode.position.y, z: helicopterNode.position.z)
         frontIR.pivot = SCNMatrix4MakeTranslation(12.0, 0, 8.0)
-        let first =  missile.childNodes.first!
-        particle = first.particleSystems![0]
-        particle.birthRate = 0
+        hideEmitter()
         spinBlades()
         scene.rootNode.addChildNode(tempScene)
+    }
+    
+    func hideEmitter() {
+        missile.setParticle()
+        missile2.setParticle()
+        missile3.setParticle()
+        missile4.setParticle()
+        missile5.setParticle()
+        missile6.setParticle()
+        missile7.setParticle()
+        missile8.setParticle()
     }
     
     func spinBlades() {
@@ -69,18 +103,19 @@ class ApacheHelicopter {
         helicopterNode.runAction(action2)
     }
     
+    func armMissile() {
+        missilesArmed.toggle()
+    }
+    
     func rotate(value: Float) {
-        print(" rotate(value: Float) {")
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.25
-        
         let locationRotation = SCNQuaternion.getQuaternion(from: SCNQuaternion.angleConversion(x: 0, y:0, z:  value * Float(Double.pi), w: 0))
         helicopterNode.localRotate(by: locationRotation)
         hud.rotate(by: SCNQuaternion.getQuaternion(from: SCNQuaternion.angleConversion(x: 0, y: -value * Float(Double.pi), z: 0, w: 0)), aroundTarget: helicopterNode.worldPosition)
         let constraint = SCNLookAtConstraint(target: helicopterNode)
         constraint.isGimbalLockEnabled = true
         constraint.influenceFactor = 0.1
-        
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 3.0
         hud.constraints = [constraint]
@@ -88,22 +123,7 @@ class ApacheHelicopter {
         SCNTransaction.commit()
     }
     
-//    func updatePositionAndOrientationOf(_ node: SCNNode, withPosition position: SCNVector3, relativeTo referenceNode: SCNNode) {
-//        let referenceNodeTransform = matrix_float4x4(referenceNode.transform)
-//        
-//        // Setup a translation matrix with the desired position
-//        var translationMatrix = matrix_identity_float4x4
-//        translationMatrix.columns.3.x = position.x
-//        translationMatrix.columns.3.y = position.y
-//        translationMatrix.columns.3.z = position.z
-//        
-//        // Combine the configured translation matrix with the referenceNode's transform to get the desired position AND orientation
-//        let updatedTransform = matrix_multiply(referenceNodeTransform, translationMatrix)
-//        node.transform = SCNMatrix4(updatedTransform)
-//    }
-    
     func moveForward(value: Float) {
-        print("moveForward(value: Float) ")
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.25
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y: value, z: 0))
@@ -112,20 +132,73 @@ class ApacheHelicopter {
         let constraint = SCNLookAtConstraint(target: helicopterNode)
         constraint.isGimbalLockEnabled = true
         constraint.influenceFactor = 0.1
-        
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 3.0
         hud.constraints = [constraint]
         SCNTransaction.commit()
-        
     }
     
     func shootMissile() {
-        particle.birthRate = LocalConstants.activeEmitterRate
-        SCNTransaction.begin()
-        SCNTransaction.animationDuration = 1
-        missile.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
-        SCNTransaction.commit()
+        if missilesArmed == false {
+            return
+        }
+        if missile.fired == false {
+            missile.particle.birthRate = LocalConstants.activeEmitterRate
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = 2
+            missile.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            SCNTransaction.commit()
+            missile.fired = true
+        } else if missile2.fired == false {
+            missile2.particle.birthRate = LocalConstants.activeEmitterRate
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = 2
+            missile2.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            SCNTransaction.commit()
+            missile2.fired = true
+        } else if missile3.fired == false {
+            missile3.particle.birthRate = LocalConstants.activeEmitterRate
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = 2
+            missile3.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            SCNTransaction.commit()
+            missile3.fired = true
+        } else if missile4.fired == false {
+            missile4.particle.birthRate = LocalConstants.activeEmitterRate
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = 2
+            missile4.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            SCNTransaction.commit()
+            missile4.fired = true
+        } else if missile5.fired == false {
+            missile5.particle.birthRate = LocalConstants.activeEmitterRate
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = 2
+            missile5.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            SCNTransaction.commit()
+            missile5.fired = true
+        } else if missile6.fired == false {
+            missile6.particle.birthRate = LocalConstants.activeEmitterRate
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = 2
+            missile6.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            SCNTransaction.commit()
+            missile6.fired = true
+        } else if missile7.fired == false {
+            missile7.particle.birthRate = LocalConstants.activeEmitterRate
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = 2
+            missile7.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            SCNTransaction.commit()
+            missile7.fired = true
+        } else if missile8.fired == false {
+            missile8.particle.birthRate = LocalConstants.activeEmitterRate
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = 2
+            missile8.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+            SCNTransaction.commit()
+            missile8.fired = true
+        }
     }
     
     func changeAltitude(value: Float) {
@@ -184,6 +257,4 @@ class ApacheHelicopter {
         }
         SCNTransaction.commit()
     }
-    
-    
 }
