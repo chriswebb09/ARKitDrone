@@ -29,29 +29,13 @@ class Osprey: NSObject {
     var rotor2: SCNNode!
     var particle: SCNParticleSystem!
     
-    
-    
     func setup(with scene: SCNScene) {
-        
         let tempScene = SCNScene.nodeWithModelName("art.scnassets/osprey.scn")
-       
-       
-        
         let tempsc = SCNScene(named: "art.scnassets/osprey.scn")!
-        
-       // make3DModel(scene: tempsc, fileName: "osprey")
-        // parentModelNode = tempScene.childNode(withName: LocalConstants.parentModelName, recursively: true)
         helicopterNode = tempScene.childNode(withName: LocalConstants.bodyName, recursively: true)
         engineNode = helicopterNode.childNode(withName: "Engine", recursively: true)
         rotor = engineNode.childNode(withName: "Blade", recursively: true)
         helicopterNode.scale = SCNVector3(0.0009, 0.0009, 0.0009)
-        //rotor = helicopterNode?.childNode(withName: LocalConstants.frontRotorName, recursively: true)
-        //rotor2 = helicopterNode?.childNode(withName: LocalConstants.tailRotorName, recursively: true)
-        // missile = helicopterNode?.childNode(withName: LocalConstants.missile1, recursively: false)
-        // parentModelNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, -20)
-        //        let first =  missile.childNodes.first!
-        //        particle = first.particleSystems![0]
-        //        particle.birthRate = 0
         spinBlades()
         scene.rootNode.addChildNode(tempScene)
     }
@@ -61,15 +45,6 @@ class Osprey: NSObject {
         let moveSequence = SCNAction.sequence([rotate])
         let moveLoop = SCNAction.repeatForever(moveSequence)
         rotor.runAction(moveLoop)
-        //        let rotate2 = SCNAction.rotateBy(x: 0, y: 0, z: 20, duration: 0.5)
-        //        let moveSequence2 = SCNAction.sequence([rotate2])
-        //        let moveLoop2 = SCNAction.repeatForever(moveSequence2)
-        //        rotor.runAction(moveLoop2)
-        //        let source = SCNAudioSource(fileNamed: LocalConstants.audioFileName)
-        //        source?.volume += 50
-        //        let action = SCNAction.playAudio(source!, waitForCompletion: true)
-        //        let action2 = SCNAction.repeatForever(action)
-        //        helicopterNode.runAction(action2)
     }
     
     func rotate(value: Float) {
@@ -78,23 +53,6 @@ class Osprey: NSObject {
         helicopterNode.localRotate(by: locationRotation)
         SCNTransaction.commit()
     }
-    
-//    func make3DModel(scene: SCNScene, fileName: String) -> URL? {
-//        let fileManager = FileManager.default
-//        //let currentPath = fileManager.file
-//        let sceneURL = URL(fileURLWithPath: "file:///art.scnassets/" + fileName + ".usdz")
-//        let options: [String: Any] = [SCNSceneExportDestinationURL: URL(fileURLWithPath: currentPath, isDirectory: true)]
-//        if scene.write(to: sceneURL, options: options, delegate: self, progressHandler: {(progress, error, stop) in
-//            if let error = error {
-//                NSLog("ShareScene \(String(describing: error))")
-//            }
-//        }) != true {
-//            NSLog("ShareScene Unable to write scene to \(sceneURL)")
-//            return nil
-//        }
-//        return sceneURL
-//    }
-//
     
     func moveForward(value: Float) {
         SCNTransaction.begin()

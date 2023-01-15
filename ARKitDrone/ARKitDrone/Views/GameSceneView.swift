@@ -11,10 +11,14 @@ import SceneKit
 
 class GameSceneView: ARSCNView {
     
+    struct LocalConstants {
+        static let sceneName =  "art.scnassets/Game.scn"
+    }
+    
     var droneSceneView: DroneSceneView!
     
     func setup() {
-        self.scene = SCNScene(named: "art.scnassets/Game.scn")!
+        self.scene = SCNScene(named: LocalConstants.sceneName)!
         self.droneSceneView = DroneSceneView(frame: UIScreen.main.bounds)
         self.droneSceneView.setup(scene: scene)
     }
@@ -42,8 +46,11 @@ extension GameSceneView: HelicopterCapable {
         droneSceneView.changeAltitude(value: -value)
     }
     
-    
     func moveSides(value: Float) {
         droneSceneView.moveSides(value: value)
+    }
+    
+    func armMissiles() {
+        droneSceneView.armMissile()
     }
 }
