@@ -12,7 +12,7 @@ import SceneKit
 
 class DroneSceneView: ARSCNView {
     
-    var helicopter = Helicopter()
+    var helicopter = ApacheHelicopter()
     
     func setup(scene: SCNScene) {
         helicopter.setup(with: scene)
@@ -38,5 +38,3 @@ class DroneSceneView: ARSCNView {
         helicopter.moveSides(value: value)
     }
 }
-
-
