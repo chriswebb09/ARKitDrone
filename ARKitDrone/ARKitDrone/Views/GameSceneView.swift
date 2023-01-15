@@ -39,7 +39,7 @@ extension GameSceneView: HelicopterCapable {
     }
     
     func changeAltitude(value: Float) {
-        droneSceneView.changeAltitude(value: value)
+        droneSceneView.changeAltitude(value: -value)
     }
     
     

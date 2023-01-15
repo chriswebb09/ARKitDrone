@@ -43,7 +43,7 @@ class GameViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        DeviceOrientation.shared.set(orientation: .landscapeLeft)
+        DeviceOrientation.shared.set(orientation: .landscapeRight)
         UIApplication.shared.isIdleTimerDisabled = true
         setupTracking()
         sceneView.setup()
@@ -60,6 +60,10 @@ class GameViewController: UIViewController {
         let sceneReconstruction: ARWorldTrackingConfiguration.SceneReconstruction = .meshWithClassification
         if ARWorldTrackingConfiguration.supportsSceneReconstruction(sceneReconstruction) {
             configuration.sceneReconstruction = sceneReconstruction
+        }
+        sceneView.automaticallyUpdatesLighting = false
+        if let environmentMap = UIImage(named: "Models.scnassets/sharedImages/environment_blur.exr") {
+            sceneView.scene.lightingEnvironment.contents = environmentMap
         }
         sceneView.delegate = self
         session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
@@ -130,10 +134,6 @@ extension GameViewController: JoystickSceneDelegate {
     }
     
     func tapped() {
-        shoot()
-    }
-    
-    func shoot() {
         sceneView.shootMissile()
     }
 }

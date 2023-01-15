@@ -42,4 +42,5 @@ class MatrixHelper {
         let transformMatrix = simd_mul(rotationMatrix, translationMatrix)
         return simd_mul(matrix, transformMatrix)
     }
+    
 }
