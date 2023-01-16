@@ -9,6 +9,7 @@
 import SceneKit
 
 extension SCNQuaternion {
+    
     // https://developer.apple.com/forums/thread/651614?answerId=616792022#616792022
     
     static func angleConversion(x: Float, y: Float, z: Float, w: Float) -> (Float, Float, Float, Float) {

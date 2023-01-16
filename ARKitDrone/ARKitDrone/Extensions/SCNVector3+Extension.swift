@@ -10,57 +10,24 @@ import SceneKit
 
 extension SCNVector3 {
     
-    func distance(to destination: SCNVector3) -> CGFloat {
-        let dx = destination.x - x
-        let dy = destination.y - y
-        let dz = destination.z - z
-        return CGFloat(sqrt(dx*dx + dy*dy + dz*dz))
-    }
-    
     func normalized() -> SCNVector3 {
         let magnitude = ((self.x * self.x) + (self.y * self.y) + (self.z * self.z)).squareRoot()
         return SCNVector3(self.x / magnitude, self.y / magnitude, self.z / magnitude)
     }
     
-    enum Axis {
-        case x, y, z
-        
-        func getAxisVector() -> simd_float3 {
-            switch self {
-            case .x:
-                return simd_float3(1,0,0)
-            case .y:
-                return simd_float3(0,1,0)
-            case .z:
-                return simd_float3(0,0,1)
-            }
-        }
-    }
-    
-    func rotatedVector(aroundAxis: Axis, angle: Float) -> SCNVector3 {
-        let q = simd_quatf(angle: angle, axis: aroundAxis.getAxisVector())
-        let simdVector = q.act(simd_float3(self))
-        return SCNVector3(simdVector)
-    }
-    
     // from Apples demo APP
+    
     static func positionFromTransform(_ transform: matrix_float4x4) -> SCNVector3 {
         return SCNVector3Make(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
     }
 }
 
-// SCNVector Operators
+// from Apples demo APP
 
-/**
- v1 = v2 + v3
- */
 func +(left: SCNVector3, right: SCNVector3) -> SCNVector3 {
   return SCNVector3Make(left.x + right.x, left.y + right.y, left.z + right.z)
 }
 
-/**
- v1 += v2
- */
 func +=( left: inout SCNVector3, right: SCNVector3) {
   left = left + right
 }
