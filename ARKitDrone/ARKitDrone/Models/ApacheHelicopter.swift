@@ -54,6 +54,22 @@ class ApacheHelicopter {
     
     private var missilesArmed: Bool = false
     
+    private func spinBlades() {
+        let rotate = SCNAction.rotateBy(x: 30, y: 0, z: 0, duration: 0.5)
+        let moveSequence = SCNAction.sequence([rotate])
+        let moveLoop = SCNAction.repeatForever(moveSequence)
+        rotor2.runAction(moveLoop)
+        let rotate2 = SCNAction.rotateBy(x: 0, y: 0, z: 20, duration: 0.5)
+        let moveSequence2 = SCNAction.sequence([rotate2])
+        let moveLoop2 = SCNAction.repeatForever(moveSequence2)
+        rotor.runAction(moveLoop2)
+        let source = SCNAudioSource(fileNamed: LocalConstants.audioFileName)
+        source?.volume += 50
+        let action = SCNAction.playAudio(source!, waitForCompletion: true)
+        let action2 = SCNAction.repeatForever(action)
+        helicopterNode.runAction(action2)
+    }
+    
     func setup(with scene: SCNScene) {
         let tempScene = SCNScene.nodeWithModelName(LocalConstants.sceneName)
         hud = tempScene.childNode(withName: LocalConstants.hudNodeName, recursively: false)
@@ -95,22 +111,6 @@ class ApacheHelicopter {
         missile6.setParticle()
         missile7.setParticle()
         missile8.setParticle()
-    }
-    
-    func spinBlades() {
-        let rotate = SCNAction.rotateBy(x: 30, y: 0, z: 0, duration: 0.5)
-        let moveSequence = SCNAction.sequence([rotate])
-        let moveLoop = SCNAction.repeatForever(moveSequence)
-        rotor2.runAction(moveLoop)
-        let rotate2 = SCNAction.rotateBy(x: 0, y: 0, z: 20, duration: 0.5)
-        let moveSequence2 = SCNAction.sequence([rotate2])
-        let moveLoop2 = SCNAction.repeatForever(moveSequence2)
-        rotor.runAction(moveLoop2)
-        let source = SCNAudioSource(fileNamed: LocalConstants.audioFileName)
-        source?.volume += 50
-        let action = SCNAction.playAudio(source!, waitForCompletion: true)
-        let action2 = SCNAction.repeatForever(action)
-        helicopterNode.runAction(action2)
     }
     
     func toggleArmMissile() {

@@ -35,7 +35,9 @@ class MenuViewController: UIViewController {
         }
     }
     
-    func countdownToStart(count: Int) {
+    // MARK: - Private Methods
+    
+    private func countdownToStart(count: Int) {
         var countdown = count
         newGameButton.titleLabel?.textAlignment = .center
         newGameButton.titleLabel?.font = newGameButton.titleLabel?.font.withWeight(.heavy)
