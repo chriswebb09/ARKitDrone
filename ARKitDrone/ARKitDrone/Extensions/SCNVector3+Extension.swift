@@ -48,3 +48,19 @@ extension SCNVector3 {
         return SCNVector3Make(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
     }
 }
+
+// SCNVector Operators
+
+/**
+ v1 = v2 + v3
+ */
+func +(left: SCNVector3, right: SCNVector3) -> SCNVector3 {
+  return SCNVector3Make(left.x + right.x, left.y + right.y, left.z + right.z)
+}
+
+/**
+ v1 += v2
+ */
+func +=( left: inout SCNVector3, right: SCNVector3) {
+  left = left + right
+}

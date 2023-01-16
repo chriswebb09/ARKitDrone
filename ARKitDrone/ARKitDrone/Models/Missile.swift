@@ -9,14 +9,14 @@
 import SceneKit
 import ARKit
 
-class Missile: SCNNode {
+class Missile {
+    
     var node: SCNNode!
     var fired: Bool = false
     var missileNum = 0
     var particle: SCNParticleSystem!
     
     init(num: Int) {
-        super.init()
         self.missileNum = num
     }
     
@@ -25,8 +25,40 @@ class Missile: SCNNode {
     }
     
     func setParticle() {
-        let particleNode =  node.childNodes.first!
-        particle = particleNode.particleSystems![0]
+        guard let particleNode = node.childNodes.first, let particleSystems = particleNode.particleSystems else { return }
+        particle = particleSystems[0]
         particle.birthRate = 0
+    }
+    
+    func setupNode(scnNode: SCNNode?) {
+        guard let scnNode = scnNode else { return }
+        node = scnNode
+        node.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
+        node.physicsBody?.mass = 3
+        node.physicsBody?.isAffectedByGravity = false
+        node.physicsBody?.categoryBitMask = CollisionCategory.missileCategory.rawValue
+        node.physicsBody?.contactTestBitMask = CollisionCategory.targetCategory.rawValue
+    }
+    
+    func fire(_ direction: simd_float3) {
+        guard fired == false else { return }
+        particle.birthRate = 1000
+        node.physicsBody?.resetTransform()
+        node.physicsBody?.angularVelocityFactor = SCNVector3(0, 0, 0)
+        node.physicsBody?.simdVelocityFactor = SIMD3<Float>(0, 0, 0)
+        node.physicsBody?.simdAngularVelocityFactor = SIMD3<Float>(0, 0, 0)
+        print(direction)
+        node.simdWorldPosition = SIMD3<Float>(0, 0, 0)
+        node.physicsBody?.resetTransform()
+        Timer.scheduledTimer(withTimeInterval: 7, repeats: false) { timer in
+            self.node.removeFromParentNode()
+        }
+        fired = true
+    }
+    
+    func getVectors() -> (SCNVector3, SCNVector3) {
+        let direction = node.worldFront
+        let position = node.position
+        return (direction, position)
     }
 }

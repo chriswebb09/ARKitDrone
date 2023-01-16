@@ -12,11 +12,12 @@ import ARKit
 class Osprey: NSObject {
     
     struct LocalConstants {
-        //static let parentModelName = "grpApache"
         static let bodyName = "Body"
+        static let engineName = "Engine"
         static let frontRotorName = "FrontRotor"
         static let tailRotorName = "TailRotor"
         static let missile1 = "Missile1"
+        static let blade = "Blade"
         static let audioFileName = "audio.m4a"
         static let activeEmitterRate: CGFloat = 1000
     }
@@ -31,10 +32,9 @@ class Osprey: NSObject {
     
     func setup(with scene: SCNScene) {
         let tempScene = SCNScene.nodeWithModelName("art.scnassets/osprey.scn")
-        let tempsc = SCNScene(named: "art.scnassets/osprey.scn")!
         helicopterNode = tempScene.childNode(withName: LocalConstants.bodyName, recursively: true)
-        engineNode = helicopterNode.childNode(withName: "Engine", recursively: true)
-        rotor = engineNode.childNode(withName: "Blade", recursively: true)
+        engineNode = helicopterNode.childNode(withName: LocalConstants.engineName, recursively: true)
+        rotor = engineNode.childNode(withName: LocalConstants.blade, recursively: true)
         helicopterNode.scale = SCNVector3(0.0009, 0.0009, 0.0009)
         spinBlades()
         scene.rootNode.addChildNode(tempScene)
@@ -111,8 +111,4 @@ class Osprey: NSObject {
         }
         SCNTransaction.commit()
     }
-}
-
-extension Osprey: SCNSceneExportDelegate {
-    
 }
