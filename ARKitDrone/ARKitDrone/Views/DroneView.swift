@@ -38,7 +38,7 @@ class DroneSceneView: ARSCNView {
         helicopter.moveSides(value: value)
     }
     
-    func armMissile() {
-        helicopter.armMissile()
+    func toggleArmMissile() {
+        helicopter.toggleArmMissile()
     }
 }

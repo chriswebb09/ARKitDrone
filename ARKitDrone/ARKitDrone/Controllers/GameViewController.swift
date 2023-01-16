@@ -17,6 +17,8 @@ class GameViewController: UIViewController {
         static let joystickSize = CGSize(width: 160, height: 150)
         static let joystickPoint = CGPoint(x: 0, y: 0)
         static let environmentalMap = "Models.scnassets/sharedImages/environment_blur.exr"
+        static let buttonTitle = "Arm Missiles".uppercased()
+        static let disarmTitle = "Disarm Missiles".uppercased()
     }
     
     var placed: Bool = false
@@ -34,10 +36,10 @@ class GameViewController: UIViewController {
         view.backgroundColor = .clear
         return view
     }()
-
+    
     lazy var armMissilesButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Arm Missiles".uppercased(), for: .normal)
+        button.setTitle(LocalConstants.buttonTitle, for: .normal)
         button.setTitleColor(UIColor.white, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.black)
         button.frame = CGRect(origin: CGPoint(x:670, y: UIScreen.main.bounds.height - 190), size: CGSize(width: 140, height: 40))
@@ -45,7 +47,7 @@ class GameViewController: UIViewController {
         button.layer.borderWidth = 3
         return button
     }()
-
+    
     var session: ARSession {
         return sceneView.session
     }
@@ -64,15 +66,13 @@ class GameViewController: UIViewController {
         UIApplication.shared.isIdleTimerDisabled = true
         setupTracking()
         sceneView.setup()
-        DispatchQueue.main.asyncAfter(deadline: .now() +  1) {
-            self.sceneView.addSubview(self.padView1)
-            self.sceneView.addSubview(self.padView2)
-            self.setupPadScene()
-            print(self.sceneView.droneSceneView.helicopter.hud.presentation.position)
-            self.sceneView.droneSceneView.helicopter.helicopterHud()
-            print(self.sceneView.droneSceneView.helicopter.hud.presentation.position)
-            self.sceneView.addSubview(self.armMissilesButton)
-            self.armMissilesButton.addTarget(self, action: #selector(self.didTapUIButton), for: .touchUpInside)
+        DispatchQueue.main.asyncAfter(deadline: .now() +  1) { [self] in
+            sceneView.addSubview(padView1)
+            sceneView.addSubview(padView2)
+            setupPadScene()
+            sceneView.positionHUD()
+            sceneView.addSubview(armMissilesButton)
+            armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
         }
     }
     
@@ -116,11 +116,11 @@ class GameViewController: UIViewController {
     
     @objc func didTapUIButton() {
         DispatchQueue.main.async {
-            self.sceneView.armMissiles()
-            if self.sceneView.droneSceneView.helicopter.missilesArmed {
-               self.armMissilesButton.setTitle("Disarm Missiles".uppercased(), for: .normal)
+            self.sceneView.toggleArmMissiles()
+            if self.sceneView.missilesArmed() {
+                self.armMissilesButton.setTitle(LocalConstants.disarmTitle, for: .normal)
             } else {
-               self.armMissilesButton.setTitle("Arm Missile".uppercased(), for: .normal)
+                self.armMissilesButton.setTitle(LocalConstants.buttonTitle, for: .normal)
             }
         }
     }

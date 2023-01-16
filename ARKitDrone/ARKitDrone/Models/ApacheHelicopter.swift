@@ -80,7 +80,7 @@ class ApacheHelicopter {
         hud.position = SCNVector3(x: helicopterNode.position.x + 0.6, y: helicopterNode.position.y, z: helicopterNode.position.z)
     }
     
-    func helicopterHud() {
+    func positionHUD() {
         hud.scale = SCNVector3(0.6, 0.6, 0.6)
         hud.position =  SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y + 0.2 , z: -7)
         print(helicopterNode.presentation.position)
@@ -113,7 +113,7 @@ class ApacheHelicopter {
         helicopterNode.runAction(action2)
     }
     
-    func armMissile() {
+    func toggleArmMissile() {
         missilesArmed.toggle()
     }
     

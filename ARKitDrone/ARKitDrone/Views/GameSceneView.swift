@@ -18,9 +18,17 @@ class GameSceneView: ARSCNView {
     var droneSceneView: DroneSceneView!
     
     func setup() {
-        self.scene = SCNScene(named: LocalConstants.sceneName)!
-        self.droneSceneView = DroneSceneView(frame: UIScreen.main.bounds)
-        self.droneSceneView.setup(scene: scene)
+        scene = SCNScene(named: LocalConstants.sceneName)!
+        droneSceneView = DroneSceneView(frame: UIScreen.main.bounds)
+        droneSceneView.setup(scene: scene)
+    }
+    
+    func positionHUD() {
+        droneSceneView.helicopter.positionHUD()
+    }
+    
+    func missilesArmed() -> Bool {
+        return droneSceneView.helicopter.missilesArmed
     }
 }
 
@@ -50,7 +58,7 @@ extension GameSceneView: HelicopterCapable {
         droneSceneView.moveSides(value: value)
     }
     
-    func armMissiles() {
-        droneSceneView.armMissile()
+    func toggleArmMissiles() {
+        droneSceneView.toggleArmMissile()
     }
 }
