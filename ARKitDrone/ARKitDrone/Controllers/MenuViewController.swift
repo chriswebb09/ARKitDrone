@@ -10,7 +10,12 @@ import UIKit
 
 class MenuViewController: UIViewController {
     
-    @IBOutlet weak var newGameButton: UIButton! {
+    private struct LocalConstants {
+        static let goToGameSegue = "GoToGame"
+        static let count = 6
+    }
+    
+    @IBOutlet private weak var newGameButton: UIButton! {
         didSet {
             newGameButton.setshadow()
         }
@@ -23,29 +28,30 @@ class MenuViewController: UIViewController {
     
     @IBAction func newGameTapped(_ sender: Any) {
         DeviceOrientation.shared.set(orientation: .landscapeRight)
-        countdownToStart()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4.5) {
-            self.performSegue(withIdentifier: "GoToGame", sender: self)
+        countdownToStart(count: LocalConstants.count)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 6) { [self] in
+            newGameButton.isHidden = true
+            performSegue(withIdentifier: LocalConstants.goToGameSegue, sender: self)
         }
     }
     
-    func countdownToStart() {
-        var countdown = 5
+    func countdownToStart(count: Int) {
+        var countdown = count
+        newGameButton.titleLabel?.textAlignment = .center
+        newGameButton.titleLabel?.font = newGameButton.titleLabel?.font.withWeight(.heavy)
+        newGameButton.titleLabel?.text = "\(countdown)"
         DispatchQueue.global(qos: .default).async {
-            for _ in 0...5 {
-                if countdown == 5 {
+            for _ in 0...LocalConstants.count {
+                if countdown == LocalConstants.count {
                     sleep(1)
                     countdown -= 1
                     continue
                 }
                 DispatchQueue.main.async {
-                    UIView.transition(with: self.newGameButton,
-                                      duration: 0.25,
-                                      options: .transitionCrossDissolve,
-                                      animations: { [weak self] in
-                        self?.newGameButton.titleLabel?.textAlignment = .center
-                        self?.newGameButton.titleLabel?.font = self?.newGameButton.titleLabel?.font.withWeight(.heavy)
-                        self?.newGameButton.titleLabel?.text = "\(countdown)"
+                    UIView.transition(with: self.newGameButton, duration: 0.25, options: .transitionCrossDissolve, animations: { [self] in
+                        newGameButton.titleLabel?.textAlignment = .center
+                        newGameButton.titleLabel?.font = newGameButton.titleLabel?.font.withWeight(.heavy)
+                        newGameButton.titleLabel?.text = "\(countdown)"
                     }, completion: nil)
                 }
                 sleep(1)

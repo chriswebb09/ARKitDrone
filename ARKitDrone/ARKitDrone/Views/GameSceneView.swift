@@ -11,11 +11,11 @@ import SceneKit
 
 class GameSceneView: ARSCNView {
     
-    struct LocalConstants {
+    private struct LocalConstants {
         static let sceneName =  "art.scnassets/Game.scn"
     }
     
-    var droneSceneView: DroneSceneView!
+    private var droneSceneView: DroneSceneView!
     
     func setup() {
         scene = SCNScene(named: LocalConstants.sceneName)!
@@ -24,11 +24,11 @@ class GameSceneView: ARSCNView {
     }
     
     func positionHUD() {
-        droneSceneView.helicopter.positionHUD()
+        droneSceneView.positionHUD()
     }
     
     func missilesArmed() -> Bool {
-        return droneSceneView.helicopter.missilesArmed
+        return droneSceneView.missilesArmed()
     }
 }
 

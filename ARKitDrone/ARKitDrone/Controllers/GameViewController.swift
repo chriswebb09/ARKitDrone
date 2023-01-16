@@ -13,7 +13,7 @@ import SpriteKit
 
 class GameViewController: UIViewController {
     
-    struct LocalConstants {
+    private struct LocalConstants {
         static let joystickSize = CGSize(width: 160, height: 150)
         static let joystickPoint = CGPoint(x: 0, y: 0)
         static let environmentalMap = "Models.scnassets/sharedImages/environment_blur.exr"
@@ -30,14 +30,14 @@ class GameViewController: UIViewController {
         return view
     }()
     
-    lazy var padView2: SKView = {
+    private lazy var padView2: SKView = {
         let view = SKView(frame: CGRect(x:660, y: UIScreen.main.bounds.height - 140, width:140, height: 140))
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
         return view
     }()
     
-    lazy var armMissilesButton: UIButton = {
+    private lazy var armMissilesButton: UIButton = {
         let button = UIButton()
         button.setTitle(LocalConstants.buttonTitle, for: .normal)
         button.setTitleColor(UIColor.white, for: .normal)
@@ -52,7 +52,7 @@ class GameViewController: UIViewController {
         return sceneView.session
     }
     
-    @IBOutlet weak var sceneView: GameSceneView!
+    @IBOutlet private weak var sceneView: GameSceneView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
