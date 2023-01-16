@@ -23,6 +23,8 @@ class GameViewController: UIViewController {
         static let disarmTitle = "Disarm Missiles".uppercased()
     }
     
+    // MARK: - Private Properties
+    
     private lazy var padView1: SKView = {
         let view = SKView(frame: CGRect(x:40, y: 20, width:140, height: 140))
         view.isMultipleTouchEnabled = true
@@ -55,12 +57,6 @@ class GameViewController: UIViewController {
     @IBOutlet private weak var sceneView: GameSceneView!
     
     // MARK: - ViewController Lifecycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        sceneView.delegate = self
-        sceneView.session.delegate = self
-    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -101,7 +97,6 @@ class GameViewController: UIViewController {
         if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
             sceneView.scene.lightingEnvironment.contents = environmentMap
         }
-        sceneView.delegate = self
         session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
@@ -133,23 +128,6 @@ class GameViewController: UIViewController {
                 self.armMissilesButton.setTitle(LocalConstants.buttonTitle, for: .normal)
             }
         }
-    }
-}
-
-// MARK: - ARSCNViewDelegate
-
-extension GameViewController: ARSCNViewDelegate, ARSessionDelegate {
-    
-    func session(_ session: ARSession, didFailWithError error: Error) {
-        print(error.localizedDescription)
-    }
-    
-    func sessionWasInterrupted(_ session: ARSession) {
-        print("Session was interrupted.")
-    }
-    
-    func sessionInterruptionEnded(_ session: ARSession) {
-        print("Session interruption has ended.")
     }
 }
 
