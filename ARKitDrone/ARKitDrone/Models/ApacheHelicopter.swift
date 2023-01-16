@@ -105,7 +105,6 @@ class ApacheHelicopter {
     func positionHUD() {
         hud.scale = SCNVector3(0.6, 0.6, 0.6)
         hud.position =  SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y + 0.2 , z: -7)
-        print(helicopterNode.presentation.position)
     }
     
     func hideEmitter() {

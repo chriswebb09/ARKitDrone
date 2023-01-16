@@ -19,12 +19,12 @@ extension SCNVector3 {
     
     
     static func positionFromTransform(_ transform: matrix_float4x4) -> SCNVector3 {
-        return SCNVector3Make(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
+        return SCNVector3(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
     }
 }
 
 func +(left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-  return SCNVector3Make(left.x + right.x, left.y + right.y, left.z + right.z)
+  return SCNVector3(left.x + right.x, left.y + right.y, left.z + right.z)
 }
 
 func +=( left: inout SCNVector3, right: SCNVector3) {
