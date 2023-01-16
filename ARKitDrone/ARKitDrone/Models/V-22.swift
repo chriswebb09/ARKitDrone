@@ -11,6 +11,8 @@ import ARKit
 
 class Osprey {
     
+    // MARK: - LocalConstants
+    
     private struct LocalConstants {
         static let bodyName = "Body"
         static let engineName = "Engine"
