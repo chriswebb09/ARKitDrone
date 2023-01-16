@@ -24,6 +24,8 @@
 		94CCC9102972F43200F7D17F /* HelicopterCapable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC90F2972F43200F7D17F /* HelicopterCapable.swift */; };
 		94CCC9122972FFB500F7D17F /* DeviceOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC9112972FFB500F7D17F /* DeviceOrientation.swift */; };
 		94D0E37D29732A3400AD55FD /* V-22.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D0E37C29732A3400AD55FD /* V-22.swift */; };
+		94D630322976077000096104 /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D630312976077000096104 /* UIFont+Extension.swift */; };
+		94D630342976078700096104 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D630332976078700096104 /* UIColor+Extension.swift */; };
 		94DF3F082975F167006723FC /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DF3F072975F15F006723FC /* UIView+Extension.swift */; };
 		94E5448F29672EE200158DA2 /* JoystickSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E5448E29672EE200158DA2 /* JoystickSceneDelegate.swift */; };
 		A7AE72BE1F888EF500B015D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */; };
@@ -53,6 +55,8 @@
 		94CCC90F2972F43200F7D17F /* HelicopterCapable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelicopterCapable.swift; sourceTree = "<group>"; };
 		94CCC9112972FFB500F7D17F /* DeviceOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceOrientation.swift; sourceTree = "<group>"; };
 		94D0E37C29732A3400AD55FD /* V-22.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "V-22.swift"; sourceTree = "<group>"; };
+		94D630312976077000096104 /* UIFont+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
+		94D630332976078700096104 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		94DF3F072975F15F006723FC /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		94E5448E29672EE200158DA2 /* JoystickSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoystickSceneDelegate.swift; sourceTree = "<group>"; };
 		A7AE72BA1F888EF500B015D3 /* ARKitDrone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARKitDrone.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -132,6 +136,8 @@
 			children = (
 				94CCC9092972E54000F7D17F /* SCNScene+Extension.swift */,
 				94DF3F072975F15F006723FC /* UIView+Extension.swift */,
+				94D630332976078700096104 /* UIColor+Extension.swift */,
+				94D630312976077000096104 /* UIFont+Extension.swift */,
 				94CCC8FE2972E43500F7D17F /* FloatingPoint+Extension.swift */,
 				94CCC8F82972E3B200F7D17F /* SCNMatrix4+Extension.swift */,
 				94CCC8F62972E38F00F7D17F /* SCNVector3+Extension.swift */,
@@ -260,12 +266,14 @@
 				94CCC8F02972D97700F7D17F /* JoystickDelegate.swift in Sources */,
 				94D0E37D29732A3400AD55FD /* V-22.swift in Sources */,
 				94CCC8EE2972D46400F7D17F /* Missile.swift in Sources */,
+				94D630322976077000096104 /* UIFont+Extension.swift in Sources */,
 				94CCC9102972F43200F7D17F /* HelicopterCapable.swift in Sources */,
 				94CCC90A2972E54000F7D17F /* SCNScene+Extension.swift in Sources */,
 				9470AE472974001A00A55134 /* MenuViewController.swift in Sources */,
 				94CCC9122972FFB500F7D17F /* DeviceOrientation.swift in Sources */,
 				A7AE72D41F88900600B015D3 /* DroneView.swift in Sources */,
 				94CCC90E2972EB2400F7D17F /* GameSceneView.swift in Sources */,
+				94D630342976078700096104 /* UIColor+Extension.swift in Sources */,
 				94DF3F082975F167006723FC /* UIView+Extension.swift in Sources */,
 				A7AE72BE1F888EF500B015D3 /* AppDelegate.swift in Sources */,
 				94E5448F29672EE200158DA2 /* JoystickSceneDelegate.swift in Sources */,

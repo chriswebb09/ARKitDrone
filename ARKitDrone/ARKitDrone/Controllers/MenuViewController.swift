@@ -10,6 +10,11 @@ import UIKit
 
 class MenuViewController: UIViewController {
     
+    struct LocalConstants {
+        static let goToGameSegue = "GoToGame"
+        static let count = 6
+    }
+    
     @IBOutlet weak var newGameButton: UIButton! {
         didSet {
             newGameButton.setshadow()
@@ -23,10 +28,10 @@ class MenuViewController: UIViewController {
     
     @IBAction func newGameTapped(_ sender: Any) {
         DeviceOrientation.shared.set(orientation: .landscapeRight)
-        countdownToStart(count: 6)
+        countdownToStart(count: LocalConstants.count)
         DispatchQueue.main.asyncAfter(deadline: .now() + 6) { [self] in
             newGameButton.isHidden = true
-            performSegue(withIdentifier: "GoToGame", sender: self)
+            performSegue(withIdentifier: LocalConstants.goToGameSegue, sender: self)
         }
     }
     
@@ -36,8 +41,8 @@ class MenuViewController: UIViewController {
         newGameButton.titleLabel?.font = newGameButton.titleLabel?.font.withWeight(.heavy)
         newGameButton.titleLabel?.text = "\(countdown)"
         DispatchQueue.global(qos: .default).async {
-            for _ in 0...5 {
-                if countdown == 6 {
+            for _ in 0...LocalConstants.count {
+                if countdown == LocalConstants.count {
                     sleep(1)
                     countdown -= 1
                     continue
