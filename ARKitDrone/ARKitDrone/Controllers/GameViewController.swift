@@ -13,6 +13,8 @@ import SpriteKit
 
 class GameViewController: UIViewController {
     
+    // MARK: - LocalConstants
+    
     private struct LocalConstants {
         static let joystickSize = CGSize(width: 160, height: 150)
         static let joystickPoint = CGPoint(x: 0, y: 0)
@@ -21,9 +23,7 @@ class GameViewController: UIViewController {
         static let disarmTitle = "Disarm Missiles".uppercased()
     }
     
-    var placed: Bool = false
-    
-    lazy var padView1: SKView = {
+    private lazy var padView1: SKView = {
         let view = SKView(frame: CGRect(x:40, y: 20, width:140, height: 140))
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
@@ -48,11 +48,13 @@ class GameViewController: UIViewController {
         return button
     }()
     
-    var session: ARSession {
+    private var session: ARSession {
         return sceneView.session
     }
     
     @IBOutlet private weak var sceneView: GameSceneView!
+    
+    // MARK: - ViewController Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -81,7 +83,14 @@ class GameViewController: UIViewController {
         }
     }
     
-    func setupTracking() {
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        sceneView.session.pause()
+    }
+    
+    // MARK: - Private Methods
+    
+    private func setupTracking() {
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = .vertical
         let sceneReconstruction: ARWorldTrackingConfiguration.SceneReconstruction = .meshWithClassification
@@ -96,7 +105,7 @@ class GameViewController: UIViewController {
         session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
-    func setupPadScene() {
+    private func setupPadScene() {
         let scene = JoystickScene()
         scene.point = LocalConstants.joystickPoint
         scene.size = LocalConstants.joystickSize
@@ -104,7 +113,6 @@ class GameViewController: UIViewController {
         scene.stickNum = 2
         padView1.presentScene(scene)
         padView1.ignoresSiblingOrder = true
-        
         let scene2 = JoystickScene()
         scene2.point = LocalConstants.joystickPoint
         scene2.size = LocalConstants.joystickSize
@@ -114,10 +122,7 @@ class GameViewController: UIViewController {
         padView2.ignoresSiblingOrder = true
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        sceneView.session.pause()
-    }
+    // MARK: - Public Methods
     
     @objc func didTapUIButton() {
         DispatchQueue.main.async {
