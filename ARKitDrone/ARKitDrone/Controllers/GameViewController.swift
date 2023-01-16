@@ -34,19 +34,18 @@ class GameViewController: UIViewController {
         view.backgroundColor = .clear
         return view
     }()
-    
+
     lazy var armMissilesButton: UIButton = {
         let button = UIButton()
         button.setTitle("Arm Missiles".uppercased(), for: .normal)
         button.setTitleColor(UIColor.white, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.black)
         button.frame = CGRect(origin: CGPoint(x:670, y: UIScreen.main.bounds.height - 190), size: CGSize(width: 140, height: 40))
-        button.titleEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         button.layer.borderColor = UIColor.red.cgColor
         button.layer.borderWidth = 3
         return button
     }()
-    
+
     var session: ARSession {
         return sceneView.session
     }
@@ -69,6 +68,9 @@ class GameViewController: UIViewController {
             self.sceneView.addSubview(self.padView1)
             self.sceneView.addSubview(self.padView2)
             self.setupPadScene()
+            print(self.sceneView.droneSceneView.helicopter.hud.presentation.position)
+            self.sceneView.droneSceneView.helicopter.helicopterHud()
+            print(self.sceneView.droneSceneView.helicopter.hud.presentation.position)
             self.sceneView.addSubview(self.armMissilesButton)
             self.armMissilesButton.addTarget(self, action: #selector(self.didTapUIButton), for: .touchUpInside)
         }
@@ -113,13 +115,12 @@ class GameViewController: UIViewController {
     }
     
     @objc func didTapUIButton() {
-        print("missile arm button tapped")
         DispatchQueue.main.async {
             self.sceneView.armMissiles()
             if self.sceneView.droneSceneView.helicopter.missilesArmed {
-                self.armMissilesButton.setTitle("Disarm Missiles".uppercased(), for: .normal)
+               self.armMissilesButton.setTitle("Disarm Missiles".uppercased(), for: .normal)
             } else {
-                self.armMissilesButton.setTitle("Arm Missile".uppercased(), for: .normal)
+               self.armMissilesButton.setTitle("Arm Missile".uppercased(), for: .normal)
             }
         }
     }

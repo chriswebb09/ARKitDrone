@@ -12,7 +12,6 @@ import ARKit
 class Osprey: NSObject {
     
     struct LocalConstants {
-        //static let parentModelName = "grpApache"
         static let bodyName = "Body"
         static let frontRotorName = "FrontRotor"
         static let tailRotorName = "TailRotor"
@@ -111,8 +110,4 @@ class Osprey: NSObject {
         }
         SCNTransaction.commit()
     }
-}
-
-extension Osprey: SCNSceneExportDelegate {
-    
 }

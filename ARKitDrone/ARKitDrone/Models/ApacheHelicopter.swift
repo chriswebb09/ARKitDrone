@@ -19,6 +19,8 @@ class ApacheHelicopter {
         static let bodyName = "Body"
         static let frontRotorName = "FrontRotor"
         static let tailRotorName = "TailRotor"
+        static let hudNodeName = "hud"
+        static let frontIRSteering = "FrontIRSteering"
         static let missile1 = "Missile1"
         static let missile2 = "Missile2"
         static let missile3 = "Missile3"
@@ -27,6 +29,7 @@ class ApacheHelicopter {
         static let missile6 = "Missile6"
         static let missile7 = "Missile7"
         static let missile8 = "Missile8"
+        static let frontIR = "FrontIR"
         static let audioFileName = "audio.m4a"
         static let activeEmitterRate: CGFloat = 1000
     }
@@ -53,27 +56,34 @@ class ApacheHelicopter {
     
     func setup(with scene: SCNScene) {
         let tempScene = SCNScene.nodeWithModelName(LocalConstants.sceneName)
-        hud = tempScene.childNode(withName: "hud", recursively: false)
+        hud = tempScene.childNode(withName: LocalConstants.hudNodeName, recursively: false)
         parentModelNode = tempScene.childNode(withName: LocalConstants.parentModelName, recursively: true)
         helicopterNode = parentModelNode?.childNode(withName: LocalConstants.bodyName, recursively: true)
-        front = helicopterNode.childNode(withName: "FrontIRSteering", recursively: true)
-        frontIR = front.childNode(withName: "FrontIR", recursively: true)
+        front = helicopterNode.childNode(withName: LocalConstants.frontIRSteering, recursively: true)
+        frontIR = front.childNode(withName: LocalConstants.frontIR, recursively: true)
         rotor = helicopterNode?.childNode(withName: LocalConstants.frontRotorName, recursively: true)
         rotor2 = helicopterNode?.childNode(withName: LocalConstants.tailRotorName, recursively: true)
-        missile.node = helicopterNode?.childNode(withName: LocalConstants.missile1, recursively: true)
-        missile2.node = helicopterNode?.childNode(withName: LocalConstants.missile2, recursively: true)
-        missile3.node = helicopterNode?.childNode(withName: LocalConstants.missile3, recursively: true)
-        missile4.node = helicopterNode?.childNode(withName: LocalConstants.missile4, recursively: true)
-        missile5.node = helicopterNode?.childNode(withName: LocalConstants.missile5, recursively: true)
-        missile6.node = helicopterNode?.childNode(withName: LocalConstants.missile6, recursively: true)
-        missile7.node = helicopterNode?.childNode(withName: LocalConstants.missile7, recursively: true)
-        missile8.node = helicopterNode?.childNode(withName: LocalConstants.missile8, recursively: true)
+        missile.setupNode(scnNode: helicopterNode?.childNode(withName: LocalConstants.missile1, recursively: true))
+        missile2.setupNode(scnNode: helicopterNode?.childNode(withName: LocalConstants.missile2, recursively: true))
+        missile3.setupNode(scnNode: helicopterNode?.childNode(withName: LocalConstants.missile3, recursively: true))
+        missile4.setupNode(scnNode: helicopterNode?.childNode(withName: LocalConstants.missile4, recursively: true))
+        missile5.setupNode(scnNode: helicopterNode?.childNode(withName: LocalConstants.missile5, recursively: true))
+        missile6.setupNode(scnNode: helicopterNode?.childNode(withName: LocalConstants.missile6, recursively: true))
+        missile7.setupNode(scnNode: helicopterNode?.childNode(withName: LocalConstants.missile7, recursively: true))
+        missile8.setupNode(scnNode: helicopterNode?.childNode(withName: LocalConstants.missile8, recursively: true))
         parentModelNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, -20)
         hud.position = SCNVector3(x: helicopterNode.position.x + 0.6, y: helicopterNode.position.y, z: helicopterNode.position.z)
         frontIR.pivot = SCNMatrix4MakeTranslation(12.0, 0, 8.0)
         hideEmitter()
         spinBlades()
         scene.rootNode.addChildNode(tempScene)
+        hud.position = SCNVector3(x: helicopterNode.position.x + 0.6, y: helicopterNode.position.y, z: helicopterNode.position.z)
+    }
+    
+    func helicopterHud() {
+        hud.scale = SCNVector3(0.6, 0.6, 0.6)
+        hud.position =  SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y + 0.2 , z: -7)
+        print(helicopterNode.presentation.position)
     }
     
     func hideEmitter() {
@@ -121,6 +131,8 @@ class ApacheHelicopter {
         hud.constraints = [constraint]
         SCNTransaction.commit()
         SCNTransaction.commit()
+        helicopterNode.physicsBody?.resetTransform()
+        missile.node.physicsBody?.resetTransform()
     }
     
     func moveForward(value: Float) {
@@ -143,61 +155,45 @@ class ApacheHelicopter {
             return
         }
         if missile.fired == false {
-            missile.particle.birthRate = LocalConstants.activeEmitterRate
-            SCNTransaction.begin()
-            SCNTransaction.animationDuration = 2
-            missile.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
-            SCNTransaction.commit()
-            missile.fired = true
+            missile.fire(helicopterNode.presentation.simdWorldFront)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.hideEmitter()
+            }
         } else if missile2.fired == false {
-            missile2.particle.birthRate = LocalConstants.activeEmitterRate
-            SCNTransaction.begin()
-            SCNTransaction.animationDuration = 2
-            missile2.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
-            SCNTransaction.commit()
-            missile2.fired = true
+            missile2.fire(helicopterNode.presentation.simdWorldFront)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.hideEmitter()
+            }
         } else if missile3.fired == false {
-            missile3.particle.birthRate = LocalConstants.activeEmitterRate
-            SCNTransaction.begin()
-            SCNTransaction.animationDuration = 2
-            missile3.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
-            SCNTransaction.commit()
-            missile3.fired = true
+            missile3.fire(helicopterNode.presentation.simdWorldFront)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.hideEmitter()
+            }
         } else if missile4.fired == false {
-            missile4.particle.birthRate = LocalConstants.activeEmitterRate
-            SCNTransaction.begin()
-            SCNTransaction.animationDuration = 2
-            missile4.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
-            SCNTransaction.commit()
-            missile4.fired = true
+            missile4.fire(helicopterNode.presentation.simdWorldFront)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.hideEmitter()
+            }
         } else if missile5.fired == false {
-            missile5.particle.birthRate = LocalConstants.activeEmitterRate
-            SCNTransaction.begin()
-            SCNTransaction.animationDuration = 2
-            missile5.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
-            SCNTransaction.commit()
-            missile5.fired = true
+            missile5.fire(helicopterNode.presentation.simdWorldFront)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.hideEmitter()
+            }
         } else if missile6.fired == false {
-            missile6.particle.birthRate = LocalConstants.activeEmitterRate
-            SCNTransaction.begin()
-            SCNTransaction.animationDuration = 2
-            missile6.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
-            SCNTransaction.commit()
-            missile6.fired = true
+            missile6.fire(helicopterNode.presentation.simdWorldFront)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.hideEmitter()
+            }
         } else if missile7.fired == false {
-            missile7.particle.birthRate = LocalConstants.activeEmitterRate
-            SCNTransaction.begin()
-            SCNTransaction.animationDuration = 2
-            missile7.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
-            SCNTransaction.commit()
-            missile7.fired = true
+            missile7.fire(helicopterNode.presentation.simdWorldFront)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.hideEmitter()
+            }
         } else if missile8.fired == false {
-            missile8.particle.birthRate = LocalConstants.activeEmitterRate
-            SCNTransaction.begin()
-            SCNTransaction.animationDuration = 2
-            missile8.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
-            SCNTransaction.commit()
-            missile8.fired = true
+            missile8.fire(helicopterNode.presentation.simdWorldFront)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.hideEmitter()
+            }
         }
     }
     
