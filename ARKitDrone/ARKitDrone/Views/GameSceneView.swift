@@ -11,6 +11,8 @@ import SceneKit
 
 class GameSceneView: ARSCNView {
     
+    // MARK: - LocalConstants
+    
     private struct LocalConstants {
         static let sceneName =  "art.scnassets/Game.scn"
     }

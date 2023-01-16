@@ -13,6 +13,8 @@ import simd
 
 class ApacheHelicopter {
     
+    // MARK: - LocalConstants
+    
     private struct LocalConstants {
         static let sceneName = "art.scnassets/Apache.scn"
         static let parentModelName = "grpApache"
@@ -128,9 +130,12 @@ class ApacheHelicopter {
     func rotate(value: Float) {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.25
-        let locationRotation = SCNQuaternion.getQuaternion(from: SCNQuaternion.angleConversion(x: 0, y:0, z:  value * Float(Double.pi), w: 0))
+        let localAngleConversion = SCNQuaternion.angleConversion(x: 0, y:0, z:  value * Float(Double.pi), w: 0)
+        let locationRotation = SCNQuaternion.getQuaternion(from: localAngleConversion)
         helicopterNode.localRotate(by: locationRotation)
-        hud.rotate(by: SCNQuaternion.getQuaternion(from: SCNQuaternion.angleConversion(x: 0, y: -value * Float(Double.pi), z: 0, w: 0)), aroundTarget: helicopterNode.worldPosition)
+        let hudAngleConversion = SCNQuaternion.angleConversion(x: 0, y: -value * Float(Double.pi), z: 0, w: 0)
+        let hudRotation = SCNQuaternion.getQuaternion(from: hudAngleConversion)
+        hud.rotate(by: hudRotation, aroundTarget: helicopterNode.worldPosition)
         let constraint = SCNLookAtConstraint(target: helicopterNode)
         constraint.isGimbalLockEnabled = true
         constraint.influenceFactor = 0.1
@@ -166,9 +171,7 @@ class ApacheHelicopter {
     }
     
     func shootMissile() {
-        if missilesArmed == false {
-            return
-        }
+        guard missilesArmed else { return }
         if missile.fired == false {
             fire(missile: missile)
         } else if missile2.fired == false {
