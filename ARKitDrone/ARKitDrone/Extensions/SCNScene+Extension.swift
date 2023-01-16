@@ -15,6 +15,8 @@ extension SCNScene {
         return SCNScene(named: modelName)!.rootNode.clone()
     }
     
+    // from Apples demo APP
+    
     func enableEnvironmentMapWithIntensity(_ intensity: CGFloat, queue: DispatchQueue) {
         queue.async {
             if self.lightingEnvironment.contents == nil {

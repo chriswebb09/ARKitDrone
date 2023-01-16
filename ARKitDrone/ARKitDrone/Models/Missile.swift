@@ -36,8 +36,8 @@ class Missile {
         node.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
         node.physicsBody?.mass = 3
         node.physicsBody?.isAffectedByGravity = false
-        node.physicsBody?.categoryBitMask = CollisionCategory.missileCategory.rawValue
-        node.physicsBody?.contactTestBitMask = CollisionCategory.targetCategory.rawValue
+        node.physicsBody?.categoryBitMask = 1
+        node.physicsBody?.contactTestBitMask = 0
     }
     
     func fire(_ direction: simd_float3) {
@@ -45,9 +45,6 @@ class Missile {
         particle.birthRate = 1000
         node.physicsBody?.resetTransform()
         node.physicsBody?.angularVelocityFactor = SCNVector3(0, 0, 0)
-        node.physicsBody?.simdVelocityFactor = SIMD3<Float>(0, 0, 0)
-        node.physicsBody?.simdAngularVelocityFactor = SIMD3<Float>(0, 0, 0)
-        print(direction)
         node.simdWorldPosition = SIMD3<Float>(0, 0, 0)
         node.physicsBody?.resetTransform()
         Timer.scheduledTimer(withTimeInterval: 7, repeats: false) { timer in
