@@ -23,29 +23,30 @@ class MenuViewController: UIViewController {
     
     @IBAction func newGameTapped(_ sender: Any) {
         DeviceOrientation.shared.set(orientation: .landscapeRight)
-        countdownToStart()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4.5) {
-            self.performSegue(withIdentifier: "GoToGame", sender: self)
+        countdownToStart(count: 6)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 6) { [self] in
+            newGameButton.isHidden = true
+            performSegue(withIdentifier: "GoToGame", sender: self)
         }
     }
     
-    func countdownToStart() {
-        var countdown = 5
+    func countdownToStart(count: Int) {
+        var countdown = count
+        newGameButton.titleLabel?.textAlignment = .center
+        newGameButton.titleLabel?.font = newGameButton.titleLabel?.font.withWeight(.heavy)
+        newGameButton.titleLabel?.text = "\(countdown)"
         DispatchQueue.global(qos: .default).async {
             for _ in 0...5 {
-                if countdown == 5 {
+                if countdown == 6 {
                     sleep(1)
                     countdown -= 1
                     continue
                 }
                 DispatchQueue.main.async {
-                    UIView.transition(with: self.newGameButton,
-                                      duration: 0.25,
-                                      options: .transitionCrossDissolve,
-                                      animations: { [weak self] in
-                        self?.newGameButton.titleLabel?.textAlignment = .center
-                        self?.newGameButton.titleLabel?.font = self?.newGameButton.titleLabel?.font.withWeight(.heavy)
-                        self?.newGameButton.titleLabel?.text = "\(countdown)"
+                    UIView.transition(with: self.newGameButton, duration: 0.25, options: .transitionCrossDissolve, animations: { [self] in
+                        newGameButton.titleLabel?.textAlignment = .center
+                        newGameButton.titleLabel?.font = newGameButton.titleLabel?.font.withWeight(.heavy)
+                        newGameButton.titleLabel?.text = "\(countdown)"
                     }, completion: nil)
                 }
                 sleep(1)
