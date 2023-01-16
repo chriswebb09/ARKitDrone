@@ -10,12 +10,12 @@ import UIKit
 
 class MenuViewController: UIViewController {
     
-    struct LocalConstants {
+    private struct LocalConstants {
         static let goToGameSegue = "GoToGame"
         static let count = 6
     }
     
-    @IBOutlet weak var newGameButton: UIButton! {
+    @IBOutlet private weak var newGameButton: UIButton! {
         didSet {
             newGameButton.setshadow()
         }

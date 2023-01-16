@@ -53,7 +53,7 @@ class Missile {
         fired = true
     }
     
-    func getVectors() -> (SCNVector3, SCNVector3) {
+    private func getVectors() -> (SCNVector3, SCNVector3) {
         let direction = node.worldFront
         let position = node.position
         return (direction, position)

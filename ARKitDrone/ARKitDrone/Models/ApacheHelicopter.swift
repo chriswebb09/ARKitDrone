@@ -13,7 +13,7 @@ import simd
 
 class ApacheHelicopter {
     
-    struct LocalConstants {
+    private struct LocalConstants {
         static let sceneName = "art.scnassets/Apache.scn"
         static let parentModelName = "grpApache"
         static let bodyName = "Body"
@@ -34,25 +34,25 @@ class ApacheHelicopter {
         static let activeEmitterRate: CGFloat = 1000
     }
     
-    var helicopterNode: SCNNode!
-    var parentModelNode: SCNNode!
+    private var helicopterNode: SCNNode!
+    private var parentModelNode: SCNNode!
     
-    var missile: Missile = Missile(num: 1)
-    var missile2: Missile = Missile(num: 2)
-    var missile3: Missile = Missile(num: 3)
-    var missile4: Missile = Missile(num: 4)
-    var missile5: Missile = Missile(num: 5)
-    var missile6: Missile = Missile(num: 6)
-    var missile7: Missile = Missile(num: 7)
-    var missile8: Missile = Missile(num: 8)
+    private var missile: Missile = Missile(num: 1)
+    private var missile2: Missile = Missile(num: 2)
+    private var missile3: Missile = Missile(num: 3)
+    private var missile4: Missile = Missile(num: 4)
+    private var missile5: Missile = Missile(num: 5)
+    private var missile6: Missile = Missile(num: 6)
+    private var missile7: Missile = Missile(num: 7)
+    private var missile8: Missile = Missile(num: 8)
     
-    var rotor: SCNNode!
-    var rotor2: SCNNode!
-    var hud: SCNNode!
-    var front: SCNNode!
-    var frontIR: SCNNode!
+    private var rotor: SCNNode!
+    private var rotor2: SCNNode!
+    private var hud: SCNNode!
+    private var front: SCNNode!
+    private var frontIR: SCNNode!
     
-    var missilesArmed: Bool = false
+    private var missilesArmed: Bool = false
     
     func setup(with scene: SCNScene) {
         let tempScene = SCNScene.nodeWithModelName(LocalConstants.sceneName)
@@ -115,6 +115,10 @@ class ApacheHelicopter {
     
     func toggleArmMissile() {
         missilesArmed.toggle()
+    }
+    
+    func missilesAreArmed() -> Bool {
+        return missilesArmed
     }
     
     func rotate(value: Float) {

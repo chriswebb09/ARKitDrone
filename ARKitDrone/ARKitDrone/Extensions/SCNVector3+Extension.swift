@@ -8,6 +8,8 @@
 
 import SceneKit
 
+// from Apples demo APP
+
 extension SCNVector3 {
     
     func normalized() -> SCNVector3 {
@@ -15,14 +17,11 @@ extension SCNVector3 {
         return SCNVector3(self.x / magnitude, self.y / magnitude, self.z / magnitude)
     }
     
-    // from Apples demo APP
     
     static func positionFromTransform(_ transform: matrix_float4x4) -> SCNVector3 {
         return SCNVector3Make(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
     }
 }
-
-// from Apples demo APP
 
 func +(left: SCNVector3, right: SCNVector3) -> SCNVector3 {
   return SCNVector3Make(left.x + right.x, left.y + right.y, left.z + right.z)
