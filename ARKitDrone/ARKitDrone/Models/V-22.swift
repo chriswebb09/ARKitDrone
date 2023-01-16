@@ -9,7 +9,7 @@
 import SceneKit
 import ARKit
 
-class Osprey: NSObject {
+class Osprey {
     
     struct LocalConstants {
         static let bodyName = "Body"
