@@ -138,7 +138,6 @@
 			children = (
 				A7AE72C11F888EF500B015D3 /* GameViewController.swift */,
 				9470AE462974001A00A55134 /* MenuViewController.swift */,
-				94DF3F072975F15F006723FC /* UIView+Extension.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -148,6 +147,7 @@
 			children = (
 				94CCC9042972E49600F7D17F /* BinaryInteger+Extension.swift */,
 				94CCC9092972E54000F7D17F /* SCNScene+Extension.swift */,
+				94DF3F072975F15F006723FC /* UIView+Extension.swift */,
 				94CCC9022972E47000F7D17F /* float4x4+extension.swift */,
 				94CCC9002972E44A00F7D17F /* Double+Extension.swift */,
 				94DF3F052975E790006723FC /* SCNPhysicsBody+Extension.swift */,

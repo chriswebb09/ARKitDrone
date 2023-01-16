@@ -16,17 +16,9 @@ class MenuViewController: UIViewController {
         }
     }
     
-    @IBOutlet weak var countDownLabel: UILabel! {
-        didSet {
-            countDownLabel.setshadow()
-        }
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.offWhite
-        countDownLabel.isHidden = true
-        
     }
     
     @IBAction func newGameTapped(_ sender: Any) {
@@ -47,7 +39,7 @@ class MenuViewController: UIViewController {
                     continue
                 }
                 DispatchQueue.main.async {
-                    UIView.transition(with: self.countDownLabel,
+                    UIView.transition(with: self.newGameButton,
                                       duration: 0.25,
                                       options: .transitionCrossDissolve,
                                       animations: { [weak self] in
