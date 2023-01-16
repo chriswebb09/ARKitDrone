@@ -32,6 +32,10 @@ class ApacheHelicopter {
         static let frontIR = "FrontIR"
         static let audioFileName = "audio.m4a"
         static let activeEmitterRate: CGFloat = 1000
+        static let angleConversion = SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float(Double.pi), z: 0 , w: 0)
+        static let negativeAngleConversion = SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float(Double.pi), z: 0 , w: 0)
+        static let altitudeAngleConversion = SCNQuaternion.angleConversion(x: 0.001 * Float(Double.pi), y:0, z: 0 , w: 0)
+        static let negativeAltitudeAngleConversion = SCNQuaternion.angleConversion(x: -0.001 * Float(Double.pi), y:0, z: 0 , w: 0)
     }
     
     private var helicopterNode: SCNNode!
@@ -154,50 +158,33 @@ class ApacheHelicopter {
         SCNTransaction.commit()
     }
     
+    private func fire(missile: Missile) {
+        missile.fire(helicopterNode.presentation.simdWorldFront)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.hideEmitter()
+        }
+    }
+    
     func shootMissile() {
         if missilesArmed == false {
             return
         }
         if missile.fired == false {
-            missile.fire(helicopterNode.presentation.simdWorldFront)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.hideEmitter()
-            }
+            fire(missile: missile)
         } else if missile2.fired == false {
-            missile2.fire(helicopterNode.presentation.simdWorldFront)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.hideEmitter()
-            }
+            fire(missile: missile2)
         } else if missile3.fired == false {
-            missile3.fire(helicopterNode.presentation.simdWorldFront)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.hideEmitter()
-            }
+            fire(missile: missile3)
         } else if missile4.fired == false {
-            missile4.fire(helicopterNode.presentation.simdWorldFront)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.hideEmitter()
-            }
+            fire(missile: missile4)
         } else if missile5.fired == false {
-            missile5.fire(helicopterNode.presentation.simdWorldFront)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.hideEmitter()
-            }
+            fire(missile: missile5)
         } else if missile6.fired == false {
-            missile6.fire(helicopterNode.presentation.simdWorldFront)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.hideEmitter()
-            }
+            fire(missile: missile6)
         } else if missile7.fired == false {
-            missile7.fire(helicopterNode.presentation.simdWorldFront)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.hideEmitter()
-            }
+            fire(missile: missile7)
         } else if missile8.fired == false {
-            missile8.fire(helicopterNode.presentation.simdWorldFront)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.hideEmitter()
-            }
+            fire(missile: missile8)
         }
     }
     
@@ -205,14 +192,13 @@ class ApacheHelicopter {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.25
         helicopterNode.position = SCNVector3(helicopterNode.position.x, helicopterNode.position.y, helicopterNode.position.z + value)
-        helicopterNode.localRotate(by: SCNQuaternion.getQuaternion(from: SCNQuaternion.angleConversion(x: 0.001 * Float(Double.pi), y:0, z: 0 , w: 0)))
+        helicopterNode.localRotate(by: SCNQuaternion.getQuaternion(from: LocalConstants.altitudeAngleConversion))
         let pos = SCNVector3.positionFromTransform(helicopterNode.worldTransform.toSimd())
         hud.position = SCNVector3(pos.x + 0.5, pos.y, pos.z + 10)
         SCNTransaction.completionBlock = { [self] in
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 0.25
-            let localRotation = SCNQuaternion.getQuaternion(from: SCNQuaternion.angleConversion(x: -0.001 * Float(Double.pi), y:0, z: 0 , w: 0))
-            helicopterNode.localRotate(by: localRotation)
+            helicopterNode.localRotate(by: SCNQuaternion.getQuaternion(from: LocalConstants.negativeAltitudeAngleConversion))
             let pos = SCNVector3.positionFromTransform(helicopterNode.worldTransform.toSimd())
             hud.position = SCNVector3(pos.x + 0.5, pos.y, pos.z + 10)
             SCNTransaction.commit()
@@ -227,12 +213,12 @@ class ApacheHelicopter {
         let pos = SCNVector3.positionFromTransform(helicopterNode.worldTransform.toSimd())
         hud.position = SCNVector3(pos.x + 0.5, pos.y, pos.z + 10)
         if abs(value) != value {
-            let localRotation = SCNQuaternion.getQuaternion(from: SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float(Double.pi), z: 0 , w: 0))
+            let localRotation = SCNQuaternion.getQuaternion(from: LocalConstants.negativeAngleConversion)
             helicopterNode.localRotate(by: localRotation)
             let pos = SCNVector3.positionFromTransform(helicopterNode.worldTransform.toSimd())
             hud.position = SCNVector3(pos.x + 0.5, pos.y, pos.z + 10)
         } else {
-            let localRotation = SCNQuaternion.getQuaternion(from: SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float(Double.pi), z: 0 , w: 0))
+            let localRotation = SCNQuaternion.getQuaternion(from: LocalConstants.angleConversion)
             helicopterNode.localRotate(by: localRotation)
             let pos = SCNVector3.positionFromTransform(helicopterNode.worldTransform.toSimd())
             hud.position = SCNVector3(pos.x + 1, pos.y, pos.z + 10)
@@ -242,12 +228,12 @@ class ApacheHelicopter {
                 SCNTransaction.begin()
                 SCNTransaction.animationDuration = 0.25
                 if abs(value) != value {
-                    let localRotation = SCNQuaternion.getQuaternion(from:SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float(Double.pi), z: 0 , w: 0))
+                    let localRotation = SCNQuaternion.getQuaternion(from: LocalConstants.angleConversion)
                     helicopterNode.localRotate(by: localRotation)
                     let pos = SCNVector3.positionFromTransform(helicopterNode.worldTransform.toSimd())
                     hud.position = SCNVector3(pos.x + 1, pos.y, pos.z + 10)
                 } else {
-                    let localRotation = SCNQuaternion.getQuaternion(from:SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float(Double.pi), z: 0 , w: 0))
+                    let localRotation = SCNQuaternion.getQuaternion(from: LocalConstants.negativeAngleConversion)
                     helicopterNode.localRotate(by: localRotation)
                     let pos = SCNVector3.positionFromTransform(helicopterNode.worldTransform.toSimd())
                     hud.position = SCNVector3(pos.x + 1, pos.y, pos.z + 10)
