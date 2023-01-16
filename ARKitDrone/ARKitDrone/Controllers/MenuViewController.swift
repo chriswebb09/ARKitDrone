@@ -10,10 +10,14 @@ import UIKit
 
 class MenuViewController: UIViewController {
     
+    // MARK: - LocalConstants
+    
     private struct LocalConstants {
         static let goToGameSegue = "GoToGame"
         static let count = 6
     }
+    
+    // MARK: - Private Properties
     
     @IBOutlet private weak var newGameButton: UIButton! {
         didSet {
