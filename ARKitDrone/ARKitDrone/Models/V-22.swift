@@ -33,7 +33,7 @@ class Osprey {
     private var particle: SCNParticleSystem!
     
     func setup(with scene: SCNScene) {
-        let tempScene = SCNScene.nodeWithModelName("art.scnassets/osprey.scn")
+        let tempScene = SCNScene.nodeWithModelName("art.scnassets/osprey.dae")
         helicopterNode = tempScene.childNode(withName: LocalConstants.bodyName, recursively: true)
         engineNode = helicopterNode.childNode(withName: LocalConstants.engineName, recursively: true)
         rotor = engineNode.childNode(withName: LocalConstants.blade, recursively: true)
@@ -42,7 +42,7 @@ class Osprey {
         scene.rootNode.addChildNode(tempScene)
     }
     
-    func spinBlades() {
+    private func spinBlades() {
         let rotate = SCNAction.rotateBy(x: 0, y: 10, z: 0, duration: 0.5)
         let moveSequence = SCNAction.sequence([rotate])
         let moveLoop = SCNAction.repeatForever(moveSequence)
@@ -79,7 +79,8 @@ class Osprey {
         SCNTransaction.completionBlock = { [self] in
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 0.25
-            let localRotation = SCNQuaternion.getQuaternion(from: SCNQuaternion.angleConversion(x: -0.001 * Float(Double.pi), y:0, z: 0 , w: 0))
+            let angleConversion = SCNQuaternion.angleConversion(x: -0.001 * Float(Double.pi), y:0, z: 0 , w: 0)
+            let localRotation = SCNQuaternion.getQuaternion(from: angleConversion)
             helicopterNode.localRotate(by: localRotation)
             SCNTransaction.commit()
         }

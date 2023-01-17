@@ -11,14 +11,15 @@ import SpriteKit
 
 class Joystick : SKNode {
     
-    struct LocalConstants {
+    private struct LocalConstants {
         static let kThumbSpringBack: Double =  0.3
     }
 
-    let backdropNode, thumbNode: SKSpriteNode
-    var isTracking: Bool = false
+    private let backdropNode, thumbNode: SKSpriteNode
+    private var isTracking: Bool = false
+    private var angularVelocity: CGFloat = 0.0
+    
     var velocity: CGPoint = CGPointMake(0, 0)
-    var angularVelocity: CGFloat = 0.0
     
     weak var delegate: JoystickDelegate?
     
@@ -34,6 +35,8 @@ class Joystick : SKNode {
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - Touches Lifecycle
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
@@ -66,6 +69,8 @@ class Joystick : SKNode {
         super.touchesCancelled(touches, with: event)
         resetVelocity()
     }
+    
+    // MARK: - Private
     
     private func resetVelocity() {
         isTracking = false

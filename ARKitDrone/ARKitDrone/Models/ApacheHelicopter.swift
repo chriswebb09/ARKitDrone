@@ -107,7 +107,7 @@ class ApacheHelicopter {
         hud.position =  SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y + 0.2 , z: -7)
     }
     
-    func hideEmitter() {
+    private func hideEmitter() {
         missile.setParticle()
         missile2.setParticle()
         missile3.setParticle()
@@ -138,10 +138,7 @@ class ApacheHelicopter {
         let constraint = SCNLookAtConstraint(target: helicopterNode)
         constraint.isGimbalLockEnabled = true
         constraint.influenceFactor = 0.1
-        SCNTransaction.begin()
-        SCNTransaction.animationDuration = 3.0
         hud.constraints = [constraint]
-        SCNTransaction.commit()
         SCNTransaction.commit()
         helicopterNode.physicsBody?.resetTransform()
         missile.node.physicsBody?.resetTransform()
