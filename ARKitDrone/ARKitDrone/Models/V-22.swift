@@ -24,13 +24,13 @@ class Osprey {
         static let activeEmitterRate: CGFloat = 1000
     }
     
-    var helicopterNode: SCNNode!
-    var engineNode: SCNNode!
-    var parentModelNode: SCNNode!
-    var missile: SCNNode!
-    var rotor: SCNNode!
-    var rotor2: SCNNode!
-    var particle: SCNParticleSystem!
+    private var helicopterNode: SCNNode!
+    private var engineNode: SCNNode!
+    private var parentModelNode: SCNNode!
+    private var missile: SCNNode!
+    private var rotor: SCNNode!
+    private var rotor2: SCNNode!
+    private var particle: SCNParticleSystem!
     
     func setup(with scene: SCNScene) {
         let tempScene = SCNScene.nodeWithModelName("art.scnassets/osprey.scn")

@@ -10,6 +10,7 @@
 import SpriteKit
 
 class JoystickScene: SKScene {
+    
     weak var joystickDelegate: JoystickSceneDelegate?
     
     var stickNum: Int = 0
@@ -17,27 +18,29 @@ class JoystickScene: SKScene {
     
     var point = CGPoint(x: 0, y: 0)
     
-    lazy var joystick: Joystick = {
+    private lazy var joystick: Joystick = {
         var joystick = Joystick()
         joystick.position = CGPointMake(90, 85)
         return joystick
     }()
     
     override func didMove(to view: SKView) {
+        super.didMove(to: view)
         self.backgroundColor = .clear
         setupJoystick()
     }
     
-    func setupNodes() {
+    private func setupNodes() {
         anchorPoint = point
     }
     
-    func setupJoystick() {
+    private func setupJoystick() {
         addChild(joystick)
         joystick.delegate = self
     }
     
     override func update(_ currentTime: CFTimeInterval) {
+        super.update(currentTime)
         if joystick.velocity.x != 0 || joystick.velocity.y != 0 {
             if abs(joystick.velocity.x) < abs(joystick.velocity.y) {
                 joystickDelegate?.update(yValue: Float(joystick.velocity.y), stickNum: stickNum)
@@ -49,7 +52,9 @@ class JoystickScene: SKScene {
 }
 
 extension JoystickScene: JoystickDelegate {
+    
     func tapped() {
         joystickDelegate?.tapped()
     }
 }
+
