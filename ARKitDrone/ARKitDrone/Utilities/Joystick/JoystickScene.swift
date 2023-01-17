@@ -15,7 +15,6 @@ class JoystickScene: SKScene {
     
     var stickNum: Int = 0
     var velocity: Float = 0
-    
     var point = CGPoint(x: 0, y: 0)
     
     private lazy var joystick: Joystick = {
@@ -26,17 +25,8 @@ class JoystickScene: SKScene {
     
     override func didMove(to view: SKView) {
         super.didMove(to: view)
-        self.backgroundColor = .clear
+        backgroundColor = .clear
         setupJoystick()
-    }
-    
-    private func setupNodes() {
-        anchorPoint = point
-    }
-    
-    private func setupJoystick() {
-        addChild(joystick)
-        joystick.delegate = self
     }
     
     override func update(_ currentTime: CFTimeInterval) {
@@ -48,6 +38,15 @@ class JoystickScene: SKScene {
                 joystickDelegate?.update(xValue: Float(joystick.velocity.x), stickNum: stickNum)
             }
         }
+    }
+    
+    private func setupNodes() {
+        anchorPoint = point
+    }
+    
+    private func setupJoystick() {
+        addChild(joystick)
+        joystick.delegate = self
     }
 }
 

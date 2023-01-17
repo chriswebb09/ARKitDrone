@@ -120,13 +120,11 @@ class GameViewController: UIViewController {
     // MARK: - Actions
     
     @objc func didTapUIButton() {
-        DispatchQueue.main.async {
-            self.sceneView.toggleArmMissiles()
-            if self.sceneView.missilesArmed() {
-                self.armMissilesButton.setTitle(LocalConstants.disarmTitle, for: .normal)
-            } else {
-                self.armMissilesButton.setTitle(LocalConstants.buttonTitle, for: .normal)
-            }
+        sceneView.toggleArmMissiles()
+        if sceneView.missilesArmed() {
+            armMissilesButton.setTitle(LocalConstants.disarmTitle, for: .normal)
+        } else {
+            armMissilesButton.setTitle(LocalConstants.buttonTitle, for: .normal)
         }
     }
 }
