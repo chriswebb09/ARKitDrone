@@ -17,6 +17,11 @@ class DroneSceneView: ARSCNView {
     func setup(scene: SCNScene) {
         helicopter.setup(with: scene)
     }
+}
+
+// MARK: - HelicopterCapable
+
+extension DroneSceneView: HelicopterCapable  {
     
     func rotate(value: Float) {
         helicopter.rotate(value: value)

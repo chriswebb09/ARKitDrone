@@ -25,10 +25,14 @@ class MenuViewController: UIViewController {
         }
     }
     
+    // MARK: - ViewController Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.offWhite
     }
+    
+    // MARK: - Button Actions
     
     @IBAction func newGameTapped(_ sender: Any) {
         DeviceOrientation.shared.set(orientation: .landscapeRight)

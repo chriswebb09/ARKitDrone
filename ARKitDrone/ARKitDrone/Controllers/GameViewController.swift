@@ -117,7 +117,7 @@ class GameViewController: UIViewController {
         padView2.ignoresSiblingOrder = true
     }
     
-    // MARK: - Public Methods
+    // MARK: - Actions
     
     @objc func didTapUIButton() {
         DispatchQueue.main.async {
