@@ -39,6 +39,8 @@ class GameViewController: UIViewController {
         return view
     }()
     
+//    private let droneQueue = DispatchQueue(label: "com.froleeyo.dronequeue")
+    
     private lazy var armMissilesButton: UIButton = {
         let button = UIButton()
         button.setTitle(LocalConstants.buttonTitle, for: .normal)
@@ -46,6 +48,7 @@ class GameViewController: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.black)
         button.frame = CGRect(origin: CGPoint(x:670, y: UIScreen.main.bounds.height - 190), size: CGSize(width: 140, height: 40))
         button.layer.borderColor = UIColor.red.cgColor
+        button.backgroundColor = UIColor.red
         button.layer.borderWidth = 3
         return button
     }()
@@ -57,6 +60,11 @@ class GameViewController: UIViewController {
     @IBOutlet private weak var sceneView: GameSceneView!
     
     // MARK: - ViewController Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        sceneView.delegate = self
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -93,10 +101,12 @@ class GameViewController: UIViewController {
         if ARWorldTrackingConfiguration.supportsSceneReconstruction(sceneReconstruction) {
             configuration.sceneReconstruction = sceneReconstruction
         }
+        configuration.frameSemantics = .sceneDepth
         sceneView.automaticallyUpdatesLighting = false
         if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
             sceneView.scene.lightingEnvironment.contents = environmentMap
         }
+        
         session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
@@ -121,12 +131,13 @@ class GameViewController: UIViewController {
     
     @objc func didTapUIButton() {
         sceneView.toggleArmMissiles()
-        if sceneView.missilesArmed() {
-            armMissilesButton.setTitle(LocalConstants.disarmTitle, for: .normal)
-        } else {
-            armMissilesButton.setTitle(LocalConstants.buttonTitle, for: .normal)
-        }
+        let title = sceneView.missilesArmed() ? LocalConstants.disarmTitle : LocalConstants.buttonTitle
+        armMissilesButton.setTitle(title, for: .normal)
     }
+}
+
+extension GameViewController: ARSCNViewDelegate {
+   
 }
 
 // MARK: - JoystickSceneDelegate
@@ -138,14 +149,14 @@ extension GameViewController: JoystickSceneDelegate {
             let scaled = (xValue) * 0.00025
             sceneView.rotate(value: scaled)
         } else if stickNum == 2 {
-            let scaled = -(xValue) * 0.5
+            let scaled = (xValue) * 0.5
             sceneView.moveSides(value: scaled)
         }
     }
     
     func update(yValue: Float, stickNum: Int) {
         if stickNum == 1 {
-            let scaled = -(yValue) * 0.5
+            let scaled = (yValue) * 0.5
             sceneView.moveForward(value: scaled)
         } else if stickNum == 2 {
             let scaled = (yValue) * 0.5
