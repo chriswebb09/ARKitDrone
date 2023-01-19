@@ -20,10 +20,6 @@ class Missile {
         self.missileNum = num
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     func setParticle() {
         guard let particleNode = node.childNodes.first, let particleSystems = particleNode.particleSystems else { return }
         particle = particleSystems[0]
@@ -34,30 +30,21 @@ class Missile {
         guard let scnNode = scnNode else { return }
         node = scnNode
         node.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
-        node.physicsBody?.mass = 3
         node.physicsBody?.isAffectedByGravity = false
         node.physicsBody?.categoryBitMask = 1
         node.physicsBody?.contactTestBitMask = 0
     }
     
-    func fire(_ direction: simd_float3) {
+    func fire() {
         guard fired == false else { return }
         particle.birthRate = 1000
-        node.physicsBody?.resetTransform()
-        node.physicsBody?.angularVelocityFactor = SCNVector3(0, 0, 0)
-        node.simdWorldPosition = SIMD3<Float>(0, 0, 0)
-        node.physicsBody?.resetTransform()
-        Timer.scheduledTimer(withTimeInterval: 7, repeats: false) { timer in
+        SCNTransaction.begin()
+        SCNTransaction.animationDuration = 4
+        self.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+        SCNTransaction.commit()
+        Timer.scheduledTimer(withTimeInterval: 4, repeats: false) { timer in
             self.node.removeFromParentNode()
         }
         fired = true
-    }
-    
-    // MARK: - Private Methods
-    
-    private func getVectors() -> (SCNVector3, SCNVector3) {
-        let direction = node.worldFront
-        let position = node.position
-        return (direction, position)
     }
 }
