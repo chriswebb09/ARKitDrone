@@ -23,6 +23,14 @@ class DroneSceneView: ARSCNView {
 
 extension DroneSceneView: HelicopterCapable  {
     
+    /// Void function that rotates the helicopter based
+    /// from *float* value passed
+    ///
+    /// - Parameters:
+    ///     - value: The *value* parameter determines the movement rotation
+    ///              of the drone
+    ///
+    ///
     func rotate(value: Float) {
         helicopter.rotate(value: value)
     }

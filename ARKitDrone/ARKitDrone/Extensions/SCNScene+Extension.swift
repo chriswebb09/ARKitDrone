@@ -57,6 +57,14 @@ extension SCNVector3 {
         return SCNVector3(self.x / magnitude, self.y / magnitude, self.z / magnitude)
     }
     
+    /// Returns a position in SCNVector3
+    /// from matrix_float4x4
+    ///
+    /// - Parameters:
+    ///     - transform: The *transform* matrix from which the coordinate is derived.
+    ///
+    /// - Returns: the positon in SCNVector3 from `transform`.
+    
     static func positionFromTransform(_ transform: matrix_float4x4) -> SCNVector3 {
         return SCNVector3(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
     }
