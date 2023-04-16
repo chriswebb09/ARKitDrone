@@ -3,6 +3,13 @@
 [![Platform](http://img.shields.io/badge/platform-ios-lightgrey.svg?style=flat)](https://developer.apple.com/resources/)
 [![Platform](https://img.shields.io/badge/swift-4.0-orange.svg?style=flat)](hhttps://swift.org/blog/swift-4-0-released/)
 
+## New UI 
+
+![New UI](https://raw.githubusercontent.com/chriswebb09/ARKitDrone/master/drone1.png)
+
+----
+
+## Outdated UI
 UISlider may need to be adjusted. 
 
 [Tutorial](https://medium.com/journey-of-one-thousand-apps/aarkit-adventures-697dfbe7779e)
