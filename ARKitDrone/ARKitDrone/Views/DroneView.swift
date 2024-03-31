@@ -30,18 +30,37 @@ extension DroneSceneView: HelicopterCapable  {
     ///     - value: The *value* parameter determines the movement rotation
     ///              of the drone
     ///
-    ///
+    
     func rotate(value: Float) {
         helicopter.rotate(value: value)
     }
+    
+    /// Void function that change the position of the helicopter based
+    /// from *float* value passed
+    ///
+    /// - Parameters:
+    ///     - value: The *value* parameter determines the movement forward and backward
+    ///              of the drone
+    ///
+
     
     func moveForward(value: Float) {
         helicopter.moveForward(value: value)
     }
     
+    /// Void function that trigger a misile firing
+
     func shootMissile() {
         helicopter.shootMissile()
     }
+    
+    /// Void function that change the altitude of the helicopter based
+    /// from *float* value passed
+    ///
+    /// - Parameters:
+    ///     - value: The *value* parameter determines the altitude
+    ///              of the drone
+    ///
     
     func changeAltitude(value: Float) {
         helicopter.changeAltitude(value: value)

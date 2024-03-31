@@ -51,7 +51,7 @@ class MenuViewController: UIViewController {
         newGameButton.titleLabel?.font = newGameButton.titleLabel?.font.withWeight(.heavy)
         newGameButton.titleLabel?.text = "\(countdown)"
         DispatchQueue.global(qos: .default).async {
-            for _ in 0...LocalConstants.count {
+            for _ in 1...LocalConstants.count {
                 if countdown == LocalConstants.count {
                     sleep(1)
                     countdown -= 1

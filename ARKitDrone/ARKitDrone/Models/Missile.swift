@@ -12,39 +12,38 @@ import ARKit
 class Missile {
     
     var node: SCNNode!
+    var particle: SCNParticleSystem?
     var fired: Bool = false
-    var missileNum = 0
-    var particle: SCNParticleSystem!
-    
-    init(num: Int) {
-        self.missileNum = num
-    }
-    
-    func setParticle() {
-        guard let particleNode = node.childNodes.first, let particleSystems = particleNode.particleSystems else { return }
-        particle = particleSystems[0]
-        particle.birthRate = 0
-    }
-    
+
     func setupNode(scnNode: SCNNode?) {
         guard let scnNode = scnNode else { return }
         node = scnNode
         node.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
         node.physicsBody?.isAffectedByGravity = false
-        node.physicsBody?.categoryBitMask = 1
-        node.physicsBody?.contactTestBitMask = 0
+        node.physicsBody?.categoryBitMask = 4
+        node.physicsBody?.collisionBitMask = 5
+        setParticle()
     }
+    
+    func setParticle() {
+           guard let particleNode = node.childNodes.first, 
+                    let particleSystems = particleNode.particleSystems else {
+               return
+           }
+           particle = particleSystems[0]
+           particle?.birthRate = 0
+       }
     
     func fire() {
         guard fired == false else { return }
-        particle.birthRate = 1000
+        particle?.birthRate = 4000
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 4
-        self.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+        SCNTransaction.animationDuration = 2
+        self.node.localTranslate(by: SCNVector3(x: 0, y: 0, z: -10000))
         SCNTransaction.commit()
-        Timer.scheduledTimer(withTimeInterval: 4, repeats: false) { timer in
+        Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { timer in
             self.node.removeFromParentNode()
+            self.fired = true
         }
-        fired = true
     }
 }

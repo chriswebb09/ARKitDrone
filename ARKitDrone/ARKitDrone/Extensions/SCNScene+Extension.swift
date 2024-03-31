@@ -7,6 +7,7 @@
 //
 
 import SceneKit
+import ARKit
 
 // MARK: - Scene extensions
 
