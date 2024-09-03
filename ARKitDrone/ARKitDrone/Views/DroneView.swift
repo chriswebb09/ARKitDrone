@@ -45,7 +45,7 @@ extension DroneSceneView: HelicopterCapable  {
 
     
     func moveForward(value: Float) {
-        helicopter.moveForward(value: value)
+        helicopter.moveForward(value: (value / 30.0))
     }
     
     /// Void function that trigger a misile firing
@@ -63,11 +63,11 @@ extension DroneSceneView: HelicopterCapable  {
     ///
     
     func changeAltitude(value: Float) {
-        helicopter.changeAltitude(value: value)
+        helicopter.changeAltitude(value: value / 10)
     }
     
     func moveSides(value: Float) {
-        helicopter.moveSides(value: value)
+        helicopter.moveSides(value: value / 10)
     }
     
     func toggleArmMissile() {

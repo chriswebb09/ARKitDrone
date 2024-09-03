@@ -38,7 +38,7 @@ class Missile {
         guard fired == false else { return }
         particle?.birthRate = 4000
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 2
+        SCNTransaction.animationDuration = 3
         self.node.localTranslate(by: SCNVector3(x: 0, y: 0, z: -10000))
         SCNTransaction.commit()
         Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { timer in

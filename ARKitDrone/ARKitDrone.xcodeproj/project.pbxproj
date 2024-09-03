@@ -15,6 +15,10 @@
 		9467A30F2BB93A840023EA62 /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9467A30E2BB93A840023EA62 /* Shell.swift */; };
 		9470AE472974001A00A55134 /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9470AE462974001A00A55134 /* MenuViewController.swift */; };
 		9485FA17295EBE42008407B2 /* MatrixHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9485FA16295EBE42008407B2 /* MatrixHelper.swift */; };
+		94A68F722C8797070059CD82 /* SCNMatrix4+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F712C8797070059CD82 /* SCNMatrix4+Extension.swift */; };
+		94A68F742C87972E0059CD82 /* SCNQuaternion+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F732C87972E0059CD82 /* SCNQuaternion+Extension.swift */; };
+		94A68F762C8797550059CD82 /* SCNVector3+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F752C8797550059CD82 /* SCNVector3+Extension.swift */; };
+		94CB148E2C8793BF0065E1B0 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CB148D2C8793BF0065E1B0 /* UIColor+Extension.swift */; };
 		94CCC8EB2972D14600F7D17F /* audio.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 94CCC8EA2972D14600F7D17F /* audio.m4a */; };
 		94CCC8EE2972D46400F7D17F /* Missile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC8ED2972D46400F7D17F /* Missile.swift */; };
 		94CCC8F02972D97700F7D17F /* JoystickDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC8EF2972D97700F7D17F /* JoystickDelegate.swift */; };
@@ -46,6 +50,10 @@
 		9467A30E2BB93A840023EA62 /* Shell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
 		9470AE462974001A00A55134 /* MenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
 		9485FA16295EBE42008407B2 /* MatrixHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixHelper.swift; sourceTree = "<group>"; };
+		94A68F712C8797070059CD82 /* SCNMatrix4+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNMatrix4+Extension.swift"; sourceTree = "<group>"; };
+		94A68F732C87972E0059CD82 /* SCNQuaternion+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNQuaternion+Extension.swift"; sourceTree = "<group>"; };
+		94A68F752C8797550059CD82 /* SCNVector3+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNVector3+Extension.swift"; sourceTree = "<group>"; };
+		94CB148D2C8793BF0065E1B0 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		94CCC8EA2972D14600F7D17F /* audio.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = audio.m4a; sourceTree = "<group>"; };
 		94CCC8ED2972D46400F7D17F /* Missile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Missile.swift; sourceTree = "<group>"; };
 		94CCC8EF2972D97700F7D17F /* JoystickDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoystickDelegate.swift; sourceTree = "<group>"; };
@@ -138,10 +146,14 @@
 			isa = PBXGroup;
 			children = (
 				94CCC9092972E54000F7D17F /* SCNScene+Extension.swift */,
+				94A68F752C8797550059CD82 /* SCNVector3+Extension.swift */,
+				94A68F732C87972E0059CD82 /* SCNQuaternion+Extension.swift */,
+				94A68F712C8797070059CD82 /* SCNMatrix4+Extension.swift */,
 				94D598432BB9037400B31874 /* SCNGeometry+Extension.swift */,
 				94DF3F072975F15F006723FC /* UIView+Extension.swift */,
 				94D630312976077000096104 /* UIFont+Extension.swift */,
 				94CCC8FE2972E43500F7D17F /* FloatingPoint+Extension.swift */,
+				94CB148D2C8793BF0065E1B0 /* UIColor+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -209,7 +221,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 0910;
-				LastUpgradeCheck = 1530;
+				LastUpgradeCheck = 1540;
 				ORGANIZATIONNAME = "Christopher Webb-Orenstein";
 				TargetAttributes = {
 					A7AE72B91F888EF500B015D3 = {
@@ -257,6 +269,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				94A68F742C87972E0059CD82 /* SCNQuaternion+Extension.swift in Sources */,
 				9485FA17295EBE42008407B2 /* MatrixHelper.swift in Sources */,
 				945B16AD294EB34800482E14 /* JoystickScene.swift in Sources */,
 				94F968A82AD7337F00D7B418 /* Plane.swift in Sources */,
@@ -272,10 +285,13 @@
 				9470AE472974001A00A55134 /* MenuViewController.swift in Sources */,
 				94CCC9122972FFB500F7D17F /* DeviceOrientation.swift in Sources */,
 				A7AE72D41F88900600B015D3 /* DroneView.swift in Sources */,
+				94CB148E2C8793BF0065E1B0 /* UIColor+Extension.swift in Sources */,
 				9467A30B2BB918EE0023EA62 /* M1Tank.swift in Sources */,
 				94CCC90E2972EB2400F7D17F /* GameSceneView.swift in Sources */,
 				94DF3F082975F167006723FC /* UIView+Extension.swift in Sources */,
 				9467A30D2BB93A6E0023EA62 /* Tank.swift in Sources */,
+				94A68F762C8797550059CD82 /* SCNVector3+Extension.swift in Sources */,
+				94A68F722C8797070059CD82 /* SCNMatrix4+Extension.swift in Sources */,
 				A7AE72BE1F888EF500B015D3 /* AppDelegate.swift in Sources */,
 				94E5448F29672EE200158DA2 /* JoystickSceneDelegate.swift in Sources */,
 				94CCC8FF2972E43500F7D17F /* FloatingPoint+Extension.swift in Sources */,
@@ -309,6 +325,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -371,6 +388,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";

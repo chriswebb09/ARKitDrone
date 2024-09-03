@@ -18,6 +18,7 @@ class GameSceneView: ARSCNView {
     }
     
     private var droneSceneView: DroneSceneView!
+    
     var tankModel: SCNNode!
     var tankNode: SCNNode!
     
@@ -26,7 +27,7 @@ class GameSceneView: ARSCNView {
         scene = SCNScene(named: LocalConstants.sceneName)!
         tankModel = nodeWithModelName("art.scnassets/m1.scn")
         tankNode = tankModel.childNode(withName: "m1tank", recursively: true)
-        tankNode.scale = SCNVector3(x: 0.04, y: 0.04, z: 0.04)
+        tankNode.scale = SCNVector3(x: 0.03, y: 0.03, z: 0.03)
         tankNode.physicsBody?.categoryBitMask = 2
         droneSceneView = DroneSceneView(frame: UIScreen.main.bounds)
         droneSceneView.setup(scene: scene)

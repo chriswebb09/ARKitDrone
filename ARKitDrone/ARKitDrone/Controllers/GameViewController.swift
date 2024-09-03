@@ -41,7 +41,7 @@ class GameViewController: UIViewController {
         if UIDevice.current.isIpad {
             offset = 220
         }
-        let view = SKView(frame: CGRect(x:60, y: UIScreen.main.bounds.height - offset, width:140, height: 140))
+        let view = SKView(frame: CGRect(x:60, y: UIScreen.main.bounds.height - 140, width:140, height: 140))
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
         return view
@@ -166,10 +166,14 @@ class GameViewController: UIViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if !placed {
             let tapLocation: CGPoint = touches.first!.location(in: sceneView)
-            let result = sceneView.raycastQuery(from: tapLocation, allowing: .estimatedPlane, alignment: .horizontal)
-            let castRay =  session.raycast(result!)
-            sceneView.positionTank(position: SCNVector3.positionFromTransform(castRay.first!.worldTransform))
-            placed = true
+            if let result = sceneView.raycastQuery(from: tapLocation, allowing: .estimatedPlane, alignment: .horizontal) {
+                let castRay =  session.raycast(result)
+                if let firstCast = castRay.first {
+                    sceneView.positionTank(position: SCNVector3.positionFromTransform(firstCast.worldTransform))
+                }
+                placed = true
+            }
+        
         }
     }
 }
