@@ -26,20 +26,19 @@ class Missile {
     }
     
     func setParticle() {
-           guard let particleNode = node.childNodes.first, 
-                    let particleSystems = particleNode.particleSystems else {
+           guard let particleNode = node.childNodes.first, let particleSystems = particleNode.particleSystems else {
                return
            }
            particle = particleSystems[0]
            particle?.birthRate = 0
        }
     
-    func fire() {
+    func fire(x: Float, y: Float) {
         guard fired == false else { return }
         particle?.birthRate = 4000
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 3
-        self.node.localTranslate(by: SCNVector3(x: 0, y: 0, z: -10000))
+        node.localTranslate(by: SCNVector3(x: x, y: y, z: -10000))
         SCNTransaction.commit()
         Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { timer in
             self.node.removeFromParentNode()

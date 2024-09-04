@@ -49,7 +49,6 @@ class OcclusionNode: SCNNode {
                                               vertexCount: mesh.normals.count,
                                               dataOffset: mesh.normals.offset,
                                               dataStride: mesh.normals.stride)
-        
         let vertexCountPerFace = mesh.faces.indexCountPerPrimitive
         let vertexIndicesPointer = mesh.faces.buffer.contents()
         var vertexIndices = [UInt32]()

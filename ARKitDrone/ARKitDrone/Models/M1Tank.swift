@@ -20,13 +20,16 @@ class M1AbramsTank {
         static let maingun = "gun"
         static let body = "body"
     }
+    
     var tankRotateAngle: Double = 0.0
+    
     private var tankNode: SCNNode!
     private var tracksNode: SCNNode!
     private var turretNode: SCNNode!
     private var mainGunNode: SCNNode!
     private var maxUp: Float = -0.133
     private var maxDown: Float = 0.133
+    
     var maxRotation: Float = 0
     
     func setup(with scene: SCNScene, transform: SCNMatrix4) {
@@ -97,7 +100,6 @@ extension M1AbramsTank: Tank {
         tankNode.localTranslate(by: SCNVector3(x: 0, y: dir, z: 0))
         SCNTransaction.commit()
     }
-    
 }
 
 

@@ -16,7 +16,6 @@ class ApacheHelicopter {
     // MARK: - LocalConstants
     
     private struct LocalConstants {
-        
         static let sceneName = "art.scnassets/Apache.scn"
         static let parentModelName = "grpApache"
         static let bodyName = "Body"
@@ -26,7 +25,6 @@ class ApacheHelicopter {
         static let tailRotorName = "TailRotor"
         static let hudNodeName = "hud"
         static let frontIRSteering = "FrontIRSteering"
-        
         static let missile1 = "Missile1"
         static let missile2 = "Missile2"
         static let missile3 = "Missile3"
@@ -35,10 +33,8 @@ class ApacheHelicopter {
         static let missile6 = "Missile6"
         static let missile7 = "Missile7"
         static let missile8 = "Missile8"
-        
         static let frontIR = "FrontIR"
         static let audioFileName = "audio.m4a"
-        
         static let activeEmitterRate: CGFloat = 1000
         static let angleConversion = SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float.pi, z: 0 , w: 0)
         static let negativeAngleConversion = SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float.pi, z: 0 , w: 0)
@@ -48,9 +44,7 @@ class ApacheHelicopter {
     
     private var helicopterNode: SCNNode!
     private var parentModelNode: SCNNode!
-    
     var firing:Bool = false
-    
     private var missile1: Missile = Missile()
     private var missile2: Missile = Missile()
     private var missile3: Missile = Missile()
@@ -59,9 +53,7 @@ class ApacheHelicopter {
     private var missile6: Missile = Missile()
     private var missile7: Missile = Missile()
     private var missile8: Missile = Missile()
-    
     var missiles: [Missile] = []
-    
     private var rotor: SCNNode!
     private var rotor2: SCNNode!
     private var wingL: SCNNode!
@@ -123,15 +115,11 @@ class ApacheHelicopter {
         missile2.setupNode(scnNode: wingR.childNode(withName: LocalConstants.missile2, recursively: true))
         missile3.setupNode(scnNode: wingR.childNode(withName: LocalConstants.missile3, recursively: true))
         missile4.setupNode(scnNode: wingR.childNode(withName: LocalConstants.missile4, recursively: true))
-        
         missile5.setupNode(scnNode: wingL.childNode(withName: LocalConstants.missile5, recursively: true))
         missile6.setupNode(scnNode: wingL.childNode(withName: LocalConstants.missile6, recursively: true))
         missile7.setupNode(scnNode: wingL.childNode(withName: LocalConstants.missile7, recursively: true))
         missile8.setupNode(scnNode: wingL.childNode(withName: LocalConstants.missile8, recursively: true))
-        
-        parentModelNode.position = SCNVector3(helicopterNode.position.x, 
-                                              helicopterNode.position.y,
-                                              0)
+        parentModelNode.position = SCNVector3(helicopterNode.position.x,  helicopterNode.position.y, 0)
         //        hud.position = SCNVector3(x: helicopterNode.position.x,
         //                                  y: helicopterNode.position.y,
         //                                  z: helicopterNode.position.z)
@@ -164,10 +152,7 @@ class ApacheHelicopter {
         let localAngleConversion = SCNQuaternion.angleConversion(x: 0, y:  -value * Float(Double.pi), z: 0, w: 0)
         let locationRotation = SCNQuaternion.getQuaternion(from: localAngleConversion)
         helicopterNode.localRotate(by: locationRotation)
-        let hudAngleConversion = SCNQuaternion.angleConversion(x: 0,
-                                                               y: -(0.35 * value) * Float(Double.pi),
-                                                               z: 0,
-                                                               w: 0)
+        let hudAngleConversion = SCNQuaternion.angleConversion(x: 0, y: -(0.35 * value) * Float(Double.pi), z: 0, w: 0)
         let hudRotation = SCNQuaternion.getQuaternion(from: hudAngleConversion)
         hud.rotate(by: hudRotation, aroundTarget: helicopterNode.position)
         SCNTransaction.commit()
@@ -176,14 +161,13 @@ class ApacheHelicopter {
             SCNTransaction.animationDuration = 0.35
             let constraint = SCNLookAtConstraint(target: helicopterNode)
             constraint.isGimbalLockEnabled = true
-            constraint.influenceFactor = 0.6
+            constraint.influenceFactor = 0.8
             hud.constraints = [constraint]
             let pos = SCNVector3.positionFromTransform(helicopterNode.worldTransform.toSimd())
             hud.position = SCNVector3(pos.x, pos.y, pos.z - 6)
             SCNTransaction.commit()
         }
     }
-    
     
     func moveForward(value: Float) {
         SCNTransaction.begin()
@@ -196,7 +180,7 @@ class ApacheHelicopter {
             SCNTransaction.animationDuration = 0.25
             let constraint = SCNLookAtConstraint(target: helicopterNode)
             constraint.isGimbalLockEnabled = true
-            constraint.influenceFactor = 0.6
+            constraint.influenceFactor = 0.8
             hud.constraints = [constraint]
             SCNTransaction.commit()
         }
@@ -230,7 +214,7 @@ class ApacheHelicopter {
         guard (!missiles.isEmpty && missilesArmed) && firing == false else { return }
         firing = true
         let missile = missiles.removeFirst()
-        missile.fire()
+        missile.fire(x: helicopterNode.position.x, y: helicopterNode.position.y)
         firing = false
     }
 }

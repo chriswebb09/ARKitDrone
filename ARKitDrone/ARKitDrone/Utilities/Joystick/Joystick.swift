@@ -32,6 +32,7 @@ class Joystick : SKNode {
         addChild(self.backdropNode)
         addChild(self.thumbNode)
         isUserInteractionEnabled = true
+        
     }
     
     required init(coder aDecoder: NSCoder) {

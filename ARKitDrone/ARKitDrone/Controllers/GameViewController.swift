@@ -46,7 +46,8 @@ class GameViewController: UIViewController {
         view.backgroundColor = .clear
         return view
     }()
-    
+    var addLinesToPlanes = false
+    var addPlanesToScene = false
     var planeNodesCount = 0
     var planeHeight: CGFloat = 0.01
     var anchors = [ARAnchor]()
@@ -117,7 +118,6 @@ class GameViewController: UIViewController {
         sceneView.addSubview(armMissilesButton)
         armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
         sceneView.isUserInteractionEnabled = true
-        
     }
     
     // MARK: - Private Methods
@@ -134,7 +134,6 @@ class GameViewController: UIViewController {
         if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
             sceneView.scene.lightingEnvironment.contents = environmentMap
         }
-        
         session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
@@ -146,6 +145,7 @@ class GameViewController: UIViewController {
         scene.stickNum = 2
         padView1.presentScene(scene)
         padView1.ignoresSiblingOrder = true
+        
         let scene2 = JoystickScene()
         scene2.point = LocalConstants.joystickPoint
         scene2.size = LocalConstants.joystickSize
@@ -170,10 +170,9 @@ class GameViewController: UIViewController {
                 let castRay =  session.raycast(result)
                 if let firstCast = castRay.first {
                     sceneView.positionTank(position: SCNVector3.positionFromTransform(firstCast.worldTransform))
+                    placed = true
                 }
-                placed = true
             }
-        
         }
     }
 }
@@ -188,7 +187,9 @@ extension GameViewController: ARSCNViewDelegate {
         geometry.firstMaterial?.colorBufferWriteMask = []
         geometry.firstMaterial?.writesToDepthBuffer = true
         geometry.firstMaterial?.readsFromDepthBuffer = true
-        //        geometry.firstMaterial?.fillMode = .lines
+        if addLinesToPlanes {
+            geometry.firstMaterial?.fillMode = .lines
+        }
         let node = OcclusionNode(for: meshAnchor)
         node.physicsBody = SCNPhysicsBody(type: .static, shape: nil)
         node.physicsBody?.isAffectedByGravity = false
@@ -199,14 +200,6 @@ extension GameViewController: ARSCNViewDelegate {
     }
     
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
-        //        if let planeAnchor = anchor as? ARPlaneAnchor {
-        //            let plane = self.scanState.addPlane(from: planeAnchor)
-        //
-        //            if plane.shouldBeTreatedAsWall() {
-        //                self.wallNode?.addPlane(planeAnchor)
-        //            }
-        //        }
-        
         if let meshAnchor = anchor as? ARMeshAnchor {
             let occlusionNode = OcclusionNode(for: meshAnchor)
             occlusionNode.physicsBody = SCNPhysicsBody(type: .static, shape: nil)
@@ -218,15 +211,6 @@ extension GameViewController: ARSCNViewDelegate {
     }
     
     func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
-        //        if let planeAnchor = anchor as? ARPlaneAnchor {
-        //            let plane = self.scanState.updatePlane(from: planeAnchor)
-        //
-        //            if plane.shouldBeTreatedAsWall() {
-        //                self.wallNode?.updatePlane(planeAnchor)
-        //            } else {
-        //                self.wallNode?.removePlane(withID: plane.id)
-        //            }
-        //        }
         if let meshAnchor = anchor as? ARMeshAnchor {
             if let occlusionNode = node.childNode(withName: "occlusion", recursively: true) as? OcclusionNode {
                 occlusionNode.update(from: meshAnchor)
@@ -251,10 +235,10 @@ extension GameViewController: JoystickSceneDelegate {
     }
     
     func update(yValue: Float, stickNum: Int) {
-        if stickNum == 1 {
+        if stickNum == 2 {
             let scaled = (yValue)
             sceneView.moveForward(value: (scaled * 0.5))
-        } else if stickNum == 2 {
+        } else if stickNum == 1 {
             let scaled = (yValue) * 0.05
             sceneView.changeAltitude(value: scaled)
         }
