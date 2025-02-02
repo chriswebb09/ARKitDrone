@@ -11,37 +11,6 @@ import SceneKit
 import ARKit
 import simd
 
-extension SCNVector3 {
-    static func -(left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-        return SCNVector3(left.x - right.x, left.y - right.y, left.z - right.z)
-    }
-}
-
-extension SCNVector3 {
-    func rotate(by quaternion: SCNQuaternion) -> SCNVector3 {
-        // Convert the vector to a quaternion (w = 0)
-        let vectorQuat = SCNQuaternion(self.x, self.y, self.z, 0)
-        
-        // Conjugate of the quaternion (invert its vector part)
-        let conjugateQuat = SCNQuaternion(-quaternion.x, -quaternion.y, -quaternion.z, quaternion.w)
-        
-        // Apply the rotation: q * v * q^-1
-        let resultQuat = quaternionMultiply(quaternionMultiply(quaternion, vectorQuat), conjugateQuat)
-        
-        // Return the rotated vector (x, y, z)
-        return SCNVector3(resultQuat.x, resultQuat.y, resultQuat.z)
-    }
-    
-    private func quaternionMultiply(_ q1: SCNQuaternion, _ q2: SCNQuaternion) -> SCNQuaternion {
-        return SCNQuaternion(
-            q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y,
-            q1.w * q2.y - q1.x * q2.z + q1.y * q2.w + q1.z * q2.x,
-            q1.w * q2.z + q1.x * q2.y - q1.y * q2.x + q1.z * q2.w,
-            q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z
-        )
-    }
-}
-
 class ApacheHelicopter {
     
     // MARK: - LocalConstants
