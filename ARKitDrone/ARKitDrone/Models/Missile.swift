@@ -14,15 +14,13 @@ class Missile {
     var node: SCNNode!
     var particle: SCNParticleSystem?
     var fired: Bool = false
+    var num: Int = -1
 
-    func setupNode(scnNode: SCNNode?) {
+    func setupNode(scnNode: SCNNode?, number: Int) {
         guard let scnNode = scnNode else { return }
         node = scnNode
-        node.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
-        node.physicsBody?.isAffectedByGravity = false
-        node.physicsBody?.categoryBitMask = 4
-        node.physicsBody?.collisionBitMask = 5
         setParticle()
+        self.num = number
     }
     
     func setParticle() {
@@ -34,13 +32,14 @@ class Missile {
        }
     
     func fire(x: Float, y: Float) {
+        print(num)
         guard fired == false else { return }
         particle?.birthRate = 4000
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 3
-        node.localTranslate(by: SCNVector3(x: x, y: y, z: -10000))
+        SCNTransaction.animationDuration = 1
+        node.localTranslate(by: SCNVector3(x: x, y: y, z: -15000))
         SCNTransaction.commit()
-        Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { timer in
+        Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { timer in
             self.node.removeFromParentNode()
             self.fired = true
         }

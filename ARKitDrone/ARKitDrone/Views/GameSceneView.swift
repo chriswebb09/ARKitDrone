@@ -19,6 +19,7 @@ class GameSceneView: ARSCNView {
     }
     
     private var droneSceneView: DroneSceneView!
+    
     var tankModel: SCNNode!
     var tankNode: SCNNode!
     
