@@ -17,8 +17,6 @@ extension SCNVector3 {
     }
 }
 
-
-
 extension SCNVector3 {
     func rotate(by quaternion: SCNQuaternion) -> SCNVector3 {
         // Convert the vector to a quaternion (w = 0)
@@ -205,107 +203,14 @@ class ApacheHelicopter {
     
     func lockOn(target: SCNNode) {
         SCNTransaction.begin()
-
-        // Set the scale for the HUD
-        hud.scale = SCNVector3(6, 6, 6)
+        hud.scale = SCNVector3(5, 5, 5)
         // Position the HUD right above the target
         hud.position = SCNVector3(x: target.position.x, y: target.position.y, z: target.position.z)
-
-        // Calculate the direction to the target
-        let directionToTarget = target.position - hud.position
-
-        // Create a quaternion that will rotate the HUD to face the target
-//        let rotation = SCNQuaternion(x: directionToTarget.x, y: directionToTarget.y, z: directionToTarget.z, w: 1)
-
-        // Apply the rotation to the HUD
-//        hud.orientation = rotation
         hud.orientation = target.orientation
-        
         hud.position = SCNVector3(x: target.position.x - 4, y: target.position.y + 10, z: target.position.z + 2)
-
-//        // Position the HUD right above the target
-//        hud.position = SCNVector3(x: target.position.x - 2, y: target.position.y + 20, z: target.position.z + 10)
-//
-//        // Make the HUD face the target by setting the orientation
-//        let directionToTarget = target.position - hud.position
-//        let rotation = SCNMatrix4MakeLookAt(hud.position.x, hud.position.y, hud.position.z, target.position.x, target.position.y, target.position.z)
-//        hud.orientation = SCNQuaternion(rotation)
-
         SCNTransaction.commit()
-//        SCNTransaction.begin()
-//        hud.scale = SCNVector3(6, 6, 6)
-//        hud.position = SCNVector3(x:target.position.x - 2, y: target.position.y + 20, z: target.position.z + 10)
-//        hud.orientation = target.orientation
-//        hud.position = SCNVector3(x:target.position.x - 2, y: target.position.y + 20, z: target.position.z + 10)
-//        hud.orientation = target.orientation
-//        SCNTransaction.commit()
     }
-//        var targetDir = SCNVector3(0, 0, 1) // Vector3.forward equivalent
-//        var missileTracking = false
-//        
-//        let error = target.position - helicopterNode.position
-//        
-//        let invertedRotation = SCNQuaternion(-helicopterNode.rotation.x, -helicopterNode.rotation.y, -helicopterNode.rotation.z, helicopterNode.rotation.w)
-//        
-//        let errorDir = error.rotate(by: invertedRotation).normalized()
-//        
-//        let rotationMatrix = SCNMatrix4MakeRotation(helicopterNode.rotation.w, helicopterNode.rotation.x, helicopterNode.rotation.y, helicopterNode.rotation.z)
-//        
-//        // Apply the rotation matrix to the missile lock direction
-//        let transformedDirection = SCNVector3Make(
-//            rotationMatrix.m11 * missileLockDirection.x + rotationMatrix.m12 * missileLockDirection.y + rotationMatrix.m13 * missileLockDirection.z,
-//            rotationMatrix.m21 * missileLockDirection.x + rotationMatrix.m22 * missileLockDirection.y + rotationMatrix.m23 * missileLockDirection.z,
-//            rotationMatrix.m31 * missileLockDirection.x + rotationMatrix.m32 * missileLockDirection.y + rotationMatrix.m33 * missileLockDirection.z
-//        )
-//        
-//        missileLockDirection = transformedDirection
-        
-//        var lockSpeed = 30.0
-//        var dt = 0.033
-//        let lockSpeedInRadians = lockSpeed * dt * .pi / 180 // Convert lockSpeed to radians
-//        var angle = SCNQuaternion.angleConversion(x: , y: targetDir.y, z: targetDir.z, w: targetDir.w)
-//        missileLockDirection = missileLockDirection.rotate(by: <#T##SCNQuaternion#>)
-//        missileLockDirection = missileLockDirection.rotated(towards: targetDir, angle: lockSpeedInRadians)
 
-//    }
-    
-//    func lockOn(target: SCNNode) {
-//        var targetDir = SCNVector3(0, 0, 1) // Vector3.forward equivalent
-//        var missileTracking = false
-//        
-//        let error = target.position - helicopterNode.position
-//        
-//        
-//        let invertedRotation = SCNQuaternion(-helicopterNode.rotation.x, -helicopterNode.rotation.y, -helicopterNode.rotation.z, helicopterNode.rotation.w)
-//        
-////        let errorDir = error.rotate(by: invertedRotation).normalized()
-//        
-//        let errorDir = error.rotate(by: invertedRotation).normalized()
-//        
-//        let rotationMatrix = SCNMatrix4MakeRotation(helicopterNode.rotation.w, helicopterNode.rotation.x, helicopterNode.rotation.y, helicopterNode.rotation.z)
-//
-//        // Apply the rotation to the missileLockDirection
-//        missileLockDirection = missileLockDirection * rotationMatrix
-//        
-////        missileLockDirection = helicopterNode.rotation * missileLockDirection
-//        
-////        if error.length() <= lockRange && SCNVector3.angleBetween(SCNVector3(0, 0, 1), errorDir) <= lockAngle {
-////               missileTracking = true
-////               targetDir = errorDir
-////           }
-//        
-////        let errorDir = helicopterNode.rotation.
-//        
-//
-////        if let target = Target, !target.plane.dead {
-////            let error = target.position - rigidBody.position
-////            let errorDir = rigidBody.rotation.inverse * error.normalized() // Transform into local space
-////            if error.length() <= lockRange && SCNVector3.angleBetween(SCNVector3(0, 0, 1), errorDir) <= lockAngle {
-////                missileTracking = true
-////                targetDir = errorDir
-////            }
-////        }
-//    }
     
     func shootMissile() {
         guard (!missiles.isEmpty && missilesArmed) && firing == false else { return }
