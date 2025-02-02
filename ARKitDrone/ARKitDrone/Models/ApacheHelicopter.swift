@@ -11,6 +11,37 @@ import SceneKit
 import ARKit
 import simd
 
+extension SCNVector3 {
+    static func -(left: SCNVector3, right: SCNVector3) -> SCNVector3 {
+        return SCNVector3(left.x - right.x, left.y - right.y, left.z - right.z)
+    }
+}
+
+extension SCNVector3 {
+    func rotate(by quaternion: SCNQuaternion) -> SCNVector3 {
+        // Convert the vector to a quaternion (w = 0)
+        let vectorQuat = SCNQuaternion(self.x, self.y, self.z, 0)
+        
+        // Conjugate of the quaternion (invert its vector part)
+        let conjugateQuat = SCNQuaternion(-quaternion.x, -quaternion.y, -quaternion.z, quaternion.w)
+        
+        // Apply the rotation: q * v * q^-1
+        let resultQuat = quaternionMultiply(quaternionMultiply(quaternion, vectorQuat), conjugateQuat)
+        
+        // Return the rotated vector (x, y, z)
+        return SCNVector3(resultQuat.x, resultQuat.y, resultQuat.z)
+    }
+    
+    private func quaternionMultiply(_ q1: SCNQuaternion, _ q2: SCNQuaternion) -> SCNQuaternion {
+        return SCNQuaternion(
+            q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y,
+            q1.w * q2.y - q1.x * q2.z + q1.y * q2.w + q1.z * q2.x,
+            q1.w * q2.z + q1.x * q2.y - q1.y * q2.x + q1.z * q2.w,
+            q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z
+        )
+    }
+}
+
 class ApacheHelicopter {
     
     // MARK: - LocalConstants
@@ -62,6 +93,7 @@ class ApacheHelicopter {
     private var front: SCNNode!
     private var frontIR: SCNNode!
     private var missilesArmed: Bool = false
+    var missileLockDirection = SCNVector3(0, 0, 1)
     
     private func spinBlades() {
         DispatchQueue.global(qos: .userInteractive).async {
@@ -152,10 +184,10 @@ class ApacheHelicopter {
     func changeAltitude(value: Float) {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
-        helicopterNode.localTranslate(by:  SCNVector3(x: 0, y:value, z:0))
+        helicopterNode.localTranslate(by: SCNVector3(x: 0, y:value, z:0))
         hud.orientation = helicopterNode.orientation
         positionHUD()
-        hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-12))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-12))
         SCNTransaction.commit()
     }
     
@@ -169,6 +201,17 @@ class ApacheHelicopter {
         SCNTransaction.commit()
     }
     
+    func lockOn(target: SCNNode) {
+        SCNTransaction.begin()
+        hud.scale = SCNVector3(5, 5, 5)
+        // Position the HUD right above the target
+        hud.position = SCNVector3(x: target.position.x, y: target.position.y, z: target.position.z)
+        hud.orientation = target.orientation
+        hud.position = SCNVector3(x: target.position.x - 4, y: target.position.y + 10, z: target.position.z + 2)
+        SCNTransaction.commit()
+    }
+
+    
     func shootMissile() {
         guard (!missiles.isEmpty && missilesArmed) && firing == false else { return }
         let missile = missiles.removeFirst()
@@ -176,6 +219,8 @@ class ApacheHelicopter {
         guard missile.fired == false else {
             return
         }
+        let invertedOrientation = SCNVector4(-hud.orientation.x, -hud.orientation.y, -hud.orientation.z, hud.orientation.w)
+        missile.node.orientation = invertedOrientation
         missile.fire(x: missile.node.position.x, y:  missile.node.position.y)
         firing = false
     }

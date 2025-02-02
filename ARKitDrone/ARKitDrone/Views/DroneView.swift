@@ -22,6 +22,10 @@ class DroneSceneView: ARSCNView {
 // MARK: - HelicopterCapable
 
 extension DroneSceneView: HelicopterCapable  {
+    func missileLock(target: SCNNode) {
+        helicopter.lockOn(target: target)
+    }
+    
     
     /// Void function that rotates the helicopter based from *float* value passed
     ///

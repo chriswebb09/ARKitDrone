@@ -231,6 +231,7 @@ extension GameViewController: JoystickSceneDelegate {
         } else if stickNum == 2 {
             let scaled = (xValue) * 0.05
             sceneView.moveSides(value: -scaled)
+//            sceneView.missileLock(target: <#T##SCNNode#>)
         }
     }
     
