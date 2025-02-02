@@ -12,39 +12,36 @@ import ARKit
 class Missile {
     
     var node: SCNNode!
+    var particle: SCNParticleSystem?
     var fired: Bool = false
-    var missileNum = 0
-    var particle: SCNParticleSystem!
-    
-    init(num: Int) {
-        self.missileNum = num
+    var num: Int = -1
+
+    func setupNode(scnNode: SCNNode?, number: Int) {
+        guard let scnNode = scnNode else { return }
+        node = scnNode
+        setParticle()
+        self.num = number
     }
     
     func setParticle() {
-        guard let particleNode = node.childNodes.first, let particleSystems = particleNode.particleSystems else { return }
-        particle = particleSystems[0]
-        particle.birthRate = 0
-    }
+           guard let particleNode = node.childNodes.first, let particleSystems = particleNode.particleSystems else {
+               return
+           }
+           particle = particleSystems[0]
+           particle?.birthRate = 0
+       }
     
-    func setupNode(scnNode: SCNNode?) {
-        guard let scnNode = scnNode else { return }
-        node = scnNode
-        node.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
-        node.physicsBody?.isAffectedByGravity = false
-        node.physicsBody?.categoryBitMask = 1
-        node.physicsBody?.contactTestBitMask = 0
-    }
-    
-    func fire() {
+    func fire(x: Float, y: Float) {
+        print(num)
         guard fired == false else { return }
-        particle.birthRate = 1000
+        particle?.birthRate = 4000
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 4
-        self.node.localTranslate(by: SCNVector3(x: 0, y: 6000, z: 0))
+        SCNTransaction.animationDuration = 1
+        node.localTranslate(by: SCNVector3(x: x, y: y, z: -15000))
         SCNTransaction.commit()
-        Timer.scheduledTimer(withTimeInterval: 4, repeats: false) { timer in
+        Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { timer in
             self.node.removeFromParentNode()
+            self.fired = true
         }
-        fired = true
     }
 }

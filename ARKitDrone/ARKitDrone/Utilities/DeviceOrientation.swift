@@ -68,3 +68,24 @@ extension UIInterfaceOrientationMask {
         }
     }
 }
+
+extension UIDevice {
+    var modelName: String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let machineMirror = Mirror(reflecting: systemInfo.machine)
+        let identifier = machineMirror.children.reduce("") { identifier, element in
+            guard let value = element.value as? Int8, value != 0 else { return identifier }
+            return identifier + String(UnicodeScalar(UInt8(value)))
+        }
+        return identifier
+    }
+    
+    var isIpad: Bool {
+        if UIDevice.current.modelName.contains("iPad") {
+            return true
+        } else {
+            return false 
+        }
+    }
+}

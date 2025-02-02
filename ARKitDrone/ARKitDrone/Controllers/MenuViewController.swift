@@ -14,7 +14,7 @@ class MenuViewController: UIViewController {
     
     private struct LocalConstants {
         static let goToGameSegue = "GoToGame"
-        static let count = 6
+        static let count = 5
     }
     
     // MARK: - Private Properties
@@ -37,7 +37,7 @@ class MenuViewController: UIViewController {
     @IBAction func newGameTapped(_ sender: Any) {
         DeviceOrientation.shared.set(orientation: .landscapeRight)
         countdownToStart(count: LocalConstants.count)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 6) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [self] in
             newGameButton.isHidden = true
             performSegue(withIdentifier: LocalConstants.goToGameSegue, sender: self)
         }
@@ -51,7 +51,7 @@ class MenuViewController: UIViewController {
         newGameButton.titleLabel?.font = newGameButton.titleLabel?.font.withWeight(.heavy)
         newGameButton.titleLabel?.text = "\(countdown)"
         DispatchQueue.global(qos: .default).async {
-            for _ in 0...LocalConstants.count {
+            for _ in 1...LocalConstants.count {
                 if countdown == LocalConstants.count {
                     sleep(1)
                     countdown -= 1

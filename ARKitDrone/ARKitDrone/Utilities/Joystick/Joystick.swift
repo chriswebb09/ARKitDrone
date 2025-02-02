@@ -13,6 +13,8 @@ class Joystick : SKNode {
     
     private struct LocalConstants {
         static let kThumbSpringBack: Double =  0.3
+        static let imageJoystickName: String = "joystick.png"
+        static let imageDpadName: String = "dpad.png"
     }
 
     private let backdropNode, thumbNode: SKSpriteNode
@@ -23,13 +25,14 @@ class Joystick : SKNode {
     
     weak var delegate: JoystickDelegate?
     
-    init(thumbNode: SKSpriteNode = SKSpriteNode(imageNamed: "joystick.png"), backdropNode: SKSpriteNode = SKSpriteNode(imageNamed: "dpad.png")) {
+    init(thumbNode: SKSpriteNode = SKSpriteNode(imageNamed: LocalConstants.imageJoystickName), backdropNode: SKSpriteNode = SKSpriteNode(imageNamed: LocalConstants.imageDpadName)) {
         self.thumbNode = thumbNode
         self.backdropNode = backdropNode
         super.init()
         addChild(self.backdropNode)
         addChild(self.thumbNode)
         isUserInteractionEnabled = true
+        
     }
     
     required init(coder aDecoder: NSCoder) {
