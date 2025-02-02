@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SceneKit
 
 protocol HelicopterCapable: AnyObject {
     func rotate(value: Float)
@@ -14,4 +15,5 @@ protocol HelicopterCapable: AnyObject {
     func shootMissile()
     func changeAltitude(value: Float)
     func moveSides(value: Float)
+    func missileLock(target: SCNNode)
 }

@@ -42,6 +42,10 @@ class GameSceneView: ARSCNView {
 // MARK: - HelicopterCapable
 
 extension GameSceneView: HelicopterCapable {
+    func missileLock(target: SCNNode) {
+        droneSceneView.missileLock(target: target)
+    }
+    
     
     func positionHUD() {
         droneSceneView.positionHUD()
@@ -73,6 +77,7 @@ extension GameSceneView: HelicopterCapable {
     
     func moveSides(value: Float) {
         droneSceneView.moveSides(value: value)
+        droneSceneView.missileLock(target: tankNode)
     }
     
     func toggleArmMissiles() {

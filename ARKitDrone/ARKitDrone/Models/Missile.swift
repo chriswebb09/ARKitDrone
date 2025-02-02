@@ -37,7 +37,7 @@ class Missile {
         particle?.birthRate = 4000
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 1
-        node.localTranslate(by: SCNVector3(x: x, y: y, z: -15000))
+        node.localTranslate(by: SCNVector3(x: x, y: y, z: -10000))
         SCNTransaction.commit()
         Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { timer in
             self.node.removeFromParentNode()
