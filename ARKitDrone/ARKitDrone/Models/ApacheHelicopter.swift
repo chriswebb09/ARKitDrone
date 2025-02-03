@@ -109,17 +109,13 @@ class ApacheHelicopter {
                                   y: helicopterNode.position.y,
                                   z: helicopterNode.position.z)
         missiles =  [missile1, missile2, missile3, missile4, missile5, missile6, missile7, missile8]
-        positionHUD()
+        hud.scale = SCNVector3(1, 1, 1)
+        hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z - 10)
         hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-12))
         spinBlades()
         scene.rootNode.addChildNode(tempScene)
     }
-    
-    func positionHUD() {
-        hud.scale = SCNVector3(1, 1, 1)
-        hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z - 10)
-    }
-    
+
     func toggleArmMissile() {
         missilesArmed.toggle()
     }
@@ -134,8 +130,7 @@ class ApacheHelicopter {
         let localAngleConversion = SCNQuaternion.angleConversion(x: 0, y:  -(0.35 * value) * Float(Double.pi), z: 0, w: 0)
         let locationRotation = SCNQuaternion.getQuaternion(from: localAngleConversion)
         helicopterNode.localRotate(by: locationRotation)
-        hud.orientation = helicopterNode.orientation
-        positionHUD()
+        updateHUD()
         hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-12))
         SCNTransaction.commit()
     }
@@ -144,8 +139,7 @@ class ApacheHelicopter {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y: 0, z: -value))
-        hud.orientation = helicopterNode.orientation
-        positionHUD()
+        updateHUD()
         hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-12))
         SCNTransaction.commit()
     }
@@ -154,18 +148,22 @@ class ApacheHelicopter {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y:value, z:0))
-        hud.orientation = helicopterNode.orientation
-        positionHUD()
+        updateHUD()
         hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-12))
         SCNTransaction.commit()
+    }
+    
+    private func updateHUD() {
+        hud.orientation = helicopterNode.orientation
+        hud.scale = SCNVector3(1, 1, 1)
+        hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z - 10)
     }
     
     func moveSides(value: Float) {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: value, y: 0, z: 0))
-        hud.orientation = helicopterNode.orientation
-        positionHUD()
+        updateHUD()
         hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-12))
         SCNTransaction.commit()
     }
@@ -173,13 +171,10 @@ class ApacheHelicopter {
     func lockOn(target: SCNNode) {
         SCNTransaction.begin()
         hud.scale = SCNVector3(5, 5, 5)
-        // Position the HUD right above the target
-        hud.position = SCNVector3(x: target.position.x, y: target.position.y, z: target.position.z)
         hud.orientation = target.orientation
         hud.position = SCNVector3(x: target.position.x - 4, y: target.position.y + 10, z: target.position.z + 2)
         SCNTransaction.commit()
     }
-
     
     func shootMissile() {
         guard (!missiles.isEmpty && missilesArmed) && firing == false else { return }

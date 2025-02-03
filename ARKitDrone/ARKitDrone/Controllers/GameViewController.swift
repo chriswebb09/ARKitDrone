@@ -46,6 +46,7 @@ class GameViewController: UIViewController {
         view.backgroundColor = .clear
         return view
     }()
+    
     var addLinesToPlanes = false
     var addPlanesToScene = false
     var planeNodesCount = 0
