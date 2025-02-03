@@ -14,7 +14,6 @@
 		9467A30D2BB93A6E0023EA62 /* Tank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9467A30C2BB93A6E0023EA62 /* Tank.swift */; };
 		9467A30F2BB93A840023EA62 /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9467A30E2BB93A840023EA62 /* Shell.swift */; };
 		9470AE472974001A00A55134 /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9470AE462974001A00A55134 /* MenuViewController.swift */; };
-		9485FA17295EBE42008407B2 /* MatrixHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9485FA16295EBE42008407B2 /* MatrixHelper.swift */; };
 		94A68F722C8797070059CD82 /* SCNMatrix4+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F712C8797070059CD82 /* SCNMatrix4+Extension.swift */; };
 		94A68F742C87972E0059CD82 /* SCNQuaternion+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F732C87972E0059CD82 /* SCNQuaternion+Extension.swift */; };
 		94A68F762C8797550059CD82 /* SCNVector3+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F752C8797550059CD82 /* SCNVector3+Extension.swift */; };
@@ -49,7 +48,6 @@
 		9467A30C2BB93A6E0023EA62 /* Tank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tank.swift; sourceTree = "<group>"; };
 		9467A30E2BB93A840023EA62 /* Shell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
 		9470AE462974001A00A55134 /* MenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
-		9485FA16295EBE42008407B2 /* MatrixHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixHelper.swift; sourceTree = "<group>"; };
 		94A68F712C8797070059CD82 /* SCNMatrix4+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNMatrix4+Extension.swift"; sourceTree = "<group>"; };
 		94A68F732C87972E0059CD82 /* SCNQuaternion+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNQuaternion+Extension.swift"; sourceTree = "<group>"; };
 		94A68F752C8797550059CD82 /* SCNVector3+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNVector3+Extension.swift"; sourceTree = "<group>"; };
@@ -104,7 +102,6 @@
 			isa = PBXGroup;
 			children = (
 				94CCC9112972FFB500F7D17F /* DeviceOrientation.swift */,
-				9485FA16295EBE42008407B2 /* MatrixHelper.swift */,
 				94CCC8F12972E34500F7D17F /* Joystick */,
 			);
 			path = Utilities;
@@ -270,7 +267,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				94A68F742C87972E0059CD82 /* SCNQuaternion+Extension.swift in Sources */,
-				9485FA17295EBE42008407B2 /* MatrixHelper.swift in Sources */,
 				945B16AD294EB34800482E14 /* JoystickScene.swift in Sources */,
 				94F968A82AD7337F00D7B418 /* Plane.swift in Sources */,
 				941706D92972A5F400CB0308 /* ApacheHelicopter.swift in Sources */,

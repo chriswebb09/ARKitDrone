@@ -25,7 +25,7 @@ class GameSceneView: ARSCNView {
     
     func setup() {
         scene = SCNScene(named: LocalConstants.sceneName)!
-        tankModel = nodeWithModelName(LocalConstants.tankAssetName)
+        tankModel = SCNScene.nodeWithModelName(LocalConstants.tankAssetName)
         tankNode = tankModel.childNode(withName: "m1tank", recursively: true)
         tankNode.scale = SCNVector3(x: 0.03, y: 0.03, z: 0.03)
         tankNode.physicsBody?.categoryBitMask = 2
@@ -83,8 +83,4 @@ extension GameSceneView: HelicopterCapable {
     func toggleArmMissiles() {
         droneSceneView.toggleArmMissile()
     }
-}
-
-func nodeWithModelName(_ modelName: String) -> SCNNode {
-    return SCNScene(named: modelName)!.rootNode.clone()
 }
