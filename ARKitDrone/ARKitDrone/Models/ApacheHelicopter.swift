@@ -115,6 +115,11 @@ class ApacheHelicopter {
         spinBlades()
         scene.rootNode.addChildNode(tempScene)
     }
+    
+    func positionHUD() {
+        hud.orientation = helicopterNode.orientation
+        hud.scale = SCNVector3(1, 1, 1)
+    }
 
     func toggleArmMissile() {
         missilesArmed.toggle()
