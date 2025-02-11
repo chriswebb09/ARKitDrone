@@ -13,15 +13,6 @@ import SpriteKit
 
 class GameViewController: UIViewController {
     
-    struct ColliderCategory {
-        static let tank = 1 << 0
-        static let shell = 1 << 1
-        static let ground = 1 << 2
-        static let helicopter = 1 << 3
-        static let missile = 1 << 4
-        static let wall = 1 << 5
-    }
-    
     var placed: Bool = false
     
     // MARK: - LocalConstants
@@ -47,9 +38,11 @@ class GameViewController: UIViewController {
         return view
     }()
     
+    var ships: [Ship] = [Ship]();
     var addLinesToPlanes = false
     var addPlanesToScene = false
     var planeNodesCount = 0
+    var hit = false
     var planeHeight: CGFloat = 0.01
     var anchors = [ARAnchor]()
     var nodes = [SCNNode]()
@@ -86,7 +79,7 @@ class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         sceneView.delegate = self
-        
+        //        sceneView.debugOptions = .showPhysicsShapes
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -115,22 +108,42 @@ class GameViewController: UIViewController {
             sceneView.addSubview(padView2)
             setupPadScene()
         }
-        sceneView.positionHUD()
         sceneView.addSubview(armMissilesButton)
         armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
         sceneView.isUserInteractionEnabled = true
+        setupShips()
+    }
+    
+    func setupShips() {
+        let shipScene = SCNScene(named: "art.scnassets/F-35B_Lightning_II.scn")!
+        // retrieve the ship node
+        for i in 1...6 {
+            let shipNode = shipScene.rootNode.childNode(withName: "F_35B_Lightning_II", recursively: true)!.clone()
+            shipNode.simdScale = SIMD3<Float>(81.876, 81.876, 81.876)
+            shipNode.name = "F_35B \(i)"
+            let physicsBody =  SCNPhysicsBody(type: .static, shape: nil)
+            shipNode.physicsBody = physicsBody
+            shipNode.physicsBody!.categoryBitMask = 7
+            shipNode.physicsBody!.contactTestBitMask = 7
+            shipNode.physicsBody!.collisionBitMask = 4
+            let ship = Ship(newNode: shipNode);
+            sceneView.scene.rootNode.addChildNode(ship.node)
+            ships.append(ship);
+            ship.node.position = SCNVector3(x: Float(Int(arc4random_uniform(10)) - 5), y: Float(Int(arc4random_uniform(10)) - 5), z: 0)
+            ship.node.scale = SCNVector3(x: Float(0.009), y: Float(0.009), z: Float(0.009))
+        }
     }
     
     // MARK: - Private Methods
     
     private func setupTracking() {
         let configuration = ARWorldTrackingConfiguration()
-        configuration.planeDetection = [.horizontal, .vertical]
-        let sceneReconstruction: ARWorldTrackingConfiguration.SceneReconstruction = .meshWithClassification
-        if ARWorldTrackingConfiguration.supportsSceneReconstruction(sceneReconstruction) {
-            configuration.sceneReconstruction = sceneReconstruction
-        }
-        configuration.frameSemantics = .sceneDepth
+        configuration.planeDetection = [.horizontal]
+        //        let sceneReconstruction: ARWorldTrackingConfiguration.SceneReconstruction = .meshWithClassification
+        //        if ARWorldTrackingConfiguration.supportsSceneReconstruction(sceneReconstruction) {
+        //            configuration.sceneReconstruction = sceneReconstruction
+        //        }
+        //        configuration.frameSemantics = .sceneDepth
         sceneView.automaticallyUpdatesLighting = false
         if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
             sceneView.scene.lightingEnvironment.contents = environmentMap
@@ -146,7 +159,6 @@ class GameViewController: UIViewController {
         scene.stickNum = 2
         padView1.presentScene(scene)
         padView1.ignoresSiblingOrder = true
-        
         let scene2 = JoystickScene()
         scene2.point = LocalConstants.joystickPoint
         scene2.size = LocalConstants.joystickSize
@@ -180,6 +192,45 @@ class GameViewController: UIViewController {
 
 extension GameViewController: ARSCNViewDelegate {
     
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        var percievedCenter = SCNVector3(x: Float(0), y: Float(0), z:Float(0))
+        var percievedVelocity = SCNVector3(x: Float(0), y: Float(0), z:Float(0))
+        for otherShip in ships {
+            percievedCenter = percievedCenter + otherShip.node.position;
+            percievedVelocity = percievedVelocity + (otherShip.velocity);
+        }
+        for ship in ships {
+            var v1 = ship.flyCenterOfMass(ships.count, percievedCenter)
+            var v2 = keepASmallDistance(ship)
+            var v3 = ship.matchSpeedWithOtherShips(ships.count, percievedVelocity)
+            var v4 = ship.boundPositions()
+            v1 *= (0.01)
+            v2 *= (0.01)
+            v3 *= (0.01)
+            v4 *= (1.0)
+            let forward = SCNVector3(x: Float(0), y: Float(0), z: Float(1))
+            let velocityNormal = ship.velocity.normalized()
+            ship.velocity = ship.velocity + v1 + v2 + v3 + v4;
+            ship.limitVelocity()
+            let nor = forward.cross(velocityNormal)
+            let angle = CGFloat(forward.dot(velocityNormal))
+            ship.node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
+            ship.node.position = ship.node.position + (ship.velocity)
+        }
+    }
+    
+    func keepASmallDistance(_ ship: Ship) -> SCNVector3 {
+        var forceAway = SCNVector3(x: Float(0), y: Float(0), z: Float(0))
+        for otherShip in ships {
+            if ship.node != otherShip.node {
+                if abs(otherShip.node.position.distance(ship.node.position)) < 5 {
+                    forceAway = (forceAway - (otherShip.node.position - ship.node.position))
+                }
+            }
+        }
+        return forceAway
+    }
+    
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
         guard let meshAnchor = anchor as? ARMeshAnchor else {
             return nil
@@ -188,9 +239,9 @@ extension GameViewController: ARSCNViewDelegate {
         geometry.firstMaterial?.colorBufferWriteMask = []
         geometry.firstMaterial?.writesToDepthBuffer = true
         geometry.firstMaterial?.readsFromDepthBuffer = true
-        if addLinesToPlanes {
-            geometry.firstMaterial?.fillMode = .lines
-        }
+        //        if addLinesToPlanes {
+        //            geometry.firstMaterial?.fillMode = .lines
+        //        }
         let node = OcclusionNode(for: meshAnchor)
         node.physicsBody = SCNPhysicsBody(type: .static, shape: nil)
         node.physicsBody?.isAffectedByGravity = false
@@ -232,7 +283,6 @@ extension GameViewController: JoystickSceneDelegate {
         } else if stickNum == 2 {
             let scaled = (xValue) * 0.05
             sceneView.moveSides(value: -scaled)
-//            sceneView.missileLock(target: <#T##SCNNode#>)
         }
     }
     
@@ -247,24 +297,78 @@ extension GameViewController: JoystickSceneDelegate {
     }
     
     func tapped() {
-        sceneView.shootMissile()
+        sceneView.helicopter.lockOn(target: ships[0].node)
+        sceneView.helicopter.shootMissile()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+            self.sceneView.helicopter.lockOn(target: self.ships[0].node)
+            self.sceneView.helicopter.shootMissile()
+            self.sceneView.helicopter.update(missile: self.sceneView.missile2, target: self.ships[0].node)
+        }
+        self.sceneView.missile8.node.simdWorldTransform = self.sceneView.tankNode.simdWorldTransform
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            self.sceneView.helicopter.lockOn(target: self.ships[0].node)
+            self.sceneView.helicopter.shootMissile()
+            self.sceneView.helicopter.update(missile: self.sceneView.missile3, target: self.ships[0].node)
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.sceneView.helicopter.lockOn(target: self.ships[0].node)
+            self.sceneView.helicopter.shootMissile()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.sceneView.helicopter.lockOn(target: self.ships[1].node)
+            self.sceneView.helicopter.shootMissile()
+            self.sceneView.helicopter.update(missile: self.sceneView.missile5, target: self.ships[1].node)
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.sceneView.helicopter.lockOn(target: self.ships[1].node)
+            self.sceneView.helicopter.shootMissile()
+            while !self.hit {
+                self.sceneView.helicopter.update(missile: self.sceneView.missile6, target: self.ships[1].node)
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            self.sceneView.helicopter.lockOn(target: self.ships[1].node)
+            self.sceneView.helicopter.shootMissile()
+            while !self.hit {
+                self.sceneView.helicopter.update(missile: self.sceneView.missile7, target: self.ships[1].node)
+            }
+        }
+        while !self.hit {
+            self.sceneView.helicopter.update(missile: self.sceneView.missile1, target: self.ships[0].node)
+            self.sceneView.helicopter.update(missile: self.sceneView.missile2, target: self.ships[0].node)
+        }
     }
 }
 
 extension GameViewController: SCNPhysicsContactDelegate {
     
+    func physicsWorld(_ world: SCNPhysicsWorld, didEnd contact: SCNPhysicsContact) {
+        
+    }
+    
+    func renderer(_ renderer: any SCNSceneRenderer, didSimulatePhysicsAtTime time: TimeInterval) {
+        //print(time)
+    }
+    
+    func physicsWorld(_ world: SCNPhysicsWorld, didUpdate contact: SCNPhysicsContact) {
+        if contact.nodeA.name!.contains("Missile") && !contact.nodeB.name!.contains("Missile") {
+            print("update missile contact")
+            hit = true
+        }
+    }
+    
     func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
-        print(contact)
-        dump(contact)
-        if contact.nodeB.physicsBody?.contactTestBitMask == 0 {
-            print("NodeB has mask = 0")
-        } else if contact.nodeB.physicsBody?.contactTestBitMask == 1 {
-            print("NodeB has mask = 1")
-        }
-        if contact.nodeB.physicsBody?.contactTestBitMask == 2 {
-            print("NodeB has mask = 2")
-        } else if contact.nodeB.physicsBody?.contactTestBitMask == 3 {
-            print("NodeB has mask = 1")
-        }
+        print("\n\n\n")
+        print(contact.nodeA.name!)
+        print(contact.nodeB.name!)
+        print("\n\n\n")
+        print(contact.nodeA.physicsBody!.categoryBitMask)
+        print(contact.nodeB.physicsBody!.categoryBitMask)
+        print("\n\n\n")
+        print(contact.nodeA.physicsBody!.collisionBitMask)
+        print(contact.nodeB.physicsBody!.collisionBitMask)
+        print("\n\n\n")
+        print(contact.nodeA.physicsBody!.contactTestBitMask)
+        print(contact.nodeB.physicsBody!.contactTestBitMask)
     }
 }

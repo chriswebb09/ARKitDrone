@@ -31,8 +31,8 @@ class Shell {
         let force = SCNVector3(x: Float(x), y: Float(y) , z: z)
         node.name = name
         node.physicsBody?.applyForce(force, at: position, asImpulse: true)
-        node.categoryBitMask = GameViewController.ColliderCategory.shell
-        node.physicsBody?.contactTestBitMask = GameViewController.ColliderCategory.tank
+//        node.categoryBitMask = GameViewController.ColliderCategory.shell
+//        node.physicsBody?.contactTestBitMask = GameViewController.ColliderCategory.tank
     }
 }
 
