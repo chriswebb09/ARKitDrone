@@ -24,7 +24,7 @@ class Ship {
         return (averagePercievedCenter - node.position) / 100;
     }
     
-    func matchSpeedWithOtherShips(_ shipCount: int,  _ percievedVelocity: SCNVector3) -> SCNVector3 {
+    func matchSpeedWithOtherShips(_ shipCount: Int,  _ percievedVelocity: SCNVector3) -> SCNVector3 {
         let averagePercievedVelocity = percievedVelocity / Float(shipCount - 1);
         return (averagePercievedVelocity - velocity)
     }
