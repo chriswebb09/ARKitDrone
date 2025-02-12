@@ -55,8 +55,6 @@ class ApacheHelicopter {
     var missile7: Missile = Missile()
     var missile8: Missile = Missile()
     var missiles: [Missile] = []
-    
-    //    var targetNode: SCNNode!
     var rotor: SCNNode!
     var rotor2: SCNNode!
     var wingL: SCNNode!
@@ -66,7 +64,6 @@ class ApacheHelicopter {
     var frontIR: SCNNode!
     var missilesArmed: Bool = false
     var missileLockDirection = SCNVector3(0, 0, 1)
-    
     
     var targetPosition: SCNVector3!
     
@@ -89,16 +86,11 @@ class ApacheHelicopter {
         }
     }
     
-    func setup(with scene: SCNScene) {
-    }
-    
     func setup(with helicopterNode: SCNNode) {
-        hud.position = SCNVector3(x: helicopterNode.position.x,
-                                  y: helicopterNode.position.y,
-                                  z: helicopterNode.position.z)
-        missiles =  [missile1, missile2, missile3, missile4, missile5, missile6, missile7, missile8]
+        helicopterNode.simdScale = SIMD3<Float>(0.001, 0.001, 0.001)
+        hud.simdScale = SIMD3<Float>(0.1, 0.1, 0.1)
         hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z: -1))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.25))
         spinBlades()
     }
     
@@ -117,7 +109,7 @@ class ApacheHelicopter {
         let locationRotation = SCNQuaternion.getQuaternion(from: localAngleConversion)
         helicopterNode.localRotate(by: locationRotation)
         updateHUD()
-        hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-1))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.25))
         SCNTransaction.commit()
     }
     
@@ -127,7 +119,7 @@ class ApacheHelicopter {
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y: 0, z: -val))
         updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-1))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.25))
         SCNTransaction.commit()
     }
     
@@ -138,13 +130,12 @@ class ApacheHelicopter {
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y:val, z:0))
         updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-1))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.25))
         SCNTransaction.commit()
     }
     
     func updateHUD() {
         hud.orientation = helicopterNode.orientation
-        hud.scale = SCNVector3(0.5, 0.5, 0.5)
         hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
     }
     
@@ -176,13 +167,13 @@ class ApacheHelicopter {
         let target = ship.node
         //et value = 9
         let physicsBody2 =  SCNPhysicsBody(type: .kinematic, shape: nil)
-        missile.particle?.birthRate = 5000
+        missile.particle?.birthRate = 9000
         missile.node.physicsBody = physicsBody2
         missile.node.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
         missile.node.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
         missile.node.physicsBody?.collisionBitMask = 2
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.2
+        SCNTransaction.animationDuration = 0.09
         hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
         hud.orientation = target.orientation
         hud.look(at: target.position)
@@ -194,15 +185,15 @@ class ApacheHelicopter {
         let (direction, _) = getUserVector(target: target)
         
         let impulseVector = SCNVector3(
-            x: direction.x * Float(200 * offset),
-            y: direction.y * Float(200 * offset),
-            z: direction.z * Float(200 * offset)
+            x: direction.x * Float(2000 * offset),
+            y: direction.y * Float(2000 * offset),
+            z: direction.z * Float(2000 * offset)
         )
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.3
+        SCNTransaction.animationDuration = 0.06
         missile.node.simdWorldOrientation = target.simdWorldOrientation
         missile.node.physicsBody?.applyForce(impulseVector, asImpulse: true)
-//        missile.node.simdWorldOrientation = target.simdWorldOrientation
+        //        missile.node.simdWorldOrientation = target.simdWorldOrientation
         SCNTransaction.commit()
     }
     
@@ -219,13 +210,6 @@ class ApacheHelicopter {
         let dir = SCNVector3(-1 * mat.m31, -1 * mat.m32, -1 * mat.m33) // orientation of camera in world space
         let pos = SCNVector3(mat.m41, mat.m42, mat.m43) // location of camera in world space
         return (dir, pos)
-    }
-    
-    func shootMissile() {
-        guard (!missiles.isEmpty && missilesArmed) && firing == false else { return }
-        let missile = missiles.removeFirst()
-        currentMissile = missile
-        firing = false
     }
     
     func normalize(vector: SCNVector3) -> SCNVector3 {
