@@ -19,14 +19,25 @@ class Missile {
     func setupNode(scnNode: SCNNode?, number: Int) {
         guard let scnNode = scnNode else { return }
         node = scnNode
-        self.num = number
+        num = number
         setParticle()
         node.name = "Missile \(num)"
-        let physicsBody4 =  SCNPhysicsBody(type: .static, shape: nil)
-        node?.physicsBody = physicsBody4
-        node?.physicsBody?.categoryBitMask = 7
-        node?.physicsBody?.contactTestBitMask = 4
-        node?.physicsBody?.collisionBitMask = 4
+        let physicsBody2 =  SCNPhysicsBody(type: .kinematic, shape: nil)
+        node.physicsBody = physicsBody2
+        node.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
+        node.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
+        node.physicsBody?.collisionBitMask = 2
+//        let physicsBody =  SCNPhysicsBody(type: .kinematic, shape: nil)
+//        node.physicsBody = physicsBody
+//        node.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
+//        node.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
+//        node.physicsBody?.collisionBitMask = 2
+//        let physicsBody4 =  SCNPhysicsBody(type: .kinematic, shape: nil)
+//        node?.physicsBody = physicsBody4
+//        node?.physicsBody?.categoryBitMask = CollisionTypes.missile.rawValue
+//        node.physicsBody?.contactTestBitMask = CollisionTypes.base.rawValue
+//        node?.physicsBody?.contactTestBitMask = CollisionTypes.plane.rawValue
+//        node?.physicsBody?.collisionBitMask = 4
         
     }
     

@@ -58,12 +58,17 @@ class GameSceneView: ARSCNView {
         dump(shape)
         let physicsBody =  SCNPhysicsBody(type: .static, shape: nil)
         tankNode.physicsBody = physicsBody
-        tankNode.physicsBody?.categoryBitMask = 1
-        tankNode.physicsBody?.contactTestBitMask = 2
+        tankNode.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
+        tankNode.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
         tankNode.physicsBody?.collisionBitMask = 2
         let tempScene = SCNScene.nodeWithModelName(GameSceneView.helicopterSceneName).clone()
         helicopterModel = tempScene.childNode(withName: GameSceneView.helicopterParentModelName, recursively: true)!.clone()
         helicopterNode = helicopterModel!.childNode(withName: GameSceneView.helicopterBodyName, recursively: true)
+        let physicsBody2 =  SCNPhysicsBody(type: .kinematic, shape: nil)
+        helicopterNode.physicsBody = physicsBody2
+        helicopterNode.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
+        helicopterNode.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
+        helicopterNode.physicsBody?.collisionBitMask = 2
         hud = helicopterModel!.childNode(withName: GameSceneView.hudNodeName, recursively: false)!
         front = helicopterNode.childNode(withName: GameSceneView.frontIRSteering, recursively: true)
         rotor = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.frontRotorName, recursively: true)

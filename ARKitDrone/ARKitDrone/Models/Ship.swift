@@ -31,12 +31,12 @@ class Ship {
     
     func boundPositions() -> SCNVector3 {
         var rebound = SCNVector3(x: Float(0), y: Float(0), z:Float(0))
-        let Xmin = -30;
-        let Ymin = -30;
-        let Zmin = -50;
-        let Xmax = 30;
-        let Ymax = 30;
-        let Zmax = 50;
+        let Xmin = -20;
+        let Ymin = -20;
+        let Zmin = -100;
+        let Xmax = 20;
+        let Ymax = 20;
+        let Zmax = 10;
         if node.position.x < Float(Xmin) {
             rebound.x = 1;
         }

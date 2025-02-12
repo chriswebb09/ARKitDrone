@@ -43,7 +43,7 @@ class ApacheHelicopter {
     }
     
     var helicopterNode: SCNNode!
-    private var parentModelNode: SCNNode!
+    var parentModelNode: SCNNode!
     var firing:Bool = false
     var missile1: Missile!
     var currentMissile: Missile!
@@ -99,7 +99,7 @@ class ApacheHelicopter {
     }
     
     func toggleArmMissile() {
-        missilesArmed.toggle()
+        missilesArmed = !missilesArmed
     }
     
     func missilesAreArmed() -> Bool {
@@ -123,7 +123,7 @@ class ApacheHelicopter {
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y: 0, z: -val))
         updateHUD()
-        hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-5))
+        hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-3))
         SCNTransaction.commit()
     }
     
@@ -138,36 +138,68 @@ class ApacheHelicopter {
     }
     
     private func updateHUD() {
-        //        hud.orientation = helicopterNode.orientation
-        //        hud.scale = SCNVector3(1, 1, 1)
-        //        hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
+        hud.orientation = helicopterNode.orientation
+        hud.scale = SCNVector3(1, 1, 1)
+        hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
     }
     
     func moveSides(value: Float) {
+        guard helicopterNode != nil else { return }
         let val = (-value / 50.0)
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: val, y: 0, z: 0))
         updateHUD()
-        //        hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-5))
+        hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-3))
         SCNTransaction.commit()
     }
     
     func lockOn(target: SCNNode) {
-        hud.scale = SCNVector3(1.5,1.5, 1.5)
         targetPosition = target.position
+        let helicopterNodePosition = helicopterNode.position
+        hud.position = SCNVector3(x: helicopterNodePosition.x, y: helicopterNodePosition.y , z: helicopterNodePosition.z)
+        hud.orientation = target.orientation
+        hud.look(at: target.position)
+        let distance = helicopterNode.position.distance(target.position) - 4
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z: -distance))
+    }
+    
+    func update(missile: Missile, target: SCNNode, offset: Int = 1) {
+//        print(missile.node.name)
+//        print(target.name)
+        var value = 9
+        let physicsBody2 =  SCNPhysicsBody(type: .kinematic, shape: nil)
+        missile.node.physicsBody = physicsBody2
+        missile.node.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
+        missile.node.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
+        missile.node.physicsBody?.collisionBitMask = 2
         hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
         hud.orientation = target.orientation
         hud.look(at: target.position)
-        let distance = helicopterNode.position.distance(target.position) - 2
-        hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-distance))
-    }
-    
-    func update(missile: Missile, target: SCNNode) {
+        let distance = helicopterNode.position.distance(target.position) - 4
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z: -distance))
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.001
+        SCNTransaction.animationDuration = 0.2
         missile.node.simdWorldTransform = target.simdWorldTransform
-        missile.node.localTranslate(by: SCNVector3(x: 30, y:30, z: -1000))
+        missile.node.localTranslate(by: SCNVector3(x: 1900, y:900, z: 1200))
+        SCNTransaction.commit()
+        let (direction, pos) = getUserVector(target: target)
+        let impulseVector = SCNVector3(
+            x: direction.x * Float(100 * offset),
+            y: direction.y * Float(100 * offset),
+            z: direction.z * Float(100 * offset)
+        )
+        SCNTransaction.begin()
+        SCNTransaction.animationDuration = 0.5
+        missile.node.physicsBody?.applyForce(impulseVector, asImpulse: true)
+//        print(target.physicsBody?.categoryBitMask)
+//        print(target.physicsBody?.contactTestBitMask)
+//        print(target.physicsBody?.collisionBitMask)
+//        print("\n")
+//        print(missile.node.physicsBody?.categoryBitMask)
+//        print(missile.node.physicsBody?.contactTestBitMask)
+//        print(missile.node.physicsBody?.collisionBitMask)
+//        print("\n")
         SCNTransaction.commit()
     }
     
@@ -177,6 +209,13 @@ class ApacheHelicopter {
             currentNode = parent
         }
         return currentNode
+    }
+    
+    func getUserVector(target: SCNNode) -> (SCNVector3, SCNVector3) { // (direction, position)
+        let mat = SCNMatrix4(target.simdWorldTransform) // 4x4 transform matrix describing camera in world space
+        let dir = SCNVector3(-1 * mat.m31, -1 * mat.m32, -1 * mat.m33) // orientation of camera in world space
+        let pos = SCNVector3(mat.m41, mat.m42, mat.m43) // location of camera in world space
+        return (dir, pos)
     }
     
     func shootMissile() {

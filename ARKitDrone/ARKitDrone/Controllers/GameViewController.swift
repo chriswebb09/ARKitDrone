@@ -11,9 +11,22 @@ import SceneKit
 import ARKit
 import SpriteKit
 
+enum CollisionTypes: Int {
+    case base = 1
+    
+    case helicopter = 0
+    
+    case tank = 32
+    
+    case missile = 2
+    
+    case plane = 5
+}
+
 class GameViewController: UIViewController {
     
     var placed: Bool = false
+    var running = false
     
     // MARK: - LocalConstants
     
@@ -42,6 +55,7 @@ class GameViewController: UIViewController {
     var addLinesToPlanes = false
     var addPlanesToScene = false
     var planeNodesCount = 0
+    var valueReached: Bool = false
     var hit = false
     var planeHeight: CGFloat = 0.01
     var anchors = [ARAnchor]()
@@ -121,11 +135,12 @@ class GameViewController: UIViewController {
             let shipNode = shipScene.rootNode.childNode(withName: "F_35B_Lightning_II", recursively: true)!.clone()
             shipNode.simdScale = SIMD3<Float>(81.876, 81.876, 81.876)
             shipNode.name = "F_35B \(i)"
-            let physicsBody =  SCNPhysicsBody(type: .static, shape: nil)
+            let physicsBody =  SCNPhysicsBody(type: .kinematic, shape: nil)
             shipNode.physicsBody = physicsBody
-            shipNode.physicsBody!.categoryBitMask = 7
-            shipNode.physicsBody!.contactTestBitMask = 7
-            shipNode.physicsBody!.collisionBitMask = 4
+            shipNode.physicsBody!.categoryBitMask = CollisionTypes.missile.rawValue
+            shipNode.physicsBody!.contactTestBitMask = CollisionTypes.base.rawValue
+            shipNode.physicsBody!.collisionBitMask = 2
+            //            shipNode.physicsBody!.collisionBitMask = 4
             let ship = Ship(newNode: shipNode);
             sceneView.scene.rootNode.addChildNode(ship.node)
             ships.append(ship);
@@ -217,6 +232,9 @@ extension GameViewController: ARSCNViewDelegate {
             ship.node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
             ship.node.position = ship.node.position + (ship.velocity)
         }
+        if placed {
+            sceneView.missileLock(target: ships[0].node)
+        }
     }
     
     func keepASmallDistance(_ ship: Ship) -> SCNVector3 {
@@ -297,49 +315,30 @@ extension GameViewController: JoystickSceneDelegate {
     }
     
     func tapped() {
+        guard sceneView.helicopter.missilesArmed else { return }
+        sceneView.toggleArmMissiles()
+        let title = sceneView.missilesArmed() ? LocalConstants.disarmTitle : LocalConstants.buttonTitle
+        armMissilesButton.setTitle(title, for: .normal)
         sceneView.helicopter.lockOn(target: ships[0].node)
         sceneView.helicopter.shootMissile()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-            self.sceneView.helicopter.lockOn(target: self.ships[0].node)
-            self.sceneView.helicopter.shootMissile()
-            self.sceneView.helicopter.update(missile: self.sceneView.missile2, target: self.ships[0].node)
-        }
-        self.sceneView.missile8.node.simdWorldTransform = self.sceneView.tankNode.simdWorldTransform
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-            self.sceneView.helicopter.lockOn(target: self.ships[0].node)
-            self.sceneView.helicopter.shootMissile()
-            self.sceneView.helicopter.update(missile: self.sceneView.missile3, target: self.ships[0].node)
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.sceneView.helicopter.lockOn(target: self.ships[0].node)
-            self.sceneView.helicopter.shootMissile()
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.sceneView.helicopter.lockOn(target: self.ships[1].node)
-            self.sceneView.helicopter.shootMissile()
-            self.sceneView.helicopter.update(missile: self.sceneView.missile5, target: self.ships[1].node)
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.sceneView.helicopter.lockOn(target: self.ships[1].node)
-            self.sceneView.helicopter.shootMissile()
-            while !self.hit {
-                self.sceneView.helicopter.update(missile: self.sceneView.missile6, target: self.ships[1].node)
+        // self.sceneView.missile1.node.move(toParent: self.ships[0].node.parent!)
+        var count = 1
+        var countlimit = 4000
+        //        running =  true
+        while !hit && (count < countlimit) {
+            self.sceneView.helicopter.update(missile: self.sceneView.missile1, target: self.ships[0].node, offset: count)
+            self.sceneView.helicopter.update(missile: self.sceneView.missile2, target: self.ships[0].node, offset: count)
+            self.sceneView.helicopter.update(missile: self.sceneView.missile3, target: self.ships[1].node, offset: count)
+            self.sceneView.helicopter.update(missile: self.sceneView.missile4, target: self.ships[1].node, offset: count)
+            count += 1
+            if count > 3200 {
+                valueReached = true
             }
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-            self.sceneView.helicopter.lockOn(target: self.ships[1].node)
-            self.sceneView.helicopter.shootMissile()
-            while !self.hit {
-                self.sceneView.helicopter.update(missile: self.sceneView.missile7, target: self.ships[1].node)
-            }
-        }
-        while !self.hit {
-            self.sceneView.helicopter.update(missile: self.sceneView.missile1, target: self.ships[0].node)
-            self.sceneView.helicopter.update(missile: self.sceneView.missile2, target: self.ships[0].node)
-        }
+        
+        
     }
 }
-
 extension GameViewController: SCNPhysicsContactDelegate {
     
     func physicsWorld(_ world: SCNPhysicsWorld, didEnd contact: SCNPhysicsContact) {
@@ -358,17 +357,18 @@ extension GameViewController: SCNPhysicsContactDelegate {
     }
     
     func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
-        print("\n\n\n")
-        print(contact.nodeA.name!)
-        print(contact.nodeB.name!)
-        print("\n\n\n")
-        print(contact.nodeA.physicsBody!.categoryBitMask)
-        print(contact.nodeB.physicsBody!.categoryBitMask)
-        print("\n\n\n")
-        print(contact.nodeA.physicsBody!.collisionBitMask)
-        print(contact.nodeB.physicsBody!.collisionBitMask)
-        print("\n\n\n")
-        print(contact.nodeA.physicsBody!.contactTestBitMask)
-        print(contact.nodeB.physicsBody!.contactTestBitMask)
+        if valueReached {
+            if (contact.nodeA.name!.contains("Missile") || contact.nodeB.name!.contains("Missile")) {
+                if contact.nodeB.name!.contains("Missile") {
+                    contact.nodeB.removeFromParentNode()
+                    contact.nodeB.isHidden = true
+                    contact.nodeA.removeFromParentNode()
+                    contact.nodeA.isHidden = true
+                }
+                hit = true
+                valueReached = false
+            }
+        }
     }
 }
+
