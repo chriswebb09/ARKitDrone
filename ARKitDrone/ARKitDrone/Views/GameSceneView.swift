@@ -94,36 +94,44 @@ class GameSceneView: ARSCNView {
     }
     
     func positionTank(position: SCNVector3) {
-        helicopter.hud = hud
-        helicopter.missile1 = missile1
-        helicopter.helicopterNode = helicopterNode
-        helicopter.front = front
-        helicopter.frontIR = frontIR
-        helicopter.missile1 = missile1
-        helicopter.missile2 = missile2
-        helicopter.missile3 = missile3
-        helicopter.missile4 = missile4
-        helicopter.missile5 = missile5
-        helicopter.missile6 = missile6
-        helicopter.missile7 = missile7
-        helicopter.missile8 = missile8
-        helicopter.rotor = rotor
-        helicopter.rotor2 = rotor2
-        helicopter.setup(with: helicopterNode)
-        scene.rootNode.addChildNode(hud)
-        scene.rootNode.addChildNode(tankNode)
-        scene.rootNode.addChildNode(helicopterNode)
-        helicopterNode.position = tankNode.position
-        tankNode.position = position
-        helicopterNode.position = position
-        helicopterNode.scale = SCNVector3(x: 0.02, y: 0.02, z: 0.02)
-        helicopter.helicopterNode.simdPivot.columns.3.x = -0.5
-        tankNode.simdPivot.columns.3.x = -0.5
-        helicopter.helicopterNode.scale = SCNVector3(x: 0.001, y: 0.001, z: 0.001)
-        tankNode.scale = SCNVector3(x: 0.02, y: 0.02, z: 0.02)
-        helicopter.helicopterNode.simdPivot.columns.3.x = -0.5
-        tankNode.simdPivot.columns.3.x = -0.5
-        helicopter.helicopterNode.scale = SCNVector3(x: 0.001, y: 0.001, z: 0.001)
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            guard let self = self else { return }
+            helicopter.hud = hud
+            helicopter.missile1 = missile1
+            helicopter.helicopterNode = helicopterNode
+            helicopter.front = front
+            helicopter.frontIR = frontIR
+            helicopter.missile1 = missile1
+            helicopter.missile2 = missile2
+            helicopter.missile3 = missile3
+            helicopter.missile4 = missile4
+            helicopter.missile5 = missile5
+            helicopter.missile6 = missile6
+            helicopter.missile7 = missile7
+            helicopter.missile8 = missile8
+            helicopter.rotor = rotor
+            helicopter.rotor2 = rotor2
+            helicopter.setup(with: helicopterNode)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                scene.rootNode.addChildNode(hud)
+                scene.rootNode.addChildNode(tankNode)
+                scene.rootNode.addChildNode(helicopterNode)
+            }
+            helicopterNode.position = tankNode.position
+            tankNode.position = position
+            helicopterNode.position = position
+            helicopterNode.scale = SCNVector3(x: 0.02, y: 0.02, z: 0.02)
+            helicopter.helicopterNode.simdPivot.columns.3.x = -0.5
+            tankNode.simdPivot.columns.3.x = -0.5
+            helicopter.helicopterNode.scale = SCNVector3(x: 0.001, y: 0.001, z: 0.001)
+            tankNode.scale = SCNVector3(x: 0.02, y: 0.02, z: 0.02)
+            helicopter.helicopterNode.simdPivot.columns.3.x = -0.5
+            tankNode.simdPivot.columns.3.x = -0.5
+            helicopter.helicopterNode.scale = SCNVector3(x: 0.001, y: 0.001, z: 0.001)
+        }
+        
+        
     }
 }
 
@@ -136,7 +144,7 @@ extension GameSceneView: HelicopterCapable {
     
     
     func positionHUD() {
-       // helicopter.
+        // helicopter.
     }
     
     func missilesArmed() -> Bool {
@@ -166,7 +174,7 @@ extension GameSceneView: HelicopterCapable {
     
     func moveSides(value: Float) {
         helicopter.moveSides(value: value)
-//        helicopter.lockOn(target: tankNode)
+        //        helicopter.lockOn(target: tankNode)
     }
     
     func toggleArmMissiles() {

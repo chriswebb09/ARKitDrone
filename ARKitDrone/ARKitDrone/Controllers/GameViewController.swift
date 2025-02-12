@@ -304,7 +304,9 @@ class GameViewController: UIViewController {
             if let result = sceneView.raycastQuery(from: tapLocation, allowing: .estimatedPlane, alignment: .horizontal) {
                 let castRay =  session.raycast(result)
                 if let firstCast = castRay.first {
-                    sceneView.positionTank(position: SCNVector3.positionFromTransform(firstCast.worldTransform))
+                    DispatchQueue.global(qos: .utility).async {
+                        self.sceneView.positionTank(position: SCNVector3.positionFromTransform(firstCast.worldTransform))
+                    }
                     placed = true
                 }
             }
