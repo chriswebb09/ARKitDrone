@@ -15,11 +15,14 @@ class Ship {
     var velocity: SCNVector3 = SCNVector3(x: Float(1), y: Float(1), z:Float(1))
     var prevDir: SCNVector3 = SCNVector3(x: Float(0), y: Float(1), z:Float(0))
     private static var shipRegistry: [SCNNode: Ship] = [:]
+    var isDestroyed: Bool = false
     var targetNode: SCNNode!
     var targetAdded = false
+    var id: String!
     
     init(newNode: SCNNode) {
         self.node = newNode;
+        self.id = UUID.init().uuidString
         Ship.shipRegistry[newNode] = self
     }
     

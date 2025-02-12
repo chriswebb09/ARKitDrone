@@ -11,11 +11,71 @@ import SceneKit
 import ARKit
 import SpriteKit
 
+class MinimapScene: SKScene {
+    private var minimap: SKShapeNode!
+    private var playerDot: SKShapeNode!
+    private var shipDots: [SKShapeNode] = []
+    
+    override func didMove(to view: SKView) {
+        backgroundColor = .clear
+        
+        // Create the minimap circle
+        let minimapRadius: CGFloat = 60
+        minimap = SKShapeNode(circleOfRadius: minimapRadius)
+        minimap.position = CGPoint(x: size.width / 2, y: size.height / 2)
+        minimap.strokeColor = .white
+        minimap.fillColor = UIColor(white: 0.2, alpha: 0.7)
+        minimap.lineWidth = 2
+        addChild(minimap)
+        
+        // Create player icon in the center
+        playerDot = SKShapeNode(circleOfRadius: 5)
+        playerDot.fillColor = .blue
+        playerDot.position = .zero
+        minimap.addChild(playerDot)
+    }
+    
+    func updateMinimap(playerPosition: simd_float4, ships: [simd_float4], cameraRotation: simd_float4x4) {
+        // Remove previous ship dots
+        shipDots.forEach { $0.removeFromParent() }
+        shipDots.removeAll()
+        
+        let minimapRadius: CGFloat = 260
+        let worldRange: Float = 200
+        let scale = minimapRadius / CGFloat(worldRange)
+        let playerX = CGFloat(playerPosition.x) * scale
+        let playerZ = CGFloat(playerPosition.z) * scale
+        playerDot.position = CGPoint(x: playerX, y: playerZ)
+        
+        // Add ship dots to the minimap
+        for shipPosition in ships {
+            let shipX = CGFloat(shipPosition.x) * scale
+            let shipZ = CGFloat(shipPosition.z) * scale
+            // Apply camera rotation to invert map based on camera's facing direction
+            let transformedShipPosition = applyCameraRotation(position: simd_float4(shipPosition.x, 0, shipPosition.z, 1), cameraRotation: cameraRotation)
+            let invertedYPosition = -CGFloat(transformedShipPosition.z)
+            let shipDot = SKShapeNode(circleOfRadius: 4)
+            shipDot.fillColor = .red
+            shipDot.position = CGPoint(x: CGFloat(transformedShipPosition.x) * scale, y: invertedYPosition * scale)
+            minimap.addChild(shipDot)
+            shipDots.append(shipDot)
+        }
+    }
+    
+    private func applyCameraRotation(position: simd_float4, cameraRotation: simd_float4x4) -> simd_float4 {
+        let rotatedPosition = cameraRotation * position
+        return rotatedPosition
+    }
+}
+
+
 class GameViewController: UIViewController {
     
     var placed: Bool = false
     var running = false
     
+    
+    var minimapScene: MinimapScene!
     // MARK: - LocalConstants
     
     private struct LocalConstants {
@@ -49,12 +109,29 @@ class GameViewController: UIViewController {
     var anchors = [ARAnchor]()
     var nodes = [SCNNode]()
     
+    var minimap: SKShapeNode!
+    var playerNode: SCNNode!
+    
     private lazy var padView2: SKView = {
         let view = SKView(frame: CGRect(x:620, y: UIScreen.main.bounds.height - 140, width:140, height: 140))
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
         return view
     }()
+    
+    private lazy var minimapView: SKView = {
+        let size: CGFloat = 140
+        let view = SKView(frame: CGRect(
+            x: UIScreen.main.bounds.width - size - 20,  // Top-right corner
+            y: 20,  // Offset from the top
+            width: size,
+            height: size
+        ))
+        view.isMultipleTouchEnabled = false
+        view.backgroundColor = .clear
+        return view
+    }()
+    
     
     //    private let droneQueue = DispatchQueue(label: "com.froleeyo.dronequeue")
     
@@ -81,6 +158,7 @@ class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         sceneView.delegate = self
+        
         //        sceneView.debugOptions = .showPhysicsShapes
     }
     
@@ -105,15 +183,25 @@ class GameViewController: UIViewController {
         setupTracking()
         sceneView.setup()
         sceneView.scene.physicsWorld.contactDelegate = self
+        playerNode = SCNNode(geometry: SCNSphere(radius: 0.5))
+        playerNode.name = "Player"
+        playerNode.position = SCNVector3(0, 0, 0)  // Center
+        sceneView.scene.rootNode.addChildNode(playerNode)
         DispatchQueue.main.asyncAfter(deadline: .now() +  0.5) { [self] in
             sceneView.addSubview(padView1)
             sceneView.addSubview(padView2)
+            minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
+            minimapScene.scaleMode = .resizeFill
+            minimapView.presentScene(minimapScene)
+            self.view.addSubview(minimapView)
+            startMinimapUpdate()
             setupPadScene()
         }
         sceneView.addSubview(armMissilesButton)
         armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
         sceneView.isUserInteractionEnabled = true
         setupShips()
+        
     }
     
     func setupShips() {
@@ -133,16 +221,42 @@ class GameViewController: UIViewController {
             ships.append(ship);
             ship.node.position = SCNVector3(x: Float(Int(arc4random_uniform(10)) - 5), y: Float(Int(arc4random_uniform(10)) - 5), z: 0)
             ship.node.scale = SCNVector3(x: Float(0.009), y: Float(0.009), z: Float(0.009))
-//            if !ship.targetAdded {
-//                let targetSceneRoot = SCNScene.nodeWithModelName(GameSceneView.targetScene)
-//                ship.targetNode = targetSceneRoot.childNode(withName: GameSceneView.targetName, recursively: false)!.clone()
-//                sceneView.scene.rootNode.addChildNode(ship.targetNode!)
-//                ship.targetAdded = true
-//            }
+            //            if !ship.targetAdded {
+            //                let targetSceneRoot = SCNScene.nodeWithModelName(GameSceneView.targetScene)
+            //                ship.targetNode = targetSceneRoot.childNode(withName: GameSceneView.targetName, recursively: false)!.clone()
+            //                sceneView.scene.rootNode.addChildNode(ship.targetNode!)
+            //                ship.targetAdded = true
+            //            }
         }
     }
     
     // MARK: - Private Methods
+    
+    func startMinimapUpdate() {
+        let updateAction = SKAction.run { [weak self] in
+            self?.updateMinimap()
+        }
+        let delay = SKAction.wait(forDuration: 0.1)
+        let updateLoop = SKAction.sequence([updateAction, delay])
+        
+        minimapScene.run(SKAction.repeatForever(updateLoop))
+    }
+    
+    func updateMinimap() {
+        // Get the camera's transform (rotation matrix)
+        let cameraTransform = sceneView.session.currentFrame?.camera.transform
+        let cameraRotation = simd_float4x4(cameraTransform!.columns.0, cameraTransform!.columns.1, cameraTransform!.columns.2, cameraTransform!.columns.3)
+        
+        // Convert SCNVector3 to simd_float4
+        let playerPosition2D = sceneView.projectPoint(playerNode.worldPosition)
+        let shipPositions2D = ships.map { sceneView.projectPoint($0.node.worldPosition) }
+        
+        // Convert SCNVector3 to simd_float4 for the minimap update
+        let playerPositionSIMD = simd_float4(playerNode.worldPosition.x, playerNode.worldPosition.y, playerNode.worldPosition.z, 1.0)
+        let shipPositionsSIMD = ships.filter { !$0.isDestroyed }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
+        
+        minimapScene.updateMinimap(playerPosition: playerPositionSIMD, ships: shipPositionsSIMD, cameraRotation: cameraRotation)
+    }
     
     private func setupTracking() {
         let configuration = ARWorldTrackingConfiguration()
@@ -195,6 +309,26 @@ class GameViewController: UIViewController {
                 }
             }
         }
+    }
+    
+    func createExplosion() -> SCNParticleSystem {
+        let explosion = SCNParticleSystem()
+        explosion.emitterShape = SCNSphere(radius: 5)
+        explosion.birthRate = 2500   // Number of particles created per second
+        explosion.emissionDuration = 0.1  // How long the explosion lasts
+        explosion.spreadingAngle = 360  // Spread particles in all directions
+        explosion.particleLifeSpan = 0.1  // How long each particle lasts
+        explosion.particleLifeSpanVariation = 0.1 // Variation in particle lifespan
+        explosion.particleVelocity = 3.0  // Initial speed of particles
+        explosion.particleVelocityVariation = 1.5 // Variation in velocity
+        explosion.particleSize = 0.04  // Size of individual particles
+        explosion.particleColor = UIColor.orange  // Color of explosion
+        explosion.particleImage = UIImage(named: "spark")  // Can use a custom particle texture
+        explosion.isAffectedByGravity = true  // Particles fall after explosion
+        explosion.blendMode = .additive  // Glowing effect
+        explosion.particleIntensity = 2
+        
+        return explosion
     }
 }
 
@@ -348,7 +482,7 @@ extension GameViewController: SCNPhysicsContactDelegate {
         if valueReached {
             if (contact.nodeA.name!.contains("Missile") || contact.nodeB.name!.contains("Missile")) {
                 if contact.nodeB.name!.contains("Missile") {
-                   
+                    
                     var particle: SCNParticleSystem?
                     guard let particleNode = contact.nodeB.childNodes.first, let particleSystems = particleNode.particleSystems else {
                         return
@@ -356,22 +490,34 @@ extension GameViewController: SCNPhysicsContactDelegate {
                     particle = particleSystems[0]
                     particle?.birthRate = 0
                     
+                    let explosion = createExplosion()
+                    let explosionNode = SCNNode()
+                    explosionNode.position = contact.contactPoint
+                    explosionNode.addParticleSystem(explosion)
+                    sceneView.scene.rootNode.addChildNode(explosionNode)
+                    explosionNode.runAction(SCNAction.sequence([
+                        SCNAction.wait(duration: 1.0),  // Wait for explosion effect to finish
+                        SCNAction.removeFromParentNode() // Remove explosion node from the scene
+                    ]))
+                    
                     contact.nodeB.isHidden = true
                     contact.nodeB.removeFromParentNode()
                     let ship = Ship.getShip(from: contact.nodeA)
-//                    ship?.targetNode.isHidden = true
-//                    ship?.targetNode.removeFromParentNode()
-                    
+                    ship?.isDestroyed = true
                     ship?.node.isHidden = true
                     ship?.node.removeFromParentNode()
                     sceneView.helicopter.updateHUD()
-                
-                    //valueReached = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        explosionNode.particleSystems![0].birthRate = 0
+                        explosion.birthRate = 0
+                        explosion.removeAllAnimations()
+                        explosionNode.removeFromParentNode()
+                        explosionNode.isHidden = true
+                    }
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 12) {
                     self.hit = true
                 }
-                
             }
         }
     }
