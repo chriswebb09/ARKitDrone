@@ -130,8 +130,6 @@ class GameSceneView: ARSCNView {
             tankNode.simdPivot.columns.3.x = -0.5
             helicopter.helicopterNode.scale = SCNVector3(x: 0.001, y: 0.001, z: 0.001)
         }
-        
-        
     }
 }
 
