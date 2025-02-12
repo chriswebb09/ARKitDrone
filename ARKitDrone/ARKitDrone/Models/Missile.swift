@@ -14,34 +14,52 @@ class Missile {
     var node: SCNNode!
     var particle: SCNParticleSystem?
     var fired: Bool = false
+    var exhaustNode: SCNNode!
+    
     var num: Int = -1
-
+    
     func setupNode(scnNode: SCNNode?, number: Int) {
         guard let scnNode = scnNode else { return }
         node = scnNode
+        num = number
+        
+        node.name = "Missile \(num)"
+        let physicsBody2 =  SCNPhysicsBody(type: .kinematic, shape: nil)
+        node.physicsBody = physicsBody2
+        node.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
+        node.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
+        node.physicsBody?.collisionBitMask = 2
+        exhaustNode = SCNNode()
+        exhaustNode.position = node.position
+        exhaustNode.position = SCNVector3(node.position.x, node.position.y, node.position.z + 1.4) // Adjust to match missile model
+        node.addChildNode(exhaustNode)
+        exhaustNode.transform = node.presentation.worldTransform
         setParticle()
-        self.num = number
     }
     
     func setParticle() {
-           guard let particleNode = node.childNodes.first, let particleSystems = particleNode.particleSystems else {
-               return
-           }
-           particle = particleSystems[0]
-           particle?.birthRate = 0
-       }
+        guard let particleNode = node.childNodes.first, let particleSystems = particleNode.particleSystems else {
+            return
+        }
+        particle = particleSystems[0]
+        particle?.birthRate = 0
+        if let exhaust = exhaustNode {
+            exhaust.addParticleSystem(particle!)
+        }
+    }
     
     func fire(x: Float, y: Float) {
-        print(num)
+        print("missile \(num)")
         guard fired == false else { return }
         particle?.birthRate = 4000
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 1
-        node.localTranslate(by: SCNVector3(x: x, y: y, z: -10000))
+        SCNTransaction.animationDuration = 3
+        node.localTranslate(by: SCNVector3(x: x, y: y, z: -100000))
         SCNTransaction.commit()
-        Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { timer in
-            self.node.removeFromParentNode()
-            self.fired = true
-        }
+//        self.fired = true
+//        Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { timer in
+//            self.node.removeFromParentNode()
+//            self.fired = true
+//        }
     }
 }

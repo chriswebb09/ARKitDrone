@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9412F0762D5B4BEB00D9F1BD /* Ship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9412F0752D5B4BE500D9F1BD /* Ship.swift */; };
 		941706D92972A5F400CB0308 /* ApacheHelicopter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941706D82972A5F400CB0308 /* ApacheHelicopter.swift */; };
+		94548F022D5C68EE00A007B0 /* CollisionTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94548F012D5C68EB00A007B0 /* CollisionTypes.swift */; };
 		945B16AB294E9F5B00482E14 /* Joystick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945B16AA294E9F5B00482E14 /* Joystick.swift */; };
 		945B16AD294EB34800482E14 /* JoystickScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945B16AC294EB34800482E14 /* JoystickScene.swift */; };
 		9467A30B2BB918EE0023EA62 /* M1Tank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9467A30A2BB918EE0023EA62 /* M1Tank.swift */; };
@@ -37,11 +39,12 @@
 		A7AE72C51F888EF500B015D3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72C31F888EF500B015D3 /* Main.storyboard */; };
 		A7AE72C71F888EF500B015D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72C61F888EF500B015D3 /* Assets.xcassets */; };
 		A7AE72CA1F888EF500B015D3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72C81F888EF500B015D3 /* LaunchScreen.storyboard */; };
-		A7AE72D41F88900600B015D3 /* DroneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AE72D31F88900600B015D3 /* DroneView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9412F0752D5B4BE500D9F1BD /* Ship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ship.swift; sourceTree = "<group>"; };
 		941706D82972A5F400CB0308 /* ApacheHelicopter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApacheHelicopter.swift; sourceTree = "<group>"; };
+		94548F012D5C68EB00A007B0 /* CollisionTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollisionTypes.swift; sourceTree = "<group>"; };
 		945B16AA294E9F5B00482E14 /* Joystick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joystick.swift; sourceTree = "<group>"; };
 		945B16AC294EB34800482E14 /* JoystickScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoystickScene.swift; sourceTree = "<group>"; };
 		9467A30A2BB918EE0023EA62 /* M1Tank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M1Tank.swift; sourceTree = "<group>"; };
@@ -73,7 +76,6 @@
 		A7AE72C61F888EF500B015D3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A7AE72C91F888EF500B015D3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A7AE72CB1F888EF500B015D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A7AE72D31F88900600B015D3 /* DroneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DroneView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +112,8 @@
 		94CCC8F32972E36100F7D17F /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				94548F012D5C68EB00A007B0 /* CollisionTypes.swift */,
+				9412F0752D5B4BE500D9F1BD /* Ship.swift */,
 				941706D82972A5F400CB0308 /* ApacheHelicopter.swift */,
 				94CCC8ED2972D46400F7D17F /* Missile.swift */,
 				94F968A72AD7337F00D7B418 /* Plane.swift */,
@@ -123,7 +127,6 @@
 		94CCC9062972E4B700F7D17F /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				A7AE72D31F88900600B015D3 /* DroneView.swift */,
 				94CCC90F2972F43200F7D17F /* HelicopterCapable.swift */,
 				94CCC90D2972EB2300F7D17F /* GameSceneView.swift */,
 			);
@@ -269,6 +272,7 @@
 				94A68F742C87972E0059CD82 /* SCNQuaternion+Extension.swift in Sources */,
 				945B16AD294EB34800482E14 /* JoystickScene.swift in Sources */,
 				94F968A82AD7337F00D7B418 /* Plane.swift in Sources */,
+				94548F022D5C68EE00A007B0 /* CollisionTypes.swift in Sources */,
 				941706D92972A5F400CB0308 /* ApacheHelicopter.swift in Sources */,
 				A7AE72C21F888EF500B015D3 /* GameViewController.swift in Sources */,
 				94CCC8F02972D97700F7D17F /* JoystickDelegate.swift in Sources */,
@@ -280,7 +284,6 @@
 				94CCC90A2972E54000F7D17F /* SCNScene+Extension.swift in Sources */,
 				9470AE472974001A00A55134 /* MenuViewController.swift in Sources */,
 				94CCC9122972FFB500F7D17F /* DeviceOrientation.swift in Sources */,
-				A7AE72D41F88900600B015D3 /* DroneView.swift in Sources */,
 				94CB148E2C8793BF0065E1B0 /* UIColor+Extension.swift in Sources */,
 				9467A30B2BB918EE0023EA62 /* M1Tank.swift in Sources */,
 				94CCC90E2972EB2400F7D17F /* GameSceneView.swift in Sources */,
@@ -288,6 +291,7 @@
 				9467A30D2BB93A6E0023EA62 /* Tank.swift in Sources */,
 				94A68F762C8797550059CD82 /* SCNVector3+Extension.swift in Sources */,
 				94A68F722C8797070059CD82 /* SCNMatrix4+Extension.swift in Sources */,
+				9412F0762D5B4BEB00D9F1BD /* Ship.swift in Sources */,
 				A7AE72BE1F888EF500B015D3 /* AppDelegate.swift in Sources */,
 				94E5448F29672EE200158DA2 /* JoystickSceneDelegate.swift in Sources */,
 				94CCC8FF2972E43500F7D17F /* FloatingPoint+Extension.swift in Sources */,
@@ -448,7 +452,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.Froleeyo.ARKitDrone2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.FroleeyoDefaultCompany.Rollaball;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -466,7 +470,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.Froleeyo.ARKitDrone2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.FroleeyoDefaultCompany.Rollaball;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

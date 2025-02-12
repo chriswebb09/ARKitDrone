@@ -15,7 +15,7 @@ class ApacheHelicopter {
     
     // MARK: - LocalConstants
     
-    private struct LocalConstants {
+    struct LocalConstants {
         static let sceneName = "art.scnassets/Apache.scn"
         static let parentModelName = "grpApache"
         static let bodyName = "Body"
@@ -42,29 +42,35 @@ class ApacheHelicopter {
         static let negativeAltitudeAngleConversion = SCNQuaternion.angleConversion(x: -0.001 * Float.pi, y:0, z: 0 , w: 0)
     }
     
-    private var helicopterNode: SCNNode!
-    private var parentModelNode: SCNNode!
+    var helicopterNode: SCNNode!
+    var parentModelNode: SCNNode!
     var firing:Bool = false
-    private var missile1: Missile = Missile()
-    private var missile2: Missile = Missile()
-    private var missile3: Missile = Missile()
-    private var missile4: Missile = Missile()
-    private var missile5: Missile = Missile()
-    private var missile6: Missile = Missile()
-    private var missile7: Missile = Missile()
-    private var missile8: Missile = Missile()
+    var missile1: Missile!
+    var currentMissile: Missile!
+    var missile2: Missile!
+    var missile3: Missile!
+    var missile4: Missile = Missile()
+    var missile5: Missile = Missile()
+    var missile6: Missile = Missile()
+    var missile7: Missile = Missile()
+    var missile8: Missile = Missile()
     var missiles: [Missile] = []
-    private var rotor: SCNNode!
-    private var rotor2: SCNNode!
-    private var wingL: SCNNode!
-    private var wingR: SCNNode!
-    private var hud: SCNNode!
-    private var front: SCNNode!
-    private var frontIR: SCNNode!
-    private var missilesArmed: Bool = false
+    
+    //    var targetNode: SCNNode!
+    var rotor: SCNNode!
+    var rotor2: SCNNode!
+    var wingL: SCNNode!
+    var wingR: SCNNode!
+    var hud: SCNNode!
+    var front: SCNNode!
+    var frontIR: SCNNode!
+    var missilesArmed: Bool = false
     var missileLockDirection = SCNVector3(0, 0, 1)
     
-    private func spinBlades() {
+    
+    var targetPosition: SCNVector3!
+    
+    func spinBlades() {
         DispatchQueue.global(qos: .userInteractive).async {
             let rotate = SCNAction.rotateBy(x: 20, y: 0, z: 0, duration: 0.5)
             let moveSequence = SCNAction.sequence([rotate])
@@ -84,40 +90,20 @@ class ApacheHelicopter {
     }
     
     func setup(with scene: SCNScene) {
-        let tempScene = SCNScene.nodeWithModelName(LocalConstants.sceneName)
-        parentModelNode = tempScene.childNode(withName: LocalConstants.parentModelName, recursively: true)
-        hud = parentModelNode?.childNode(withName: LocalConstants.hudNodeName, recursively: false)
-        helicopterNode = parentModelNode?.childNode(withName: LocalConstants.bodyName, recursively: true)
-        parentModelNode.scale = SCNVector3(0.02, 0.02, 0.02)
-        helicopterNode.scale = SCNVector3(0.02, 0.02, 0.02)
-        wingL = helicopterNode?.childNode(withName: LocalConstants.wingLName, recursively: true)
-        wingR = helicopterNode?.childNode(withName: LocalConstants.wingRName, recursively: true)
-        front = helicopterNode.childNode(withName: LocalConstants.frontIRSteering, recursively: true)
-        frontIR = front.childNode(withName: LocalConstants.frontIR, recursively: true)
-        rotor = helicopterNode?.childNode(withName: LocalConstants.frontRotorName, recursively: true)
-        rotor2 = helicopterNode?.childNode(withName: LocalConstants.tailRotorName, recursively: true)
-        missile1.setupNode(scnNode: wingR.childNode(withName: LocalConstants.missile1, recursively: false), number: 1)
-        missile2.setupNode(scnNode: wingR.childNode(withName: LocalConstants.missile2, recursively: false), number: 2)
-        missile3.setupNode(scnNode: wingR.childNode(withName: LocalConstants.missile3, recursively: false), number: 3)
-        missile4.setupNode(scnNode: wingR.childNode(withName: LocalConstants.missile4, recursively: false), number: 4)
-        missile5.setupNode(scnNode: wingL.childNode(withName: LocalConstants.missile5, recursively: false), number: 5)
-        missile6.setupNode(scnNode: wingL.childNode(withName: LocalConstants.missile6, recursively: false), number: 6)
-        missile7.setupNode(scnNode: wingL.childNode(withName: LocalConstants.missile7, recursively: false), number: 7)
-        missile8.setupNode(scnNode: wingL.childNode(withName: LocalConstants.missile8, recursively: false), number: 8)
-        parentModelNode.position = SCNVector3(helicopterNode.position.x,  helicopterNode.position.y, 0)
+    }
+    
+    func setup(with helicopterNode: SCNNode) {
         hud.position = SCNVector3(x: helicopterNode.position.x,
                                   y: helicopterNode.position.y,
                                   z: helicopterNode.position.z)
         missiles =  [missile1, missile2, missile3, missile4, missile5, missile6, missile7, missile8]
-        hud.scale = SCNVector3(1, 1, 1)
-        hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z - 10)
-        hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-12))
+        hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z: -1))
         spinBlades()
-        scene.rootNode.addChildNode(tempScene)
     }
-
+    
     func toggleArmMissile() {
-        missilesArmed.toggle()
+        missilesArmed = !missilesArmed
     }
     
     func missilesAreArmed() -> Bool {
@@ -131,61 +117,117 @@ class ApacheHelicopter {
         let locationRotation = SCNQuaternion.getQuaternion(from: localAngleConversion)
         helicopterNode.localRotate(by: locationRotation)
         updateHUD()
-        hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-12))
+        hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-1))
         SCNTransaction.commit()
     }
     
     func moveForward(value: Float) {
+        let val = (value / 50.0)
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
-        helicopterNode.localTranslate(by: SCNVector3(x: 0, y: 0, z: -value))
+        helicopterNode.localTranslate(by: SCNVector3(x: 0, y: 0, z: -val))
         updateHUD()
-        hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-12))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-1))
         SCNTransaction.commit()
     }
     
     func changeAltitude(value: Float) {
+        let val = (value / 50.0)
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
-        helicopterNode.localTranslate(by: SCNVector3(x: 0, y:value, z:0))
+        helicopterNode.localTranslate(by: SCNVector3(x: 0, y:val, z:0))
         updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-12))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-1))
         SCNTransaction.commit()
     }
     
-    private func updateHUD() {
+    func updateHUD() {
         hud.orientation = helicopterNode.orientation
-        hud.scale = SCNVector3(1, 1, 1)
-        hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z - 10)
+        hud.scale = SCNVector3(0.5, 0.5, 0.5)
+        hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
     }
     
     func moveSides(value: Float) {
+        guard helicopterNode != nil else { return }
+        let val = (-value / 50.0)
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
-        helicopterNode.localTranslate(by: SCNVector3(x: value, y: 0, z: 0))
+        helicopterNode.localTranslate(by: SCNVector3(x: val, y: 0, z: 0))
         updateHUD()
-        hud.localTranslate(by:  SCNVector3(x: 0, y:0, z:-12))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-1))
         SCNTransaction.commit()
     }
     
-    func lockOn(target: SCNNode) {
-        SCNTransaction.begin()
-        hud.scale = SCNVector3(5, 5, 5)
+    func lockOn(ship: Ship) {
+        let target = ship.node
+        targetPosition = target.position
+        let helicopterNodePosition = helicopterNode.position
+        hud.position = SCNVector3(x: helicopterNodePosition.x, y: helicopterNodePosition.y , z: helicopterNodePosition.z)
         hud.orientation = target.orientation
-        hud.position = SCNVector3(x: target.position.x - 4, y: target.position.y + 10, z: target.position.z + 2)
+        hud.look(at: target.position)
+        let distance = helicopterNode.position.distance(target.position) - 4
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z: -distance))
         SCNTransaction.commit()
+    }
+    
+    func update(missile: Missile, ship: Ship, offset: Int = 1) {
+        let target = ship.node
+        let value = 9
+        let physicsBody2 =  SCNPhysicsBody(type: .kinematic, shape: nil)
+        missile.particle?.birthRate = 5000
+        missile.node.physicsBody = physicsBody2
+        missile.node.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
+        missile.node.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
+        missile.node.physicsBody?.collisionBitMask = 2
+        SCNTransaction.begin()
+        SCNTransaction.animationDuration = 0.2
+        hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
+        hud.orientation = target.orientation
+        hud.look(at: target.position)
+        let distance = helicopterNode.position.distance(target.position) - 4
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z: -distance))
+        missile.node.simdWorldTransform = target.simdWorldTransform
+        missile.node.localTranslate(by: SCNVector3(x: 1900, y:900, z: 1200))
+        SCNTransaction.commit()
+        let (direction, _) = getUserVector(target: target)
+        
+        let impulseVector = SCNVector3(
+            x: direction.x * Float(100 * offset),
+            y: direction.y * Float(100 * offset),
+            z: direction.z * Float(100 * offset)
+        )
+        SCNTransaction.begin()
+        SCNTransaction.animationDuration = 0.3
+        missile.node.simdWorldOrientation = target.simdWorldOrientation
+        missile.node.physicsBody?.applyForce(impulseVector, asImpulse: true)
+//        missile.node.simdWorldOrientation = target.simdWorldOrientation
+        SCNTransaction.commit()
+    }
+    
+    func getRootNode(from node: SCNNode) -> SCNNode {
+        var currentNode = node
+        while let parent = currentNode.parent {
+            currentNode = parent
+        }
+        return currentNode
+    }
+    
+    func getUserVector(target: SCNNode) -> (SCNVector3, SCNVector3) { // (direction, position)
+        let mat = SCNMatrix4(target.simdWorldTransform) // 4x4 transform matrix describing camera in world space
+        let dir = SCNVector3(-1 * mat.m31, -1 * mat.m32, -1 * mat.m33) // orientation of camera in world space
+        let pos = SCNVector3(mat.m41, mat.m42, mat.m43) // location of camera in world space
+        return (dir, pos)
     }
     
     func shootMissile() {
         guard (!missiles.isEmpty && missilesArmed) && firing == false else { return }
         let missile = missiles.removeFirst()
-        firing = true
-        guard missile.fired == false else {
-            return
-        }
-        let invertedOrientation = SCNVector4(-hud.orientation.x, -hud.orientation.y, -hud.orientation.z, hud.orientation.w)
-        missile.node.orientation = invertedOrientation
-        missile.fire(x: missile.node.position.x, y:  missile.node.position.y)
+        currentMissile = missile
         firing = false
+    }
+    
+    func normalize(vector: SCNVector3) -> SCNVector3 {
+        let length = sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z)
+        return length == 0 ? vector : SCNVector3(vector.x / length, vector.y / length, vector.z / length)
     }
 }
