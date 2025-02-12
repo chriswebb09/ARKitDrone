@@ -41,6 +41,8 @@ class GameSceneView: ARSCNView {
     var missile8: Missile = Missile()
     
     static let helicopterSceneName = "art.scnassets/Helicopter.scn"
+    static let targetScene = "art.scnassets/Target.scn"
+    static let targetName = "target"
     static let helicopterParentModelName = "grpApache"
     static let hudNodeName = "hud"
     static let helicopterBodyName = "Body"
@@ -129,13 +131,12 @@ class GameSceneView: ARSCNView {
 
 extension GameSceneView: HelicopterCapable {
     func missileLock(target: SCNNode) {
-        helicopter.lockOn(target: target)
-        //.missileLock(target: target)
+        //helicopter.lockOn(target: target)
     }
     
     
     func positionHUD() {
-       
+       // helicopter.
     }
     
     func missilesArmed() -> Bool {
@@ -165,7 +166,7 @@ extension GameSceneView: HelicopterCapable {
     
     func moveSides(value: Float) {
         helicopter.moveSides(value: value)
-        helicopter.lockOn(target: tankNode)
+//        helicopter.lockOn(target: tankNode)
     }
     
     func toggleArmMissiles() {

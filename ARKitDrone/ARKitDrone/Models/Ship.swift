@@ -14,10 +14,18 @@ class Ship {
     var node: SCNNode;
     var velocity: SCNVector3 = SCNVector3(x: Float(1), y: Float(1), z:Float(1))
     var prevDir: SCNVector3 = SCNVector3(x: Float(0), y: Float(1), z:Float(0))
+    private static var shipRegistry: [SCNNode: Ship] = [:]
+    var targetNode: SCNNode!
+    var targetAdded = false
     
     init(newNode: SCNNode) {
         self.node = newNode;
+        Ship.shipRegistry[newNode] = self
     }
+    
+    deinit {
+            Ship.shipRegistry.removeValue(forKey: node) // Clean up when object is destroyed
+        }
     
     func flyCenterOfMass(_ shipCount: Int, _ percievedCenter: SCNVector3) -> SCNVector3 {
         let averagePercievedCenter = percievedCenter / Float(shipCount - 1);
@@ -70,4 +78,8 @@ class Ship {
             velocity = (velocity/mag) * limit
         }
     }
+    
+    static func getShip(from node: SCNNode) -> Ship? {
+           return shipRegistry[node]
+       }
 }

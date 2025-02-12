@@ -14,19 +14,26 @@ class Missile {
     var node: SCNNode!
     var particle: SCNParticleSystem?
     var fired: Bool = false
+    var exhaustNode: SCNNode!
+    
     var num: Int = -1
     
     func setupNode(scnNode: SCNNode?, number: Int) {
         guard let scnNode = scnNode else { return }
         node = scnNode
         num = number
-        setParticle()
+        
         node.name = "Missile \(num)"
         let physicsBody2 =  SCNPhysicsBody(type: .kinematic, shape: nil)
         node.physicsBody = physicsBody2
         node.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
         node.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
         node.physicsBody?.collisionBitMask = 2
+        exhaustNode = SCNNode()
+        exhaustNode.position = node.position
+        exhaustNode.position = SCNVector3(0, 0, -1.5) // Adjust to match missile model
+        node.addChildNode(exhaustNode)
+        setParticle()
     }
     
     func setParticle() {
@@ -35,6 +42,10 @@ class Missile {
         }
         particle = particleSystems[0]
         particle?.birthRate = 0
+        if let exhaust = exhaustNode {
+            exhaust.addParticleSystem(particle!)
+        }
+        
     }
     
     func fire(x: Float, y: Float) {

@@ -11,18 +11,6 @@ import SceneKit
 import ARKit
 import SpriteKit
 
-enum CollisionTypes: Int {
-    case base = 1
-    
-    case helicopter = 0
-    
-    case tank = 32
-    
-    case missile = 2
-    
-    case plane = 5
-}
-
 class GameViewController: UIViewController {
     
     var placed: Bool = false
@@ -140,12 +128,17 @@ class GameViewController: UIViewController {
             shipNode.physicsBody!.categoryBitMask = CollisionTypes.missile.rawValue
             shipNode.physicsBody!.contactTestBitMask = CollisionTypes.base.rawValue
             shipNode.physicsBody!.collisionBitMask = 2
-            //            shipNode.physicsBody!.collisionBitMask = 4
             let ship = Ship(newNode: shipNode);
             sceneView.scene.rootNode.addChildNode(ship.node)
             ships.append(ship);
             ship.node.position = SCNVector3(x: Float(Int(arc4random_uniform(10)) - 5), y: Float(Int(arc4random_uniform(10)) - 5), z: 0)
             ship.node.scale = SCNVector3(x: Float(0.009), y: Float(0.009), z: Float(0.009))
+            if !ship.targetAdded {
+                let targetSceneRoot = SCNScene.nodeWithModelName(GameSceneView.targetScene)
+                ship.targetNode = targetSceneRoot.childNode(withName: GameSceneView.targetName, recursively: false)!.clone()
+                sceneView.scene.rootNode.addChildNode(ship.targetNode!)
+                ship.targetAdded = true
+            }
         }
     }
     
@@ -231,6 +224,15 @@ extension GameViewController: ARSCNViewDelegate {
             let angle = CGFloat(forward.dot(velocityNormal))
             ship.node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
             ship.node.position = ship.node.position + (ship.velocity)
+            
+            if ship.targetAdded {
+                SCNTransaction.begin()
+                SCNTransaction.animationDuration = 0.001
+                ship.targetNode.rotation =  SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
+                ship.targetNode.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
+                ship.targetNode.position = SCNVector3(x: ship.node.position.x, y: ship.node.position.y + 1, z: ship.node.position.z - 5)
+                SCNTransaction.commit()
+            }
         }
         if placed {
             sceneView.missileLock(target: ships[0].node)
@@ -319,22 +321,23 @@ extension GameViewController: JoystickSceneDelegate {
         sceneView.toggleArmMissiles()
         let title = sceneView.missilesArmed() ? LocalConstants.disarmTitle : LocalConstants.buttonTitle
         armMissilesButton.setTitle(title, for: .normal)
-        sceneView.helicopter.lockOn(target: ships[0].node)
+        sceneView.helicopter.lockOn(ship: ships[0])
+        sceneView.helicopter.lockOn(ship: ships[1])
+        sceneView.helicopter.lockOn(ship: ships[2])
+        sceneView.helicopter.lockOn(ship: ships[2])
         sceneView.helicopter.shootMissile()
         var count = 1
-        var countlimit = 4000
+        let countlimit = 4000
         while !hit && (count < countlimit) {
-            self.sceneView.helicopter.update(missile: self.sceneView.missile1, target: self.ships[0].node, offset: count)
-            self.sceneView.helicopter.update(missile: self.sceneView.missile2, target: self.ships[0].node, offset: count)
-            self.sceneView.helicopter.update(missile: self.sceneView.missile3, target: self.ships[1].node, offset: count)
-            self.sceneView.helicopter.update(missile: self.sceneView.missile4, target: self.ships[1].node, offset: count)
+            self.sceneView.helicopter.update(missile: self.sceneView.missile1, ship: self.ships[0], offset: count)
+            self.sceneView.helicopter.update(missile: self.sceneView.missile2, ship: self.ships[0], offset: count)
+            self.sceneView.helicopter.update(missile: self.sceneView.missile3, ship: self.ships[1], offset: count)
+            self.sceneView.helicopter.update(missile: self.sceneView.missile4, ship: self.ships[1], offset: count)
             count += 1
             if count > 3200 {
                 valueReached = true
             }
         }
-        
-        
     }
 }
 extension GameViewController: SCNPhysicsContactDelegate {
@@ -345,8 +348,11 @@ extension GameViewController: SCNPhysicsContactDelegate {
                 if contact.nodeB.name!.contains("Missile") {
                     contact.nodeB.removeFromParentNode()
                     contact.nodeB.isHidden = true
-                    contact.nodeA.removeFromParentNode()
-                    contact.nodeA.isHidden = true
+                    let ship = Ship.getShip(from: contact.nodeA)
+                    ship?.targetNode.removeFromParentNode()
+                    ship?.targetNode.isHidden = true
+                    ship?.node.removeFromParentNode()
+                    ship?.node.isHidden = true
                 }
                 hit = true
                 valueReached = false
