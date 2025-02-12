@@ -44,10 +44,10 @@ class Ship {
         var rebound = SCNVector3(x: Float(0), y: Float(0), z:Float(0))
         let Xmin = -40;
         let Ymin = -40;
-        let Zmin = -60;
+        let Zmin = -80;
         let Xmax = 40;
         let Ymax = 40;
-        let Zmax = 40;
+        let Zmax = 20;
         if node.position.x < Float(Xmin) {
             rebound.x = 1;
         }
