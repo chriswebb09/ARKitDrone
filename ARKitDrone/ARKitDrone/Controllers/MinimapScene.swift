@@ -46,8 +46,8 @@ class MinimapScene: SKScene {
         
         // Add ship dots to the minimap
         for shipPosition in ships {
-            let shipX = CGFloat(shipPosition.x) * scale
-            let shipZ = CGFloat(shipPosition.z) * scale
+//            let shipX = CGFloat(shipPosition.x) * scale
+//            let shipZ = CGFloat(shipPosition.z) * scale
             // Apply camera rotation to invert map based on camera's facing direction
             let transformedShipPosition = applyCameraRotation(position: simd_float4(shipPosition.x, 0, shipPosition.z, 1), cameraRotation: cameraRotation)
             let invertedYPosition = -CGFloat(transformedShipPosition.z)

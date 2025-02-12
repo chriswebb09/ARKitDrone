@@ -173,7 +173,7 @@ class ApacheHelicopter {
     
     func update(missile: Missile, ship: Ship, offset: Int = 1) {
         let target = ship.node
-        let value = 9
+        //et value = 9
         let physicsBody2 =  SCNPhysicsBody(type: .kinematic, shape: nil)
         missile.particle?.birthRate = 5000
         missile.node.physicsBody = physicsBody2

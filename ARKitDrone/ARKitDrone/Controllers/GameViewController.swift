@@ -63,8 +63,8 @@ class GameViewController: UIViewController {
     private lazy var minimapView: SKView = {
         let size: CGFloat = 140
         let view = SKView(frame: CGRect(
-            x: UIScreen.main.bounds.width - size - 20,  // Top-right corner
-            y: 20,  // Offset from the top
+            x: UIScreen.main.bounds.width - size - 20,
+            y: 20,
             width: size,
             height: size
         ))
@@ -184,15 +184,12 @@ class GameViewController: UIViewController {
     }
     
     func updateMinimap() {
-        // Get the camera's transform (rotation matrix)
         let cameraTransform = sceneView.session.currentFrame?.camera.transform
         let cameraRotation = simd_float4x4(cameraTransform!.columns.0, cameraTransform!.columns.1, cameraTransform!.columns.2, cameraTransform!.columns.3)
         
-        // Convert SCNVector3 to simd_float4
-        let playerPosition2D = sceneView.projectPoint(playerNode.worldPosition)
-        let shipPositions2D = ships.map { sceneView.projectPoint($0.node.worldPosition) }
+     //   let playerPosition2D = sceneView.projectPoint(playerNode.worldPosition)
+        //let shipPositions2D = ships.map { sceneView.projectPoint($0.node.worldPosition) }
         
-        // Convert SCNVector3 to simd_float4 for the minimap update
         let playerPositionSIMD = simd_float4(playerNode.worldPosition.x, playerNode.worldPosition.y, playerNode.worldPosition.z, 1.0)
         let shipPositionsSIMD = ships.filter { !$0.isDestroyed }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
         
@@ -257,20 +254,19 @@ class GameViewController: UIViewController {
     func createExplosion() -> SCNParticleSystem {
         let explosion = SCNParticleSystem()
         explosion.emitterShape = SCNSphere(radius: 5)
-        explosion.birthRate = 2500   // Number of particles created per second
-        explosion.emissionDuration = 0.1  // How long the explosion lasts
-        explosion.spreadingAngle = 360  // Spread particles in all directions
-        explosion.particleLifeSpan = 0.1  // How long each particle lasts
-        explosion.particleLifeSpanVariation = 0.1 // Variation in particle lifespan
-        explosion.particleVelocity = 3.0  // Initial speed of particles
-        explosion.particleVelocityVariation = 1.5 // Variation in velocity
-        explosion.particleSize = 0.04  // Size of individual particles
-        explosion.particleColor = UIColor.orange  // Color of explosion
-        explosion.particleImage = UIImage(named: "spark")  // Can use a custom particle texture
-        explosion.isAffectedByGravity = true  // Particles fall after explosion
-        explosion.blendMode = .additive  // Glowing effect
+        explosion.birthRate = 2500
+        explosion.emissionDuration = 0.1
+        explosion.spreadingAngle = 360
+        explosion.particleLifeSpan = 0.1
+        explosion.particleLifeSpanVariation = 0.1
+        explosion.particleVelocity = 3.0
+        explosion.particleVelocityVariation = 1.5
+        explosion.particleSize = 0.04
+        explosion.particleColor = UIColor.orange
+        explosion.particleImage = UIImage(named: "spark")
+        explosion.isAffectedByGravity = true
+        explosion.blendMode = .additive
         explosion.particleIntensity = 2
-        
         return explosion
     }
 }
