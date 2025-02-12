@@ -56,7 +56,7 @@ class ApacheHelicopter {
     var missile8: Missile = Missile()
     var missiles: [Missile] = []
     
-//    var targetNode: SCNNode!
+    //    var targetNode: SCNNode!
     var rotor: SCNNode!
     var rotor2: SCNNode!
     var wingL: SCNNode!
@@ -141,7 +141,7 @@ class ApacheHelicopter {
         SCNTransaction.commit()
     }
     
-   func updateHUD() {
+    func updateHUD() {
         hud.orientation = helicopterNode.orientation
         hud.scale = SCNVector3(0.5, 0.5, 0.5)
         hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
@@ -197,8 +197,10 @@ class ApacheHelicopter {
             z: direction.z * Float(100 * offset)
         )
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.5
+        SCNTransaction.animationDuration = 0.3
+        missile.node.simdWorldOrientation = target.simdWorldOrientation
         missile.node.physicsBody?.applyForce(impulseVector, asImpulse: true)
+//        missile.node.simdWorldOrientation = target.simdWorldOrientation
         SCNTransaction.commit()
     }
     

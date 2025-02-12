@@ -31,7 +31,7 @@ class Missile {
         node.physicsBody?.collisionBitMask = 2
         exhaustNode = SCNNode()
         exhaustNode.position = node.position
-        exhaustNode.position = SCNVector3(node.position.x, node.position.y, node.position.z - 1.4) // Adjust to match missile model
+        exhaustNode.position = SCNVector3(node.position.x, node.position.y, node.position.z + 1.4) // Adjust to match missile model
         node.addChildNode(exhaustNode)
         exhaustNode.transform = node.presentation.worldTransform
         setParticle()

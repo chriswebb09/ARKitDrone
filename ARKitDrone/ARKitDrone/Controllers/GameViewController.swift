@@ -133,12 +133,12 @@ class GameViewController: UIViewController {
             ships.append(ship);
             ship.node.position = SCNVector3(x: Float(Int(arc4random_uniform(10)) - 5), y: Float(Int(arc4random_uniform(10)) - 5), z: 0)
             ship.node.scale = SCNVector3(x: Float(0.009), y: Float(0.009), z: Float(0.009))
-            if !ship.targetAdded {
-                let targetSceneRoot = SCNScene.nodeWithModelName(GameSceneView.targetScene)
-                ship.targetNode = targetSceneRoot.childNode(withName: GameSceneView.targetName, recursively: false)!.clone()
-                sceneView.scene.rootNode.addChildNode(ship.targetNode!)
-                ship.targetAdded = true
-            }
+//            if !ship.targetAdded {
+//                let targetSceneRoot = SCNScene.nodeWithModelName(GameSceneView.targetScene)
+//                ship.targetNode = targetSceneRoot.childNode(withName: GameSceneView.targetName, recursively: false)!.clone()
+//                sceneView.scene.rootNode.addChildNode(ship.targetNode!)
+//                ship.targetAdded = true
+//            }
         }
     }
     
@@ -359,8 +359,8 @@ extension GameViewController: SCNPhysicsContactDelegate {
                     contact.nodeB.isHidden = true
                     contact.nodeB.removeFromParentNode()
                     let ship = Ship.getShip(from: contact.nodeA)
-                    ship?.targetNode.isHidden = true
-                    ship?.targetNode.removeFromParentNode()
+//                    ship?.targetNode.isHidden = true
+//                    ship?.targetNode.removeFromParentNode()
                     
                     ship?.node.isHidden = true
                     ship?.node.removeFromParentNode()
@@ -368,7 +368,7 @@ extension GameViewController: SCNPhysicsContactDelegate {
                 
                     //valueReached = false
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 12) {
                     self.hit = true
                 }
                 
