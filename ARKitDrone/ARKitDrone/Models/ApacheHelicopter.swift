@@ -132,6 +132,7 @@ class ApacheHelicopter {
     }
     
     func changeAltitude(value: Float) {
+        guard helicopterNode != nil else { return }
         let val = (value / 50.0)
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
@@ -193,9 +194,9 @@ class ApacheHelicopter {
         let (direction, _) = getUserVector(target: target)
         
         let impulseVector = SCNVector3(
-            x: direction.x * Float(100 * offset),
-            y: direction.y * Float(100 * offset),
-            z: direction.z * Float(100 * offset)
+            x: direction.x * Float(200 * offset),
+            y: direction.y * Float(200 * offset),
+            z: direction.z * Float(200 * offset)
         )
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.3
