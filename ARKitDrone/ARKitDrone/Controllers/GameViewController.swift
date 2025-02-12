@@ -75,7 +75,6 @@ class GameViewController: UIViewController {
         return view
     }()
     
-    
     //    private let droneQueue = DispatchQueue(label: "com.froleeyo.dronequeue")
     
     private lazy var armMissilesButton: UIButton = {
@@ -109,7 +108,6 @@ class GameViewController: UIViewController {
         label.text = "Score: 0"
         label.backgroundColor = .clear
         label.frame = CGRect(origin: CGPoint(x: 40 , y:  UIScreen.main.bounds.origin.y + 50), size: CGSize(width: 300, height: 40))
-        //        label.setshadow()
         return label
     }()
     
@@ -262,10 +260,6 @@ class GameViewController: UIViewController {
                 if let firstCast = castRay.first {
                     DispatchQueue.global(qos: .background).async {
                         self.sceneView.positionTank(position: SCNVector3.positionFromTransform(firstCast.worldTransform))
-                        DispatchQueue.main.async {
-                            //                            self.sceneView.helicopterNode.scale = SCNVector3(x: -0.001, y: -0.001, z: -0.001)
-                            //                            self.sceneView.helicopter.helicopterNode.scale = SCNVector3(x: -0.001, y: -0.001, z: -0.001)
-                        }
                     }
                     placed = true
                 }
@@ -300,14 +294,14 @@ extension GameViewController: ARSCNViewDelegate {
             let angle = CGFloat(forward.dot(velocityNormal))
             ship.node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
             ship.node.position = ship.node.position + (ship.velocity)
-            //            if ship.targetAdded {
-            //                SCNTransaction.begin()
-            //                SCNTransaction.animationDuration = 0.001
-            //                ship.targetNode.rotation =  SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
-            //                ship.targetNode.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
-            //                ship.targetNode.position = SCNVector3(x: ship.node.position.x, y: ship.node.position.y + 1, z: ship.node.position.z - 10)
-            //                SCNTransaction.commit()
-            //            }
+            if ship.targetAdded {
+                SCNTransaction.begin()
+                SCNTransaction.animationDuration = 0.001
+                ship.targetNode.rotation =  SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
+                ship.targetNode.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
+                ship.targetNode.position = SCNVector3(x: ship.node.position.x, y: ship.node.position.y + 1, z: ship.node.position.z - 10)
+                SCNTransaction.commit()
+            }
         }
         if placed {
             sceneView.missileLock(target: ships[0].node)
@@ -360,16 +354,13 @@ extension GameViewController: JoystickSceneDelegate {
     func fire() {
         guard sceneView.missiles.isEmpty == false else { return }
         let ship = ships.filter { $0.isDestroyed == false }.first
-        //        sceneView.helicopter.lockOn(ship:  ship!)
         let missile = sceneView.missiles.removeFirst()
         guard missile.hit == false else { return }
         currentMissile = missile
         sceneView.helicopter.lockOn(ship: ship!)
         valueReached = false
-        // hit = false
         print("Missile \(missile.num)")
         var count = 1
-        //        let countlimit = 5000
         while !missile.hit {
             self.sceneView.helicopter.update(missile: missile, ship: ship!, offset: count)
             count += 1
@@ -382,7 +373,6 @@ extension GameViewController: JoystickSceneDelegate {
                 return
             }
         }
-        //        hit = false
         sceneView.toggleArmMissiles()
     }
 }
@@ -450,9 +440,6 @@ extension GameViewController: SCNPhysicsContactDelegate {
                             }
                         }
                     }
-                    //                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    //                    self.destoryedText.text = ""
-                    //                }
                 } else {
                     var particle: SCNParticleSystem?
                     guard let particleNode = contact.nodeA.childNodes.first, let particleSystems = particleNode.particleSystems else {
