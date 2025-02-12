@@ -9,6 +9,7 @@
 import SpriteKit
 
 class MinimapScene: SKScene {
+    
     private var minimap: SKShapeNode!
     private var playerDot: SKShapeNode!
     private var shipDots: [SKShapeNode] = []
