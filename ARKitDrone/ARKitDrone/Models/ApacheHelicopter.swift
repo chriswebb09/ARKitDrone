@@ -159,6 +159,7 @@ class ApacheHelicopter {
     }
     
     func lockOn(ship: Ship) {
+        guard helicopterNode != nil else { return }
         let target = ship.node
         targetPosition = target.position
         let helicopterNodePosition = helicopterNode.position
