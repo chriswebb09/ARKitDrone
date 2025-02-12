@@ -125,7 +125,7 @@ class GameSceneView: ARSCNView {
                 scene.rootNode.addChildNode(helicopterNode)
             }
             tankNode.position = position
-            helicopterNode.position =  SCNVector3(x:position.x, y:position.y + 1.0, z: position.z - 2.0)
+            helicopterNode.position =  SCNVector3(x:position.x, y:position.y + 0.1, z: position.z - 0.1)
             helicopter.helicopterNode.simdPivot.columns.3.x = -0.5
             tankNode.simdPivot.columns.3.x = -0.5
             tankNode.scale = SCNVector3(x: 0.02, y: 0.02, z: 0.02)
