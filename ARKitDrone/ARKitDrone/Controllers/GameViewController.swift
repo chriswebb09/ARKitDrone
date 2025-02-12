@@ -34,7 +34,7 @@ class GameViewController: UIViewController {
         if UIDevice.current.isIpad {
             offset = 220
         }
-        let view = SKView(frame: CGRect(x:60, y: UIScreen.main.bounds.height - 140, width:140, height: 140))
+        let view = SKView(frame: CGRect(x:60, y: UIScreen.main.bounds.height - 220, width:140, height: 140))
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
         return view
@@ -54,7 +54,7 @@ class GameViewController: UIViewController {
     var playerNode: SCNNode!
     
     private lazy var padView2: SKView = {
-        let view = SKView(frame: CGRect(x:620, y: UIScreen.main.bounds.height - 140, width:140, height: 140))
+        let view = SKView(frame: CGRect(x:600, y: UIScreen.main.bounds.height - 220, width: 160, height: 140))
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
         return view
@@ -80,12 +80,23 @@ class GameViewController: UIViewController {
         let button = UIButton()
         button.setTitle(LocalConstants.buttonTitle, for: .normal)
         button.setTitleColor(UIColor.white, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.black)
-        button.frame = CGRect(origin: CGPoint(x:630, y: UIScreen.main.bounds.height - 200), size: CGSize(width: 140, height: 40))
-        button.layer.borderColor = UIColor.red.cgColor
-        button.backgroundColor = UIColor.red
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: UIFont.Weight.black)
+        button.frame = CGRect(origin: CGPoint(x:600, y: UIScreen.main.bounds.height - 320), size: CGSize(width: 180, height: 50))
+        button.layer.borderColor = UIColor(red: 0.95, green: 0.15, blue: 0.07, alpha: 1.00).cgColor
+        button.backgroundColor = UIColor(red: 0.95, green: 0.15, blue: 0.07, alpha: 1.00)
         button.layer.borderWidth = 3
         return button
+    }()
+    
+    private lazy var destoryedText: UILabel = {
+        let label = UILabel()
+        label.text = ""
+        label.textAlignment = .center
+        label.textColor = UIColor(red: 0.95, green: 0.15, blue: 0.07, alpha: 1.00)
+        label.backgroundColor = .clear
+        label.font = UIFont.systemFont(ofSize: 35, weight: .black)
+        label.frame = CGRect(origin: CGPoint(x: UIScreen.main.bounds.width / 2 - 250, y:  UIScreen.main.bounds.origin.y + 100), size: CGSize(width: 400, height: 40))
+        return label
     }()
     
     private var session: ARSession {
@@ -138,6 +149,7 @@ class GameViewController: UIViewController {
             startMinimapUpdate()
             setupPadScene()
         }
+        sceneView.addSubview(destoryedText)
         sceneView.addSubview(armMissilesButton)
         armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
         sceneView.isUserInteractionEnabled = true
@@ -148,26 +160,22 @@ class GameViewController: UIViewController {
     func setupShips() {
         let shipScene = SCNScene(named: "art.scnassets/F-35B_Lightning_II.scn")!
         // retrieve the ship node
-        for i in 1...6 {
+        for i in 1...8 {
             let shipNode = shipScene.rootNode.childNode(withName: "F_35B_Lightning_II", recursively: true)!.clone()
-            shipNode.simdScale = SIMD3<Float>(81.876, 81.876, 81.876)
             shipNode.name = "F_35B \(i)"
             let physicsBody =  SCNPhysicsBody(type: .kinematic, shape: nil)
             shipNode.physicsBody = physicsBody
             shipNode.physicsBody!.categoryBitMask = CollisionTypes.missile.rawValue
             shipNode.physicsBody!.contactTestBitMask = CollisionTypes.base.rawValue
             shipNode.physicsBody!.collisionBitMask = 2
-            let ship = Ship(newNode: shipNode);
-            sceneView.scene.rootNode.addChildNode(ship.node)
-            ships.append(ship);
-            ship.node.position = SCNVector3(x: Float(Int(arc4random_uniform(10)) - 5), y: Float(Int(arc4random_uniform(10)) - 5), z: 0)
-            ship.node.scale = SCNVector3(x: Float(0.009), y: Float(0.009), z: Float(0.009))
-            //            if !ship.targetAdded {
-            //                let targetSceneRoot = SCNScene.nodeWithModelName(GameSceneView.targetScene)
-            //                ship.targetNode = targetSceneRoot.childNode(withName: GameSceneView.targetName, recursively: false)!.clone()
-            //                sceneView.scene.rootNode.addChildNode(ship.targetNode!)
-            //                ship.targetAdded = true
-            //            }
+            let ship = Ship(newNode: shipNode)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                sceneView.scene.rootNode.addChildNode(ship.node)
+                ships.append(ship)
+                ship.node.position = SCNVector3(x: Float(Int(arc4random_uniform(10)) - 5), y: Float(Int(arc4random_uniform(10)) - 5), z: -5)
+                ship.node.scale = SCNVector3(x: Float(0.006), y: Float(0.006), z: Float(0.006))
+            }
         }
     }
     
@@ -179,36 +187,31 @@ class GameViewController: UIViewController {
         }
         let delay = SKAction.wait(forDuration: 0.1)
         let updateLoop = SKAction.sequence([updateAction, delay])
-        
         minimapScene.run(SKAction.repeatForever(updateLoop))
     }
     
     func updateMinimap() {
         let cameraTransform = sceneView.session.currentFrame?.camera.transform
+        guard cameraTransform != nil else { return }
         let cameraRotation = simd_float4x4(cameraTransform!.columns.0, cameraTransform!.columns.1, cameraTransform!.columns.2, cameraTransform!.columns.3)
-        
-     //   let playerPosition2D = sceneView.projectPoint(playerNode.worldPosition)
-        //let shipPositions2D = ships.map { sceneView.projectPoint($0.node.worldPosition) }
-        
         let playerPositionSIMD = simd_float4(playerNode.worldPosition.x, playerNode.worldPosition.y, playerNode.worldPosition.z, 1.0)
         let shipPositionsSIMD = ships.filter { !$0.isDestroyed }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
-        
         minimapScene.updateMinimap(playerPosition: playerPositionSIMD, ships: shipPositionsSIMD, cameraRotation: cameraRotation)
     }
     
     private func setupTracking() {
         let configuration = ARWorldTrackingConfiguration()
-        configuration.planeDetection = [.horizontal]
-        //        let sceneReconstruction: ARWorldTrackingConfiguration.SceneReconstruction = .meshWithClassification
-        //        if ARWorldTrackingConfiguration.supportsSceneReconstruction(sceneReconstruction) {
-        //            configuration.sceneReconstruction = sceneReconstruction
-        //        }
-        //        configuration.frameSemantics = .sceneDepth
+        configuration.planeDetection = [.horizontal, .horizontal]
+        let sceneReconstruction: ARWorldTrackingConfiguration.SceneReconstruction = .meshWithClassification
+        if ARWorldTrackingConfiguration.supportsSceneReconstruction(sceneReconstruction) {
+            configuration.sceneReconstruction = sceneReconstruction
+        }
+        configuration.frameSemantics = .sceneDepth
         sceneView.automaticallyUpdatesLighting = false
         if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
             sceneView.scene.lightingEnvironment.contents = environmentMap
         }
-        session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+        session.run(configuration, options: [.resetTracking, .removeExistingAnchors, .resetSceneReconstruction, .stopTrackedRaycasts])
     }
     
     private func setupPadScene() {
@@ -242,8 +245,12 @@ class GameViewController: UIViewController {
             if let result = sceneView.raycastQuery(from: tapLocation, allowing: .estimatedPlane, alignment: .horizontal) {
                 let castRay =  session.raycast(result)
                 if let firstCast = castRay.first {
-                    DispatchQueue.global(qos: .utility).async {
+                    DispatchQueue.global(qos: .background).async {
                         self.sceneView.positionTank(position: SCNVector3.positionFromTransform(firstCast.worldTransform))
+                        DispatchQueue.main.async {
+                            //                            self.sceneView.helicopterNode.scale = SCNVector3(x: -0.001, y: -0.001, z: -0.001)
+                            //                            self.sceneView.helicopter.helicopterNode.scale = SCNVector3(x: -0.001, y: -0.001, z: -0.001)
+                        }
                     }
                     placed = true
                 }
@@ -253,7 +260,7 @@ class GameViewController: UIViewController {
     
     func createExplosion() -> SCNParticleSystem {
         let explosion = SCNParticleSystem()
-        explosion.emitterShape = SCNSphere(radius: 5)
+        explosion.emitterShape = SCNSphere(radius: 3)
         explosion.birthRate = 2500
         explosion.emissionDuration = 0.1
         explosion.spreadingAngle = 360
@@ -262,7 +269,7 @@ class GameViewController: UIViewController {
         explosion.particleVelocity = 3.0
         explosion.particleVelocityVariation = 1.5
         explosion.particleSize = 0.04
-        explosion.particleColor = UIColor.orange
+        explosion.particleColor = UIColor.red
         explosion.particleImage = UIImage(named: "spark")
         explosion.isAffectedByGravity = true
         explosion.blendMode = .additive
@@ -297,7 +304,6 @@ extension GameViewController: ARSCNViewDelegate {
             let angle = CGFloat(forward.dot(velocityNormal))
             ship.node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
             ship.node.position = ship.node.position + (ship.velocity)
-            
             if ship.targetAdded {
                 SCNTransaction.begin()
                 SCNTransaction.animationDuration = 0.001
@@ -329,13 +335,11 @@ extension GameViewController: ARSCNViewDelegate {
             return nil
         }
         let geometry = SCNGeometry(arGeometry: meshAnchor.geometry)
-        geometry.firstMaterial?.colorBufferWriteMask = []
-        geometry.firstMaterial?.writesToDepthBuffer = true
-        geometry.firstMaterial?.readsFromDepthBuffer = true
-        //        if addLinesToPlanes {
-        //            geometry.firstMaterial?.fillMode = .lines
-        //        }
-        let node = OcclusionNode(for: meshAnchor)
+        //        geometry.firstMaterial?.colorBufferWriteMask = []
+        //        geometry.firstMaterial?.writesToDepthBuffer = true
+        //        geometry.firstMaterial?.readsFromDepthBuffer = true
+        geometry.firstMaterial?.fillMode = .lines
+        let node = OcclusionNode(meshAnchor: meshAnchor)
         node.physicsBody = SCNPhysicsBody(type: .static, shape: nil)
         node.physicsBody?.isAffectedByGravity = false
         node.physicsBody?.categoryBitMask = 5
@@ -346,7 +350,7 @@ extension GameViewController: ARSCNViewDelegate {
     
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         if let meshAnchor = anchor as? ARMeshAnchor {
-            let occlusionNode = OcclusionNode(for: meshAnchor)
+            let occlusionNode = OcclusionNode(meshAnchor: meshAnchor)
             occlusionNode.physicsBody = SCNPhysicsBody(type: .static, shape: nil)
             occlusionNode.physicsBody?.isAffectedByGravity = false
             occlusionNode.physicsBody?.categoryBitMask = 5
@@ -358,12 +362,55 @@ extension GameViewController: ARSCNViewDelegate {
     func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
         if let meshAnchor = anchor as? ARMeshAnchor {
             if let occlusionNode = node.childNode(withName: "occlusion", recursively: true) as? OcclusionNode {
-                occlusionNode.update(from: meshAnchor)
+                occlusionNode.updateOcclusionNode(with: meshAnchor, visible: true)
             }
         }
     }
 }
 
+extension ARPlaneAnchor.Classification: Equatable {
+    
+    public static func == (lhs: ARPlaneAnchor.Classification, rhs: ARPlaneAnchor.Classification) -> Bool {
+        switch (lhs, rhs) {
+        case
+            (.wall, .wall),
+            (.floor, .floor),
+            (.ceiling, .ceiling),
+            (.table, .table),
+            (.seat, .seat),
+            (.window, .window),
+            (.door, .door):
+            return true
+        case (.none(let lhsStatus), .none(let rhsStatus)):
+            return lhsStatus == rhsStatus
+        default: return false
+        }
+    }
+    
+}
+
+extension SCNMaterial {
+    
+    static var occluder: SCNMaterial {
+        let material = SCNMaterial()
+        material.colorBufferWriteMask = []
+        return material
+    }
+    
+    static func colored(with color: UIColor) -> SCNMaterial {
+        let material = SCNMaterial()
+        material.diffuse.contents = color
+        return material
+    }
+    
+    static var visibleMesh: SCNMaterial {
+        let material = SCNMaterial()
+        material.fillMode = .lines
+        material.diffuse.contents = UIColor.red
+        return material
+    }
+    
+}
 
 // MARK: - JoystickSceneDelegate
 
@@ -382,9 +429,9 @@ extension GameViewController: JoystickSceneDelegate {
     func update(yValue: Float, stickNum: Int) {
         if stickNum == 2 {
             let scaled = (yValue)
-            sceneView.moveForward(value: (scaled * 0.5))
+            sceneView.moveForward(value: (scaled * 0.009))
         } else if stickNum == 1 {
-            let scaled = (yValue) * 0.05
+            let scaled = (yValue) * 0.01
             sceneView.changeAltitude(value: scaled)
         }
     }
@@ -392,34 +439,41 @@ extension GameViewController: JoystickSceneDelegate {
     func tapped() {
         guard sceneView.helicopter.missilesArmed else { return }
         sceneView.toggleArmMissiles()
-        let title = sceneView.missilesArmed() ? LocalConstants.disarmTitle : LocalConstants.buttonTitle
-        armMissilesButton.setTitle(title, for: .normal)
-        sceneView.helicopter.lockOn(ship: ships[0])
-        sceneView.helicopter.lockOn(ship: ships[1])
-        sceneView.helicopter.lockOn(ship: ships[2])
-        sceneView.helicopter.lockOn(ship: ships[2])
-        sceneView.helicopter.shootMissile()
+        fire()
+    }
+    
+    func fire() {
+        guard sceneView.missiles.isEmpty == false else { return }
+        let ship = ships.filter { $0.isDestroyed == false }.first
+        //        sceneView.helicopter.lockOn(ship:  ship!)
+        let missile = sceneView.missiles.removeFirst()
+        sceneView.helicopter.lockOn(ship: ship!)
+        valueReached = false
+        hit = false
+        print("Missile \(missile.num)")
         var count = 1
-        let countlimit = 4000
+        let countlimit = 5000
         while !hit && (count < countlimit) {
-            self.sceneView.helicopter.update(missile: self.sceneView.missile1, ship: self.ships[0], offset: count)
-            self.sceneView.helicopter.update(missile: self.sceneView.missile2, ship: self.ships[1], offset: count)
-            self.sceneView.helicopter.update(missile: self.sceneView.missile3, ship: self.ships[2], offset: count)
-            self.sceneView.helicopter.update(missile: self.sceneView.missile4, ship: self.ships[3], offset: count)
-            self.sceneView.helicopter.update(missile: self.sceneView.missile5, ship: self.ships[4], offset: count)
-            self.sceneView.helicopter.update(missile: self.sceneView.missile6, ship: self.ships[5], offset: count)
+            self.sceneView.helicopter.update(missile: missile, ship: ship!, offset: count)
             count += 1
-            if count > 1000 {
+            if count > 800 {
                 valueReached = true
             }
+            if hit {
+                missile.particle?.birthRate = 0
+                missile.exhaustNode.removeFromParentNode()
+                return
+            }
         }
+        hit = false
+        sceneView.toggleArmMissiles()
     }
 }
 extension GameViewController: SCNPhysicsContactDelegate {
     
     func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
-        if valueReached {
-            if (contact.nodeA.name!.contains("Missile") || contact.nodeB.name!.contains("Missile")) {
+        if valueReached, let nodeBName = contact.nodeB.name {
+            if (contact.nodeA.name!.contains("Missile") || nodeBName.contains("Missile")) {
                 if contact.nodeB.name!.contains("Missile") {
                     
                     var particle: SCNParticleSystem?
@@ -434,18 +488,86 @@ extension GameViewController: SCNPhysicsContactDelegate {
                     explosionNode.position = contact.contactPoint
                     explosionNode.addParticleSystem(explosion)
                     sceneView.scene.rootNode.addChildNode(explosionNode)
+                    
                     explosionNode.runAction(SCNAction.sequence([
-                        SCNAction.wait(duration: 1.0),  // Wait for explosion effect to finish
+                        SCNAction.wait(duration: 0.25),  // Wait for explosion effect to finish
                         SCNAction.removeFromParentNode() // Remove explosion node from the scene
                     ]))
                     
                     contact.nodeB.isHidden = true
                     contact.nodeB.removeFromParentNode()
-                    let ship = Ship.getShip(from: contact.nodeA)
-                    ship?.isDestroyed = true
-                    ship?.node.isHidden = true
-                    ship?.node.removeFromParentNode()
+                    DispatchQueue.main.async {
+                        let ship = Ship.getShip(from: contact.nodeA)!
+                        ship.isDestroyed = true
+                        ship.node.isHidden = true
+                        ship.node.removeFromParentNode()
+                        self.hit = true
+                    }
                     sceneView.helicopter.updateHUD()
+                    DispatchQueue.main.async {
+                        self.destoryedText.text = "Enemy Destroyed"
+                    }
+                    if ships.filter { !$0.isDestroyed }.count == 0 {
+                        explosionNode.particleSystems![0].birthRate = 0
+                        explosion.birthRate = 0
+                        explosion.removeAllAnimations()
+                        explosionNode.removeFromParentNode()
+                        explosionNode.isHidden = true
+                    } else {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            explosionNode.particleSystems![0].birthRate = 0
+                            explosion.birthRate = 0
+                            explosion.removeAllAnimations()
+                            explosionNode.removeFromParentNode()
+                            explosionNode.isHidden = true
+                        }
+                    }
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                    self.destoryedText.text = ""
+                }
+            } else {
+                var particle: SCNParticleSystem?
+                guard let particleNode = contact.nodeA.childNodes.first, let particleSystems = particleNode.particleSystems else {
+                    return
+                }
+                
+                particle = particleSystems[0]
+                particle?.birthRate = 0
+                
+                DispatchQueue.main.async {
+                    let ship = Ship.getShip(from: contact.nodeB)!
+                    ship.isDestroyed = true
+                    ship.node.isHidden = true
+                    ship.node.removeFromParentNode()
+                    self.hit = true
+                }
+                
+                let explosion = createExplosion()
+                let explosionNode = SCNNode()
+                explosionNode.position = contact.contactPoint
+                explosionNode.addParticleSystem(explosion)
+                sceneView.scene.rootNode.addChildNode(explosionNode)
+                
+                explosionNode.runAction(SCNAction.sequence([
+                    SCNAction.wait(duration: 0.25),  // Wait for explosion effect to finish
+                    SCNAction.removeFromParentNode() // Remove explosion node from the scene
+                ]))
+                
+                contact.nodeA.isHidden = true
+                contact.nodeA.removeFromParentNode()
+                
+                sceneView.helicopter.updateHUD()
+                DispatchQueue.main.async {
+                    self.destoryedText.text = "Enemy Destroyed"
+                }
+                if ships.filter { !$0.isDestroyed }.count == 0 {
+                    explosionNode.particleSystems![0].birthRate = 0
+                    explosion.birthRate = 0
+                    explosion.removeAllAnimations()
+                    explosionNode.removeFromParentNode()
+                    explosionNode.isHidden = true
+                } else {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         explosionNode.particleSystems![0].birthRate = 0
                         explosion.birthRate = 0
@@ -454,9 +576,9 @@ extension GameViewController: SCNPhysicsContactDelegate {
                         explosionNode.isHidden = true
                     }
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 12) {
-                    self.hit = true
-                }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                self.destoryedText.text = ""
             }
         }
     }

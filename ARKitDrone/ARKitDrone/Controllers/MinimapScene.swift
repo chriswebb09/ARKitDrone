@@ -37,17 +37,14 @@ class MinimapScene: SKScene {
         shipDots.forEach { $0.removeFromParent() }
         shipDots.removeAll()
         
-        let minimapRadius: CGFloat = 260
-        let worldRange: Float = 200
+        let minimapRadius: CGFloat = 280
+        let worldRange: Float = 300
         let scale = minimapRadius / CGFloat(worldRange)
         let playerX = CGFloat(playerPosition.x) * scale
         let playerZ = CGFloat(playerPosition.z) * scale
         playerDot.position = CGPoint(x: playerX, y: playerZ)
-        
         // Add ship dots to the minimap
         for shipPosition in ships {
-//            let shipX = CGFloat(shipPosition.x) * scale
-//            let shipZ = CGFloat(shipPosition.z) * scale
             // Apply camera rotation to invert map based on camera's facing direction
             let transformedShipPosition = applyCameraRotation(position: simd_float4(shipPosition.x, 0, shipPosition.z, 1), cameraRotation: cameraRotation)
             let invertedYPosition = -CGFloat(transformedShipPosition.z)
