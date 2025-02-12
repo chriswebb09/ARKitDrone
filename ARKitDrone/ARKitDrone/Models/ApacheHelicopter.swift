@@ -141,7 +141,7 @@ class ApacheHelicopter {
         SCNTransaction.commit()
     }
     
-    private func updateHUD() {
+   func updateHUD() {
         hud.orientation = helicopterNode.orientation
         hud.scale = SCNVector3(0.5, 0.5, 0.5)
         hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
@@ -174,7 +174,7 @@ class ApacheHelicopter {
         let target = ship.node
         let value = 9
         let physicsBody2 =  SCNPhysicsBody(type: .kinematic, shape: nil)
-        missile.particle?.birthRate = 4000
+        missile.particle?.birthRate = 5000
         missile.node.physicsBody = physicsBody2
         missile.node.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
         missile.node.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue

@@ -330,11 +330,13 @@ extension GameViewController: JoystickSceneDelegate {
         let countlimit = 4000
         while !hit && (count < countlimit) {
             self.sceneView.helicopter.update(missile: self.sceneView.missile1, ship: self.ships[0], offset: count)
-            self.sceneView.helicopter.update(missile: self.sceneView.missile2, ship: self.ships[0], offset: count)
-            self.sceneView.helicopter.update(missile: self.sceneView.missile3, ship: self.ships[1], offset: count)
-            self.sceneView.helicopter.update(missile: self.sceneView.missile4, ship: self.ships[1], offset: count)
+            self.sceneView.helicopter.update(missile: self.sceneView.missile2, ship: self.ships[1], offset: count)
+            self.sceneView.helicopter.update(missile: self.sceneView.missile3, ship: self.ships[2], offset: count)
+            self.sceneView.helicopter.update(missile: self.sceneView.missile4, ship: self.ships[3], offset: count)
+            self.sceneView.helicopter.update(missile: self.sceneView.missile5, ship: self.ships[4], offset: count)
+            self.sceneView.helicopter.update(missile: self.sceneView.missile6, ship: self.ships[5], offset: count)
             count += 1
-            if count > 3200 {
+            if count > 1000 {
                 valueReached = true
             }
         }
@@ -346,16 +348,30 @@ extension GameViewController: SCNPhysicsContactDelegate {
         if valueReached {
             if (contact.nodeA.name!.contains("Missile") || contact.nodeB.name!.contains("Missile")) {
                 if contact.nodeB.name!.contains("Missile") {
-                    contact.nodeB.removeFromParentNode()
+                   
+                    var particle: SCNParticleSystem?
+                    guard let particleNode = contact.nodeB.childNodes.first, let particleSystems = particleNode.particleSystems else {
+                        return
+                    }
+                    particle = particleSystems[0]
+                    particle?.birthRate = 0
+                    
                     contact.nodeB.isHidden = true
+                    contact.nodeB.removeFromParentNode()
                     let ship = Ship.getShip(from: contact.nodeA)
-                    ship?.targetNode.removeFromParentNode()
                     ship?.targetNode.isHidden = true
-                    ship?.node.removeFromParentNode()
+                    ship?.targetNode.removeFromParentNode()
+                    
                     ship?.node.isHidden = true
+                    ship?.node.removeFromParentNode()
+                    sceneView.helicopter.updateHUD()
+                
+                    //valueReached = false
                 }
-                hit = true
-                valueReached = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                    self.hit = true
+                }
+                
             }
         }
     }
