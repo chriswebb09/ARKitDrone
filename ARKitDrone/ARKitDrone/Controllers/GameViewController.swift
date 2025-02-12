@@ -17,6 +17,7 @@ class GameViewController: UIViewController {
     var running = false
     var minimapScene: MinimapScene!
     var score: Int = 0
+    var currentMissile: Missile!
     
     // MARK: - LocalConstants
     
@@ -46,7 +47,7 @@ class GameViewController: UIViewController {
     var addPlanesToScene = false
     var planeNodesCount = 0
     var valueReached: Bool = false
-    var hit = false
+    //    var hit = false
     var planeHeight: CGFloat = 0.01
     var anchors = [ARAnchor]()
     var nodes = [SCNNode]()
@@ -108,7 +109,7 @@ class GameViewController: UIViewController {
         label.text = "Score: 0"
         label.backgroundColor = .clear
         label.frame = CGRect(origin: CGPoint(x: 40 , y:  UIScreen.main.bounds.origin.y + 50), size: CGSize(width: 300, height: 40))
-//        label.setshadow()
+        //        label.setshadow()
         return label
     }()
     
@@ -187,7 +188,7 @@ class GameViewController: UIViewController {
                 guard let self = self else { return }
                 sceneView.scene.rootNode.addChildNode(ship.node)
                 ships.append(ship)
-                ship.node.position = SCNVector3(x: Float(Int(arc4random_uniform(10)) - 5), y: Float(Int(arc4random_uniform(10)) - 5), z: -5)
+                ship.node.position = SCNVector3(x: Float(Int(arc4random_uniform(10)) - 5), y: Float(Int(arc4random_uniform(10)) - 5), z: -15)
                 ship.node.scale = SCNVector3(x: Float(0.006), y: Float(0.006), z: Float(0.006))
             }
         }
@@ -271,25 +272,6 @@ class GameViewController: UIViewController {
             }
         }
     }
-    
-    func createExplosion() -> SCNParticleSystem {
-        let explosion = SCNParticleSystem()
-        explosion.emitterShape = SCNSphere(radius: 3)
-        explosion.birthRate = 2500
-        explosion.emissionDuration = 0.1
-        explosion.spreadingAngle = 360
-        explosion.particleLifeSpan = 0.1
-        explosion.particleLifeSpanVariation = 0.1
-        explosion.particleVelocity = 3.0
-        explosion.particleVelocityVariation = 1.5
-        explosion.particleSize = 0.04
-        explosion.particleColor = UIColor.red
-        explosion.particleImage = UIImage(named: "spark")
-        explosion.isAffectedByGravity = true
-        explosion.blendMode = .additive
-        explosion.particleIntensity = 2
-        return explosion
-    }
 }
 
 extension GameViewController: ARSCNViewDelegate {
@@ -318,14 +300,14 @@ extension GameViewController: ARSCNViewDelegate {
             let angle = CGFloat(forward.dot(velocityNormal))
             ship.node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
             ship.node.position = ship.node.position + (ship.velocity)
-            if ship.targetAdded {
-                SCNTransaction.begin()
-                SCNTransaction.animationDuration = 0.001
-                ship.targetNode.rotation =  SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
-                ship.targetNode.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
-                ship.targetNode.position = SCNVector3(x: ship.node.position.x, y: ship.node.position.y + 1, z: ship.node.position.z - 5)
-                SCNTransaction.commit()
-            }
+            //            if ship.targetAdded {
+            //                SCNTransaction.begin()
+            //                SCNTransaction.animationDuration = 0.001
+            //                ship.targetNode.rotation =  SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
+            //                ship.targetNode.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
+            //                ship.targetNode.position = SCNVector3(x: ship.node.position.x, y: ship.node.position.y + 1, z: ship.node.position.z - 10)
+            //                SCNTransaction.commit()
+            //            }
         }
         if placed {
             sceneView.missileLock(target: ships[0].node)
@@ -336,95 +318,13 @@ extension GameViewController: ARSCNViewDelegate {
         var forceAway = SCNVector3(x: Float(0), y: Float(0), z: Float(0))
         for otherShip in ships {
             if ship.node != otherShip.node {
-                if abs(otherShip.node.position.distance(ship.node.position)) < 5 {
+                if abs(otherShip.node.position.distance(ship.node.position)) < 4 {
                     forceAway = (forceAway - (otherShip.node.position - ship.node.position))
                 }
             }
         }
         return forceAway
     }
-    
-    func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-        return nil
-//        guard let meshAnchor = anchor as? ARMeshAnchor else {
-//            return nil
-//        }
-//        let geometry = SCNGeometry(arGeometry: meshAnchor.geometry)
-//        //        geometry.firstMaterial?.colorBufferWriteMask = []
-//        //        geometry.firstMaterial?.writesToDepthBuffer = true
-//        //        geometry.firstMaterial?.readsFromDepthBuffer = true
-//        geometry.firstMaterial?.fillMode = .lines
-//        let node = OcclusionNode(meshAnchor: meshAnchor)
-////        node.physicsBody = SCNPhysicsBody(type: .static, shape: nil)
-////        node.physicsBody?.isAffectedByGravity = false
-////        node.physicsBody?.categoryBitMask = 5
-//       // node.physicsBody?.collisionBitMask = 4
-//        node.geometry = geometry
-//        return node
-    }
-    
-    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
-        if let meshAnchor = anchor as? ARMeshAnchor {
-            let occlusionNode = OcclusionNode(meshAnchor: meshAnchor)
-//            occlusionNode.physicsBody = SCNPhysicsBody(type: .static, shape: nil)
-//            occlusionNode.physicsBody?.isAffectedByGravity = false
-//            occlusionNode.physicsBody?.categoryBitMask = 5
-//            occlusionNode.physicsBody?.collisionBitMask = 4
-            node.addChildNode(occlusionNode)
-        }
-    }
-    
-    func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
-        if let meshAnchor = anchor as? ARMeshAnchor {
-            if let occlusionNode = node.childNode(withName: "occlusion", recursively: true) as? OcclusionNode {
-                occlusionNode.updateOcclusionNode(with: meshAnchor, visible: true)
-            }
-        }
-    }
-}
-
-extension ARPlaneAnchor.Classification: Equatable {
-    
-    public static func == (lhs: ARPlaneAnchor.Classification, rhs: ARPlaneAnchor.Classification) -> Bool {
-        switch (lhs, rhs) {
-        case
-            (.wall, .wall),
-            (.floor, .floor),
-            (.ceiling, .ceiling),
-            (.table, .table),
-            (.seat, .seat),
-            (.window, .window),
-            (.door, .door):
-            return true
-        case (.none(let lhsStatus), .none(let rhsStatus)):
-            return lhsStatus == rhsStatus
-        default: return false
-        }
-    }
-    
-}
-
-extension SCNMaterial {
-    
-    static var occluder: SCNMaterial {
-        let material = SCNMaterial()
-        material.colorBufferWriteMask = []
-        return material
-    }
-    
-    static func colored(with color: UIColor) -> SCNMaterial {
-        let material = SCNMaterial()
-        material.diffuse.contents = color
-        return material
-    }
-    
-    static var visibleMesh: SCNMaterial {
-        let material = SCNMaterial()
-        material.fillMode = .lines
-        material.diffuse.contents = UIColor.red
-        return material
-    }
-    
 }
 
 // MARK: - JoystickSceneDelegate
@@ -462,25 +362,27 @@ extension GameViewController: JoystickSceneDelegate {
         let ship = ships.filter { $0.isDestroyed == false }.first
         //        sceneView.helicopter.lockOn(ship:  ship!)
         let missile = sceneView.missiles.removeFirst()
+        guard missile.hit == false else { return }
+        currentMissile = missile
         sceneView.helicopter.lockOn(ship: ship!)
         valueReached = false
-        hit = false
+        // hit = false
         print("Missile \(missile.num)")
         var count = 1
-        let countlimit = 5000
-        while !hit && (count < countlimit) {
+        //        let countlimit = 5000
+        while !missile.hit {
             self.sceneView.helicopter.update(missile: missile, ship: ship!, offset: count)
             count += 1
-            if count > 800 {
+            if count > 3000 {
                 valueReached = true
             }
-            if hit {
+            if missile.hit {
                 missile.particle?.birthRate = 0
                 missile.exhaustNode.removeFromParentNode()
                 return
             }
         }
-        hit = false
+        //        hit = false
         sceneView.toggleArmMissiles()
     }
 }
@@ -501,7 +403,7 @@ extension GameViewController: SCNPhysicsContactDelegate {
                     } else {
                         return
                     }
-                     
+                    
                     if contact.nodeB.name!.contains("Missile") {
                         
                         var particle: SCNParticleSystem?
@@ -511,7 +413,7 @@ extension GameViewController: SCNPhysicsContactDelegate {
                         particle = particleSystems[0]
                         particle?.birthRate = 0
                         
-                        let explosion = createExplosion()
+                        let explosion = SCNParticleSystem.createExplosion()
                         let explosionNode = SCNNode()
                         explosionNode.position = contact.contactPoint
                         explosionNode.addParticleSystem(explosion)
@@ -529,7 +431,7 @@ extension GameViewController: SCNPhysicsContactDelegate {
                             ship.isDestroyed = true
                             ship.node.isHidden = true
                             ship.node.removeFromParentNode()
-                            self.hit = true
+                            self.currentMissile.hit = true
                         }
                         sceneView.helicopter.updateHUD()
                         if ships.filter { !$0.isDestroyed }.count == 0 {
@@ -548,9 +450,9 @@ extension GameViewController: SCNPhysicsContactDelegate {
                             }
                         }
                     }
-    //                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-    //                    self.destoryedText.text = ""
-    //                }
+                    //                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    //                    self.destoryedText.text = ""
+                    //                }
                 } else {
                     var particle: SCNParticleSystem?
                     guard let particleNode = contact.nodeA.childNodes.first, let particleSystems = particleNode.particleSystems else {
@@ -565,10 +467,11 @@ extension GameViewController: SCNPhysicsContactDelegate {
                         ship.isDestroyed = true
                         ship.node.isHidden = true
                         ship.node.removeFromParentNode()
-                        self.hit = true
+                        //                        self.hit = true
+                        self.currentMissile.hit = true
                     }
                     
-                    let explosion = createExplosion()
+                    let explosion = SCNParticleSystem.createExplosion()
                     let explosionNode = SCNNode()
                     explosionNode.position = contact.contactPoint
                     explosionNode.addParticleSystem(explosion)
@@ -601,14 +504,18 @@ extension GameViewController: SCNPhysicsContactDelegate {
                     }
                 }
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
+            if currentMissile.hit {
                 self.scoreUpdated = false
-               
+                currentMissile = nil
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                self.destoryedText.text = ""
-                self.hit = false
-            }
+            //            DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
+            //                self.scoreUpdated = false
+            //
+            //            }
+            //            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+            //                self.destoryedText.text = ""
+            //                self.hit = false
+            //            }
         }
     }
 }

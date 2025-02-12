@@ -185,12 +185,12 @@ class ApacheHelicopter {
         let (direction, _) = getUserVector(target: target)
         
         let impulseVector = SCNVector3(
-            x: direction.x * Float(2000 * offset),
-            y: direction.y * Float(2000 * offset),
-            z: direction.z * Float(2000 * offset)
+            x: direction.x * Float(4000 * offset),
+            y: direction.y * Float(4000 * offset),
+            z: direction.z * Float(4000 * offset)
         )
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.06
+        SCNTransaction.animationDuration = 0.01
         missile.node.simdWorldOrientation = target.simdWorldOrientation
         missile.node.physicsBody?.applyForce(impulseVector, asImpulse: true)
         //        missile.node.simdWorldOrientation = target.simdWorldOrientation

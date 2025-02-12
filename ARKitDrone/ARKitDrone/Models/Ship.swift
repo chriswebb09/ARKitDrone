@@ -42,41 +42,41 @@ class Ship {
     
     func boundPositions() -> SCNVector3 {
         var rebound = SCNVector3(x: Float(0), y: Float(0), z:Float(0))
-        let Xmin = -40;
-        let Ymin = -40;
-        let Zmin = -80;
-        let Xmax = 40;
-        let Ymax = 40;
-        let Zmax = 20;
+        let Xmin = -20;
+        let Ymin = -20;
+        let Zmin = -70;
+        let Xmax = 20;
+        let Ymax = 20;
+        let Zmax = 0;
         if node.position.x < Float(Xmin) {
-            rebound.x = 1;
+            rebound.x = 1
         }
         
         if node.position.x > Float(Xmax) {
-            rebound.x = -1;
+            rebound.x = -1
         }
         
         if node.position.y < Float(Ymin) {
-            rebound.y = 1;
+            rebound.y = 1
         }
         
         if node.position.y > Float(Ymax) {
-            rebound.y = -1;
+            rebound.y = -1
         }
         
         if node.position.z < Float(Zmin) {
-            rebound.z = 1;
+            rebound.z = 1
         }
         
         if node.position.z > Float(Zmax) {
-            rebound.z = -1;
+            rebound.z = -1
         }
         return rebound;
     }
     
     func limitVelocity() {
         let mag = Float(velocity.length())
-        let limit = Float(0.9)
+        let limit = Float(0.8)
         if mag > limit {
             velocity = (velocity/mag) * limit
         }
