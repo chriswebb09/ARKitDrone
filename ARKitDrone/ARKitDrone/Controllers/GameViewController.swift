@@ -321,10 +321,8 @@ extension GameViewController: JoystickSceneDelegate {
         armMissilesButton.setTitle(title, for: .normal)
         sceneView.helicopter.lockOn(target: ships[0].node)
         sceneView.helicopter.shootMissile()
-        // self.sceneView.missile1.node.move(toParent: self.ships[0].node.parent!)
         var count = 1
         var countlimit = 4000
-        //        running =  true
         while !hit && (count < countlimit) {
             self.sceneView.helicopter.update(missile: self.sceneView.missile1, target: self.ships[0].node, offset: count)
             self.sceneView.helicopter.update(missile: self.sceneView.missile2, target: self.ships[0].node, offset: count)
@@ -340,21 +338,6 @@ extension GameViewController: JoystickSceneDelegate {
     }
 }
 extension GameViewController: SCNPhysicsContactDelegate {
-    
-    func physicsWorld(_ world: SCNPhysicsWorld, didEnd contact: SCNPhysicsContact) {
-        
-    }
-    
-    func renderer(_ renderer: any SCNSceneRenderer, didSimulatePhysicsAtTime time: TimeInterval) {
-        //print(time)
-    }
-    
-    func physicsWorld(_ world: SCNPhysicsWorld, didUpdate contact: SCNPhysicsContact) {
-        if contact.nodeA.name!.contains("Missile") && !contact.nodeB.name!.contains("Missile") {
-            print("update missile contact")
-            hit = true
-        }
-    }
     
     func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
         if valueReached {

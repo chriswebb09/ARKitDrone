@@ -165,8 +165,6 @@ class ApacheHelicopter {
     }
     
     func update(missile: Missile, target: SCNNode, offset: Int = 1) {
-//        print(missile.node.name)
-//        print(target.name)
         var value = 9
         let physicsBody2 =  SCNPhysicsBody(type: .kinematic, shape: nil)
         missile.node.physicsBody = physicsBody2
@@ -192,14 +190,6 @@ class ApacheHelicopter {
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.5
         missile.node.physicsBody?.applyForce(impulseVector, asImpulse: true)
-//        print(target.physicsBody?.categoryBitMask)
-//        print(target.physicsBody?.contactTestBitMask)
-//        print(target.physicsBody?.collisionBitMask)
-//        print("\n")
-//        print(missile.node.physicsBody?.categoryBitMask)
-//        print(missile.node.physicsBody?.contactTestBitMask)
-//        print(missile.node.physicsBody?.collisionBitMask)
-//        print("\n")
         SCNTransaction.commit()
     }
     

@@ -27,18 +27,6 @@ class Missile {
         node.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
         node.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
         node.physicsBody?.collisionBitMask = 2
-//        let physicsBody =  SCNPhysicsBody(type: .kinematic, shape: nil)
-//        node.physicsBody = physicsBody
-//        node.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
-//        node.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
-//        node.physicsBody?.collisionBitMask = 2
-//        let physicsBody4 =  SCNPhysicsBody(type: .kinematic, shape: nil)
-//        node?.physicsBody = physicsBody4
-//        node?.physicsBody?.categoryBitMask = CollisionTypes.missile.rawValue
-//        node.physicsBody?.contactTestBitMask = CollisionTypes.base.rawValue
-//        node?.physicsBody?.contactTestBitMask = CollisionTypes.plane.rawValue
-//        node?.physicsBody?.collisionBitMask = 4
-        
     }
     
     func setParticle() {
