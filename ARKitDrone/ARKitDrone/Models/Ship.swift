@@ -24,6 +24,11 @@ class Ship {
         self.node = newNode;
         self.id = UUID.init().uuidString
         Ship.shipRegistry[newNode] = self
+        let physicsBody =  SCNPhysicsBody(type: .kinematic, shape: nil)
+        node.physicsBody = physicsBody
+        node.physicsBody!.categoryBitMask = CollisionTypes.missile.rawValue
+        node.physicsBody!.contactTestBitMask = CollisionTypes.base.rawValue
+        node.physicsBody!.collisionBitMask = 2
     }
     
     deinit {

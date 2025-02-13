@@ -174,21 +174,17 @@ class GameViewController: UIViewController {
     
     func setupShips() {
         let shipScene = SCNScene(named: "art.scnassets/F-35B_Lightning_II.scn")!
-        // retrieve the ship node
         for i in 1...8 {
             let shipNode = shipScene.rootNode.childNode(withName: "F_35B_Lightning_II", recursively: true)!.clone()
             shipNode.name = "F_35B \(i)"
-            let physicsBody =  SCNPhysicsBody(type: .kinematic, shape: nil)
-            shipNode.physicsBody = physicsBody
-            shipNode.physicsBody!.categoryBitMask = CollisionTypes.missile.rawValue
-            shipNode.physicsBody!.contactTestBitMask = CollisionTypes.base.rawValue
-            shipNode.physicsBody!.collisionBitMask = 2
             let ship = Ship(newNode: shipNode)
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 sceneView.scene.rootNode.addChildNode(ship.node)
                 ships.append(ship)
-                ship.node.position = SCNVector3(x: Float(Int(arc4random_uniform(10)) - 5), y: Float(Int(arc4random_uniform(10)) - 5), z: -15)
+                let randomX = Float(Int(arc4random_uniform(10)) - 5)
+                let randomY = Float(Int(arc4random_uniform(10)) - 5)
+                ship.node.position = SCNVector3(x:randomX , y: randomY, z: -15)
                 ship.node.scale = SCNVector3(x: Float(0.006), y: Float(0.006), z: Float(0.006))
             }
         }
@@ -259,17 +255,14 @@ class GameViewController: UIViewController {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if !placed {
-            let tapLocation: CGPoint = touches.first!.location(in: sceneView)
-            if let result = sceneView.raycastQuery(from: tapLocation, allowing: .estimatedPlane, alignment: .horizontal) {
-                let castRay =  session.raycast(result)
-                if let firstCast = castRay.first {
-                    DispatchQueue.global(qos: .background).async {
-                        self.sceneView.positionTank(position: SCNVector3.positionFromTransform(firstCast.worldTransform))
-                    }
-                    placed = true
-                }
-            }
+        guard !placed else { return }
+        let tapLocation: CGPoint = touches.first!.location(in: sceneView)
+        guard let result = sceneView.raycastQuery(from: tapLocation, allowing: .estimatedPlane, alignment: .horizontal)  else { return }
+        let castRay =  session.raycast(result)
+        if let firstCast = castRay.first {
+            let tappedPosition =  SCNVector3.positionFromTransform(firstCast.worldTransform)
+            self.sceneView.positionTank(position: tappedPosition)
+            placed = true
         }
     }
 }
@@ -277,34 +270,35 @@ class GameViewController: UIViewController {
 extension GameViewController: ARSCNViewDelegate {
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        var percievedCenter = SCNVector3(x: Float(0), y: Float(0), z:Float(0))
-        var percievedVelocity = SCNVector3(x: Float(0), y: Float(0), z:Float(0))
+        var percievedCenter = SCNVector3Zero
+        var percievedVelocity = SCNVector3Zero
+        
         for otherShip in ships {
-            percievedCenter = percievedCenter + otherShip.node.position;
-            percievedVelocity = percievedVelocity + (otherShip.velocity);
+            percievedCenter = percievedCenter + otherShip.node.position
+            percievedVelocity = percievedVelocity + (otherShip.velocity)
         }
-        for ship in ships {
-            updateShipPosition(ship: ship, percievedCenter: percievedCenter, percievedVelocity: percievedVelocity)
-        }
+        ships.forEach { updateShipPosition(ship: $0, percievedCenter: percievedCenter, percievedVelocity: percievedVelocity) }
         if placed {
             sceneView.missileLock(target: ships[0].node)
         }
     }
-    
     
     func updateShipPosition(ship: Ship, percievedCenter: SCNVector3, percievedVelocity: SCNVector3) {
         var v1 = ship.flyCenterOfMass(ships.count, percievedCenter)
         var v2 = keepASmallDistance(ship)
         var v3 = ship.matchSpeedWithOtherShips(ships.count, percievedVelocity)
         var v4 = ship.boundPositions()
+        
         v1 *= (0.01)
         v2 *= (0.01)
         v3 *= (0.01)
         v4 *= (1.0)
+        
         let forward = SCNVector3(x: Float(0), y: Float(0), z: Float(1))
         let velocityNormal = ship.velocity.normalized()
         ship.velocity = ship.velocity + v1 + v2 + v3 + v4;
         ship.limitVelocity()
+        
         let nor = forward.cross(velocityNormal)
         let angle = CGFloat(forward.dot(velocityNormal))
         ship.node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
@@ -325,10 +319,9 @@ extension GameViewController: ARSCNViewDelegate {
     func keepASmallDistance(_ ship: Ship) -> SCNVector3 {
         var forceAway = SCNVector3(x: Float(0), y: Float(0), z: Float(0))
         for otherShip in ships {
-            if ship.node != otherShip.node {
-                if abs(otherShip.node.position.distance(ship.node.position)) < 4 {
-                    forceAway = (forceAway - (otherShip.node.position - ship.node.position))
-                }
+            if ship.node != otherShip.node,
+               abs(otherShip.node.position.distance(ship.node.position)) < 4 {
+                forceAway = (forceAway - (otherShip.node.position - ship.node.position))
             }
         }
         return forceAway
@@ -377,9 +370,7 @@ extension GameViewController: JoystickSceneDelegate {
             var count = 1
             while !missile.hit {
                 sceneView.helicopter.update(missile: missile, ship: ship, offset: count)
-                if count > 800 {
-                    valueReached = true
-                }
+                valueReached = count > 800
                 count += 1
             }
         }
@@ -389,40 +380,46 @@ extension GameViewController: JoystickSceneDelegate {
 extension GameViewController: SCNPhysicsContactDelegate {
     
     func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
-        
         let conditionOne = (contact.nodeA.name!.contains("Missile") && !contact.nodeB.name!.contains("Missile"))
         let conditionTwo = (contact.nodeB.name!.contains("Missile") && !contact.nodeA.name!.contains("Missile"))
-        
         if (valueReached && (conditionOne || conditionTwo) && !self.scoreUpdated) {
-            var conditionalShipNode: SCNNode! = conditionOne ? contact.nodeA : contact.nodeB
-            var conditionalMissileNode: SCNNode! = conditionOne ? contact.nodeB : contact.nodeA
-            if !self.scoreUpdated && !Missile.getMissile(from: conditionalMissileNode)!.hit {
+            let conditionalShipNode: SCNNode! = conditionOne ? contact.nodeB : contact.nodeA
+            let conditionalMissileNode: SCNNode! = conditionOne ? contact.nodeA : contact.nodeB
+            let tempMissile = Missile.getMissile(from: conditionalMissileNode)!
+            let canUpdateScore = !self.scoreUpdated && tempMissile.hit == false
+            if canUpdateScore{
                 DispatchQueue.main.async {
                     self.scoreUpdated = true
                     self.score += 1
-                    self.destoryedText.text = "Enemy Destroyed!"
-                    self.scoreText.text = "Score \(self.score)"
+                   
                 }
             }
-            Missile.getMissile(from: conditionalMissileNode)?.hit = true
-            Missile.getMissile(from: conditionalMissileNode)?.particle?.birthRate = 0
+            
+            tempMissile.hit = true
+            tempMissile.particle?.birthRate = 0
+            
             let explosion = SCNParticleSystem.createExplosion()
             let explosionNode = SCNNode()
             explosionNode.position = contact.contactPoint
             explosionNode.addParticleSystem(explosion)
             sceneView.scene.rootNode.addChildNode(explosionNode)
             explosionNode.runAction(SCNAction.sequence([
-                SCNAction.wait(duration: 0.25),  // Wait for explosion effect to finish
-                SCNAction.removeFromParentNode() // Remove explosion node from the scene
+                SCNAction.wait(duration: 0.25),
+                SCNAction.removeFromParentNode()
             ]))
+            
             conditionalMissileNode.isHidden = true
             conditionalMissileNode.removeFromParentNode()
+            
             DispatchQueue.main.async {
                 let ship = Ship.getShip(from: conditionalShipNode)!
                 ship.isDestroyed = true
                 ship.node.isHidden = true
                 ship.node.removeFromParentNode()
+                self.destoryedText.text = "Enemy Destroyed!"
+                self.scoreText.text = "Score \(self.score)"
             }
+            
             DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
                 self.destoryedText.text = ""
                 self.scoreUpdated = false
