@@ -14,7 +14,7 @@ class MenuViewController: UIViewController {
     
     private struct LocalConstants {
         static let goToGameSegue = "GoToGame"
-        static let count = 5
+        static let count = 2
     }
     
     // MARK: - Private Properties

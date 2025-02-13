@@ -11,7 +11,7 @@ import SceneKit
 extension SCNParticleSystem {
     static func createExplosion() -> SCNParticleSystem {
         let explosion = SCNParticleSystem()
-        explosion.emitterShape = SCNSphere(radius: 3)
+        explosion.emitterShape = SCNSphere(radius: 6)
         explosion.birthRate = 2500
         explosion.emissionDuration = 0.1
         explosion.spreadingAngle = 360
@@ -20,7 +20,7 @@ extension SCNParticleSystem {
         explosion.particleVelocity = 3.0
         explosion.particleVelocityVariation = 1.5
         explosion.particleSize = 0.04
-        explosion.particleColor = UIColor.red
+        explosion.particleColor = UIColor.systemOrange
         explosion.particleImage = UIImage(named: "spark")
         explosion.isAffectedByGravity = true
         explosion.blendMode = .additive
