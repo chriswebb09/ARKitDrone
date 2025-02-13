@@ -382,11 +382,14 @@ extension GameViewController: SCNPhysicsContactDelegate {
     func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
         let conditionOne = (contact.nodeA.name!.contains("Missile") && !contact.nodeB.name!.contains("Missile"))
         let conditionTwo = (contact.nodeB.name!.contains("Missile") && !contact.nodeA.name!.contains("Missile"))
+        
         if (valueReached && (conditionOne || conditionTwo) && !self.scoreUpdated) {
+            
             let conditionalShipNode: SCNNode! = conditionOne ? contact.nodeB : contact.nodeA
             let conditionalMissileNode: SCNNode! = conditionOne ? contact.nodeA : contact.nodeB
             let tempMissile = Missile.getMissile(from: conditionalMissileNode)!
             let canUpdateScore = !self.scoreUpdated && tempMissile.hit == false
+            
             if canUpdateScore{
                 DispatchQueue.main.async {
                     self.scoreUpdated = true
@@ -420,7 +423,7 @@ extension GameViewController: SCNPhysicsContactDelegate {
                 self.scoreText.text = "Score \(self.score)"
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 self.destoryedText.text = ""
                 self.scoreUpdated = false
                 self.updateFiredButton()
