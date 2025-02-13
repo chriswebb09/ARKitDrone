@@ -252,7 +252,6 @@ class GameViewController: UIViewController {
         updateFiredButton()
     }
     
-    
     func updateFiredButton() {
         sceneView.helicopter.missilesArmed = !sceneView.helicopter.missilesArmed
         let title = sceneView.helicopter.missilesAreArmed() ? LocalConstants.disarmTitle : LocalConstants.buttonTitle
@@ -285,33 +284,41 @@ extension GameViewController: ARSCNViewDelegate {
             percievedVelocity = percievedVelocity + (otherShip.velocity);
         }
         for ship in ships {
-            var v1 = ship.flyCenterOfMass(ships.count, percievedCenter)
-            var v2 = keepASmallDistance(ship)
-            var v3 = ship.matchSpeedWithOtherShips(ships.count, percievedVelocity)
-            var v4 = ship.boundPositions()
-            v1 *= (0.01)
-            v2 *= (0.01)
-            v3 *= (0.01)
-            v4 *= (1.0)
-            let forward = SCNVector3(x: Float(0), y: Float(0), z: Float(1))
-            let velocityNormal = ship.velocity.normalized()
-            ship.velocity = ship.velocity + v1 + v2 + v3 + v4;
-            ship.limitVelocity()
-            let nor = forward.cross(velocityNormal)
-            let angle = CGFloat(forward.dot(velocityNormal))
-            ship.node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
-            ship.node.position = ship.node.position + (ship.velocity)
-            if ship.targetAdded {
-                SCNTransaction.begin()
-                SCNTransaction.animationDuration = 0.001
-                ship.targetNode.rotation =  SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
-                ship.targetNode.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
-                ship.targetNode.position = SCNVector3(x: ship.node.position.x, y: ship.node.position.y + 1, z: ship.node.position.z - 10)
-                SCNTransaction.commit()
-            }
+            updateShipPosition(ship: ship, percievedCenter: percievedCenter, percievedVelocity: percievedVelocity)
         }
         if placed {
             sceneView.missileLock(target: ships[0].node)
+        }
+    }
+    
+    
+    func updateShipPosition(ship: Ship, percievedCenter: SCNVector3, percievedVelocity: SCNVector3) {
+        var v1 = ship.flyCenterOfMass(ships.count, percievedCenter)
+        var v2 = keepASmallDistance(ship)
+        var v3 = ship.matchSpeedWithOtherShips(ships.count, percievedVelocity)
+        var v4 = ship.boundPositions()
+        v1 *= (0.01)
+        v2 *= (0.01)
+        v3 *= (0.01)
+        v4 *= (1.0)
+        let forward = SCNVector3(x: Float(0), y: Float(0), z: Float(1))
+        let velocityNormal = ship.velocity.normalized()
+        ship.velocity = ship.velocity + v1 + v2 + v3 + v4;
+        ship.limitVelocity()
+        let nor = forward.cross(velocityNormal)
+        let angle = CGFloat(forward.dot(velocityNormal))
+        ship.node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
+        ship.node.position = ship.node.position + (ship.velocity)
+        setTargetAboveSelected(ship: ship)
+    }
+    
+    func setTargetAboveSelected(ship: Ship) {
+        if ship.targetAdded {
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = 0.001
+            ship.targetNode.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
+            ship.targetNode.position = SCNVector3(x: ship.node.position.x, y: ship.node.position.y + 1, z: ship.node.position.z - 10)
+            SCNTransaction.commit()
         }
     }
     
@@ -360,7 +367,6 @@ extension GameViewController: JoystickSceneDelegate {
     func fire() {
         guard sceneView.missiles.isEmpty == false else { return }
         guard !scoreUpdated else { return }
-       
         let ship = ships.filter { $0.isDestroyed == false }.first
         if let ship = ship {
             updateFiredButton()
@@ -388,51 +394,35 @@ extension GameViewController: SCNPhysicsContactDelegate {
         let conditionTwo = (contact.nodeB.name!.contains("Missile") && !contact.nodeA.name!.contains("Missile"))
         
         if (valueReached && (conditionOne || conditionTwo) && !self.scoreUpdated) {
-            var conditionalShipNode: SCNNode!
-            var conditionalMissileNode: SCNNode!
-            
-            conditionalMissileNode = contact.nodeA
-            conditionalShipNode = contact.nodeB
-            
-            if conditionTwo {
-                conditionalMissileNode = contact.nodeB
-                conditionalShipNode = contact.nodeA
-            }
-            
+            var conditionalShipNode: SCNNode! = conditionOne ? contact.nodeA : contact.nodeB
+            var conditionalMissileNode: SCNNode! = conditionOne ? contact.nodeB : contact.nodeA
             if !self.scoreUpdated && !Missile.getMissile(from: conditionalMissileNode)!.hit {
                 DispatchQueue.main.async {
                     self.scoreUpdated = true
                     self.score += 1
                     self.destoryedText.text = "Enemy Destroyed!"
                     self.scoreText.text = "Score \(self.score)"
-                    
                 }
             }
-            
             Missile.getMissile(from: conditionalMissileNode)?.hit = true
             Missile.getMissile(from: conditionalMissileNode)?.particle?.birthRate = 0
-            
             let explosion = SCNParticleSystem.createExplosion()
             let explosionNode = SCNNode()
             explosionNode.position = contact.contactPoint
             explosionNode.addParticleSystem(explosion)
             sceneView.scene.rootNode.addChildNode(explosionNode)
-            
             explosionNode.runAction(SCNAction.sequence([
                 SCNAction.wait(duration: 0.25),  // Wait for explosion effect to finish
                 SCNAction.removeFromParentNode() // Remove explosion node from the scene
             ]))
-            
             conditionalMissileNode.isHidden = true
             conditionalMissileNode.removeFromParentNode()
-            
             DispatchQueue.main.async {
                 let ship = Ship.getShip(from: conditionalShipNode)!
                 ship.isDestroyed = true
                 ship.node.isHidden = true
                 ship.node.removeFromParentNode()
             }
-            
             DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
                 self.destoryedText.text = ""
                 self.scoreUpdated = false
