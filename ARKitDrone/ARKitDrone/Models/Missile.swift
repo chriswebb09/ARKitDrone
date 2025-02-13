@@ -16,13 +16,15 @@ class Missile {
     var fired: Bool = false
     var exhaustNode: SCNNode!
     var hit: Bool = false
+    var id: String!
     var num: Int = -1
+    private static var missileRegistry: [SCNNode: Missile] = [:]
     
     func setupNode(scnNode: SCNNode?, number: Int) {
         guard let scnNode = scnNode else { return }
         node = scnNode
         num = number
-        
+        self.id = UUID.init().uuidString
         node.name = "Missile \(num)"
         let physicsBody2 =  SCNPhysicsBody(type: .kinematic, shape: nil)
         node.physicsBody = physicsBody2
@@ -30,12 +32,20 @@ class Missile {
         node.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
         node.physicsBody?.collisionBitMask = 2
         setParticle()
+        Missile.missileRegistry[node] = self
         //        exhaustNode = SCNNode()
         //        exhaustNode.position = node.position
         //        exhaustNode.position = SCNVector3(node.position.x, node.position.y, node.position.z + 1.4) // Adjust to match missile model
         //        node.addChildNode(exhaustNode)
         //        exhaustNode.transform = node.presentation.worldTransform
         //        setParticle()
+    }
+    
+    deinit {
+        if let node = node {
+            Missile.missileRegistry.removeValue(forKey: node)
+        }
+    // Clean up when object is destroyed
     }
     
     func setParticle() {
@@ -62,5 +72,9 @@ class Missile {
         //            self.node.removeFromParentNode()
         //            self.fired = true
         //        }
+    }
+    
+    static func getMissile(from node: SCNNode) -> Missile? {
+        return missileRegistry[node]
     }
 }

@@ -190,7 +190,7 @@ class ApacheHelicopter {
             z: direction.z * Float(4000 * offset)
         )
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.01
+        SCNTransaction.animationDuration = 0.09
         missile.node.simdWorldOrientation = target.simdWorldOrientation
         missile.node.physicsBody?.applyForce(impulseVector, asImpulse: true)
         //        missile.node.simdWorldOrientation = target.simdWorldOrientation

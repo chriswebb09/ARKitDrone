@@ -54,6 +54,8 @@ class GameViewController: UIViewController {
     var scoreUpdated = false
     var minimap: SKShapeNode!
     var playerNode: SCNNode!
+    //    var valueReached: Bool = false
+    var hit = false
     
     private lazy var padView2: SKView = {
         let view = SKView(frame: CGRect(x:600, y: UIScreen.main.bounds.height - 220, width: 160, height: 140))
@@ -247,8 +249,13 @@ class GameViewController: UIViewController {
     // MARK: - Actions
     
     @objc func didTapUIButton() {
-        sceneView.toggleArmMissiles()
-        let title = sceneView.missilesArmed() ? LocalConstants.disarmTitle : LocalConstants.buttonTitle
+        updateFiredButton()
+    }
+    
+    
+    func updateFiredButton() {
+        sceneView.helicopter.missilesArmed = !sceneView.helicopter.missilesArmed
+        let title = sceneView.helicopter.missilesAreArmed() ? LocalConstants.disarmTitle : LocalConstants.buttonTitle
         armMissilesButton.setTitle(title, for: .normal)
     }
     
@@ -347,163 +354,91 @@ extension GameViewController: JoystickSceneDelegate {
     
     func tapped() {
         guard sceneView.helicopter.missilesArmed else { return }
-        sceneView.toggleArmMissiles()
         fire()
     }
     
     func fire() {
         guard sceneView.missiles.isEmpty == false else { return }
+        guard !scoreUpdated else { return }
+       
         let ship = ships.filter { $0.isDestroyed == false }.first
-        let missile = sceneView.missiles.removeFirst()
-        guard missile.hit == false else { return }
-        currentMissile = missile
-        sceneView.helicopter.lockOn(ship: ship!)
-        valueReached = false
-        print("Missile \(missile.num)")
-        var count = 1
-        while !missile.hit {
-            self.sceneView.helicopter.update(missile: missile, ship: ship!, offset: count)
-            count += 1
-            if count > 3000 {
-                valueReached = true
-            }
-            if missile.hit {
-                missile.particle?.birthRate = 0
-                missile.exhaustNode.removeFromParentNode()
-                return
-            }
-        }
-        sceneView.toggleArmMissiles()
-    }
-}
-extension GameViewController: SCNPhysicsContactDelegate {
-    
-    func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
-        if valueReached {
-            if (contact.nodeA.name!.contains("Missile") || contact.nodeB.name!.contains("Missile")) {
-                if ((contact.nodeA.name!.contains("Missile") && !contact.nodeB.name!.contains("Missile")) || (contact.nodeB.name!.contains("Missile") && !contact.nodeA.name!.contains("Missile")) ) {
-                    
-                    if !self.scoreUpdated {
-                        DispatchQueue.main.async {
-                            self.scoreUpdated = true
-                            self.score += 1
-                            self.destoryedText.text = "Enemy Destroyed!"
-                            self.scoreText.text = "Score \(self.score)"
-                        }
-                    } else {
-                        return
-                    }
-                    
-                    if contact.nodeB.name!.contains("Missile") {
-                        
-                        var particle: SCNParticleSystem?
-                        guard let particleNode = contact.nodeB.childNodes.first, let particleSystems = particleNode.particleSystems else {
-                            return
-                        }
-                        particle = particleSystems[0]
-                        particle?.birthRate = 0
-                        
-                        let explosion = SCNParticleSystem.createExplosion()
-                        let explosionNode = SCNNode()
-                        explosionNode.position = contact.contactPoint
-                        explosionNode.addParticleSystem(explosion)
-                        sceneView.scene.rootNode.addChildNode(explosionNode)
-                        
-                        explosionNode.runAction(SCNAction.sequence([
-                            SCNAction.wait(duration: 0.25),  // Wait for explosion effect to finish
-                            SCNAction.removeFromParentNode() // Remove explosion node from the scene
-                        ]))
-                        
-                        contact.nodeB.isHidden = true
-                        contact.nodeB.removeFromParentNode()
-                        DispatchQueue.main.async {
-                            let ship = Ship.getShip(from: contact.nodeA)!
-                            ship.isDestroyed = true
-                            ship.node.isHidden = true
-                            ship.node.removeFromParentNode()
-                            self.currentMissile.hit = true
-                        }
-                        sceneView.helicopter.updateHUD()
-                        if ships.filter { !$0.isDestroyed }.count == 0 {
-                            explosionNode.particleSystems![0].birthRate = 0
-                            explosion.birthRate = 0
-                            explosion.removeAllAnimations()
-                            explosionNode.removeFromParentNode()
-                            explosionNode.isHidden = true
-                        } else {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                explosionNode.particleSystems![0].birthRate = 0
-                                explosion.birthRate = 0
-                                explosion.removeAllAnimations()
-                                explosionNode.removeFromParentNode()
-                                explosionNode.isHidden = true
-                            }
-                        }
-                    }
-                } else {
-                    var particle: SCNParticleSystem?
-                    guard let particleNode = contact.nodeA.childNodes.first, let particleSystems = particleNode.particleSystems else {
-                        return
-                    }
-                    
-                    particle = particleSystems[0]
-                    particle?.birthRate = 0
-                    
-                    DispatchQueue.main.async {
-                        let ship = Ship.getShip(from: contact.nodeB)!
-                        ship.isDestroyed = true
-                        ship.node.isHidden = true
-                        ship.node.removeFromParentNode()
-                        //                        self.hit = true
-                        self.currentMissile.hit = true
-                    }
-                    
-                    let explosion = SCNParticleSystem.createExplosion()
-                    let explosionNode = SCNNode()
-                    explosionNode.position = contact.contactPoint
-                    explosionNode.addParticleSystem(explosion)
-                    sceneView.scene.rootNode.addChildNode(explosionNode)
-                    
-                    explosionNode.runAction(SCNAction.sequence([
-                        SCNAction.wait(duration: 0.25),  // Wait for explosion effect to finish
-                        SCNAction.removeFromParentNode() // Remove explosion node from the scene
-                    ]))
-                    
-                    contact.nodeA.isHidden = true
-                    contact.nodeA.removeFromParentNode()
-                    
-                    sceneView.helicopter.updateHUD()
-                    
-                    if ships.filter { !$0.isDestroyed }.count == 0 {
-                        explosionNode.particleSystems![0].birthRate = 0
-                        explosion.birthRate = 0
-                        explosion.removeAllAnimations()
-                        explosionNode.removeFromParentNode()
-                        explosionNode.isHidden = true
-                    } else {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            explosionNode.particleSystems![0].birthRate = 0
-                            explosion.birthRate = 0
-                            explosion.removeAllAnimations()
-                            explosionNode.removeFromParentNode()
-                            explosionNode.isHidden = true
-                        }
-                    }
+        if let ship = ship {
+            updateFiredButton()
+            let missile = sceneView.missiles.removeFirst()
+            sceneView.helicopter.lockOn(ship: ship)
+            valueReached = false
+            print("Missile \(missile.num)")
+            var count = 1
+            while !missile.hit {
+                sceneView.helicopter.update(missile: missile, ship: ship, offset: count)
+                if count > 800 {
+                    valueReached = true
                 }
+                count += 1
             }
-            if currentMissile.hit {
-                self.scoreUpdated = false
-                currentMissile = nil
-            }
-            //            DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
-            //                self.scoreUpdated = false
-            //
-            //            }
-            //            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-            //                self.destoryedText.text = ""
-            //                self.hit = false
-            //            }
         }
     }
 }
 
+extension GameViewController: SCNPhysicsContactDelegate {
+    
+    func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
+        
+        let conditionOne = (contact.nodeA.name!.contains("Missile") && !contact.nodeB.name!.contains("Missile"))
+        let conditionTwo = (contact.nodeB.name!.contains("Missile") && !contact.nodeA.name!.contains("Missile"))
+        
+        if (valueReached && (conditionOne || conditionTwo) && !self.scoreUpdated) {
+            var conditionalShipNode: SCNNode!
+            var conditionalMissileNode: SCNNode!
+            
+            conditionalMissileNode = contact.nodeA
+            conditionalShipNode = contact.nodeB
+            
+            if conditionTwo {
+                conditionalMissileNode = contact.nodeB
+                conditionalShipNode = contact.nodeA
+            }
+            
+            if !self.scoreUpdated && !Missile.getMissile(from: conditionalMissileNode)!.hit {
+                DispatchQueue.main.async {
+                    self.scoreUpdated = true
+                    self.score += 1
+                    self.destoryedText.text = "Enemy Destroyed!"
+                    self.scoreText.text = "Score \(self.score)"
+                    
+                }
+            }
+            
+            Missile.getMissile(from: conditionalMissileNode)?.hit = true
+            Missile.getMissile(from: conditionalMissileNode)?.particle?.birthRate = 0
+            
+            let explosion = SCNParticleSystem.createExplosion()
+            let explosionNode = SCNNode()
+            explosionNode.position = contact.contactPoint
+            explosionNode.addParticleSystem(explosion)
+            sceneView.scene.rootNode.addChildNode(explosionNode)
+            
+            explosionNode.runAction(SCNAction.sequence([
+                SCNAction.wait(duration: 0.25),  // Wait for explosion effect to finish
+                SCNAction.removeFromParentNode() // Remove explosion node from the scene
+            ]))
+            
+            conditionalMissileNode.isHidden = true
+            conditionalMissileNode.removeFromParentNode()
+            
+            DispatchQueue.main.async {
+                let ship = Ship.getShip(from: conditionalShipNode)!
+                ship.isDestroyed = true
+                ship.node.isHidden = true
+                ship.node.removeFromParentNode()
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+                self.destoryedText.text = ""
+                self.scoreUpdated = false
+                self.updateFiredButton()
+                self.armMissilesButton.isEnabled = true
+            }
+        }
+    }
+}
