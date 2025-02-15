@@ -89,7 +89,7 @@ class Ship {
     
     func limitVelocity(_ ship: Ship) {
         let mag = Float(ship.velocity.length())
-        let limit = Float(0.5);
+        let limit = Float(0.9);
         if mag > limit {
             ship.velocity = (ship.velocity/mag) * limit
         }
@@ -108,7 +108,7 @@ class Ship {
         
         for otherShip in ships {
             if ship.node != otherShip.node {
-                if abs(otherShip.node.position.distance(ship.node.position)) < 10 {
+                if abs(otherShip.node.position.distance(ship.node.position)) < 14 {
                     forceAway = (forceAway - (otherShip.node.position - ship.node.position))
                 }
             }
@@ -121,9 +121,9 @@ class Ship {
         var v2 = keepASmallDistance(self, ships: otherShips)
         var v3 = matchSpeedWithOtherShips(otherShips.count, percievedVelocity)
         var v4 = boundPositions()
-        v1 *= (0.01)
-        v2 *= (0.01)
-        v3 *= (0.01)
+        v1 *= (0.1)
+        v2 *= (0.1)
+        v3 *= (0.1)
         v4 *= (1.0)
         let forward = SCNVector3(x: Float(0), y: Float(0), z: Float(1))
         let velocityNormal = self.velocity.normalized()

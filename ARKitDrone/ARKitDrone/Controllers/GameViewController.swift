@@ -36,7 +36,7 @@ class GameViewController: UIViewController {
         if UIDevice.current.isIpad {
             offset = 220
         }
-        let view = SKView(frame: CGRect(x:60, y: UIScreen.main.bounds.height - 220, width:140, height: 140))
+        let view = SKView(frame: CGRect(x:60, y: UIScreen.main.bounds.height - 220, width:170, height: 170))
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
         return view
@@ -51,7 +51,7 @@ class GameViewController: UIViewController {
     var nodes = [SCNNode]()
     
     private lazy var padView2: SKView = {
-        let view = SKView(frame: CGRect(x:600, y: UIScreen.main.bounds.height - 220, width: 160, height: 140))
+        let view = SKView(frame: CGRect(x:600, y: UIScreen.main.bounds.height - 220, width: 170, height: 170))
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
         return view
@@ -101,12 +101,12 @@ class GameViewController: UIViewController {
     
     private lazy var scoreText: UILabel = {
         let label = UILabel()
-        label.textAlignment = .left
-        label.font = UIFont(name: "AvenirNext-Medium", size: 22)
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.black)
         label.textColor = UIColor(red: 0.00, green: 1.00, blue: 0.01, alpha: 1.00)
         label.text = "Score: 0"
-        label.backgroundColor = .clear
-        label.frame = CGRect(origin: CGPoint(x: 40 , y:  UIScreen.main.bounds.origin.y + 50), size: CGSize(width: 300, height: 40))
+        label.backgroundColor = .black
+        label.frame = CGRect(origin: CGPoint(x: 40 , y:  UIScreen.main.bounds.origin.y + 50), size: CGSize(width: 130, height: 50))
         return label
     }()
     
@@ -199,6 +199,7 @@ class GameViewController: UIViewController {
         let cameraRotation = simd_float4x4(cameraTransform.columns.0, cameraTransform.columns.1, cameraTransform.columns.2, cameraTransform.columns.3)
         let playerPosition = simd_float4(playerNode.worldPosition.x, playerNode.worldPosition.y, playerNode.worldPosition.z, 1.0)
         let shipPositions = sceneView.ships.filter { !$0.isDestroyed }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
+        let missilePositions = sceneView.missiles.filter { $0.fired && !$0.hit }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
         let helcopterWorldPosition = sceneView.helicopterNode.worldPosition
         let helicopterPosition: simd_float4 = game.placed ? simd_float4(helcopterWorldPosition.x, helcopterWorldPosition.y, helcopterWorldPosition.z, 1.0) : simd_float4.zero
         
@@ -208,6 +209,7 @@ class GameViewController: UIViewController {
                 playerPosition: playerPosition,
                 helicopterPosition: helicopterPosition,
                 ships: shipPositions,
+                missiles: missilePositions,
                 cameraRotation: cameraRotation,
                 placed: game.placed
             )
