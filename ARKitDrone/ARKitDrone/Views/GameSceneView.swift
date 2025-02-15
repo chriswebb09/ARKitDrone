@@ -18,6 +18,8 @@ class GameSceneView: ARSCNView {
         static let tankAssetName = "art.scnassets/m1.scn"
     }
     
+    var ships: [Ship] = [Ship]()
+    
     var helicopter = ApacheHelicopter()
     var tankModel: SCNNode!
     var tankNode: SCNNode!
@@ -58,7 +60,6 @@ class GameSceneView: ARSCNView {
         tankModel = SCNScene.nodeWithModelName(LocalConstants.tankAssetName).clone()
         tankNode = tankModel.childNode(withName: "m1tank", recursively: true)
         tankNode.scale = SCNVector3(x: 0.1, y: 0.1, z: 0.1)
-        let shape = SCNPhysicsShape(node: tankNode)
         let physicsBody =  SCNPhysicsBody(type: .static, shape: nil)
         tankNode.physicsBody = physicsBody
         tankNode.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
@@ -82,10 +83,12 @@ class GameSceneView: ARSCNView {
         wingR = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.wingRName, recursively: true)
         front = helicopterNode.childNode(withName: GameSceneView.frontIRSteering, recursively: true)
         frontIR = front!.childNode(withName:GameSceneView.frontIR, recursively: true)
+        
         let missile1Node = wingR!.childNode(withName: ApacheHelicopter.LocalConstants.missile1, recursively: false)!
         missile1.setupNode(scnNode: missile1Node, number: 1)
         let missile2Node = wingR?.childNode(withName: ApacheHelicopter.LocalConstants.missile2, recursively: false)!
         missile2.setupNode(scnNode:missile2Node, number: 2)
+        
         missile3.setupNode(scnNode: wingR!.childNode(withName: ApacheHelicopter.LocalConstants.missile3, recursively: false), number: 3)
         missile4.setupNode(scnNode: wingR.childNode(withName: ApacheHelicopter.LocalConstants.missile4, recursively: true), number: 4)
         missile5.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile5, recursively: true), number: 5)
@@ -103,7 +106,6 @@ class GameSceneView: ARSCNView {
             helicopter.helicopterNode = helicopterNode
             helicopter.front = front
             helicopter.frontIR = frontIR
-            
             helicopter.missile1 = missile1
             helicopter.missile2 = missile2
             helicopter.missile3 = missile3
@@ -116,32 +118,91 @@ class GameSceneView: ARSCNView {
             helicopter.rotor = rotor
             helicopter.rotor2 = rotor2
             helicopter.setup(with: helicopterNode)
-            helicopterNode.scale = SCNVector3(x: 0.00001, y: 0.00001, z: 0.00001)
-            helicopter.helicopterNode.scale = SCNVector3(x: 0.0001, y: 0.0001, z: 0.0001)
+            helicopterNode.scale = SCNVector3(x: 0.0004, y: 0.0004, z: 0.0004)
+            
+            //            helicopter.helicopterNode.scale = SCNVector3(x: 0.0001, y: 0.0001, z: 0.0001)
+            
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 scene.rootNode.addChildNode(hud)
                 scene.rootNode.addChildNode(tankNode)
                 scene.rootNode.addChildNode(helicopterNode)
             }
+            
             tankNode.position = position
-            helicopterNode.position =  SCNVector3(x:position.x, y:position.y + 0.1, z: position.z - 0.1)
+            helicopterNode.position =  SCNVector3(x:position.x, y:position.y + 0.1, z: position.z - 0.2)
             helicopter.helicopterNode.simdPivot.columns.3.x = -0.5
+            
             tankNode.simdPivot.columns.3.x = -0.5
             tankNode.scale = SCNVector3(x: 0.02, y: 0.02, z: 0.02)
+            
+            helicopter.updateHUD()
+            helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -1.2))
         }
     }
+    
+    func addExplosion(contactPoint: SCNVector3) {
+        let explosion = SCNParticleSystem.createExplosion()
+        let explosionNode = SCNNode()
+        explosionNode.position = contactPoint
+        explosionNode.addParticleSystem(explosion)
+        scene.rootNode.addChildNode(explosionNode)
+        
+        explosionNode.runAction(SCNAction.sequence([
+            SCNAction.wait(duration: 0.25),
+            SCNAction.removeFromParentNode()
+        ]))
+    }
+    
+    func moveShips() {
+        var percievedCenter = SCNVector3Zero
+        var percievedVelocity = SCNVector3Zero
+        
+        for otherShip in ships {
+            percievedCenter = percievedCenter + otherShip.node.position
+            percievedVelocity = percievedVelocity + (otherShip.velocity)
+        }
+        
+        ships.forEach {
+            $0.updateShipPosition(percievedCenter: percievedCenter, percievedVelocity: percievedVelocity, otherShips: ships, obstacles: [helicopterNode])
+        }
+    }
+    
+    func setupShips() {
+        let shipScene = SCNScene(named: "art.scnassets/F-35B_Lightning_II.scn")!
+        
+        for i in 1...8 {
+            
+            let shipNode = shipScene.rootNode.childNode(withName: "F_35B_Lightning_II", recursively: true)!.clone()
+            
+            shipNode.name = "F_35B \(i)"
+            let ship = Ship(newNode: shipNode)
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                scene.rootNode.addChildNode(ship.node)
+                ships.append(ship)
+                let randomX = Float(Int(arc4random_uniform(10)) - 5)
+                let randomY = Float(Int(arc4random_uniform(10)) - 5)
+                ship.node.position = SCNVector3(x:randomX , y: randomY, z: -20)
+                ship.node.scale = SCNVector3(x: 0.0055, y: 0.0055, z: 0.0055)
+            }
+        }
+    }
+    
 }
 
 // MARK: - HelicopterCapable
 
 extension GameSceneView: HelicopterCapable {
-    func missileLock(target: SCNNode) {
-        //helicopter.lockOn(target: target)
+    
+    func missileLock(ship: Ship) {
+        helicopter.lockOn(ship: ship)
     }
     
     
     func positionHUD() {
+        helicopter.updateHUD()
         // helicopter.
     }
     
@@ -163,15 +224,9 @@ extension GameSceneView: HelicopterCapable {
     
     func moveSides(value: Float) {
         helicopter.moveSides(value: value)
-        //        helicopter.lockOn(target: tankNode)
     }
     
     func toggleArmMissiles() {
         helicopter.toggleArmMissile()
-    }
-    
-    func normalize(vector: SCNVector3) -> SCNVector3 {
-        let length = sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z)
-        return length == 0 ? vector : SCNVector3(vector.x / length, vector.y / length, vector.z / length)
     }
 }

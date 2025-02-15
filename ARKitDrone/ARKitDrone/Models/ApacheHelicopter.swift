@@ -72,15 +72,11 @@ class ApacheHelicopter {
             let rotate = SCNAction.rotateBy(x: 20, y: 0, z: 0, duration: 0.5)
             let moveSequence = SCNAction.sequence([rotate])
             let moveLoop = SCNAction.repeatForever(moveSequence)
-            DispatchQueue.main.async {
-                self.rotor2.runAction(moveLoop)
-            }
-        }
-        DispatchQueue.global(qos: .userInteractive).async {
             let rotate2 = SCNAction.rotateBy(x: 0, y: 20, z: 0, duration: 0.25)
             let moveSequence2 = SCNAction.sequence([rotate2])
             let moveLoop2 = SCNAction.repeatForever(moveSequence2)
             DispatchQueue.main.async {
+                self.rotor2.runAction(moveLoop)
                 self.rotor.runAction(moveLoop2)
             }
         }
@@ -90,7 +86,7 @@ class ApacheHelicopter {
         helicopterNode.simdScale = SIMD3<Float>(0.001, 0.001, 0.001)
         hud.simdScale = SIMD3<Float>(0.1, 0.1, 0.1)
         hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.25))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.7))
         spinBlades()
     }
     
@@ -103,23 +99,25 @@ class ApacheHelicopter {
     }
     
     func rotate(value: Float) {
+        guard helicopterNode != nil else { return }
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
         let localAngleConversion = SCNQuaternion.angleConversion(x: 0, y:  -(0.35 * value) * Float(Double.pi), z: 0, w: 0)
         let locationRotation = SCNQuaternion.getQuaternion(from: localAngleConversion)
         helicopterNode.localRotate(by: locationRotation)
         updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.25))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.7))
         SCNTransaction.commit()
     }
     
     func moveForward(value: Float) {
-        let val = (value / 50.0)
+        guard helicopterNode != nil else { return }
+        let val = (value / 30.0)
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y: 0, z: -val))
         updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.25))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.9))
         SCNTransaction.commit()
     }
     
@@ -130,7 +128,7 @@ class ApacheHelicopter {
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y:val, z:0))
         updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.25))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.9))
         SCNTransaction.commit()
     }
     
@@ -141,14 +139,21 @@ class ApacheHelicopter {
     
     func moveSides(value: Float) {
         guard helicopterNode != nil else { return }
-        let val = (-value / 50.0)
+        let val = -(value / 300)
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: val, y: 0, z: 0))
         updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-1))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.7))
         SCNTransaction.commit()
     }
+    
+    
+    var speed: Float = 2000 // Base speed
+    let maxSpeed: Float = 10000.0 // Max missile speed
+    // Define smooth factors for rotation
+    let rotationSmoothFactor: Float = 0.005 // Lower = smoother turns
+    
     
     func lockOn(ship: Ship) {
         guard helicopterNode != nil else { return }
@@ -163,38 +168,34 @@ class ApacheHelicopter {
         SCNTransaction.commit()
     }
     
-    func update(missile: Missile, ship: Ship, offset: Int = 1) {
-        let target = ship.node
-        //et value = 9
-        let physicsBody2 =  SCNPhysicsBody(type: .kinematic, shape: nil)
-        missile.particle?.birthRate = 9000
-        missile.node.physicsBody = physicsBody2
-        missile.node.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
-        missile.node.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
-        missile.node.physicsBody?.collisionBitMask = 2
-        SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.09
-        hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
-        hud.orientation = target.orientation
-        hud.look(at: target.position)
-        let distance = helicopterNode.position.distance(target.position) - 4
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z: -distance))
-        missile.node.simdWorldTransform = target.simdWorldTransform
-        missile.node.localTranslate(by: SCNVector3(x: 1900, y:900, z: 1200))
-        SCNTransaction.commit()
-        let (direction, _) = getUserVector(target: target)
-        
-        let impulseVector = SCNVector3(
-            x: direction.x * Float(4000 * offset),
-            y: direction.y * Float(4000 * offset),
-            z: direction.z * Float(4000 * offset)
-        )
-        SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.09
-        missile.node.simdWorldOrientation = target.simdWorldOrientation
-        missile.node.physicsBody?.applyForce(impulseVector, asImpulse: true)
-        //        missile.node.simdWorldOrientation = target.simdWorldOrientation
-        SCNTransaction.commit()
+    static var speed: Float = 50
+    
+    func update(missile: Missile, ship: Ship, offset: Int = 1, previousTime: CFAbsoluteTime) -> CFAbsoluteTime {
+        let currentTime = CFAbsoluteTimeGetCurrent()
+        let deltaTime = max(Float(currentTime - previousTime), 1.0 / 120.0)
+        let nextTime = currentTime
+        let missilePosition = missile.node.presentation.simdPosition
+        let shipPosition = ship.node.simdPosition
+        let targetDirection = simd_normalize(shipPosition - missilePosition)
+        let currentDirection = missile.node.simdOrientation.act(simd_float3(0, 0, -1))
+        let distanceToTarget = simd_length(shipPosition - missilePosition)
+        let maxSpeed: Float = 10000.0
+        let speedSmoothFactor: Float = 1
+        let acceleration: Float = 20
+        ApacheHelicopter.speed = min(ApacheHelicopter.speed + acceleration * deltaTime * speedSmoothFactor, maxSpeed)
+        let rotationStartDistance: Float = 3000
+        let rotationSmoothFactor: Float = 1000
+        if distanceToTarget < rotationStartDistance {
+            let targetRotation = simd_quaternion(currentDirection, targetDirection)
+            let smoothRotation = simd_slerp(missile.node.simdOrientation, targetRotation, rotationSmoothFactor)
+            missile.node.simdOrientation = smoothRotation
+            missile.particle?.orientationDirection = SCNVector3(-smoothRotation.axis.x, -smoothRotation.axis.y, -smoothRotation.axis.z)
+        }
+        let forwardDirection = missile.node.simdOrientation.act(simd_float3(0, 0, -1))
+        let scnForwardDirection = SCNVector3(forwardDirection.x, forwardDirection.y, forwardDirection.z)
+        let impulse = scnForwardDirection * speed * deltaTime * speedSmoothFactor
+        missile.node.physicsBody?.applyForce(impulse, asImpulse: true)
+        return nextTime
     }
     
     func getRootNode(from node: SCNNode) -> SCNNode {
@@ -205,10 +206,10 @@ class ApacheHelicopter {
         return currentNode
     }
     
-    func getUserVector(target: SCNNode) -> (SCNVector3, SCNVector3) { // (direction, position)
-        let mat = SCNMatrix4(target.simdWorldTransform) // 4x4 transform matrix describing camera in world space
-        let dir = SCNVector3(-1 * mat.m31, -1 * mat.m32, -1 * mat.m33) // orientation of camera in world space
-        let pos = SCNVector3(mat.m41, mat.m42, mat.m43) // location of camera in world space
+    func getUserVector(target: SCNNode) -> (SCNVector3, SCNVector3) {
+        let mat = SCNMatrix4(target.simdWorldTransform)
+        let dir = SCNVector3(-1 * mat.m31, -1 * mat.m32, -1 * mat.m33)
+        let pos = SCNVector3(mat.m41, mat.m42, mat.m43)
         return (dir, pos)
     }
     

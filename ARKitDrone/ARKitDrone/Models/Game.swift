@@ -15,4 +15,7 @@ class Game {
     var playerWonRound: Bool = false
     var currentLevel: Int = 0
     var enemiesLeft: Int = 0
+    var scoreUpdated = false
+    var placed: Bool = false
+    var valueReached: Bool = false
 }
