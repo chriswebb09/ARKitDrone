@@ -42,32 +42,36 @@ class MinimapScene: SKScene {
     }
     
     func updateMinimap(playerPosition: simd_float4, helicopterPosition: simd_float4, ships: [simd_float4], cameraRotation: simd_float4x4, placed: Bool) {
-        
-        shipDots.forEach { $0.removeFromParent() }
-        shipDots.removeAll()
-        helicopterDot?.removeFromParent()
-        helicopterDot = nil
-        
-        let minimapRadius: CGFloat = 160
-        let worldRange: Float = 32
+        let minimapRadius: CGFloat = 180
+        let worldRange: Float = 90
         let scale = minimapRadius / CGFloat(worldRange)
+        
+        // Update player position on the minimap
         let playerX = CGFloat(playerPosition.x) * scale
         let playerZ = CGFloat(playerPosition.z) * scale
         playerDot.position = CGPoint(x: playerX, y: playerZ)
         
+        // Update helicopter position if placed
         if placed {
-            helicopterDot = SKShapeNode(circleOfRadius: 5)
-            helicopterDot.fillColor = .purple
-            let transformedHelicopterPosition = applyCameraRotation(position: simd_float4(helicopterPosition.x, 0, helicopterPosition.z, 1), cameraRotation: cameraRotation)
+            if helicopterDot == nil {
+                helicopterDot = SKShapeNode(circleOfRadius: 5)
+                helicopterDot?.fillColor = .purple
+                cropNode.addChild(helicopterDot!)
+            }
+            
+            let transformedHelicopterPosition = applyCameraRotation(position: helicopterPosition, cameraRotation: cameraRotation)
             let invertedHelicopterYPosition = -CGFloat(transformedHelicopterPosition.z * 5)
-            helicopterDot.position = CGPoint(x: CGFloat(transformedHelicopterPosition.x) * scale, y: invertedHelicopterYPosition * scale)
-            cropNode.addChild(helicopterDot)
+            helicopterDot?.position = CGPoint(x: CGFloat(transformedHelicopterPosition.x) * scale, y: invertedHelicopterYPosition * scale)
         }
         
+        // Update ship positions
+        shipDots.forEach { $0.removeFromParent() }
+        shipDots.removeAll()
+        
         for shipPosition in ships {
-            let transformedShipPosition = applyCameraRotation(position: simd_float4(shipPosition.x, 0, shipPosition.z, 1), cameraRotation: cameraRotation)
-            let invertedYPosition = -CGFloat(transformedShipPosition.z)
-            let shipDot = SKShapeNode(circleOfRadius: 4)
+            let transformedShipPosition = applyCameraRotation(position: shipPosition, cameraRotation: cameraRotation)
+            let invertedYPosition = -CGFloat(transformedShipPosition.z * 0.45)
+            let shipDot = SKShapeNode(circleOfRadius: 5)
             shipDot.fillColor = .red
             shipDot.position = CGPoint(x: CGFloat(transformedShipPosition.x) * scale, y: invertedYPosition * scale)
             cropNode.addChild(shipDot)

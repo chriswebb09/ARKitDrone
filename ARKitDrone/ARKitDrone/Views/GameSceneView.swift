@@ -16,6 +16,8 @@ class GameSceneView: ARSCNView {
     private struct LocalConstants {
         static let sceneName =  "art.scnassets/Game.scn"
         static let tankAssetName = "art.scnassets/m1.scn"
+        static let f35Scene = "art.scnassets/F-35B_Lightning_II.scn"
+        static let f35Node = "F_35B_Lightning_II"
     }
     
     var ships: [Ship] = [Ship]()
@@ -137,7 +139,7 @@ class GameSceneView: ARSCNView {
             tankNode.scale = SCNVector3(x: 0.02, y: 0.02, z: 0.02)
             
             helicopter.updateHUD()
-            helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -1.2))
+            helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.32))
         }
     }
     
@@ -147,7 +149,6 @@ class GameSceneView: ARSCNView {
         explosionNode.position = contactPoint
         explosionNode.addParticleSystem(explosion)
         scene.rootNode.addChildNode(explosionNode)
-        
         explosionNode.runAction(SCNAction.sequence([
             SCNAction.wait(duration: 0.25),
             SCNAction.removeFromParentNode()
@@ -157,35 +158,34 @@ class GameSceneView: ARSCNView {
     func moveShips() {
         var percievedCenter = SCNVector3Zero
         var percievedVelocity = SCNVector3Zero
-        
         for otherShip in ships {
             percievedCenter = percievedCenter + otherShip.node.position
             percievedVelocity = percievedVelocity + (otherShip.velocity)
         }
-        
         ships.forEach {
             $0.updateShipPosition(percievedCenter: percievedCenter, percievedVelocity: percievedVelocity, otherShips: ships, obstacles: [helicopterNode])
         }
     }
     
     func setupShips() {
-        let shipScene = SCNScene(named: "art.scnassets/F-35B_Lightning_II.scn")!
-        
+        let shipScene = SCNScene(named: LocalConstants.f35Scene)!
         for i in 1...8 {
-            
-            let shipNode = shipScene.rootNode.childNode(withName: "F_35B_Lightning_II", recursively: true)!.clone()
-            
+            let shipNode = shipScene.rootNode.childNode(withName: LocalConstants.f35Node, recursively: true)!.clone()
             shipNode.name = "F_35B \(i)"
             let ship = Ship(newNode: shipNode)
-            
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 scene.rootNode.addChildNode(ship.node)
                 ships.append(ship)
-                let randomX = Float(Int(arc4random_uniform(10)) - 5)
-                let randomY = Float(Int(arc4random_uniform(10)) - 5)
-                ship.node.position = SCNVector3(x:randomX , y: randomY, z: -20)
-                ship.node.scale = SCNVector3(x: 0.0055, y: 0.0055, z: 0.0055)
+                //                let randomX = Float(Int(arc4random_uniform(10)) - 5)
+                //                let randomY = Float(Int(arc4random_uniform(10)) - 5)
+                let randomOffset = SCNVector3(
+                    x: Float.random(in: -20.0...20.0),
+                    y: Float.random(in: -10.0...10.0),
+                    z: Float.random(in: -20.0...20.0)
+                )
+                ship.node.position = SCNVector3(x:randomOffset.x , y: randomOffset.y, z: randomOffset.z)
+                ship.node.scale = SCNVector3(x: 0.0015, y: 0.0015, z: 0.0015)
             }
         }
     }
@@ -203,7 +203,7 @@ extension GameSceneView: HelicopterCapable {
     
     func positionHUD() {
         helicopter.updateHUD()
-        // helicopter.
+        helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.16))
     }
     
     func missilesArmed() -> Bool {

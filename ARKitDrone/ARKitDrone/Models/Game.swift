@@ -18,4 +18,11 @@ class Game {
     var scoreUpdated = false
     var placed: Bool = false
     var valueReached: Bool = false
+    var destoryedTextString: String = ""
+    var scoreTextString: String = ""
+    
+    func updateScoreText() {
+        destoryedTextString = "Enemy Destroyed!"
+        scoreTextString = "Score \(self.playerScore)"
+    }
 }

@@ -43,6 +43,7 @@ class GameViewController: UIViewController {
     
     var addLinesToPlanes = false
     var addPlanesToScene = false
+    var addsMesh = false
     var planeNodesCount = 0
     var planeHeight: CGFloat = 0.01
     var anchors = [ARAnchor]()
@@ -112,7 +113,7 @@ class GameViewController: UIViewController {
     
     // Dictionary to store active missile trackers
     private var activeMissileTrackers: [String: MissileTrackingInfo] = [:]
-
+    
     
     // MARK: - ViewController Lifecycle
     
@@ -162,15 +163,14 @@ class GameViewController: UIViewController {
             guard let self = self else { return }
             sceneView.addSubview(padView1)
             sceneView.addSubview(padView2)
+            sceneView.setupShips()
             minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
             minimapScene.scaleMode = .resizeFill
             minimapView.presentScene(minimapScene)
             view.addSubview(minimapView)
             startMinimapUpdate()
             setupPadScene()
-        }
-        DispatchQueue.main.async {
-            self.sceneView.setupShips()
+           
         }
         sceneView.addSubview(destoryedText)
         sceneView.addSubview(armMissilesButton)
@@ -214,12 +214,18 @@ class GameViewController: UIViewController {
     private func setupTracking() {
         
         let configuration = ARWorldTrackingConfiguration()
+        
         configuration.planeDetection = [.horizontal]
-//        let sceneReconstruction: ARWorldTrackingConfiguration.SceneReconstruction = .meshWithClassification
-//        if ARWorldTrackingConfiguration.supportsSceneReconstruction(sceneReconstruction) {
-//            configuration.sceneReconstruction = sceneReconstruction
-//        }
-//        configuration.frameSemantics = .sceneDepth
+        
+        if addsMesh {
+            let sceneReconstruction: ARWorldTrackingConfiguration.SceneReconstruction = .meshWithClassification
+            if ARWorldTrackingConfiguration.supportsSceneReconstruction(sceneReconstruction) {
+                configuration.sceneReconstruction = sceneReconstruction
+            }
+            configuration.frameSemantics = .sceneDepth
+        }
+        
+        
         sceneView.automaticallyUpdatesLighting = false
         
         if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
@@ -341,7 +347,7 @@ extension GameViewController: JoystickSceneDelegate {
         )
         displayLink.add(to: .main, forMode: .common)
     }
-
+    
     private struct MissileTrackingInfo {
         let missile: Missile
         let target: Ship
@@ -350,13 +356,12 @@ extension GameViewController: JoystickSceneDelegate {
         var frameCount: Int = 0
         var lastUpdateTime: CFTimeInterval
     }
-
+    
     @objc private func updateMissilePosition(displayLink: CADisplayLink) {
         guard let trackingInfo = activeMissileTrackers.first(where: { $0.value.displayLink === displayLink })?.value else {
             displayLink.invalidate()
             return
         }
-        
         let missile = trackingInfo.missile
         let ship = trackingInfo.target
         if missile.hit {
@@ -377,9 +382,9 @@ extension GameViewController: JoystickSceneDelegate {
         updatedInfo.frameCount += 1
         updatedInfo.lastUpdateTime = displayLink.timestamp
         activeMissileTrackers[missile.id] = updatedInfo
-        game.valueReached = updatedInfo.frameCount > 200  /*updatedInfo.frameCount > 600*/
+        game.valueReached = updatedInfo.frameCount > 200
     }
-
+    
 }
 
 extension GameViewController: SCNPhysicsContactDelegate {
@@ -390,12 +395,10 @@ extension GameViewController: SCNPhysicsContactDelegate {
         let conditionTwo = (contact.nodeB.name!.contains("Missile") && !contact.nodeA.name!.contains("Missile"))
         
         if (game.valueReached && (conditionOne || conditionTwo) && !self.game.scoreUpdated) {
-            
             let conditionalShipNode: SCNNode! = conditionOne ? contact.nodeB : contact.nodeA
             let conditionalMissileNode: SCNNode! = conditionOne ? contact.nodeA : contact.nodeB
             let tempMissile = Missile.getMissile(from: conditionalMissileNode)!
             let canUpdateScore = !self.game.scoreUpdated && tempMissile.hit == false
-            
             if canUpdateScore{
                 DispatchQueue.main.async {
                     self.game.scoreUpdated = true
@@ -403,11 +406,8 @@ extension GameViewController: SCNPhysicsContactDelegate {
                     ApacheHelicopter.speed = 0
                 }
             }
-            
             tempMissile.hit = true
             tempMissile.particle?.birthRate = 0
-            // Create the flash light
-            // Create the flash light
             tempMissile.node.removeAll()
             let flash = SCNLight()
             flash.type = .omni
@@ -415,39 +415,32 @@ extension GameViewController: SCNPhysicsContactDelegate {
             flash.intensity = 4000
             flash.attenuationStartDistance = 5
             flash.attenuationEndDistance = 15  // Ensures the light fades over distance
-
-            // Attach to an SCNNode
             let flashNode = SCNNode()
             flashNode.light = flash
             flashNode.position = contact.contactPoint // Set this to the explosion's position
-
-            // Add to scene
             sceneView.scene.rootNode.addChildNode(flashNode)
-
-            // Animate intensity fade-out
             let fadeAction = SCNAction.customAction(duration: 0.3) { (node, elapsedTime) in
                 let percent = 1.0 - (elapsedTime / 0.3)
                 node.light?.intensity = 4000 * percent
             }
-            // Sequence: Fade out → Remove from scene
             let removeAction = SCNAction.sequence([fadeAction, SCNAction.removeFromParentNode()])
             flashNode.runAction(removeAction)
             flashNode.runAction(SCNAction.sequence([
                 SCNAction.wait(duration: 0.25),
                 SCNAction.removeFromParentNode()
             ]))
-            
             sceneView.addExplosion(contactPoint: contact.contactPoint)
-            
             DispatchQueue.main.async {
                 self.sceneView.positionHUD()
-                self.sceneView.helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.15))
+                self.sceneView.helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.18))
+                
                 let ship = Ship.getShip(from: conditionalShipNode)!
                 ship.isDestroyed = true
                 ship.node.isHidden = true
                 ship.node.removeFromParentNode()
-                self.destoryedText.text = "Enemy Destroyed!"
-                self.scoreText.text = "Score \(self.game.playerScore)"
+                self.game.updateScoreText()
+                self.destoryedText.text = self.game.destoryedTextString
+                self.scoreText.text = self.game.scoreTextString
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.24) {
@@ -457,7 +450,8 @@ extension GameViewController: SCNPhysicsContactDelegate {
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                self.destoryedText.text = ""
+                self.game.destoryedTextString = ""
+                self.destoryedText.text = self.game.destoryedTextString
             }
         }
     }
