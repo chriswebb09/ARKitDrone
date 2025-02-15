@@ -86,7 +86,7 @@ class ApacheHelicopter {
         helicopterNode.simdScale = SIMD3<Float>(0.001, 0.001, 0.001)
         hud.simdScale = SIMD3<Float>(0.1, 0.1, 0.1)
         hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.7))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.32))
         spinBlades()
     }
     
@@ -106,29 +106,29 @@ class ApacheHelicopter {
         let locationRotation = SCNQuaternion.getQuaternion(from: localAngleConversion)
         helicopterNode.localRotate(by: locationRotation)
         updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.7))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.32))
         SCNTransaction.commit()
     }
     
     func moveForward(value: Float) {
         guard helicopterNode != nil else { return }
-        let val = (value / 30.0)
+        let val = value / 8
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y: 0, z: -val))
         updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.9))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.32))
         SCNTransaction.commit()
     }
     
     func changeAltitude(value: Float) {
         guard helicopterNode != nil else { return }
-        let val = (value / 50.0)
+        let val = (value / 30.0)
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y:val, z:0))
         updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.9))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.32))
         SCNTransaction.commit()
     }
     
@@ -144,7 +144,7 @@ class ApacheHelicopter {
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: val, y: 0, z: 0))
         updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.7))
+        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.32))
         SCNTransaction.commit()
     }
     

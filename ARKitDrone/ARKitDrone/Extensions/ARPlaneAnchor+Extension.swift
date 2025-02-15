@@ -8,7 +8,7 @@
 
 import ARKit
 
-extension ARPlaneAnchor.Classification: Equatable {
+extension ARPlaneAnchor.Classification: @retroactive Equatable {
     
     public static func == (lhs: ARPlaneAnchor.Classification, rhs: ARPlaneAnchor.Classification) -> Bool {
         switch (lhs, rhs) {

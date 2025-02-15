@@ -12,7 +12,7 @@ import QuartzCore
 class Ship {
     
     var node: SCNNode
-    
+    var targeted: Bool = false
     var velocity: SCNVector3 = SCNVector3(x: 1, y: 1, z: 1)
     var prevDir: SCNVector3 = SCNVector3(x: 0, y: 1, z: 0)
     
@@ -52,45 +52,46 @@ class Ship {
         
         var rebound = SCNVector3(x: 0, y: 0, z: 0)
         
-        let Xmin:Float = -90.0
-        let Ymin: Float = -30.0
-        let Zmin: Float = -50.0
-        let Xmax: Float = 30.0
-        let Ymax: Float = 30.0
-        let Zmax: Float = 0.0
+        let Xmin:Float = -50.0
+        let Ymin: Float = -50.0
+        let Zmin: Float = -70.0
+        let Xmax: Float = 50.0
+        let Ymax: Float = 50.0
+        let Zmax: Float = 30.0
+        
         
         if node.position.x < Xmin {
-            rebound.x = 1
+            rebound.x = Float.random(in: 1...2)
         }
         
         if node.position.x > Xmax {
-            rebound.x = -1
+            rebound.x =  Float.random(in: -3.0 ... -1.0)
         }
         
         if node.position.y < Ymin {
-            rebound.y = 1
+            rebound.y =  Float.random(in:1...2)
         }
         
         if node.position.y > Ymax {
-            rebound.y = -1
+            rebound.y = Float.random(in: -3.0 ... -1.0)
         }
         
         if node.position.z < Zmin {
-            rebound.z = 1
+            rebound.z = Float.random(in:1 ... 2)
         }
         
         if node.position.z > Zmax {
-            rebound.z = -1
+            rebound.z = Float.random(in: -2.0 ... -1.0)
         }
         
         return rebound
     }
     
-    func limitVelocity() {
-        let mag = Float(velocity.length())
-        let limit = Float(0.9)
+    func limitVelocity(_ ship: Ship) {
+        let mag = Float(ship.velocity.length())
+        let limit = Float(0.5);
         if mag > limit {
-            velocity = (velocity/mag) * limit
+            ship.velocity = (ship.velocity/mag) * limit
         }
     }
     
@@ -98,37 +99,42 @@ class Ship {
         return shipRegistry[node]
     }
     
-    
     func smoothForces(forces: SCNVector3, factor: Float) -> SCNVector3 {
         return velocity + forces * factor
     }
     
-    func keepASmallDistance(otherShips: [Ship]) -> SCNVector3 {
-        var forceAway = SCNVector3(x: 0, y: 0, z: 0)
-        for otherShip in otherShips {
-            if self.node != otherShip.node {
-                let distance = self.node.position.distance(otherShip.node.position)
-                if distance < 2 {
-                    // Use a stronger force when the ships are closer, but also add damping
-                    let strength = (2 - distance) * 5.0  // Repulsion strength
-                    forceAway += (self.node.position - otherShip.node.position).normalized() * strength
+    func keepASmallDistance(_ ship: Ship, ships: [Ship]) -> SCNVector3 {
+        var forceAway = SCNVector3(x: Float(0), y: Float(0), z: Float(0))
+        
+        for otherShip in ships {
+            if ship.node != otherShip.node {
+                if abs(otherShip.node.position.distance(ship.node.position)) < 10 {
+                    forceAway = (forceAway - (otherShip.node.position - ship.node.position))
                 }
             }
         }
         return forceAway
     }
     
-    func avoidObstacles(obstacles: [SCNNode]) -> SCNVector3 {
-        var avoidanceForce = SCNVector3(x: 0, y: 0, z: 0)
-        for obstacle in obstacles {
-            let distance = self.node.position.distance(obstacle.position)
-            if distance < 5.0 {  // Threshold for detecting an obstacle
-                avoidanceForce += (self.node.position - obstacle.position).normalized() * 2.0
-            }
-        }
-        return avoidanceForce
+    func updateShipPosition(percievedCenter: SCNVector3, percievedVelocity: SCNVector3, otherShips: [Ship], obstacles: [SCNNode]) {
+        var v1 = flyCenterOfMass(otherShips.count, percievedCenter)
+        var v2 = keepASmallDistance(self, ships: otherShips)
+        var v3 = matchSpeedWithOtherShips(otherShips.count, percievedVelocity)
+        var v4 = boundPositions()
+        v1 *= (0.01)
+        v2 *= (0.01)
+        v3 *= (0.01)
+        v4 *= (1.0)
+        let forward = SCNVector3(x: Float(0), y: Float(0), z: Float(1))
+        let velocityNormal = self.velocity.normalized()
+        self.velocity = self.velocity + v1 + v2 + v3 + v4;
+        limitVelocity(self);
+        let nor = forward.cross(velocityNormal)
+        let angle = CGFloat(forward.dot(velocityNormal))
+        self.node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
+        self.node.position = self.node.position + (self.velocity)
     }
-    
+
     func setTargetAboveSelected() {
         if self.targetAdded {
             SCNTransaction.begin()
@@ -138,27 +144,4 @@ class Ship {
             SCNTransaction.commit()
         }
     }
-    
-    func updateShipPosition(percievedCenter: SCNVector3, percievedVelocity: SCNVector3, otherShips: [Ship], obstacles: [SCNNode]) {
-        var v1 = flyCenterOfMass(otherShips.count, percievedCenter)
-        var v2 = keepASmallDistance(otherShips: otherShips)
-        var v3 = matchSpeedWithOtherShips(otherShips.count, percievedVelocity)
-        var v4 = boundPositions()
-        v1 *= (0.01)
-        v2 *= (0.01)
-        v3 *= (0.01)
-        v4 *= (1.0)
-        let forward = SCNVector3(x: 0, y: 0, z: 1)
-        let velocityNormal = velocity.normalized()
-        let avoidanceForce = avoidObstacles(obstacles: obstacles)
-        velocity += avoidanceForce
-        velocity = smoothForces(forces: v1 + v2 + v3 + v4, factor: 0.1)
-        limitVelocity()
-        let nor = forward.cross(velocityNormal)
-        let angle = CGFloat(forward.dot(velocityNormal))
-        node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
-        node.position = node.position + (velocity)
-        setTargetAboveSelected()
-    }
-    
 }
