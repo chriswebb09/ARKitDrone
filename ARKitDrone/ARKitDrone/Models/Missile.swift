@@ -74,6 +74,13 @@ class Missile {
         //        }
     }
     
+    func addCollision() {
+        let physicsBody2 = SCNPhysicsBody(type: .kinematic, shape: nil)
+        node.physicsBody = physicsBody2
+        node.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
+        node.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
+    }
+    
     static func getMissile(from node: SCNNode) -> Missile? {
         return missileRegistry[node]
     }

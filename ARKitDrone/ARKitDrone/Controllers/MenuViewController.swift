@@ -37,7 +37,7 @@ class MenuViewController: UIViewController {
     @IBAction func newGameTapped(_ sender: Any) {
         DeviceOrientation.shared.set(orientation: .landscapeRight)
         countdownToStart(count: LocalConstants.count)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [self] in
             newGameButton.isHidden = true
             performSegue(withIdentifier: LocalConstants.goToGameSegue, sender: self)
         }
@@ -58,14 +58,12 @@ class MenuViewController: UIViewController {
                     continue
                 }
                 DispatchQueue.main.async {
-                    UIView.transition(with: self.newGameButton, duration: 0.25, options: .transitionCrossDissolve, animations: { [self] in
+                    UIView.transition(with: self.newGameButton, duration: 0.1, options: .transitionCrossDissolve, animations: { [self] in
                         newGameButton.titleLabel?.textAlignment = .center
                         newGameButton.titleLabel?.font = newGameButton.titleLabel?.font.withWeight(.heavy)
                         newGameButton.titleLabel?.text = "\(countdown)"
                     }, completion: nil)
                 }
-                sleep(1)
-                countdown -= 1
             }
         }
     }

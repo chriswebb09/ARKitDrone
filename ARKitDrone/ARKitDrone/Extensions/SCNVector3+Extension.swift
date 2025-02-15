@@ -17,10 +17,11 @@ func +=( left: inout SCNVector3, right: SCNVector3) {
 }
 
 extension SCNVector3 {
+    
     static func -(left: SCNVector3, right: SCNVector3) -> SCNVector3 {
         return SCNVector3(left.x - right.x, left.y - right.y, left.z - right.z)
     }
-
+    
     func rotate(by quaternion: SCNQuaternion) -> SCNVector3 {
         // Convert the vector to a quaternion (w = 0)
         let vectorQuat = SCNQuaternion(self.x, self.y, self.z, 0)
@@ -43,11 +44,8 @@ extension SCNVector3 {
             q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z
         )
     }
-}
-
-// from Apples demo APP
-
-extension SCNVector3 {
+    
+    // from Apples demo APP
     
     func rescaled(to desiredLength: Float) -> SCNVector3 {
         let length = sqrt(x * x + y * y + z * z)
@@ -75,9 +73,7 @@ extension SCNVector3 {
     static func positionFromTransform(_ transform: matrix_float4x4) -> SCNVector3 {
         return SCNVector3(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
     }
-}
-
-extension SCNVector3 {
+    
     /**
      * Negates the vector described by SCNVector3 and returns
      * the result as a new SCNVector3.
@@ -94,15 +90,6 @@ extension SCNVector3 {
         return self
     }
     
-//    var length:Float {
-//         get {
-//             return sqrtf(x*x + y*y + z*z)
-//         }
-//         set {
-//             self = self.unit * newValue
-//         }
-//     }
-     
     
     /**
      * Returns the length (magnitude) of the vector described by the SCNVector3
@@ -111,13 +98,6 @@ extension SCNVector3 {
         return sqrtf(((Float(x) * Float(x)) + (Float(y) * Float(y))) + (Float(z) * Float(z)))
     }
     
-    /**
-     * Normalizes the vector described by the SCNVector3 to length 1.0 and returns
-     * the result as a new SCNVector3.
-     */
-//    func normalized() -> SCNVector3 {
-//        return self / length()
-//    }
     
     /**
      * Normalizes the vector described by the SCNVector3 to length 1.0.
@@ -145,47 +125,9 @@ extension SCNVector3 {
      * Calculates the cross product between two SCNVector3.
      */
     func cross(_ vector: SCNVector3) -> SCNVector3 {
-        return SCNVector3Make( ((y * vector.z) - (z * vector.y)), ((z * vector.x) - (x * vector.z)), ((x * vector.y) - (y * vector.x)))
+        return SCNVector3(x:((y * vector.z) - (z * vector.y)), y: ((z * vector.x) - (x * vector.z)), z: ((x * vector.y) - (y * vector.x)))
     }
 }
-
-/**
- * Adds two SCNVector3 vectors and returns the result as a new SCNVector3.
- */
-//infix operator +
-//func + (left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-//    return SCNVector3Make(left.x + right.x, left.y + right.y, left.z + right.z)
-//}
-
-/**
- * Increments a SCNVector3 with the value of another.
- */
-//func += (left: inout SCNVector3, right: SCNVector3) {
-//    left = left + right
-//}
-
-/**
- * Subtracts two SCNVector3 vectors and returns the result as a new SCNVector3.
- */
-//infix operator -
-//func - (left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-//    return SCNVector3Make(left.x - right.x, left.y - right.y, left.z - right.z)
-//}
-
-/**
- * Decrements a SCNVector3 with the value of another.
- */
-//func -= (left: inout SCNVector3, right: SCNVector3) {
-//    left = left - right
-//}
-
-/**
-// * Multiplies two SCNVector3 vectors and returns the result as a new SCNVector3.
-// */
-//infix operator *
-//func * (left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-//    return SCNVector3Make(left.x * right.x, left.y * right.y, left.z * right.z)
-//}
 
 /**
  * Multiplies a SCNVector3 with another.
@@ -200,7 +142,7 @@ func *= (left: inout SCNVector3, right: SCNVector3) {
  */
 
 func * (vector: SCNVector3, scalar: Float) -> SCNVector3 {
-    return SCNVector3Make(vector.x * Float(scalar), vector.y * Float(scalar), vector.z * Float(scalar))
+    return SCNVector3(x: vector.x * scalar, y: vector.y * scalar, z: vector.z * scalar)
 }
 
 /**
@@ -215,7 +157,7 @@ func *= (vector: inout SCNVector3, scalar: Float) {
  */
 infix operator /
 func / (left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-    return SCNVector3Make(left.x / right.x, left.y / right.y, left.z / right.z)
+    return SCNVector3(x: left.x / right.x, y: left.y / right.y, z: left.z / right.z)
 }
 
 /**
@@ -230,7 +172,7 @@ func /= (left: inout SCNVector3, right: SCNVector3) {
  * returns the result as a new SCNVector3.
  */
 func / (vector: SCNVector3, scalar: Float) -> SCNVector3 {
-    return SCNVector3Make(vector.x / Float(scalar), vector.y / Float(scalar), vector.z / Float(scalar))
+    return SCNVector3(x: vector.x / Float(scalar), y: vector.y / Float(scalar), z: vector.z / Float(scalar))
 }
 
 /**
@@ -250,9 +192,8 @@ func SCNVector3Negate(_ vector: SCNVector3) -> SCNVector3 {
 /**
  * Returns the length (magnitude) of the vector described by the SCNVector3
  */
-func SCNVector3Length(_ vector: SCNVector3) -> Float
-{
-    return sqrtf((Float(vector.x*vector.x) + Float(vector.y*vector.y)) + Float(vector.z*vector.z))
+func SCNVector3Length(_ vector: SCNVector3) -> Float {
+    return sqrtf((Float(vector.x * vector.x) + Float(vector.y * vector.y)) + Float(vector.z * vector.z))
 }
 
 /**
@@ -280,7 +221,7 @@ func SCNVector3DotProduct(_ left: SCNVector3, right: SCNVector3) -> Float {
  * Calculates the cross product between two SCNVector3 vectors
  */
 func SCNVector3CrossProduct(_ left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-    return SCNVector3Make(((left.y * right.z) - (left.z * right.y)), ((left.z * right.x) - (left.x * right.z)), ((left.x * right.y) - (left.y * right.x)))
+    return SCNVector3(x: ((left.y * right.z) - (left.z * right.y)), y: ((left.z * right.x) - (left.x * right.z)), z: ((left.x * right.y) - (left.y * right.x)))
 }
 
 
