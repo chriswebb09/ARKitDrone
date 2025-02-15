@@ -123,7 +123,7 @@ class GameSceneView: ARSCNView {
             helicopter.rotor = rotor
             helicopter.rotor2 = rotor2
             helicopter.setup(with: helicopterNode)
-            helicopterNode.scale = SCNVector3(x: 0.0006, y: 0.0006, z: 0.0006)
+            helicopterNode.scale = SCNVector3(x: 0.0005, y: 0.0005, z: 0.0005)
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 scene.rootNode.addChildNode(hud)
@@ -136,7 +136,7 @@ class GameSceneView: ARSCNView {
             tankNode.simdPivot.columns.3.x = -0.5
             tankNode.scale = SCNVector3(x: 0.07, y: 0.07, z: 0.07)
             helicopter.updateHUD()
-            helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.32))
+            helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.44))
         }
     }
     
@@ -177,10 +177,10 @@ class GameSceneView: ARSCNView {
                 let randomOffset = SCNVector3(
                     x: Float.random(in: -20.0...20.0),
                     y: Float.random(in: -10.0...10.0),
-                    z: Float.random(in: -20.0...20.0)
+                    z: Float.random(in: -20.0...40.0)
                 )
                 ship.node.position = SCNVector3(x:randomOffset.x , y: randomOffset.y, z: randomOffset.z)
-                ship.node.scale = SCNVector3(x: 0.0015, y: 0.0015, z: 0.0015)
+                ship.node.scale = SCNVector3(x: 0.003, y: 0.003, z: 0.003)
             }
         }
     }
