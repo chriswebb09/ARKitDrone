@@ -62,11 +62,13 @@ class GameSceneView: ARSCNView {
         tankModel = SCNScene.nodeWithModelName(LocalConstants.tankAssetName).clone()
         tankNode = tankModel.childNode(withName: "m1tank", recursively: true)
         tankNode.scale = SCNVector3(x: 0.1, y: 0.1, z: 0.1)
+        
         let physicsBody =  SCNPhysicsBody(type: .static, shape: nil)
         tankNode.physicsBody = physicsBody
         tankNode.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
         tankNode.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
         tankNode.physicsBody?.collisionBitMask = 2
+        
         let tempScene = SCNScene.nodeWithModelName(GameSceneView.helicopterSceneName).clone()
         helicopterModel = tempScene.childNode(withName: GameSceneView.helicopterParentModelName, recursively: true)!
         helicopterModel.scale = SCNVector3(0.001,0.001, 0.001)
@@ -76,6 +78,7 @@ class GameSceneView: ARSCNView {
         helicopterNode.simdEulerAngles = SIMD3<Float>(-3.0, 0, 0)
         helicopterNode.simdScale = SIMD3<Float>(0.001, 0.00001, 0.00001)
         helicopterNode.scale = SCNVector3(x: 0.001, y: 0.00001, z: 0.00001)
+        
         hud = helicopterModel!.childNode(withName: GameSceneView.hudNodeName, recursively: false)!
         front = helicopterNode.childNode(withName: GameSceneView.frontIRSteering, recursively: true)
         rotor = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.frontRotorName, recursively: true)
@@ -120,24 +123,18 @@ class GameSceneView: ARSCNView {
             helicopter.rotor = rotor
             helicopter.rotor2 = rotor2
             helicopter.setup(with: helicopterNode)
-            helicopterNode.scale = SCNVector3(x: 0.0004, y: 0.0004, z: 0.0004)
-            
-            //            helicopter.helicopterNode.scale = SCNVector3(x: 0.0001, y: 0.0001, z: 0.0001)
-            
+            helicopterNode.scale = SCNVector3(x: 0.0006, y: 0.0006, z: 0.0006)
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 scene.rootNode.addChildNode(hud)
                 scene.rootNode.addChildNode(tankNode)
                 scene.rootNode.addChildNode(helicopterNode)
             }
-            
             tankNode.position = position
-            helicopterNode.position =  SCNVector3(x:position.x, y:position.y + 0.1, z: position.z - 0.2)
+            helicopterNode.position =  SCNVector3(x:position.x, y:position.y + 0.5, z: position.z - 0.2)
             helicopter.helicopterNode.simdPivot.columns.3.x = -0.5
-            
             tankNode.simdPivot.columns.3.x = -0.5
-            tankNode.scale = SCNVector3(x: 0.02, y: 0.02, z: 0.02)
-            
+            tankNode.scale = SCNVector3(x: 0.07, y: 0.07, z: 0.07)
             helicopter.updateHUD()
             helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.32))
         }
@@ -177,8 +174,6 @@ class GameSceneView: ARSCNView {
                 guard let self = self else { return }
                 scene.rootNode.addChildNode(ship.node)
                 ships.append(ship)
-                //                let randomX = Float(Int(arc4random_uniform(10)) - 5)
-                //                let randomY = Float(Int(arc4random_uniform(10)) - 5)
                 let randomOffset = SCNVector3(
                     x: Float.random(in: -20.0...20.0),
                     y: Float.random(in: -10.0...10.0),

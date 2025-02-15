@@ -12,7 +12,7 @@ import QuartzCore
 class Ship {
     
     var node: SCNNode
-    
+    var targeted: Bool = false
     var velocity: SCNVector3 = SCNVector3(x: 1, y: 1, z: 1)
     var prevDir: SCNVector3 = SCNVector3(x: 0, y: 1, z: 0)
     

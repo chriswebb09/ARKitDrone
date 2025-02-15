@@ -112,7 +112,7 @@ class ApacheHelicopter {
     
     func moveForward(value: Float) {
         guard helicopterNode != nil else { return }
-        let val = (value / 30.0)
+        let val = value / 8
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y: 0, z: -val))
@@ -123,7 +123,7 @@ class ApacheHelicopter {
     
     func changeAltitude(value: Float) {
         guard helicopterNode != nil else { return }
-        let val = (value / 50.0)
+        let val = (value / 30.0)
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y:val, z:0))

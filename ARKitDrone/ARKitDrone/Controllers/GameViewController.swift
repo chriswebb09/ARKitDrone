@@ -17,6 +17,7 @@ class GameViewController: UIViewController {
     var minimapScene: MinimapScene!
     var minimap: SKShapeNode!
     var playerNode: SCNNode!
+    var score: [Int] = []
     
     // MARK: - LocalConstants
     
@@ -77,8 +78,9 @@ class GameViewController: UIViewController {
         button.setTitleColor(UIColor.white, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: UIFont.Weight.black)
         button.frame = CGRect(origin: CGPoint(x:600, y: UIScreen.main.bounds.height - 320), size: CGSize(width: 180, height: 50))
-        button.layer.borderColor = UIColor(red: 0.95, green: 0.15, blue: 0.07, alpha: 1.00).cgColor
-        button.backgroundColor = UIColor(red: 0.95, green: 0.15, blue: 0.07, alpha: 1.00)
+        button.layer.borderColor = UIColor(red: 1.00, green: 0.03, blue: 0.00, alpha: 1.00).cgColor
+        //UIColor(red: 0.95, green: 0.15, blue: 0.07, alpha: 1.00).cgColor
+        button.backgroundColor = UIColor(red: 1.00, green: 0.03, blue: 0.00, alpha: 1.00)
         button.layer.borderWidth = 3
         return button
     }()
@@ -87,9 +89,12 @@ class GameViewController: UIViewController {
         let label = UILabel()
         label.text = ""
         label.textAlignment = .center
-        label.textColor = UIColor(red:1.0, green: 0, blue: 0.01, alpha: 1.00)
+        label.textColor = UIColor(red: 1.00, green: 0.03, blue: 0.00, alpha: 1.00)
         label.backgroundColor = .clear
-        label.font = UIFont(name: "AvenirNext-Bold", size: 30)
+        label.font = UIFont(
+            name: "AvenirNext-Bold",
+            size: 30
+        )
         label.frame = CGRect(origin: CGPoint(x: UIScreen.main.bounds.width / 2 - 200, y:  UIScreen.main.bounds.origin.y + 100), size: CGSize(width: 400, height: 60))
         return label
     }()
@@ -97,7 +102,7 @@ class GameViewController: UIViewController {
     private lazy var scoreText: UILabel = {
         let label = UILabel()
         label.textAlignment = .left
-        label.font = UIFont(name: "AvenirNext-Bold", size: 24)
+        label.font = UIFont(name: "AvenirNext-Medium", size: 22)
         label.textColor = UIColor(red: 0.00, green: 1.00, blue: 0.01, alpha: 1.00)
         label.text = "Score: 0"
         label.backgroundColor = .clear
@@ -111,9 +116,7 @@ class GameViewController: UIViewController {
     
     @IBOutlet private weak var sceneView: GameSceneView!
     
-    // Dictionary to store active missile trackers
     private var activeMissileTrackers: [String: MissileTrackingInfo] = [:]
-    
     
     // MARK: - ViewController Lifecycle
     
@@ -170,7 +173,7 @@ class GameViewController: UIViewController {
             view.addSubview(minimapView)
             startMinimapUpdate()
             setupPadScene()
-           
+            
         }
         sceneView.addSubview(destoryedText)
         sceneView.addSubview(armMissilesButton)
@@ -323,21 +326,29 @@ extension GameViewController: JoystickSceneDelegate {
     
     func fire() {
         guard !sceneView.missiles.isEmpty, !game.scoreUpdated else { return }
-        guard let ship = sceneView.ships.first(where: { !$0.isDestroyed }) else { return }
-        updateFiredButton()
-        let missile = sceneView.missiles.removeFirst()
+        guard let ship = sceneView.ships.first(where: { !$0.isDestroyed && !$0.targeted }) else { return }
+        ship.targeted = true
+        
+        guard let missile = sceneView.missiles.first(where:{ !$0.fired }) else { return }
+        
+        missile.fired = true
+        
         game.valueReached = false
         missile.addCollision()
         sceneView.missileLock(ship: ship)
         missile.node.look(at: ship.node.position)
         ApacheHelicopter.speed = 0
+        
         let targetPos = ship.node.presentation.simdWorldPosition
         let currentPos = missile.node.presentation.simdWorldPosition
         let direction = simd_normalize(targetPos - currentPos)
+        
         missile.particle?.orientationDirection = SCNVector3(-direction.x, -direction.y, -direction.z)
         missile.particle?.birthRate = 1000
+        
         let displayLink = CADisplayLink(target: self, selector: #selector(updateMissilePosition))
         displayLink.preferredFramesPerSecond = 60
+        
         activeMissileTrackers[missile.id] = MissileTrackingInfo(
             missile: missile,
             target: ship,
@@ -370,7 +381,7 @@ extension GameViewController: JoystickSceneDelegate {
             return
         }
         let deltaTime = displayLink.timestamp - trackingInfo.lastUpdateTime
-        let speed: Float = 30
+        let speed: Float = 50
         let targetPos = ship.node.presentation.simdWorldPosition
         let currentPos = missile.node.presentation.simdWorldPosition
         let direction = simd_normalize(targetPos - currentPos)
@@ -382,7 +393,7 @@ extension GameViewController: JoystickSceneDelegate {
         updatedInfo.frameCount += 1
         updatedInfo.lastUpdateTime = displayLink.timestamp
         activeMissileTrackers[missile.id] = updatedInfo
-        game.valueReached = updatedInfo.frameCount > 200
+        game.valueReached = updatedInfo.frameCount > 50
     }
     
 }
@@ -398,15 +409,21 @@ extension GameViewController: SCNPhysicsContactDelegate {
             let conditionalShipNode: SCNNode! = conditionOne ? contact.nodeB : contact.nodeA
             let conditionalMissileNode: SCNNode! = conditionOne ? contact.nodeA : contact.nodeB
             let tempMissile = Missile.getMissile(from: conditionalMissileNode)!
-            let canUpdateScore = !self.game.scoreUpdated && tempMissile.hit == false
+            let canUpdateScore = tempMissile.hit == false
+            tempMissile.hit = true
             if canUpdateScore{
                 DispatchQueue.main.async {
-                    self.game.scoreUpdated = true
+                    //                    self.game.playerScore = -(self.sceneView.missiles.filter { !$0.hit }.count - 8)
                     self.game.playerScore += 1
                     ApacheHelicopter.speed = 0
+                    self.game.updateScoreText()
+                    self.destoryedText.fadeTransition(0.001)
+                    self.scoreText.fadeTransition(0.001)
+                    self.destoryedText.text = self.game.destoryedTextString
+                    self.scoreText.text = self.game.scoreTextString
                 }
             }
-            tempMissile.hit = true
+            
             tempMissile.particle?.birthRate = 0
             tempMissile.node.removeAll()
             let flash = SCNLight()
@@ -433,25 +450,22 @@ extension GameViewController: SCNPhysicsContactDelegate {
             DispatchQueue.main.async {
                 self.sceneView.positionHUD()
                 self.sceneView.helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.18))
-                
                 let ship = Ship.getShip(from: conditionalShipNode)!
                 ship.isDestroyed = true
                 ship.node.isHidden = true
                 ship.node.removeFromParentNode()
-                self.game.updateScoreText()
-                self.destoryedText.text = self.game.destoryedTextString
-                self.scoreText.text = self.game.scoreTextString
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.24) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.04) {
                 self.game.scoreUpdated = false
                 self.armMissilesButton.isEnabled = true
-                self.updateFiredButton()
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                self.game.playerScore = -(self.sceneView.missiles.count - 8)
                 self.game.destoryedTextString = ""
                 self.destoryedText.text = self.game.destoryedTextString
+                self.destoryedText.fadeTransition(0.001)
             }
         }
     }

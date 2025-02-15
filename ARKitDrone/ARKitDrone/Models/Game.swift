@@ -23,6 +23,6 @@ class Game {
     
     func updateScoreText() {
         destoryedTextString = "Enemy Destroyed!"
-        scoreTextString = "Score \(self.playerScore)"
+        scoreTextString = "Score: \(self.playerScore)"
     }
 }
