@@ -35,6 +35,7 @@ class ApacheHelicopter {
         static let missile8 = "Missile8"
         static let frontIR = "FrontIR"
         static let audioFileName = "audio.m4a"
+        static let upperGun = "UpperGun"
         static let activeEmitterRate: CGFloat = 1000
         static let angleConversion = SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float.pi, z: 0 , w: 0)
         static let negativeAngleConversion = SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float.pi, z: 0 , w: 0)
@@ -64,6 +65,7 @@ class ApacheHelicopter {
     var frontIR: SCNNode!
     var missilesArmed: Bool = false
     var missileLockDirection = SCNVector3(0, 0, 1)
+    var upperGun: SCNNode!
     
     var targetPosition: SCNVector3!
     
@@ -217,4 +219,9 @@ class ApacheHelicopter {
         let length = sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z)
         return length == 0 ? vector : SCNVector3(vector.x / length, vector.y / length, vector.z / length)
     }
+    
+    func shootUpperGun() {
+        // move code here
+    }
+
 }

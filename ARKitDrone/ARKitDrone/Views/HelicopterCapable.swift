@@ -15,4 +15,5 @@ protocol HelicopterCapable: AnyObject {
     func changeAltitude(value: Float)
     func moveSides(value: Float)
     func missileLock(ship: Ship)
+    func shootUpperGun()
 }

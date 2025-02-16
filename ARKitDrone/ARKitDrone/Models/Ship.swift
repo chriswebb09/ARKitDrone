@@ -134,7 +134,7 @@ class Ship {
         self.node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
         self.node.position = self.node.position + (self.velocity)
     }
-
+    
     func setTargetAboveSelected() {
         if self.targetAdded {
             SCNTransaction.begin()
@@ -143,5 +143,47 @@ class Ship {
             self.targetNode.position = SCNVector3(x: self.node.position.x, y: self.node.position.y + 1, z: self.node.position.z - 10)
             SCNTransaction.commit()
         }
+    }
+    
+    func updateShipPosition(target: SCNVector3, otherShips: [Ship]) {
+        let nodes = otherShips.map { $0.node }
+        let perceivedCenter: SCNVector3
+        if otherShips.isEmpty {
+            perceivedCenter = node.position
+        } else {
+            let sumPositions = otherShips.reduce(SCNVector3Zero) { (accumulated, ship) -> SCNVector3 in
+                return SCNVector3(accumulated.x + ship.node.position.x,
+                                  accumulated.y + ship.node.position.y,
+                                  accumulated.z + ship.node.position.z)
+            }
+            perceivedCenter = SCNVector3(
+                x: sumPositions.x / Float(otherShips.count),
+                y: sumPositions.y / Float(otherShips.count),
+                z: sumPositions.z / Float(otherShips.count)
+            )
+        }
+        let directionToTarget = (target - node.position).normalized()
+        let avoidCollisions = nodes.reduce(SCNVector3Zero) { (force, shipNode) in
+            let distance = node.position.distance(shipNode.position)
+            if distance < 14 { // Avoid collisions if too close
+                return force - (shipNode.position - node.position).normalized() * (1 / distance) // apply more force as ships are closer
+            }
+            return force
+        }
+        let boundary = SCNVector3(
+            x: max(-50, min(50, node.position.x)),
+            y: max(-50, min(50, node.position.y)),
+            z: max(-70, min(30, node.position.z))
+        ) - node.position
+        let newVelocity = (perceivedCenter - node.position) * 0.1 +
+        avoidCollisions * 0.1 +
+        directionToTarget * 0.2 +
+        boundary
+        
+        let speedLimit: Float = 0.9
+        let speed = newVelocity.length()
+        
+        velocity = (speed > speedLimit) ? (newVelocity / speed) * speedLimit : newVelocity
+        node.position += velocity
     }
 }

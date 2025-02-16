@@ -55,7 +55,7 @@ class MinimapScene: SKScene {
         // Update helicopter position if placed
         if placed {
             if helicopterDot == nil {
-                helicopterDot = SKShapeNode(circleOfRadius: 5)
+                helicopterDot = SKShapeNode(circleOfRadius: 3)
                 helicopterDot?.fillColor = .purple
                 cropNode.addChild(helicopterDot!)
             }
@@ -75,7 +75,7 @@ class MinimapScene: SKScene {
         for shipPosition in ships {
             let transformedShipPosition = applyCameraRotation(position: shipPosition, cameraRotation: cameraRotation)
             let invertedYPosition = -CGFloat(transformedShipPosition.z * 0.45)
-            let shipDot = SKShapeNode(circleOfRadius: 5)
+            let shipDot = SKShapeNode(circleOfRadius: 3)
             shipDot.fillColor = .red
             shipDot.position = CGPoint(x: CGFloat(transformedShipPosition.x) * scale, y: invertedYPosition * scale)
             cropNode.addChild(shipDot)
