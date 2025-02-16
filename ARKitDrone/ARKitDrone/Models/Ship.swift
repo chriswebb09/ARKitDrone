@@ -187,3 +187,47 @@ class Ship {
         node.position += velocity
     }
 }
+
+
+extension Ship {
+    
+    func attack(target: Ship) {
+        let distanceToTarget = node.position.distance(target.node.position)
+        let attackRange: Float = 50.0
+        if distanceToTarget <= attackRange {
+            if !isDestroyed {
+                fireAt(target)
+            }
+        } else {
+            flyTowards(target.node.position)
+        }
+    }
+    
+    private func fireAt(_ target: Ship) {
+        let missileNode = createMissile()
+        missileNode.position = self.node.position + SCNVector3(x: 0, y: 0, z: 1)
+        let direction = (target.node.position - self.node.position).normalized()
+        missileNode.physicsBody?.applyForce(direction * 10, at: missileNode.position, asImpulse: true)
+    }
+    
+    private func createMissile() -> SCNNode {
+        // This method creates a missile node. Customize it based on your scene's needs.
+        let missileGeometry = SCNSphere(radius: 0.5)
+        let missileNode = SCNNode(geometry: missileGeometry)
+        missileNode.name = "Missile"
+        let missilePhysicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
+        missileNode.physicsBody = missilePhysicsBody
+        missileNode.physicsBody?.categoryBitMask = CollisionTypes.missile.rawValue
+        missileNode.physicsBody?.collisionBitMask = CollisionTypes.base.rawValue
+        missileNode.physicsBody?.contactTestBitMask = CollisionTypes.base.rawValue
+        node.getRootNode().addChildNode(missileNode)
+        return missileNode
+    }
+    
+    private func flyTowards(_ targetPosition: SCNVector3) {
+        // If the target is out of range, move towards it
+        let directionToTarget = (targetPosition - node.position).normalized()
+        velocity = directionToTarget * 0.1 // Adjust the speed
+        node.position += velocity
+    }
+}
