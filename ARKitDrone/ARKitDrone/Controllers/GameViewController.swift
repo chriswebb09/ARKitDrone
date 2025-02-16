@@ -18,6 +18,9 @@ class GameViewController: UIViewController {
     var minimap: SKShapeNode!
     var playerNode: SCNNode!
     var score: [Int] = []
+    let updateQueue = DispatchQueue(label: "com.example.apple-samplecode.arkitexample.serialSceneKitQueue")
+    
+    let coachingOverlay = ARCoachingOverlayView()
     
     // MARK: - LocalConstants
     
@@ -142,26 +145,21 @@ class GameViewController: UIViewController {
     }
     
     func setupViews() {
-        
         if UIDevice.current.userInterfaceIdiom == .phone {
             DeviceOrientation.shared.set(orientation: .landscapeRight)
         } else {
             DeviceOrientation.shared.set(orientation: .portrait)
         }
-        
         UIApplication.shared.isIdleTimerDisabled = true
-        
         setupTracking()
         sceneView.setup()
-        
+       
         sceneView.scene.physicsWorld.contactDelegate = self
-        
-        playerNode = SCNNode(geometry: SCNSphere(radius: 0.5))
+        playerNode = SCNNode(geometry: SCNSphere(radius: 0.01))
         playerNode.name = "Player"
         playerNode.position = SCNVector3(0, 0, 0)
-        
+        playerNode.geometry?.firstMaterial?.transparency = 0.0
         sceneView.scene.rootNode.addChildNode(playerNode)
-        
         DispatchQueue.main.asyncAfter(deadline: .now() +  0.5) { [weak self] in
             guard let self = self else { return }
             sceneView.addSubview(padView1)
@@ -180,6 +178,9 @@ class GameViewController: UIViewController {
         sceneView.addSubview(scoreText)
         armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
         sceneView.isUserInteractionEnabled = true
+        DispatchQueue.main.async {
+            self.setupCoachingOverlay()
+        }
     }
     
     // MARK: - Private Methods
@@ -281,9 +282,12 @@ class GameViewController: UIViewController {
         let tapLocation: CGPoint = touch.location(in: sceneView)
         guard let result = sceneView.raycastQuery(from: tapLocation, allowing: .estimatedPlane, alignment: .horizontal) else { return }
         let castRay = session.raycast(result)
+        
         if let firstCast = castRay.first {
             let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
-            sceneView.positionTank(position: tappedPosition)
+            DispatchQueue.main.async {
+                self.sceneView.positionTank(position: tappedPosition)
+            }
             game.placed = true
         }
     }
@@ -292,7 +296,7 @@ class GameViewController: UIViewController {
 extension GameViewController: ARSCNViewDelegate {
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        sceneView.moveShips()
+        sceneView.moveShips(placed: game.placed)
     }
     
 }
@@ -323,7 +327,8 @@ extension GameViewController: JoystickSceneDelegate {
     
     func tapped() {
         guard sceneView.helicopter.missilesArmed else { return }
-        fire()
+        sceneView.shootUpperGun()
+//        fire()
     }
     
     func fire() {
@@ -403,9 +408,9 @@ extension GameViewController: JoystickSceneDelegate {
 extension GameViewController: SCNPhysicsContactDelegate {
     
     func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
-        
-        let conditionOne = (contact.nodeA.name!.contains("Missile") && !contact.nodeB.name!.contains("Missile"))
-        let conditionTwo = (contact.nodeB.name!.contains("Missile") && !contact.nodeA.name!.contains("Missile"))
+    
+        let conditionOne = (((contact.nodeA.name?.contains("Missile")) != nil) && ((contact.nodeB.name?.contains("Missile")) == nil))
+        let conditionTwo = (((contact.nodeB.name?.contains("Missile")) != nil) && ((contact.nodeA.name?.contains("Missile")) == nil))
         
         if (game.valueReached && (conditionOne || conditionTwo) && !self.game.scoreUpdated) {
             let conditionalShipNode: SCNNode! = conditionOne ? contact.nodeB : contact.nodeA
@@ -464,11 +469,49 @@ extension GameViewController: SCNPhysicsContactDelegate {
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//                self.game.playerScore = -(self.sceneView.missiles.count - 8)
+                //                self.game.playerScore = -(self.sceneView.missiles.count - 8)
                 self.game.destoryedTextString = ""
                 self.destoryedText.text = self.game.destoryedTextString
                 self.destoryedText.fadeTransition(0.001)
             }
         }
+    }
+}
+
+extension GameViewController: ARCoachingOverlayViewDelegate {
+    
+    func coachingOverlayViewWillActivate(_ coachingOverlayView: ARCoachingOverlayView) {
+        //        upperControlsView.isHidden = true
+    }
+    
+    func coachingOverlayViewDidDeactivate(_ coachingOverlayView: ARCoachingOverlayView) {
+        //        upperControlsView.isHidden = false
+    }
+    
+    func coachingOverlayViewDidRequestSessionReset(_ coachingOverlayView: ARCoachingOverlayView) {
+        //        restartExperience()
+    }
+    
+    func setupCoachingOverlay() {
+        coachingOverlay.session = sceneView.session
+        coachingOverlay.delegate = self
+        coachingOverlay.translatesAutoresizingMaskIntoConstraints = false
+        sceneView.addSubview(coachingOverlay)
+        NSLayoutConstraint.activate([
+            coachingOverlay.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            coachingOverlay.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            coachingOverlay.widthAnchor.constraint(equalTo: view.widthAnchor),
+            coachingOverlay.heightAnchor.constraint(equalTo: view.heightAnchor)
+        ])
+        setActivatesAutomatically()
+        setGoal()
+    }
+    
+    func setActivatesAutomatically() {
+        coachingOverlay.activatesAutomatically = true
+    }
+    
+    func setGoal() {
+        coachingOverlay.goal = .horizontalPlane
     }
 }
