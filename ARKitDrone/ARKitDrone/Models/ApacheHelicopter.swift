@@ -221,26 +221,7 @@ class ApacheHelicopter {
     }
     
     func shootUpperGun() {
-//        guard let sceneView = upperGun.scene else { return }
-//        
-//        let bullet = SCNNode(geometry: SCNSphere(radius: 0.01))
-//        bullet.geometry?.firstMaterial?.diffuse.contents = UIColor.yellow
-//        bullet.position = upperGun.worldPosition
-//        
-//        let physicsShape = SCNPhysicsShape(geometry: bullet.geometry!, options: nil)
-//        let physicsBody = SCNPhysicsBody(type: .dynamic, shape: physicsShape)
-//        physicsBody.isAffectedByGravity = false
-//        bullet.physicsBody = physicsBody
-//        
-//        let forwardDirection = upperGun.simdConvertVector(simd_float3(0, 0, -1), to: nil)
-//        let impulse = SCNVector3(forwardDirection.x, forwardDirection.y, forwardDirection.z) * 10
-//        bullet.physicsBody?.applyForce(impulse, asImpulse: true)
-//        
-//        sceneView.rootNode.addChildNode(bullet)
-//        
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//            bullet.removeFromParentNode()
-//        }
+        // move code here
     }
 
 }

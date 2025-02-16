@@ -179,8 +179,10 @@ class Ship {
         avoidCollisions * 0.1 +
         directionToTarget * 0.2 +
         boundary
+        
         let speedLimit: Float = 0.9
         let speed = newVelocity.length()
+        
         velocity = (speed > speedLimit) ? (newVelocity / speed) * speedLimit : newVelocity
         node.position += velocity
     }
