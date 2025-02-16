@@ -205,21 +205,6 @@ class ApacheHelicopter {
         return nextTime
     }
     
-    func getRootNode(from node: SCNNode) -> SCNNode {
-        var currentNode = node
-        while let parent = currentNode.parent {
-            currentNode = parent
-        }
-        return currentNode
-    }
-    
-    func getUserVector(target: SCNNode) -> (SCNVector3, SCNVector3) {
-        let mat = SCNMatrix4(target.simdWorldTransform)
-        let dir = SCNVector3(-1 * mat.m31, -1 * mat.m32, -1 * mat.m33)
-        let pos = SCNVector3(mat.m41, mat.m42, mat.m43)
-        return (dir, pos)
-    }
-    
     func normalize(vector: SCNVector3) -> SCNVector3 {
         let length = sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z)
         return length == 0 ? vector : SCNVector3(vector.x / length, vector.y / length, vector.z / length)

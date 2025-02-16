@@ -34,4 +34,20 @@ extension SCNNode {
         let posB = nodeB.worldPosition
         return (posA - posB).length()
     }
+    
+    func getRootNode() -> SCNNode {
+        var currentNode = self
+        while let parent = currentNode.parent {
+            currentNode = parent
+        }
+        return currentNode
+    }
+    
+    func getTargetVector(target: SCNNode) -> (SCNVector3, SCNVector3) {
+        let mat = SCNMatrix4(target.simdWorldTransform)
+        let dir = SCNVector3(-1 * mat.m31, -1 * mat.m32, -1 * mat.m33)
+        let pos = SCNVector3(mat.m41, mat.m42, mat.m43)
+        return (dir, pos)
+    }
+    
 }

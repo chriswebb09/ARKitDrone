@@ -20,16 +20,17 @@ class M1AbramsTank {
         static let maingun = "gun"
         static let body = "body"
     }
-    
     var tankRotateAngle: Double = 0.0
-    
     private var tankNode: SCNNode!
     private var tracksNode: SCNNode!
     private var turretNode: SCNNode!
     private var mainGunNode: SCNNode!
     private var maxUp: Float = -0.133
     private var maxDown: Float = 0.133
-    
+    var position: SCNVector3 = SCNVector3Zero
+    var firingRange: Float = 20.0
+    var moveSpeed: Float = 0.5     // Speed of movement
+    var forwardAngleThreshold: Float = 45.0
     var maxRotation: Float = 0
     
     func setup(with scene: SCNScene, transform: SCNMatrix4) {
@@ -39,7 +40,7 @@ class M1AbramsTank {
         turretNode = tankNode.childNode(withName: LocalConstants.turret, recursively: true)
         mainGunNode = turretNode.childNode(withName: LocalConstants.maingun, recursively: true)
         tankNode.transform = transform
-//        tankNode.simdScale = SIMD3<Float>(repeating: 0.04)
+        //        tankNode.simdScale = SIMD3<Float>(repeating: 0.04)
         tankNode.simdEulerAngles = SIMD3<Float>(-1.7, 0, 0)
         scene.rootNode.addChildNode(tankNode)
     }
@@ -95,5 +96,41 @@ extension M1AbramsTank: Tank {
         let dir = direction * 0.8
         tankNode.localTranslate(by: SCNVector3(x: 0, y: dir, z: 0))
         SCNTransaction.commit()
+    }
+
+    func distanceToTarget(_ target: M1AbramsTank) -> Float {
+        let dx = target.tankNode.position.x - self.tankNode.position.x
+        let dz = target.tankNode.position.z - self.tankNode.position.z
+        return sqrt(dx * dx + dz * dz)
+    }
+    
+    func angleToTarget(_ target: M1AbramsTank) -> Float {
+        let dx = target.tankNode.position.x - self.tankNode.position.x
+        let dz = target.tankNode.position.z - self.tankNode.position.z
+        return atan2(dz, dx) * 180 / .pi
+    }
+    
+
+    func hasLineOfSight(to target: M1AbramsTank) -> Bool {
+        return true
+    }
+    
+    func decideToEngage(against opponent: M1AbramsTank) {
+        let distance = distanceToTarget(opponent)
+        let angleToOpponent = angleToTarget(opponent)
+        if abs(angleToOpponent) <= forwardAngleThreshold {
+            print("M1 Abrams Tank: Opponent is in front.")
+            if distance <= firingRange && hasLineOfSight(to: opponent) {
+                print("M1 Abrams Tank: Engaging opponent. Target within range and clear line of sight.")
+                fire()
+            } else {
+                print("M1 Abrams Tank: Not in range. Moving toward opponent.")
+                move(direction: 1.0)
+            }
+        } else {
+            print("M1 Abrams Tank: Opponent is not in front, repositioning.")
+            rotate(angle: angleToOpponent)
+            move(direction: 1.0)
+        }
     }
 }
