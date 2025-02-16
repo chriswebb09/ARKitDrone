@@ -16,9 +16,3 @@ extension SCNMatrix4 {
     
 }
 
-extension SCNVector3 {
-    
-    public func toSimd() -> SIMD3<Float> {
-        return SIMD3<Float>(self)
-    }
-}

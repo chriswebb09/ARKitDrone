@@ -22,7 +22,6 @@
 		94A68F742C87972E0059CD82 /* SCNQuaternion+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F732C87972E0059CD82 /* SCNQuaternion+Extension.swift */; };
 		94A68F762C8797550059CD82 /* SCNVector3+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F752C8797550059CD82 /* SCNVector3+Extension.swift */; };
 		94C881A82D5D05C20050119D /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C881A72D5D05B50050119D /* Game.swift */; };
-		94C881AA2D5D06D30050119D /* ARPlaneAnchor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C881A92D5D06CB0050119D /* ARPlaneAnchor+Extension.swift */; };
 		94C881AC2D5D07000050119D /* SCNMaterial+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C881AB2D5D06F40050119D /* SCNMaterial+Extension.swift */; };
 		94C881AE2D5D07450050119D /* SCNParticleSystem+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C881AD2D5D07400050119D /* SCNParticleSystem+Extension.swift */; };
 		94CB148E2C8793BF0065E1B0 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CB148D2C8793BF0065E1B0 /* UIColor+Extension.swift */; };
@@ -38,6 +37,7 @@
 		94D630322976077000096104 /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D630312976077000096104 /* UIFont+Extension.swift */; };
 		94DF3F082975F167006723FC /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DF3F072975F15F006723FC /* UIView+Extension.swift */; };
 		94E5448F29672EE200158DA2 /* JoystickSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E5448E29672EE200158DA2 /* JoystickSceneDelegate.swift */; };
+		94F0ACBA2D619A3800658B0F /* SCNNode+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F0ACB92D619A2F00658B0F /* SCNNode+Extension.swift */; };
 		94F5D19C2D5CAEA000019569 /* MinimapScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F5D19B2D5CAE9B00019569 /* MinimapScene.swift */; };
 		94F968A82AD7337F00D7B418 /* Plane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F968A72AD7337F00D7B418 /* Plane.swift */; };
 		A7AE72BE1F888EF500B015D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */; };
@@ -64,7 +64,6 @@
 		94A68F732C87972E0059CD82 /* SCNQuaternion+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNQuaternion+Extension.swift"; sourceTree = "<group>"; };
 		94A68F752C8797550059CD82 /* SCNVector3+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNVector3+Extension.swift"; sourceTree = "<group>"; };
 		94C881A72D5D05B50050119D /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
-		94C881A92D5D06CB0050119D /* ARPlaneAnchor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARPlaneAnchor+Extension.swift"; sourceTree = "<group>"; };
 		94C881AB2D5D06F40050119D /* SCNMaterial+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNMaterial+Extension.swift"; sourceTree = "<group>"; };
 		94C881AD2D5D07400050119D /* SCNParticleSystem+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNParticleSystem+Extension.swift"; sourceTree = "<group>"; };
 		94CB148D2C8793BF0065E1B0 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
@@ -80,6 +79,7 @@
 		94D630312976077000096104 /* UIFont+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
 		94DF3F072975F15F006723FC /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		94E5448E29672EE200158DA2 /* JoystickSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoystickSceneDelegate.swift; sourceTree = "<group>"; };
+		94F0ACB92D619A2F00658B0F /* SCNNode+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNNode+Extension.swift"; sourceTree = "<group>"; };
 		94F5D19B2D5CAE9B00019569 /* MinimapScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimapScene.swift; sourceTree = "<group>"; };
 		94F968A72AD7337F00D7B418 /* Plane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plane.swift; sourceTree = "<group>"; };
 		A7AE72BA1F888EF500B015D3 /* ARKitDrone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARKitDrone.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -164,8 +164,8 @@
 			isa = PBXGroup;
 			children = (
 				94C881AD2D5D07400050119D /* SCNParticleSystem+Extension.swift */,
+				94F0ACB92D619A2F00658B0F /* SCNNode+Extension.swift */,
 				94C881AB2D5D06F40050119D /* SCNMaterial+Extension.swift */,
-				94C881A92D5D06CB0050119D /* ARPlaneAnchor+Extension.swift */,
 				94CCC9092972E54000F7D17F /* SCNScene+Extension.swift */,
 				94A68F752C8797550059CD82 /* SCNVector3+Extension.swift */,
 				94A68F732C87972E0059CD82 /* SCNQuaternion+Extension.swift */,
@@ -290,7 +290,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				94C881AA2D5D06D30050119D /* ARPlaneAnchor+Extension.swift in Sources */,
 				94A68F742C87972E0059CD82 /* SCNQuaternion+Extension.swift in Sources */,
 				945B16AD294EB34800482E14 /* JoystickScene.swift in Sources */,
 				94C881AE2D5D07450050119D /* SCNParticleSystem+Extension.swift in Sources */,
@@ -309,6 +308,7 @@
 				9470AE472974001A00A55134 /* MenuViewController.swift in Sources */,
 				94F5D19C2D5CAEA000019569 /* MinimapScene.swift in Sources */,
 				9455B7532D60C73F0019FE10 /* MissileManager.swift in Sources */,
+				94F0ACBA2D619A3800658B0F /* SCNNode+Extension.swift in Sources */,
 				94CCC9122972FFB500F7D17F /* DeviceOrientation.swift in Sources */,
 				94C881A82D5D05C20050119D /* Game.swift in Sources */,
 				94CB148E2C8793BF0065E1B0 /* UIColor+Extension.swift in Sources */,
