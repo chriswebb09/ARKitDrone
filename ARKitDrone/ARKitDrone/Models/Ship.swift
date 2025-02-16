@@ -146,10 +146,7 @@ class Ship {
     }
     
     func updateShipPosition(target: SCNVector3, otherShips: [Ship]) {
-        // Get nodes from other ships
         let nodes = otherShips.map { $0.node }
-        
-        // Calculate perceived center of other ships
         let perceivedCenter: SCNVector3
         if otherShips.isEmpty {
             perceivedCenter = node.position
@@ -165,11 +162,7 @@ class Ship {
                 z: sumPositions.z / Float(otherShips.count)
             )
         }
-
-        // Direction to target
         let directionToTarget = (target - node.position).normalized()
-
-        // Collision avoidance force
         let avoidCollisions = nodes.reduce(SCNVector3Zero) { (force, shipNode) in
             let distance = node.position.distance(shipNode.position)
             if distance < 14 { // Avoid collisions if too close
@@ -177,53 +170,18 @@ class Ship {
             }
             return force
         }
-
-        // Boundaries to keep the ship within limits
         let boundary = SCNVector3(
             x: max(-50, min(50, node.position.x)),
             y: max(-50, min(50, node.position.y)),
             z: max(-70, min(30, node.position.z))
         ) - node.position
-
-        // Calculate new velocity based on perceived center, collision avoidance, target direction, and boundary
         let newVelocity = (perceivedCenter - node.position) * 0.1 +
-                          avoidCollisions * 0.1 +
-                          directionToTarget * 0.2 +
-                          boundary
-
-        // Speed limit
+        avoidCollisions * 0.1 +
+        directionToTarget * 0.2 +
+        boundary
         let speedLimit: Float = 0.9
         let speed = newVelocity.length()
-        
-        // Apply speed limit
         velocity = (speed > speedLimit) ? (newVelocity / speed) * speedLimit : newVelocity
-
-        // Update ship position
         node.position += velocity
     }
-
-    
-//    func updateShipPosition(target: SCNVector3, otherShips: [Ship]) {
-//        let nodes = otherShips.map { $0.node }
-//        let perceivedCenter = otherShips.isEmpty ? node.position : otherShips.reduce(SCNVector3(x: 0, y: 0, z: 0)) { (accumulated, ship) in
-//            SCNVector3(accumulated.x + ship.node.position.x, accumulated.y + ship.node.position.y, accumulated.z + ship.node.position.z)
-//        } / Float(otherShips.count)
-//
-//        let directionToTarget = (target - node.position).normalized()
-//        let avoidCollisions = nodes.reduce(SCNVector3Zero) { force, shipPos in
-//            let distance = node.position.distance(shipPos.position)
-//            return distance < 14 ? force - (shipPos.position - node.position) : force
-//        }
-//        let boundary = SCNVector3(
-//            x: max(-50, min(50, node.position.x)),
-//            y: max(-50, min(50, node.position.y)),
-//            z: max(-70, min(30, node.position.z))
-//        ) - node.position
-//        let newVelocity = (perceivedCenter - node.position) * 0.1 + avoidCollisions * 0.1 + directionToTarget * 0.2 + boundary
-//        let speedLimit: Float = 0.9
-//        let speed = newVelocity.length()
-//        velocity = speed > speedLimit ? (newVelocity / speed) * speedLimit : newVelocity
-//        node.position += velocity
-//    }
-    
 }
