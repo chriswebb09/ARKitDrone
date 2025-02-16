@@ -233,3 +233,15 @@ func SCNVector3Project(_ vectorToProject: SCNVector3, projectionVector: SCNVecto
     let v: SCNVector3 = projectionVector * scale
     return v
 }
+
+
+extension SCNVector3 {
+    
+    public func toSimd() -> SIMD3<Float> {
+        return SIMD3<Float>(self)
+    }
+}
+
+func / (left: SCNVector3, right: Int) -> SCNVector3 {
+    return SCNVector3(x: left.x / Float(right), y: left.y / Float(right), z: left.z / Float(right))
+}

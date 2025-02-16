@@ -35,6 +35,7 @@ class GameSceneView: ARSCNView {
     var rotor: SCNNode!
     var rotor2: SCNNode!
     var upperGun: SCNNode!
+    
     var missile1: Missile = Missile()
     var missile2: Missile = Missile()
     var missile3: Missile = Missile()
@@ -124,12 +125,14 @@ class GameSceneView: ARSCNView {
         helicopter.rotor2 = rotor2
         helicopter.setup(with: helicopterNode)
         helicopterNode.scale = SCNVector3(x: 0.0005, y: 0.0005, z: 0.0005)
+        
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             scene.rootNode.addChildNode(hud)
             scene.rootNode.addChildNode(tankNode)
             scene.rootNode.addChildNode(helicopterNode)
         }
+        
         tankNode.position = position
         helicopterNode.position =  SCNVector3(x:position.x, y:position.y + 0.5, z: position.z - 0.2)
         helicopter.helicopterNode.simdPivot.columns.3.x = -0.5
@@ -137,7 +140,6 @@ class GameSceneView: ARSCNView {
         tankNode.scale = SCNVector3(x: 0.07, y: 0.07, z: 0.07)
         helicopter.updateHUD()
         helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.44))
-        
     }
     
     func addExplosion(contactPoint: SCNVector3) {
@@ -159,17 +161,25 @@ class GameSceneView: ARSCNView {
             percievedCenter = percievedCenter + otherShip.node.position
             percievedVelocity = percievedVelocity + (otherShip.velocity)
         }
-        $0.updateShipPosition(percievedCenter: percievedCenter, percievedVelocity: percievedVelocity, otherShips: ships, obstacles: [helicopterNode])
+        ships.forEach {
+            $0.updateShipPosition(
+                percievedCenter: percievedCenter,
+                percievedVelocity: percievedVelocity,
+                otherShips: ships,
+                obstacles: [helicopterNode]
+            )
+        }
         
-//        if placed {
-//            ships.forEach {
-//                $0.updateShipPosition(target: helicopterNode.position, otherShips: self.ships)
-//            }
-//        } else {
-//            ships.forEach {
-//                $0.updateShipPosition(percievedCenter: percievedCenter, percievedVelocity: percievedVelocity, otherShips: ships, obstacles: [helicopterNode])
-//            }
-//        }
+        
+        //        if placed {
+        //            ships.forEach {
+        //                $0.updateShipPosition(target: helicopterNode.position, otherShips: self.ships)
+        //            }
+        //        } else {
+        //            ships.forEach {
+        //                $0.updateShipPosition(percievedCenter: percievedCenter, percievedVelocity: percievedVelocity, otherShips: ships, obstacles: [helicopterNode])
+        //            }
+        //        }
     }
     
     func setupShips() {
@@ -204,10 +214,12 @@ extension GameSceneView: HelicopterCapable {
         bullet.geometry?.firstMaterial?.diffuse.contents = UIColor.yellow
         print("Gun position: \(upperGun.presentation.worldPosition)")
         bullet.position = SCNVector3(upperGun.presentation.worldPosition.x + 0.009, upperGun.presentation.worldPosition.y + 0.07, upperGun.presentation.worldPosition.z + 0.3)
+        
         let physicsShape = SCNPhysicsShape(geometry: bullet.geometry!, options: nil)
         let physicsBody = SCNPhysicsBody(type: .dynamic, shape: physicsShape)
         physicsBody.isAffectedByGravity = false
         bullet.physicsBody = physicsBody
+        
         let forwardDirection = SCNVector3(
             -helicopterNode.presentation.transform.m31,  // x-component of the z-axis
              -helicopterNode.presentation.transform.m32,  // y-component of the z-axis
@@ -221,6 +233,7 @@ extension GameSceneView: HelicopterCapable {
             print("Warning: Forward direction is too small, helicopter rotation might be incorrect.")
         }
         scene.rootNode.addChildNode(bullet)
+        
         let impulse = forwardDirection * 500
         bullet.physicsBody?.applyForce(impulse, asImpulse: true)
         print("Bullet position after force application: \(bullet.position)")

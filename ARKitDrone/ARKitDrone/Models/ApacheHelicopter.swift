@@ -25,6 +25,7 @@ class ApacheHelicopter {
         static let tailRotorName = "TailRotor"
         static let hudNodeName = "hud"
         static let frontIRSteering = "FrontIRSteering"
+        
         static let missile1 = "Missile1"
         static let missile2 = "Missile2"
         static let missile3 = "Missile3"
@@ -33,9 +34,11 @@ class ApacheHelicopter {
         static let missile6 = "Missile6"
         static let missile7 = "Missile7"
         static let missile8 = "Missile8"
+        
         static let frontIR = "FrontIR"
         static let audioFileName = "audio.m4a"
         static let upperGun = "UpperGun"
+        
         static let activeEmitterRate: CGFloat = 1000
         static let angleConversion = SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float.pi, z: 0 , w: 0)
         static let negativeAngleConversion = SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float.pi, z: 0 , w: 0)
@@ -46,6 +49,7 @@ class ApacheHelicopter {
     var helicopterNode: SCNNode!
     var parentModelNode: SCNNode!
     var firing:Bool = false
+    
     var missile1: Missile!
     var currentMissile: Missile!
     var missile2: Missile!
@@ -56,6 +60,7 @@ class ApacheHelicopter {
     var missile7: Missile = Missile()
     var missile8: Missile = Missile()
     var missiles: [Missile] = []
+    
     var rotor: SCNNode!
     var rotor2: SCNNode!
     var wingL: SCNNode!
@@ -223,5 +228,5 @@ class ApacheHelicopter {
     func shootUpperGun() {
         // move code here
     }
-
+    
 }

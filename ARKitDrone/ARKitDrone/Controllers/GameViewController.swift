@@ -25,7 +25,7 @@ class GameViewController: UIViewController {
     // MARK: - LocalConstants
     
     private struct LocalConstants {
-        static let joystickSize = CGSize(width: 160, height: 150)
+        static let joystickSize = CGSize(width: 170, height: 170)
         static let joystickPoint = CGPoint(x: 0, y: 0)
         static let environmentalMap = "Models.scnassets/sharedImages/environment_blur.exr"
         static let buttonTitle = "Arm Missiles".uppercased()
@@ -39,7 +39,7 @@ class GameViewController: UIViewController {
         if UIDevice.current.isIpad {
             offset = 220
         }
-        let view = SKView(frame: CGRect(x:60, y: UIScreen.main.bounds.height - 220, width:170, height: 170))
+        let view = SKView(frame: CGRect(x:60, y: UIScreen.main.bounds.height - 220, width: 170, height: 170))
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
         return view

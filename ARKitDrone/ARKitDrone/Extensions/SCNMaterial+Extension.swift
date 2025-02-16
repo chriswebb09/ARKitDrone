@@ -29,6 +29,5 @@ extension SCNMaterial {
         material.diffuse.contents = UIColor.red
         return material
     }
-    
 }
 

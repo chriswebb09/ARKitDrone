@@ -14,12 +14,12 @@ class JoystickScene: SKScene {
     weak var joystickDelegate: JoystickSceneDelegate?
     
     var stickNum: Int = 0
-    var velocity: Float = 0
-    var point = CGPoint(x: 0, y: 0)
+    var point = CGPoint.zero
     
     private lazy var joystick: Joystick = {
-        var joystick = Joystick()
-        joystick.position = CGPointMake(90, 85)
+        let joystick = Joystick()
+        joystick.position = CGPoint(x: 90, y: 85)
+        joystick.delegate = self
         return joystick
     }()
     
@@ -31,22 +31,20 @@ class JoystickScene: SKScene {
     
     override func update(_ currentTime: CFTimeInterval) {
         super.update(currentTime)
-        if joystick.velocity.x != 0 || joystick.velocity.y != 0 {
-            if abs(joystick.velocity.x) < abs(joystick.velocity.y) {
-                joystickDelegate?.update(yValue: Float(joystick.velocity.y), stickNum: stickNum)
+        let joystickVelocity = joystick.velocity
+        if joystickVelocity != .zero {
+            let isVertical = abs(joystickVelocity.y) > abs(joystickVelocity.x)
+            if isVertical {
+                joystickDelegate?.update(yValue: Float(joystickVelocity.y), stickNum: stickNum)
             } else {
-                joystickDelegate?.update(xValue: Float(joystick.velocity.x), stickNum: stickNum)
+                joystickDelegate?.update(xValue: Float(joystickVelocity.x), stickNum: stickNum)
             }
         }
     }
     
-    private func setupNodes() {
-        anchorPoint = point
-    }
-    
     private func setupJoystick() {
         addChild(joystick)
-        joystick.delegate = self
+        anchorPoint = point  // Using the point property here
     }
 }
 
@@ -56,4 +54,3 @@ extension JoystickScene: JoystickDelegate {
         joystickDelegate?.tapped()
     }
 }
-

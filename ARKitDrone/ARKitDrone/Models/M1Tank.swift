@@ -97,7 +97,3 @@ extension M1AbramsTank: Tank {
         SCNTransaction.commit()
     }
 }
-
-
-
-
