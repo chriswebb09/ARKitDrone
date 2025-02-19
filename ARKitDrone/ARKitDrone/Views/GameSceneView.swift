@@ -128,14 +128,9 @@ class GameSceneView: ARSCNView {
             helicopter.rotor2 = rotor2
             helicopter.setup(with: helicopterNode)
             helicopterNode.scale = SCNVector3(x: 0.0005, y: 0.0005, z: 0.0005)
-            
-            
-//            guard let self = self else { return }
             scene.rootNode.addChildNode(hud)
             scene.rootNode.addChildNode(tankNode)
             scene.rootNode.addChildNode(helicopterNode)
-            
-            
             tankNode.position = position
             helicopterNode.position =  SCNVector3(x:position.x, y:position.y + 0.5, z: position.z - 0.2)
             helicopter.helicopterNode.simdPivot.columns.3.x = -0.5
@@ -248,32 +243,6 @@ extension GameSceneView: HelicopterCapable {
     
     func shootUpperGun() {
         helicopter.shootUpperGun()
-        //        let bullet = SCNNode(geometry: SCNSphere(radius: 0.002)) // Temporarily increase size to make sure it's visible
-        //        bullet.geometry?.firstMaterial?.diffuse.contents = UIColor.yellow
-        //        print("Gun position: \(upperGun.presentation.worldPosition)")
-        //        bullet.position = SCNVector3(upperGun.presentation.worldPosition.x + 0.009, upperGun.presentation.worldPosition.y + 0.07, upperGun.presentation.worldPosition.z + 0.3)
-        //        let physicsShape = SCNPhysicsShape(geometry: bullet.geometry!, options: nil)
-        //        let physicsBody = SCNPhysicsBody(type: .dynamic, shape: physicsShape)
-        //        physicsBody.isAffectedByGravity = false
-        //        bullet.physicsBody = physicsBody
-        //        let forwardDirection = SCNVector3(
-        //            -helicopterNode.presentation.transform.m31,  // x-component of the z-axis
-        //             -helicopterNode.presentation.transform.m32,  // y-component of the z-axis
-        //             -helicopterNode.presentation.transform.m33   // z-component of the z-axis
-        //        )
-        //        if forwardDirection.length() > 0.01 {
-        //            let impulse = forwardDirection * 200  // Adjust force if needed
-        //            bullet.physicsBody?.applyForce(impulse, asImpulse: true)
-        //        } else {
-        //            print("Warning: Forward direction is too small, helicopter rotation might be incorrect.")
-        //        }
-        //        scene.rootNode.addChildNode(bullet)
-        //        let impulse = forwardDirection * 500
-        //        bullet.physicsBody?.applyForce(impulse, asImpulse: true)
-        //        print("Bullet position after force application: \(bullet.position)")
-        //        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-        //            bullet.removeFromParentNode()
-        //        }
     }
     
     func missileLock(ship: Ship) {

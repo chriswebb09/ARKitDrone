@@ -359,9 +359,7 @@ extension GameViewController: JoystickSceneDelegate {
                     }
                 }
             }
-            //            self.sceneView.shootUpperGun()
         }
-        //        fire()
     }
     
     func fire() {
@@ -483,8 +481,8 @@ extension GameViewController: SCNPhysicsContactDelegate {
             flashNode.light = flash
             flashNode.position = contact.contactPoint // Set this to the explosion's position
             sceneView.scene.rootNode.addChildNode(flashNode)
-            let fadeAction = SCNAction.customAction(duration: 0.3) { (node, elapsedTime) in
-                let percent = 1.0 - (elapsedTime / 0.3)
+            let fadeAction = SCNAction.customAction(duration: 0.1) { (node, elapsedTime) in
+                let percent = 1.0 - (elapsedTime / 0.1)
                 node.light?.intensity = 4000 * percent
             }
             let removeAction = SCNAction.sequence([fadeAction, SCNAction.removeFromParentNode()])

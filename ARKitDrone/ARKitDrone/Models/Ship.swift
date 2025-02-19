@@ -205,7 +205,7 @@ class Ship {
             square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
             SCNTransaction.begin()
             square.simdScale = [1.0, 1.0, 1.0]
-            SCNTransaction.animationDuration = 0.1
+            SCNTransaction.animationDuration = 0.3
             square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
             square.simdWorldPosition = node.simdWorldPosition
             square.simdWorldOrientation = node.simdWorldOrientation
@@ -233,11 +233,7 @@ extension Ship {
                         fired = false
                         timer.invalidate()
                     })
-                    //                    let targetPos = target.presentation.simdWorldPosition
-                    //                    let currentPos = self.node.presentation.simdWorldPosition
-                    //                    flyTowards(target.position, orientation: target.simdWorldOrientation, currentPos: currentPos, targetPos: targetPos)
                 }
-                
             }
         }
     }
@@ -245,24 +241,15 @@ extension Ship {
     private func fireAt(_ target: SCNNode) {
         let missile = createMissile()
         missile.position = self.node.position
-        //        let speed: Float = 50
         let targetPos = target.presentation.simdWorldPosition
         let currentPos = missile.presentation.simdWorldPosition
         let targetDirection = simd_normalize(currentPos - targetPos)
-        //        missile.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
         let direction = SCNVector3(x: -Float(targetDirection.x), y: -Float(targetDirection.y), z: -Float(targetDirection.z))
-        //        missile.node.simdWorldTransform = self.node.simdWorldTransform
         missile.simdWorldOrientation = target.simdWorldOrientation
         missile.look(at: target.position)
         missile.physicsBody?.applyForce(direction * 1000, at: target.presentation.position, asImpulse: true)
         missile.simdWorldOrientation = target.simdWorldOrientation
         missile.look(at: target.position)
-        //        let movement = direction * speed
-        //        missile.simdWorldPosition += movement
-        //        missile.look(at: self.node.presentation.position)
-        //        missile.particle?.orientationDirection = SCNVector3(-direction.x, -direction.y, -direction.z)
-        //        let direction = (target.position - self.node.position).normalized()
-        //        missileNode.physicsBody?.applyForce(direction * 10, at: missileNode.position, asImpulse: true)
     }
     
     private func createMissile() -> SCNNode {
