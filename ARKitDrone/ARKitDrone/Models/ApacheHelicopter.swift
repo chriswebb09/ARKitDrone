@@ -61,6 +61,8 @@ class ApacheHelicopter {
     var missile8: Missile = Missile()
     var missiles: [Missile] = []
     
+    var autoLock = true 
+    
     var rotor: SCNNode!
     var rotor2: SCNNode!
     var wingL: SCNNode!
@@ -108,7 +110,7 @@ class ApacheHelicopter {
     func rotate(value: Float) {
         guard helicopterNode != nil else { return }
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.15
+        SCNTransaction.animationDuration = 0.3
         let localAngleConversion = SCNQuaternion.angleConversion(x: 0, y:  -(0.35 * value) * Float(Double.pi), z: 0, w: 0)
         let locationRotation = SCNQuaternion.getQuaternion(from: localAngleConversion)
         helicopterNode.localRotate(by: locationRotation)
@@ -121,7 +123,7 @@ class ApacheHelicopter {
         guard helicopterNode != nil else { return }
         let val = value / 8
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.15
+        SCNTransaction.animationDuration = 0.3
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y: 0, z: -val))
         updateHUD()
         hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
@@ -132,7 +134,7 @@ class ApacheHelicopter {
         guard helicopterNode != nil else { return }
         let val = (value / 30.0)
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.15
+        SCNTransaction.animationDuration = 0.3
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y:val, z:0))
         updateHUD()
         hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
@@ -172,7 +174,6 @@ class ApacheHelicopter {
         hud.look(at: target.position)
         let distance = helicopterNode.position.distance(target.position) - 4
         hud.localTranslate(by: SCNVector3(x: 0, y:0, z: -distance))
-        SCNTransaction.commit()
     }
     
     static var speed: Float = 50
@@ -211,7 +212,32 @@ class ApacheHelicopter {
     }
     
     func shootUpperGun() {
-        // move code here
+        let bullet = SCNNode(geometry: SCNSphere(radius: 0.002)) // Temporarily increase size to make sure it's visible
+        bullet.geometry?.firstMaterial?.diffuse.contents = UIColor.yellow
+        print("Gun position: \(upperGun.presentation.worldPosition)")
+        bullet.position = SCNVector3(upperGun.presentation.worldPosition.x + 0.009, upperGun.presentation.worldPosition.y + 0.07, upperGun.presentation.worldPosition.z + 0.3)
+        let physicsShape = SCNPhysicsShape(geometry: bullet.geometry!, options: nil)
+        let physicsBody = SCNPhysicsBody(type: .dynamic, shape: physicsShape)
+        physicsBody.isAffectedByGravity = false
+        bullet.physicsBody = physicsBody
+        let forwardDirection = SCNVector3(
+            -helicopterNode.presentation.transform.m31,  // x-component of the z-axis
+             -helicopterNode.presentation.transform.m32,  // y-component of the z-axis
+             -helicopterNode.presentation.transform.m33   // z-component of the z-axis
+        )
+        if forwardDirection.length() > 0.01 {
+            let impulse = forwardDirection * 200  // Adjust force if needed
+            bullet.physicsBody?.applyForce(impulse, asImpulse: true)
+        } else {
+            print("Warning: Forward direction is too small, helicopter rotation might be incorrect.")
+        }
+        self.helicopterNode.getRootNode().addChildNode(bullet)
+        let impulse = forwardDirection * 200
+        bullet.physicsBody?.applyForce(impulse, asImpulse: true)
+        print("Bullet position after force application: \(bullet.position)")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            bullet.removeFromParentNode()
+        }
     }
     
 }
