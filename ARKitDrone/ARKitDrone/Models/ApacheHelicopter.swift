@@ -61,6 +61,8 @@ class ApacheHelicopter {
     var missile8: Missile = Missile()
     var missiles: [Missile] = []
     
+    var autoLock = true 
+    
     var rotor: SCNNode!
     var rotor2: SCNNode!
     var wingL: SCNNode!
@@ -231,10 +233,10 @@ class ApacheHelicopter {
             print("Warning: Forward direction is too small, helicopter rotation might be incorrect.")
         }
         self.helicopterNode.getRootNode().addChildNode(bullet)
-        let impulse = forwardDirection * 500
+        let impulse = forwardDirection * 200
         bullet.physicsBody?.applyForce(impulse, asImpulse: true)
         print("Bullet position after force application: \(bullet.position)")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             bullet.removeFromParentNode()
         }
     }

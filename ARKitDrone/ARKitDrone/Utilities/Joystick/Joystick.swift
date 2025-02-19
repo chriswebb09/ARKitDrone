@@ -43,31 +43,40 @@ class Joystick: SKNode {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        guard let touch = touches.first else { return }
-        let touchPoint = touch.location(in: self)
-        if !isTracking, thumbNode.frame.contains(touchPoint) {
-            isTracking = true
+
+        DispatchQueue.main.async {
+            guard let touch = touches.first else { return }
+            let touchPoint = touch.location(in: self)
+            if !self.isTracking, self.thumbNode.frame.contains(touchPoint) {
+                self.isTracking = true
+            }
         }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
-        guard let touch = touches.first else { return }
-        let touchPoint = touch.location(in: self)
-        updateJoystick(touchPoint: touchPoint)
+        DispatchQueue.main.async {
+            guard let touch = touches.first else { return }
+            let touchPoint = touch.location(in: self)
+            self.updateJoystick(touchPoint: touchPoint)
+        }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        if velocity == .zero {
-            delegate?.tapped()
+        DispatchQueue.main.async {
+            if self.velocity == .zero {
+                self.delegate?.tapped()
+            }
+            self.resetVelocity()
         }
-        resetVelocity()
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
-        resetVelocity()
+        DispatchQueue.main.async {
+            self.resetVelocity()
+        }
     }
     
     // MARK: - Private

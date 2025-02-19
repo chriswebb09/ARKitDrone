@@ -22,7 +22,9 @@ class Ship {
     var targetNode: SCNNode!
     var square: TargetNode!
     var targetAdded = false
+    var fired = false
     var id: String!
+    var num: Int!
     
     init(newNode: SCNNode) {
         self.node = newNode;
@@ -49,48 +51,44 @@ class Ship {
         return (averagePercievedVelocity - velocity)
     }
     
-    func boundPositions() -> SCNVector3 {
-        
-        var rebound = SCNVector3(x: 0, y: 0, z: 0)
-        
-        let Xmin:Float = -50.0
-        let Ymin: Float = -50.0
-        let Zmin: Float = -70.0
-        let Xmax: Float = 50.0
-        let Ymax: Float = 50.0
-        let Zmax: Float = 30.0
-        
-        
-        if node.position.x < Xmin {
-            rebound.x = Float.random(in: 1...2)
+    func boundPositions(_ ship: Ship) -> SCNVector3 {
+        var rebound = SCNVector3(x: Float(0), y: Float(0), z:Float(0))
+        let Xmin = -30;
+        let Ymin = -30;
+        let Zmin = -100;
+        let Xmax = 50;
+        let Ymax = 50;
+        let Zmax = 50;
+        if ship.node.position.x < Float(Xmin) {
+            rebound.x = 1;
         }
         
-        if node.position.x > Xmax {
-            rebound.x =  Float.random(in: -3.0 ... -1.0)
+        if ship.node.position.x > Float(Xmax) {
+            rebound.x = -1;
         }
         
-        if node.position.y < Ymin {
-            rebound.y =  Float.random(in:1...2)
+        if ship.node.position.y < Float(Ymin) {
+            rebound.y = 1;
         }
         
-        if node.position.y > Ymax {
-            rebound.y = Float.random(in: -3.0 ... -1.0)
+        if ship.node.position.y > Float(Ymax) {
+            rebound.y = -1;
         }
         
-        if node.position.z < Zmin {
-            rebound.z = Float.random(in:1 ... 2)
+        if ship.node.position.z < Float(Zmin) {
+            rebound.z = 1;
         }
         
-        if node.position.z > Zmax {
-            rebound.z = Float.random(in: -2.0 ... -1.0)
+        if ship.node.position.z > Float(Zmax) {
+            rebound.z = -1;
         }
+        return rebound;
         
-        return rebound
     }
     
     func limitVelocity(_ ship: Ship) {
         let mag = Float(ship.velocity.length())
-        let limit = Float(0.9);
+        let limit: Float = 0.8
         if mag > limit {
             ship.velocity = (ship.velocity/mag) * limit
         }
@@ -109,7 +107,7 @@ class Ship {
         
         for otherShip in ships {
             if ship.node != otherShip.node {
-                if abs(otherShip.node.position.distance(ship.node.position)) < 14 {
+                if abs(otherShip.node.position.distance(ship.node.position)) < 40 {
                     forceAway = (forceAway - (otherShip.node.position - ship.node.position))
                 }
             }
@@ -121,7 +119,7 @@ class Ship {
         var v1 = flyCenterOfMass(otherShips.count, percievedCenter)
         var v2 = keepASmallDistance(self, ships: otherShips)
         var v3 = matchSpeedWithOtherShips(otherShips.count, percievedVelocity)
-        var v4 = boundPositions()
+        var v4 = boundPositions(self)
         v1 *= (0.1)
         v2 *= (0.1)
         v3 *= (0.1)
@@ -129,7 +127,7 @@ class Ship {
         let forward = SCNVector3(x: Float(0), y: Float(0), z: Float(1))
         let velocityNormal = self.velocity.normalized()
         self.velocity = self.velocity + v1 + v2 + v3 + v4;
-        limitVelocity(self);
+        limitVelocity(self)
         let nor = forward.cross(velocityNormal)
         let angle = CGFloat(forward.dot(velocityNormal))
         self.node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
@@ -144,7 +142,7 @@ class Ship {
             square.simdPosition = average
             square.simdScale = [20.0, 20.0, 20.0]
             SCNTransaction.begin()
-            SCNTransaction.animationDuration = 0.001
+            SCNTransaction.animationDuration = 0.1
             self.square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
             self.square.position = SCNVector3(x: self.node.position.x, y: self.node.position.y, z: self.node.position.z)
             SCNTransaction.commit()
@@ -155,7 +153,7 @@ class Ship {
     func setTargetAboveSelected() {
         if self.targetAdded {
             SCNTransaction.begin()
-            SCNTransaction.animationDuration = 0.001
+            SCNTransaction.animationDuration = 0.01
             self.targetNode.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
             self.targetNode.position = SCNVector3(x: self.node.position.x, y: self.node.position.y + 1, z: self.node.position.z - 10)
             SCNTransaction.commit()
@@ -189,16 +187,16 @@ class Ship {
             return force
         }
         let boundary = SCNVector3(
-            x: max(-50, min(50, node.position.x)),
-            y: max(-50, min(50, node.position.y)),
-            z: max(-70, min(30, node.position.z))
+            x: max(-10, min(10, node.position.x)),
+            y: max(-10, min(10, node.position.y)),
+            z: max(-10, min(10, node.position.z))
         ) - node.position
         let newVelocity = (perceivedCenter - node.position) * 0.1 +
         avoidCollisions * 0.1 +
         directionToTarget * 0.2 +
         boundary
         
-        let speedLimit: Float = 0.9
+        let speedLimit: Float = 0.4
         let speed = newVelocity.length()
         
         velocity = (speed > speedLimit) ? (newVelocity / speed) * speedLimit : newVelocity
@@ -207,8 +205,7 @@ class Ship {
             square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
             SCNTransaction.begin()
             square.simdScale = [1.0, 1.0, 1.0]
-            SCNTransaction.animationDuration = 0.001
-            self.targetNode.position = SCNVector3(x: self.node.position.x, y: self.node.position.y + 1, z: self.node.position.z - 10)
+            SCNTransaction.animationDuration = 0.1
             square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
             square.simdWorldPosition = node.simdWorldPosition
             square.simdWorldOrientation = node.simdWorldOrientation
@@ -221,41 +218,92 @@ class Ship {
 
 extension Ship {
     
-    func attack(target: Ship) {
-        let distanceToTarget = node.position.distance(target.node.position)
+    func attack(target: SCNNode) {
+        let distanceToTarget = node.position.distance(target.position)
         let attackRange: Float = 50.0
+        self.node.simdWorldOrientation = target.simdWorldOrientation
+        self.node.look(at: target.position)
         if distanceToTarget <= attackRange {
             if !isDestroyed {
-                fireAt(target)
+                if !fired {
+                    fired = true
+                    self.fireAt(target)
+                    _ = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { [weak self] timer in
+                        guard let self = self else { return }
+                        fired = false
+                        timer.invalidate()
+                    })
+                    //                    let targetPos = target.presentation.simdWorldPosition
+                    //                    let currentPos = self.node.presentation.simdWorldPosition
+                    //                    flyTowards(target.position, orientation: target.simdWorldOrientation, currentPos: currentPos, targetPos: targetPos)
+                }
+                
             }
-        } else {
-            flyTowards(target.node.position)
         }
     }
     
-    private func fireAt(_ target: Ship) {
-        let missileNode = createMissile()
-        missileNode.position = self.node.position + SCNVector3(x: 0, y: 0, z: 1)
-        let direction = (target.node.position - self.node.position).normalized()
-        missileNode.physicsBody?.applyForce(direction * 10, at: missileNode.position, asImpulse: true)
+    private func fireAt(_ target: SCNNode) {
+        let missile = createMissile()
+        missile.position = self.node.position
+        //        let speed: Float = 50
+        let targetPos = target.presentation.simdWorldPosition
+        let currentPos = missile.presentation.simdWorldPosition
+        let targetDirection = simd_normalize(currentPos - targetPos)
+        //        missile.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
+        let direction = SCNVector3(x: -Float(targetDirection.x), y: -Float(targetDirection.y), z: -Float(targetDirection.z))
+        //        missile.node.simdWorldTransform = self.node.simdWorldTransform
+        missile.simdWorldOrientation = target.simdWorldOrientation
+        missile.look(at: target.position)
+        missile.physicsBody?.applyForce(direction * 1000, at: target.presentation.position, asImpulse: true)
+        missile.simdWorldOrientation = target.simdWorldOrientation
+        missile.look(at: target.position)
+        //        let movement = direction * speed
+        //        missile.simdWorldPosition += movement
+        //        missile.look(at: self.node.presentation.position)
+        //        missile.particle?.orientationDirection = SCNVector3(-direction.x, -direction.y, -direction.z)
+        //        let direction = (target.position - self.node.position).normalized()
+        //        missileNode.physicsBody?.applyForce(direction * 10, at: missileNode.position, asImpulse: true)
     }
     
     private func createMissile() -> SCNNode {
-        let missileGeometry = SCNSphere(radius: 0.5)
+        let missileGeometry = SCNCapsule(capRadius: 0.6, height: 4)
+        
+        let material = missileGeometry.firstMaterial!
+        material.diffuse.contents = TargetNode.fillColor
+        material.isDoubleSided = true
+        material.ambient.contents = UIColor.black
+        material.lightingModel = .constant
+        material.emission.contents = TargetNode.fillColor
         let missileNode = SCNNode(geometry: missileGeometry)
         missileNode.name = "Missile"
         let missilePhysicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
         missileNode.physicsBody = missilePhysicsBody
+        missileNode.physicsBody?.isAffectedByGravity = false
         missileNode.physicsBody?.categoryBitMask = CollisionTypes.missile.rawValue
         missileNode.physicsBody?.collisionBitMask = CollisionTypes.base.rawValue
         missileNode.physicsBody?.contactTestBitMask = CollisionTypes.base.rawValue
         node.getRootNode().addChildNode(missileNode)
+        missileNode.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
         return missileNode
     }
     
-    private func flyTowards(_ targetPosition: SCNVector3) {
-        let directionToTarget = (targetPosition - node.position).normalized()
-        velocity = directionToTarget * 0.1 // Adjust the speed
+    private func flyTowards(_ targetPosition: SCNVector3, orientation: simd_quatf, currentPos: simd_float3, targetPos: simd_float3) {
+        // Correct the direction: from the object to the target
+        let targetDirection = simd_normalize(targetPos - currentPos)
+        
+        // Convert target direction to SCNVector3
+        let direction = SCNVector3(x: Float(targetDirection.x), y: Float(targetDirection.y), z: Float(targetDirection.z))
+        
+        // Update the orientation if needed (optional if you want to manually handle it)
+        node.simdWorldOrientation = orientation
+        
+        // Ensure the node faces the target
+        node.look(at: targetPosition)
+        
+        // Scale the direction for movement speed
+        velocity = direction * 5 // Adjust the speed multiplier
+        
+        // Update the position based on the velocity
         node.position += velocity
     }
 }

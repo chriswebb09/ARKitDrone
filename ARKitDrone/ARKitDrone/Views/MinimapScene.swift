@@ -65,7 +65,7 @@ class MinimapScene: SKScene {
             let invertedYPosition = -CGFloat(transformedShipPosition.z * 0.45)
             let shipDot = SKShapeNode(circleOfRadius: 3)
             shipDot.fillColor = .red
-            shipDot.position = CGPoint(x: CGFloat(transformedShipPosition.x) * scale, y: invertedYPosition * scale)
+            shipDot.position = CGPoint(x: CGFloat(-transformedShipPosition.x) * scale, y: invertedYPosition * scale)
             cropNode.addChild(shipDot)
             shipDots.append(shipDot)
         }
@@ -74,7 +74,7 @@ class MinimapScene: SKScene {
             let invertedYPosition = -CGFloat(transformedMissilePosition.z * 0.55)
             let missileDot = SKShapeNode(circleOfRadius: 1)
             missileDot.fillColor = .orange
-            missileDot.position = CGPoint(x: CGFloat(transformedMissilePosition.x) * scale, y: invertedYPosition * scale)
+            missileDot.position = CGPoint(x: -CGFloat(transformedMissilePosition.x) * scale, y: invertedYPosition * scale)
             cropNode.addChild(missileDot)
             missileDots.append(missileDot)
         }

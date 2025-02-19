@@ -47,6 +47,8 @@ class GameSceneView: ARSCNView {
     
     var missiles: [Missile] = []
     
+    var targetIndex = 0
+    
     static let helicopterSceneName = "art.scnassets/Helicopter.scn"
     static let targetScene = "art.scnassets/Target.scn"
     static let helicopterParentModelName = "Apache"
@@ -104,41 +106,44 @@ class GameSceneView: ARSCNView {
     }
     
     func positionTank(position: SCNVector3) {
-        helicopter.hud = hud
-        missiles =  [missile1, missile2, missile3, missile4, missile5, missile6, missile7, missile8]
-        helicopter.missile1 = missile1
-        helicopter.helicopterNode = helicopterNode
-        helicopter.front = front
-        helicopter.frontIR = frontIR
-        helicopter.upperGun = upperGun
-        helicopter.missile1 = missile1
-        helicopter.missile2 = missile2
-        helicopter.missile3 = missile3
-        helicopter.missile4 = missile4
-        helicopter.missile5 = missile5
-        helicopter.missile6 = missile6
-        helicopter.missile7 = missile7
-        helicopter.missile8 = missile8
-        helicopter.missiles = missiles
-        helicopter.rotor = rotor
-        helicopter.rotor2 = rotor2
-        helicopter.setup(with: helicopterNode)
-        helicopterNode.scale = SCNVector3(x: 0.0005, y: 0.0005, z: 0.0005)
-        
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+            helicopter.hud = hud
+            missiles =  [missile1, missile2, missile3, missile4, missile5, missile6, missile7, missile8]
+            helicopter.missile1 = missile1
+            helicopter.helicopterNode = helicopterNode
+            helicopter.front = front
+            helicopter.frontIR = frontIR
+            helicopter.upperGun = upperGun
+            helicopter.missile1 = missile1
+            helicopter.missile2 = missile2
+            helicopter.missile3 = missile3
+            helicopter.missile4 = missile4
+            helicopter.missile5 = missile5
+            helicopter.missile6 = missile6
+            helicopter.missile7 = missile7
+            helicopter.missile8 = missile8
+            helicopter.missiles = missiles
+            helicopter.rotor = rotor
+            helicopter.rotor2 = rotor2
+            helicopter.setup(with: helicopterNode)
+            helicopterNode.scale = SCNVector3(x: 0.0005, y: 0.0005, z: 0.0005)
+            
+            
+//            guard let self = self else { return }
             scene.rootNode.addChildNode(hud)
             scene.rootNode.addChildNode(tankNode)
             scene.rootNode.addChildNode(helicopterNode)
+            
+            
+            tankNode.position = position
+            helicopterNode.position =  SCNVector3(x:position.x, y:position.y + 0.5, z: position.z - 0.2)
+            helicopter.helicopterNode.simdPivot.columns.3.x = -0.5
+            tankNode.simdPivot.columns.3.x = -0.5
+            tankNode.scale = SCNVector3(x: 0.07, y: 0.07, z: 0.07)
+            helicopter.updateHUD()
+            helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.44))
         }
-        
-        tankNode.position = position
-        helicopterNode.position =  SCNVector3(x:position.x, y:position.y + 0.5, z: position.z - 0.2)
-        helicopter.helicopterNode.simdPivot.columns.3.x = -0.5
-        tankNode.simdPivot.columns.3.x = -0.5
-        tankNode.scale = SCNVector3(x: 0.07, y: 0.07, z: 0.07)
-        helicopter.updateHUD()
-        helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.44))
     }
     
     func addExplosion(contactPoint: SCNVector3) {
@@ -153,21 +158,46 @@ class GameSceneView: ARSCNView {
         ]))
     }
     
-
+    var attack: Bool = false
+    
+    
     func moveShips(placed: Bool) {
         var percievedCenter = SCNVector3Zero
         var percievedVelocity = SCNVector3Zero
+        
         for otherShip in ships {
             percievedCenter = percievedCenter + otherShip.node.position
             percievedVelocity = percievedVelocity + (otherShip.velocity)
         }
+        
         ships.forEach {
+            
             $0.updateShipPosition(
                 percievedCenter: percievedCenter,
                 percievedVelocity: percievedVelocity,
                 otherShips: ships,
                 obstacles: [helicopterNode]
             )
+        }
+        
+        if placed {
+            _  = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { [weak self] timer in
+                guard let self = self else { return }
+                attack = true
+                timer.invalidate()
+            })
+            for ship in ships {
+                if attack {
+                    ship.attack(target: self.helicopterNode)
+                    _  = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { [weak self] timer in
+                        guard let self = self else { return }
+                        self.attack = false
+                        timer.invalidate()
+                    })
+                }
+             
+               
+            }
         }
         //        if placed {
         //            ships.forEach {
@@ -196,12 +226,15 @@ class GameSceneView: ARSCNView {
                     z: Float.random(in: -20.0...40.0)
                 )
                 ship.node.position = SCNVector3(x:randomOffset.x , y: randomOffset.y, z: randomOffset.z)
-                ship.node.scale = SCNVector3(x: 0.003, y: 0.003, z: 0.003)
-                DispatchQueue.main.async {
-                    let square = TargetNode()
-                    ship.square = square
-                    self.scene.rootNode.addChildNode(square)
-                    ship.targetAdded = true
+                ship.node.scale = SCNVector3(x: 0.005, y: 0.005, z: 0.005)
+                if i == 1 {
+                    targetIndex = 0
+                    DispatchQueue.main.async {
+                        let square = TargetNode()
+                        ship.square = square
+                        self.scene.rootNode.addChildNode(square)
+                        ship.targetAdded = true
+                    }
                 }
             }
         }
@@ -215,32 +248,32 @@ extension GameSceneView: HelicopterCapable {
     
     func shootUpperGun() {
         helicopter.shootUpperGun()
-//        let bullet = SCNNode(geometry: SCNSphere(radius: 0.002)) // Temporarily increase size to make sure it's visible
-//        bullet.geometry?.firstMaterial?.diffuse.contents = UIColor.yellow
-//        print("Gun position: \(upperGun.presentation.worldPosition)")
-//        bullet.position = SCNVector3(upperGun.presentation.worldPosition.x + 0.009, upperGun.presentation.worldPosition.y + 0.07, upperGun.presentation.worldPosition.z + 0.3)
-//        let physicsShape = SCNPhysicsShape(geometry: bullet.geometry!, options: nil)
-//        let physicsBody = SCNPhysicsBody(type: .dynamic, shape: physicsShape)
-//        physicsBody.isAffectedByGravity = false
-//        bullet.physicsBody = physicsBody
-//        let forwardDirection = SCNVector3(
-//            -helicopterNode.presentation.transform.m31,  // x-component of the z-axis
-//             -helicopterNode.presentation.transform.m32,  // y-component of the z-axis
-//             -helicopterNode.presentation.transform.m33   // z-component of the z-axis
-//        )
-//        if forwardDirection.length() > 0.01 {
-//            let impulse = forwardDirection * 200  // Adjust force if needed
-//            bullet.physicsBody?.applyForce(impulse, asImpulse: true)
-//        } else {
-//            print("Warning: Forward direction is too small, helicopter rotation might be incorrect.")
-//        }
-//        scene.rootNode.addChildNode(bullet)
-//        let impulse = forwardDirection * 500
-//        bullet.physicsBody?.applyForce(impulse, asImpulse: true)
-//        print("Bullet position after force application: \(bullet.position)")
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-//            bullet.removeFromParentNode()
-//        }
+        //        let bullet = SCNNode(geometry: SCNSphere(radius: 0.002)) // Temporarily increase size to make sure it's visible
+        //        bullet.geometry?.firstMaterial?.diffuse.contents = UIColor.yellow
+        //        print("Gun position: \(upperGun.presentation.worldPosition)")
+        //        bullet.position = SCNVector3(upperGun.presentation.worldPosition.x + 0.009, upperGun.presentation.worldPosition.y + 0.07, upperGun.presentation.worldPosition.z + 0.3)
+        //        let physicsShape = SCNPhysicsShape(geometry: bullet.geometry!, options: nil)
+        //        let physicsBody = SCNPhysicsBody(type: .dynamic, shape: physicsShape)
+        //        physicsBody.isAffectedByGravity = false
+        //        bullet.physicsBody = physicsBody
+        //        let forwardDirection = SCNVector3(
+        //            -helicopterNode.presentation.transform.m31,  // x-component of the z-axis
+        //             -helicopterNode.presentation.transform.m32,  // y-component of the z-axis
+        //             -helicopterNode.presentation.transform.m33   // z-component of the z-axis
+        //        )
+        //        if forwardDirection.length() > 0.01 {
+        //            let impulse = forwardDirection * 200  // Adjust force if needed
+        //            bullet.physicsBody?.applyForce(impulse, asImpulse: true)
+        //        } else {
+        //            print("Warning: Forward direction is too small, helicopter rotation might be incorrect.")
+        //        }
+        //        scene.rootNode.addChildNode(bullet)
+        //        let impulse = forwardDirection * 500
+        //        bullet.physicsBody?.applyForce(impulse, asImpulse: true)
+        //        print("Bullet position after force application: \(bullet.position)")
+        //        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+        //            bullet.removeFromParentNode()
+        //        }
     }
     
     func missileLock(ship: Ship) {

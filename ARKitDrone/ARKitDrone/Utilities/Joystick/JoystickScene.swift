@@ -25,19 +25,24 @@ class JoystickScene: SKScene {
     
     override func didMove(to view: SKView) {
         super.didMove(to: view)
-        backgroundColor = .clear
-        setupJoystick()
+        DispatchQueue.main.async {
+            self.backgroundColor = .clear
+            self.setupJoystick()
+        }
     }
     
     override func update(_ currentTime: CFTimeInterval) {
         super.update(currentTime)
-        let joystickVelocity = joystick.velocity
-        if joystickVelocity != .zero {
-            let isVertical = abs(joystickVelocity.y) > abs(joystickVelocity.x)
-            if isVertical {
-                joystickDelegate?.update(yValue: Float(joystickVelocity.y), stickNum: stickNum)
-            } else {
-                joystickDelegate?.update(xValue: Float(joystickVelocity.x), stickNum: stickNum)
+       
+        DispatchQueue.main.async {
+            let joystickVelocity = self.joystick.velocity
+            if joystickVelocity != .zero {
+                let isVertical = abs(joystickVelocity.y) > abs(joystickVelocity.x)
+                if isVertical {
+                    self.joystickDelegate?.update(yValue: Float(joystickVelocity.y), stickNum: self.stickNum)
+                } else {
+                    self.joystickDelegate?.update(xValue: Float(joystickVelocity.x), stickNum: self.stickNum)
+                }
             }
         }
     }
