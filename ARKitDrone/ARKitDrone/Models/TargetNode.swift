@@ -1,66 +1,13 @@
 //
-//  Plane.swift
+//  TargetNode.swift
 //  ARKitDrone
 //
-//  Created by Christopher Webb on 10/11/23.
-//  Copyright © 2023 Christopher Webb-Orenstein. All rights reserved.
+//  Created by Christopher Webb on 2/18/25.
+//  Copyright © 2025 Christopher Webb-Orenstein. All rights reserved.
 //
 
-import Foundation
+import SceneKit
 import ARKit
-
-class OcclusionNode: SCNNode {
-       private var meshNode: SCNNode!
-       private var visible: Bool = false
-    
-       init(meshAnchor: ARMeshAnchor) {
-           super.init()
-           createOcclusionNode(with: meshAnchor)
-       }
-
-       required init?(coder: NSCoder) {
-           fatalError("init(coder:) has not been implemented")
-       }
-
-       func updateOcclusionNode(with meshAnchor: ARMeshAnchor, visible: Bool) {
-           self.visible = visible
-           let meshGeometry = getGeometry(from: meshAnchor)
-           meshNode.removeFromParentNode()
-           createMeshNode(with: meshGeometry)
-       }
-
-       private func createOcclusionNode(with meshAnchor: ARMeshAnchor) {
-           let meshGeometry = getGeometry(from: meshAnchor)
-           createMeshNode(with: meshGeometry)
-       }
-
-       private func getGeometry(from meshAnchor: ARMeshAnchor) -> SCNGeometry {
-           let meshGeometry = SCNGeometry(from: meshAnchor.geometry)
-           if visible {
-               meshGeometry.materials = [SCNMaterial.visibleMesh]
-           } else {
-               meshGeometry.materials = [SCNMaterial.occluder]
-           }
-           return meshGeometry
-       }
-
-       private func createMeshNode(with geometry: SCNGeometry) {
-           meshNode = SCNNode(geometry: geometry)
-           meshNode.renderingOrder = -1
-           addChildNode(meshNode)
-       }
-   }
-
-extension SCNGeometry {
-
-    convenience init(from arGeometry: ARMeshGeometry) {
-        let verticesSource = SCNGeometrySource(arGeometry.vertices, semantic: .vertex)
-        let normalsSource = SCNGeometrySource(arGeometry.normals, semantic: .normal)
-        let faces = SCNGeometryElement(arGeometry.faces)
-        self.init(sources: [verticesSource, normalsSource], elements: [faces])
-    }
-
-}
 
 
 class TargetNode: SCNNode {
@@ -70,13 +17,13 @@ class TargetNode: SCNNode {
     var isOpen = false
     
     /// Indicates if the square is currently being animated for opening or closing.
-     var isAnimating = false
+    var isAnimating = false
     
     /// Indicates if the square is currently changing its orientation when the camera is pointing downwards.
-     var isChangingOrientation = false
+    var isChangingOrientation = false
     
     /// Indicates if the camera is currently pointing towards the floor.
-     var isPointingDownwards = true
+    var isPointingDownwards = true
     
     static let primaryColor = UIColor.green
     
@@ -85,30 +32,27 @@ class TargetNode: SCNNode {
     
     
     /// The focus square's most recent positions.
-     var recentFocusSquarePositions: [SIMD3<Float>] = []
+    var recentFocusSquarePositions: [SIMD3<Float>] = []
     
-     lazy var fillPlane: SCNNode = {
+    lazy var fillPlane: SCNNode = {
         let correctionFactor = FocusSquare.thickness / 2 // correction to align lines perfectly
         let length = CGFloat(1.0 - FocusSquare.thickness * 2 + correctionFactor)
-        
         let plane = SCNPlane(width: length, height: length)
         let node = SCNNode(geometry: plane)
         node.name = "fillPlane"
         node.opacity = 0
-        
         let material = plane.firstMaterial!
         material.diffuse.contents = TargetNode.fillColor
         material.isDoubleSided = true
         material.ambient.contents = UIColor.black
         material.lightingModel = .constant
         material.emission.contents = TargetNode.fillColor
-        
         return node
     }()
     
     override init() {
         super.init()
-         
+        
         let s1 = FocusSquare.Segment(name: "s1", corner: .topLeft, alignment: .horizontal, color: TargetNode.fillColor, thickness: 0.04)
         
         let s2 = FocusSquare.Segment(name: "s2", corner: .topRight, alignment: .horizontal, color: TargetNode.fillColor, thickness: 0.04)
@@ -160,7 +104,6 @@ class TargetNode: SCNNode {
     
     func unhide() {
         guard action(forKey: "unhide") == nil else { return }
-        
         displayNodeHierarchyOnTop(true)
         runAction(.fadeIn(duration: 0.5), forKey: "unhide")
     }
@@ -179,7 +122,7 @@ class TargetNode: SCNNode {
             segment.open()
         }
         SCNTransaction.completionBlock = {
-//            self.positioningNode.runAction(pulseAction(), forKey: "pulse")
+            //            self.positioningNode.runAction(pulseAction(), forKey: "pulse")
             // This is a safe operation because `SCNTransaction`'s completion block is called back on the main thread.
             self.isAnimating = false
         }
@@ -197,11 +140,8 @@ class TargetNode: SCNNode {
         guard isOpen, !isAnimating else { return }
         isOpen = false
         isAnimating = true
-        
         positioningNode.removeAction(forKey: "pulse")
         positioningNode.opacity = 1.0
-        
-        // Close animation
         SCNTransaction.begin()
         SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: .easeOut)
         SCNTransaction.animationDuration = FocusSquare.animationDuration / 2
@@ -218,7 +158,6 @@ class TargetNode: SCNNode {
         }
         SCNTransaction.commit()
         positioningNode.opacity = 1
-        
         // Scale/bounce animation
         positioningNode.addAnimation(scaleAnimation(for: "transform.scale.x"), forKey: "transform.scale.x")
         positioningNode.addAnimation(scaleAnimation(for: "transform.scale.y"), forKey: "transform.scale.y")
@@ -229,7 +168,6 @@ class TargetNode: SCNNode {
             let fadeInAction = SCNAction.fadeOpacity(to: 0.25, duration: FocusSquare.animationDuration * 0.125)
             let fadeOutAction = SCNAction.fadeOpacity(to: 0.0, duration: FocusSquare.animationDuration * 0.125)
             fillPlane.runAction(SCNAction.sequence([waitAction, fadeInAction, fadeOutAction]))
-            
             let flashSquareAction = flashAnimation(duration: FocusSquare.animationDuration * 0.25)
             for segment in segments {
                 segment.runAction(.sequence([waitAction, flashSquareAction]))
@@ -239,41 +177,32 @@ class TargetNode: SCNNode {
     
     func scaleAnimation(for keyPath: String) -> CAKeyframeAnimation {
         let scaleAnimation = CAKeyframeAnimation(keyPath: keyPath)
-        
         let easeOut = CAMediaTimingFunction(name: .easeOut)
         let easeInOut = CAMediaTimingFunction(name: .easeInEaseOut)
         let linear = CAMediaTimingFunction(name: .linear)
-        
         let size = FocusSquare.size
         let ts = FocusSquare.size * FocusSquare.scaleForClosedSquare
         let values = [size, size * 1.15, size * 1.15, ts * 0.97, ts]
         let keyTimes: [NSNumber] = [0.00, 0.25, 0.50, 0.75, 1.00]
         let timingFunctions = [easeOut, linear, easeOut, easeInOut]
-        
         scaleAnimation.values = values
         scaleAnimation.keyTimes = keyTimes
         scaleAnimation.timingFunctions = timingFunctions
         scaleAnimation.duration = FocusSquare.animationDuration
-        
         return scaleAnimation
     }
-    
-    
     
     func displayNodeHierarchyOnTop(_ isOnTop: Bool) {
         // Recursivley traverses the node's children to update the rendering order depending on the `isOnTop` parameter.
         func updateRenderOrder(for node: SCNNode) {
             node.renderingOrder = isOnTop ? 2 : 0
-            
             for material in node.geometry?.materials ?? [] {
                 material.readsFromDepthBuffer = !isOnTop
             }
-            
             for child in node.childNodes {
                 updateRenderOrder(for: child)
             }
         }
-        
         updateRenderOrder(for: positioningNode)
     }
     
@@ -285,13 +214,12 @@ class TargetNode: SCNNode {
 
 private func flashAnimation(duration: TimeInterval) -> SCNAction {
     let action = SCNAction.customAction(duration: duration) { (node, elapsedTime) -> Void in
-        // animate color from HSB 48/100/100 to 48/30/100 and back
         let elapsedTimePercentage = elapsedTime / CGFloat(duration)
         let saturation = 2.8 * (elapsedTimePercentage - 0.5) * (elapsedTimePercentage - 0.5) + 0.3
         if let material = node.geometry?.firstMaterial {
             material.diffuse.contents = TargetNode.fillColor.withAlphaComponent(1.0)
-//            UIColor(hue: 0.1333, saturation: saturation, brightness: 1.0, alpha: 1.0)
         }
     }
     return action
 }
+

@@ -67,7 +67,6 @@ extension FocusSquare {
         init(name: String, corner: Corner, alignment: Alignment, color: UIColor = FocusSquare.primaryColor, thickness: CGFloat = 0.018) {
             self.corner = corner
             self.alignment = alignment
-            
             switch alignment {
             case .vertical:
                 plane = SCNPlane(width: thickness, height: Segment.length)
@@ -76,7 +75,6 @@ extension FocusSquare {
             }
             super.init()
             self.name = name
-            
             let material = plane.firstMaterial!
             material.diffuse.contents = color
             material.isDoubleSided = true
@@ -125,7 +123,6 @@ extension FocusSquare {
                 oldLength = plane.height
                 plane.height = Segment.length
             }
-            
             let offset = Segment.length / 2 - oldLength / 2
             updatePosition(withOffset: Float(offset), for: openDirection.reversed)
         }
@@ -340,7 +337,7 @@ class FocusSquare: SCNNode {
     func updateOrientation(basedOn raycastResult: ARRaycastResult) {
         self.simdOrientation = raycastResult.worldTransform.orientation
     }
-//    
+    //
     func updateOrientation(for transform: simd_float4x4) {
         self.simdOrientation = transform.orientation
     }
@@ -617,5 +614,364 @@ extension CGPoint {
     /// Returns the length of a point when considered as a vector. (Used with gesture recognizers.)
     var length: CGFloat {
         return sqrt(x * x + y * y)
+    }
+}
+
+
+extension FocusCircle {
+    class Segment: SCNNode {
+        enum Quadrant {
+            case topLeft, topRight, bottomRight, bottomLeft
+        }
+        
+        //        init(name: String, quadrant: Quadrant) {
+        //            super.init()
+        //
+        //            let radius: CGFloat = 0.1
+        //            let arcThickness: CGFloat = 0.02
+        //            let startAngle: CGFloat
+        //            let endAngle: CGFloat
+        //            let quadrantOffset: SCNVector3
+        //            let rotationAngle: Float
+        //
+        //            // Define each quadrant covers 90 degrees (π/2 radians)
+        //            let arcAngle: CGFloat = .pi * 0.5 // 90 degrees for each quadrant
+        //
+        //            switch quadrant {
+        //            case .topLeft:
+        //                startAngle = .pi
+        //                endAngle = .pi + arcAngle
+        //                quadrantOffset = SCNVector3(-radius, radius, 0) // Position in the top left
+        //                rotationAngle = .pi  // Rotate the segment to face top-left
+        //            case .topRight:
+        //                startAngle = .pi + arcAngle
+        //                endAngle = .pi * 2
+        //                quadrantOffset = SCNVector3(radius, radius, 0) // Position in the top right
+        //                rotationAngle = 0  // No rotation for top-right, it aligns with the positive x-axis
+        //            case .bottomRight:
+        //                startAngle = 0
+        //                endAngle = arcAngle
+        //                quadrantOffset = SCNVector3(radius, -radius, 0) // Position in the bottom right
+        //                rotationAngle = -.pi / 2 // Rotate the segment to face bottom-right
+        //            case .bottomLeft:
+        //                startAngle = arcAngle
+        //                endAngle = .pi
+        //                quadrantOffset = SCNVector3(-radius, -radius, 0) // Position in the bottom left
+        //                rotationAngle = .pi / 2 // Rotate the segment to face bottom-left
+        //            }
+        //
+        //            // Define the number of vertices for the arc (higher count will make the arc smoother)
+        //            let vertexCount = 30  // Higher count will make the arc smoother
+        //            var vertices: [SCNVector3] = []
+        //
+        //            // Add the points along the outer arc (the visible edge of the arc)
+        //            for i in 0..<vertexCount {
+        //                let angle = startAngle + CGFloat(i) * (endAngle - startAngle) / CGFloat(vertexCount - 1)
+        //                let x = radius * cos(angle)
+        //                let y = radius * sin(angle)
+        //                vertices.append(SCNVector3(x, y, 0))
+        //            }
+        //
+        //            // Now, create the indices for the geometry (only for the outer arc, no inner lines)
+        //            var indices: [Int32] = []
+        //
+        //            // Connect the outer arc points using triangle strips (no inner center point)
+        //            for i in 0..<vertexCount-1 {
+        //                indices.append(Int32(i))
+        //                indices.append(Int32(i + 1))
+        //                indices.append(Int32(i + 1))  // Loop back to the first point for the triangle
+        //            }
+        //
+        //            // Handle the wrapping indices for the last point of the arc
+        //            indices.append(Int32(vertexCount - 1))
+        //            indices.append(Int32(0)) // Wrap around to start again
+        //            indices.append(Int32(0))
+        //
+        //            // Create the geometry using the vertices and indices
+        //            let geometrySource = SCNGeometrySource(vertices: vertices)
+        //            let geometryElement = SCNGeometryElement(indices: indices, primitiveType: .triangles)
+        //
+        //            // Create the final geometry
+        //            let geometry = SCNGeometry(sources: [geometrySource], elements: [geometryElement])
+        //
+        //            // Now create a node for the geometry
+        //            let arcNode = SCNNode(geometry: geometry)
+        //
+        //            // Apply the material to make the arc outline visible
+        //            let material = SCNMaterial()
+        //            material.diffuse.contents = FocusCircle.primaryColor // Set color or material
+        //            material.isDoubleSided = true
+        //            arcNode.geometry?.firstMaterial = material
+        //
+        //            // Apply the correct position and rotation
+        //            arcNode.position = quadrantOffset
+        //            arcNode.eulerAngles = SCNVector3(0, 0, rotationAngle)
+        //
+        //            // Ensure that the node is visible in the scene
+        //            arcNode.scale = SCNVector3(1, 1, 1)
+        //
+        //            // Add the arc node to the scene or parent node
+        //            self.addChildNode(arcNode)
+        //        }
+        
+        
+        
+        //        init(name: String, quadrant: Quadrant) {
+        //            super.init()
+        //
+        //            let radius: CGFloat = 0.1
+        //            let arcThickness: CGFloat = 0.01
+        //            let startAngle: CGFloat
+        //            let endAngle: CGFloat
+        //            let quadrantOffset: SCNVector3
+        //            let rotationAngle: Float
+        //
+        //            // Define each quadrant covers 90 degrees (π/2 radians)
+        //            let arcAngle: CGFloat = .pi * 0.5 // 90 degrees for each quadrant
+        //
+        //            switch quadrant {
+        //            case .topLeft:
+        //                startAngle = .pi
+        //                endAngle = .pi + arcAngle
+        //                quadrantOffset = SCNVector3(-radius, radius, 0) // Position in the top left
+        //                rotationAngle = .pi  // Rotate the segment to face top-left
+        //            case .topRight:
+        //                startAngle = .pi + arcAngle
+        //                endAngle = .pi * 2
+        //                quadrantOffset = SCNVector3(radius, radius, 0) // Position in the top right
+        //                rotationAngle = 0  // No rotation for top-right, it aligns with the positive x-axis
+        //            case .bottomRight:
+        //                startAngle = 0
+        //                endAngle = arcAngle
+        //                quadrantOffset = SCNVector3(radius, -radius, 0) // Position in the bottom right
+        //                rotationAngle = -.pi / 2 // Rotate the segment to face bottom-right
+        //            case .bottomLeft:
+        //                startAngle = arcAngle
+        //                endAngle = .pi
+        //                quadrantOffset = SCNVector3(-radius, -radius, 0) // Position in the bottom left
+        //                rotationAngle = .pi / 2 // Rotate the segment to face bottom-left
+        //            }
+        //
+        //            // Define the number of vertices for the arc (higher count will make the arc smoother)
+        //            let vertexCount = 30  // Higher count will make the arc smoother
+        //            var vertices: [SCNVector3] = []
+        //
+        //            // Add the points along the outer arc (visible edge of the arc)
+        //            for i in 0..<vertexCount {
+        //                let angle = startAngle + CGFloat(i) * (endAngle - startAngle) / CGFloat(vertexCount - 1)
+        //                let x = radius * cos(angle)
+        //                let y = radius * sin(angle)
+        //                vertices.append(SCNVector3(x, y, 0))
+        //            }
+        //
+        //            // Define a smaller inner radius for the arc (for the inner edge)
+        //            let innerRadius = radius - arcThickness
+        //
+        //            // Add points for the inner arc (the inner edge of the arc)
+        //            for i in 0..<vertexCount {
+        //                let angle = startAngle + CGFloat(i) * (endAngle - startAngle) / CGFloat(vertexCount - 1)
+        //                let x = innerRadius * cos(angle)
+        //                let y = innerRadius * sin(angle)
+        //                vertices.append(SCNVector3(x, y, 0))
+        //            }
+        //
+        //            // Now, create the indices for the geometry (triangle strips)
+        //            var indices: [Int32] = []
+        //
+        //            // Connect the vertices for the outer arc to the inner arc to form a thin strip
+        //            for i in 0..<vertexCount-1 {
+        //                // Outer arc indices
+        //                indices.append(Int32(i))
+        //                indices.append(Int32(i + 1))
+        //                indices.append(Int32(i + vertexCount))
+        //
+        //                indices.append(Int32(i + vertexCount))
+        //                indices.append(Int32(i + 1))
+        //                indices.append(Int32(i + vertexCount + 1))
+        //            }
+        //
+        //            // Handle the wrapping indices for the last point of the arc
+        //            indices.append(Int32(vertexCount - 1))
+        //            indices.append(Int32(0))
+        //            indices.append(Int32(2 * vertexCount - 1))
+        //
+        //            indices.append(Int32(2 * vertexCount - 1))
+        //            indices.append(Int32(0))
+        //            indices.append(Int32(vertexCount))
+        //
+        //            // Create the geometry using the vertices and indices
+        //            let geometrySource = SCNGeometrySource(vertices: vertices)
+        //            let geometryElement = SCNGeometryElement(indices: indices, primitiveType: .triangles)
+        //
+        //            // Create the final geometry
+        //            let geometry = SCNGeometry(sources: [geometrySource], elements: [geometryElement])
+        //
+        //            // Now create a node for the geometry
+        //            let arcNode = SCNNode(geometry: geometry)
+        //
+        //            // Apply the material to make the arc outline visible
+        //            arcNode.geometry?.firstMaterial?.diffuse.contents = FocusCircle.primaryColor // Set color or material
+        //            arcNode.geometry?.firstMaterial?.isDoubleSided = true
+        //
+        //            // Apply the correct position and rotation
+        //            arcNode.position = quadrantOffset
+        //            arcNode.eulerAngles = SCNVector3(0, 0, rotationAngle)
+        //
+        //            // Add the arc node to the scene or parent node
+        //            self.addChildNode(arcNode)
+        //        }
+        
+        
+        init(name: String, quadrant: Quadrant) {
+            super.init()
+            
+            let radius: CGFloat = 0.1
+            let arcThickness: CGFloat = 0.01
+            let startAngle: CGFloat
+            let endAngle: CGFloat
+            let quadrantOffset: SCNVector3
+            let rotationAngle: Float
+            
+            // Each segment will have a 90-degree arc, divided into four parts.
+            let arcAngle: CGFloat = .pi * 0.5 // 90 degrees for each quadrant
+            
+            switch quadrant {
+            case .topLeft:
+                startAngle = .pi
+                endAngle = .pi + arcAngle
+                quadrantOffset = SCNVector3(radius, radius, 0) // Position in the top left
+                rotationAngle = .pi  // Rotate the segment to face top-left
+            case .topRight:
+                startAngle = .pi + arcAngle
+                endAngle = .pi * 2
+                quadrantOffset = SCNVector3(radius, radius, 0) // Position in the top right
+                rotationAngle = -.pi  // No rotation for top-right, it aligns with the positive x-axis
+            case .bottomRight:
+                startAngle = 0
+                endAngle = arcAngle
+                quadrantOffset = SCNVector3(radius, radius, 0) // Position in the bottom right
+                rotationAngle = -.pi / 2 // Rotate the segment to face bottom-right
+            case .bottomLeft:
+                startAngle = arcAngle
+                endAngle = .pi
+                quadrantOffset = SCNVector3(radius, radius, 0) // Position in the bottom left
+                rotationAngle = .pi / 2 // Rotate the segment to face bottom-left
+            }
+            
+            // Create the vertices for the arc (triangle fan)
+            let vertexCount = 8  // Number of vertices for the arc (higher means smoother)
+            var vertices: [SCNVector3] = []
+            
+            // Add the center point (all arcs share the center)
+            vertices.append(SCNVector3(0, 0, 0))
+            
+            // Create points along the arc for the outer edge
+            for i in 0..<vertexCount {
+                let angle = startAngle + CGFloat(i) * (endAngle - startAngle) / CGFloat(vertexCount - 1)
+                let x = radius * cos(angle)
+                let y = radius * sin(angle)
+                vertices.append(SCNVector3(x, y, 0))
+            }
+            
+            // Now, create the indices for the geometry (triangle fan indices)
+            var indices: [Int32] = []
+            for i in 1..<vertexCount {
+                indices.append(0)  // The center vertex
+                indices.append(Int32(i))  // Current outer vertex
+                indices.append(Int32(i + 1 == vertexCount ? 1 : i + 1))  // Next outer vertex (loop around)
+            }
+            
+            // Create the geometry using the vertices and indices
+            let geometrySource = SCNGeometrySource(vertices: vertices)
+            let geometryElement = SCNGeometryElement(indices: indices, primitiveType: .line)
+            
+            // Create the final geometry
+            let geometry = SCNGeometry(sources: [geometrySource], elements: [geometryElement])
+            
+            // Now create a node for the geometry
+            let arcNode = SCNNode(geometry: geometry)
+
+            let material =  arcNode.geometry!.firstMaterial!
+            material.diffuse.contents = TargetNode.fillColor
+            material.isDoubleSided = true
+            material.ambient.contents = UIColor.black
+            material.lightingModel = .constant
+            material.emission.contents = TargetNode.fillColor
+            
+            // Apply the correct position and rotation
+            arcNode.position = quadrantOffset
+            arcNode.eulerAngles = SCNVector3(0, 0, rotationAngle)
+            
+            // Ensure that the node is visible in the scene
+            arcNode.scale = SCNVector3(1, 1, 1)
+            
+            // Add the arc node to the scene or parent node
+            self.addChildNode(arcNode)
+        }
+        
+        required init?(coder aDecoder: NSCoder) {
+            fatalError("\(#function) has not been implemented")
+        }
+    }
+}
+
+class FocusCircle: SCNNode {
+    static let primaryColor = #colorLiteral(red: 1, green: 0.8, blue: 0, alpha: 1)
+    
+    private var segments: [FocusCircle.Segment] = []
+    private let positioningNode = SCNNode()
+    
+    override init() {
+        super.init()
+        //        opacity = 0.0
+        
+        let s1 = Segment(name: "s1", quadrant: .topLeft)
+        let s2 = Segment(name: "s2", quadrant: .topRight)
+        let s3 = Segment(name: "s3", quadrant: .bottomRight)
+        let s4 = Segment(name: "s4", quadrant: .bottomLeft)
+        
+        segments = [s1, s2, s3, s4]
+        
+        for segment in segments {
+            positioningNode.addChildNode(segment)
+        }
+        addChildNode(positioningNode)
+        displayAsBillboard()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("\(#function) has not been implemented")
+    }
+    
+    private func displayAsBillboard() {
+        simdTransform = matrix_identity_float4x4
+        eulerAngles.x = .pi / 2
+        simdPosition = [0, 0, -0.8]
+        unhide()
+        //        performOpenAnimation()
+    }
+    
+    func unhide() {
+        guard action(forKey: "unhide") == nil else { return }
+        
+        displayNodeHierarchyOnTop(true)
+        runAction(.fadeIn(duration: 0.5), forKey: "unhide")
+    }
+    
+    func displayNodeHierarchyOnTop(_ isOnTop: Bool) {
+        // Recursivley traverses the node's children to update the rendering order depending on the `isOnTop` parameter.
+        func updateRenderOrder(for node: SCNNode) {
+            node.renderingOrder = isOnTop ? 2 : 0
+            
+            for material in node.geometry?.materials ?? [] {
+                material.readsFromDepthBuffer = !isOnTop
+            }
+            
+            for child in node.childNodes {
+                updateRenderOrder(for: child)
+            }
+        }
+        
+        updateRenderOrder(for: positioningNode)
     }
 }

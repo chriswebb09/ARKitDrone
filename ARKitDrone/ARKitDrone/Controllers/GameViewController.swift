@@ -174,6 +174,8 @@ class GameViewController: UIViewController {
             startMinimapUpdate()
             setupPadScene()
             self.sceneView.scene.rootNode.addChildNode(focusSquare)
+            let circle = FocusCircle()
+            self.sceneView.scene.rootNode.addChildNode(circle) 
             
         }
         sceneView.addSubview(destoryedText)
