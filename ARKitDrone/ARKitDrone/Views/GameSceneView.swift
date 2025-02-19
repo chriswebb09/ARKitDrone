@@ -49,7 +49,6 @@ class GameSceneView: ARSCNView {
     
     static let helicopterSceneName = "art.scnassets/Helicopter.scn"
     static let targetScene = "art.scnassets/Target.scn"
-    //    static let targetName = "target"
     static let helicopterParentModelName = "Apache"
     static let hudNodeName = "hud"
     static let helicopterBodyName = "Body"
@@ -154,6 +153,7 @@ class GameSceneView: ARSCNView {
         ]))
     }
     
+
     func moveShips(placed: Bool) {
         var percievedCenter = SCNVector3Zero
         var percievedVelocity = SCNVector3Zero
@@ -169,8 +169,6 @@ class GameSceneView: ARSCNView {
                 obstacles: [helicopterNode]
             )
         }
-        
-        
         //        if placed {
         //            ships.forEach {
         //                $0.updateShipPosition(target: helicopterNode.position, otherShips: self.ships)
@@ -199,6 +197,12 @@ class GameSceneView: ARSCNView {
                 )
                 ship.node.position = SCNVector3(x:randomOffset.x , y: randomOffset.y, z: randomOffset.z)
                 ship.node.scale = SCNVector3(x: 0.003, y: 0.003, z: 0.003)
+                DispatchQueue.main.async {
+                    let square = TargetNode()
+                    ship.square = square
+                    self.scene.rootNode.addChildNode(square)
+                    ship.targetAdded = true
+                }
             }
         }
     }
@@ -210,42 +214,38 @@ class GameSceneView: ARSCNView {
 extension GameSceneView: HelicopterCapable {
     
     func shootUpperGun() {
-        let bullet = SCNNode(geometry: SCNSphere(radius: 0.002)) // Temporarily increase size to make sure it's visible
-        bullet.geometry?.firstMaterial?.diffuse.contents = UIColor.yellow
-        print("Gun position: \(upperGun.presentation.worldPosition)")
-        bullet.position = SCNVector3(upperGun.presentation.worldPosition.x + 0.009, upperGun.presentation.worldPosition.y + 0.07, upperGun.presentation.worldPosition.z + 0.3)
-        
-        let physicsShape = SCNPhysicsShape(geometry: bullet.geometry!, options: nil)
-        let physicsBody = SCNPhysicsBody(type: .dynamic, shape: physicsShape)
-        physicsBody.isAffectedByGravity = false
-        bullet.physicsBody = physicsBody
-        
-        let forwardDirection = SCNVector3(
-            -helicopterNode.presentation.transform.m31,  // x-component of the z-axis
-             -helicopterNode.presentation.transform.m32,  // y-component of the z-axis
-             -helicopterNode.presentation.transform.m33   // z-component of the z-axis
-        )
-        
-        if forwardDirection.length() > 0.01 {
-            let impulse = forwardDirection * 200  // Adjust force if needed
-            bullet.physicsBody?.applyForce(impulse, asImpulse: true)
-        } else {
-            print("Warning: Forward direction is too small, helicopter rotation might be incorrect.")
-        }
-        scene.rootNode.addChildNode(bullet)
-        
-        let impulse = forwardDirection * 500
-        bullet.physicsBody?.applyForce(impulse, asImpulse: true)
-        print("Bullet position after force application: \(bullet.position)")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            bullet.removeFromParentNode()
-        }
+        helicopter.shootUpperGun()
+//        let bullet = SCNNode(geometry: SCNSphere(radius: 0.002)) // Temporarily increase size to make sure it's visible
+//        bullet.geometry?.firstMaterial?.diffuse.contents = UIColor.yellow
+//        print("Gun position: \(upperGun.presentation.worldPosition)")
+//        bullet.position = SCNVector3(upperGun.presentation.worldPosition.x + 0.009, upperGun.presentation.worldPosition.y + 0.07, upperGun.presentation.worldPosition.z + 0.3)
+//        let physicsShape = SCNPhysicsShape(geometry: bullet.geometry!, options: nil)
+//        let physicsBody = SCNPhysicsBody(type: .dynamic, shape: physicsShape)
+//        physicsBody.isAffectedByGravity = false
+//        bullet.physicsBody = physicsBody
+//        let forwardDirection = SCNVector3(
+//            -helicopterNode.presentation.transform.m31,  // x-component of the z-axis
+//             -helicopterNode.presentation.transform.m32,  // y-component of the z-axis
+//             -helicopterNode.presentation.transform.m33   // z-component of the z-axis
+//        )
+//        if forwardDirection.length() > 0.01 {
+//            let impulse = forwardDirection * 200  // Adjust force if needed
+//            bullet.physicsBody?.applyForce(impulse, asImpulse: true)
+//        } else {
+//            print("Warning: Forward direction is too small, helicopter rotation might be incorrect.")
+//        }
+//        scene.rootNode.addChildNode(bullet)
+//        let impulse = forwardDirection * 500
+//        bullet.physicsBody?.applyForce(impulse, asImpulse: true)
+//        print("Bullet position after force application: \(bullet.position)")
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+//            bullet.removeFromParentNode()
+//        }
     }
     
     func missileLock(ship: Ship) {
         helicopter.lockOn(ship: ship)
     }
-    
     
     func positionHUD() {
         helicopter.updateHUD()

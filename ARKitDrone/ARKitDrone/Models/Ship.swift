@@ -20,6 +20,7 @@ class Ship {
     
     var isDestroyed: Bool = false
     var targetNode: SCNNode!
+    var square: TargetNode!
     var targetAdded = false
     var id: String!
     
@@ -133,6 +134,22 @@ class Ship {
         let angle = CGFloat(forward.dot(velocityNormal))
         self.node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
         self.node.position = self.node.position + (self.velocity)
+        if targetAdded {
+            square.unhide()
+            square.displayNodeHierarchyOnTop(true)
+            self.square.recentFocusSquarePositions = Array(square.recentFocusSquarePositions.suffix(10))
+            let position = self.node.simdWorldTransform.translation
+            square.recentFocusSquarePositions.append(position)
+            let average = square.recentFocusSquarePositions.reduce([0, 0, 0], { $0 + $1 }) / Float(square.recentFocusSquarePositions.count)
+            square.simdPosition = average
+            square.simdScale = [20.0, 20.0, 20.0]
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = 0.001
+            self.square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
+            self.square.position = SCNVector3(x: self.node.position.x, y: self.node.position.y, z: self.node.position.z)
+            SCNTransaction.commit()
+            square.performOpenAnimation()
+        }
     }
     
     func setTargetAboveSelected() {
@@ -147,6 +164,7 @@ class Ship {
     
     func updateShipPosition(target: SCNVector3, otherShips: [Ship]) {
         let nodes = otherShips.map { $0.node }
+        
         let perceivedCenter: SCNVector3
         if otherShips.isEmpty {
             perceivedCenter = node.position
@@ -185,6 +203,18 @@ class Ship {
         
         velocity = (speed > speedLimit) ? (newVelocity / speed) * speedLimit : newVelocity
         node.position += velocity
+        if targetAdded {
+            square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
+            SCNTransaction.begin()
+            square.simdScale = [1.0, 1.0, 1.0]
+            SCNTransaction.animationDuration = 0.001
+            self.targetNode.position = SCNVector3(x: self.node.position.x, y: self.node.position.y + 1, z: self.node.position.z - 10)
+            square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
+            square.simdWorldPosition = node.simdWorldPosition
+            square.simdWorldOrientation = node.simdWorldOrientation
+            square.simdWorldTransform = node.simdWorldTransform
+            SCNTransaction.commit()
+        }
     }
 }
 
@@ -211,7 +241,6 @@ extension Ship {
     }
     
     private func createMissile() -> SCNNode {
-        // This method creates a missile node. Customize it based on your scene's needs.
         let missileGeometry = SCNSphere(radius: 0.5)
         let missileNode = SCNNode(geometry: missileGeometry)
         missileNode.name = "Missile"
@@ -225,9 +254,9 @@ extension Ship {
     }
     
     private func flyTowards(_ targetPosition: SCNVector3) {
-        // If the target is out of range, move towards it
         let directionToTarget = (targetPosition - node.position).normalized()
         velocity = directionToTarget * 0.1 // Adjust the speed
         node.position += velocity
     }
 }
+

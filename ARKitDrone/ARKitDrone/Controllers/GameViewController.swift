@@ -14,6 +14,7 @@ import SpriteKit
 class GameViewController: UIViewController {
     
     let game = Game()
+    var focusSquare: FocusSquare! = FocusSquare()
     var minimapScene: MinimapScene!
     var minimap: SKShapeNode!
     var playerNode: SCNNode!
@@ -113,6 +114,8 @@ class GameViewController: UIViewController {
         return label
     }()
     
+    var squareSet = false
+    
     private var session: ARSession {
         return sceneView.session
     }
@@ -153,7 +156,6 @@ class GameViewController: UIViewController {
         UIApplication.shared.isIdleTimerDisabled = true
         setupTracking()
         sceneView.setup()
-       
         sceneView.scene.physicsWorld.contactDelegate = self
         playerNode = SCNNode(geometry: SCNSphere(radius: 0.01))
         playerNode.name = "Player"
@@ -171,6 +173,7 @@ class GameViewController: UIViewController {
             view.addSubview(minimapView)
             startMinimapUpdate()
             setupPadScene()
+            self.sceneView.scene.rootNode.addChildNode(focusSquare)
             
         }
         sceneView.addSubview(destoryedText)
@@ -203,7 +206,6 @@ class GameViewController: UIViewController {
         let missilePositions = sceneView.missiles.filter { $0.fired && !$0.hit }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
         let helcopterWorldPosition = sceneView.helicopterNode.worldPosition
         let helicopterPosition: simd_float4 = game.placed ? simd_float4(helcopterWorldPosition.x, helcopterWorldPosition.y, helcopterWorldPosition.z, 1.0) : simd_float4.zero
-        
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             minimapScene.updateMinimap(
@@ -255,7 +257,6 @@ class GameViewController: UIViewController {
         scene.stickNum = 2
         padView1.presentScene(scene)
         padView1.ignoresSiblingOrder = true
-        
         let scene2 = JoystickScene()
         scene2.point = LocalConstants.joystickPoint
         scene2.size = LocalConstants.joystickSize
@@ -282,11 +283,11 @@ class GameViewController: UIViewController {
         let tapLocation: CGPoint = touch.location(in: sceneView)
         guard let result = sceneView.raycastQuery(from: tapLocation, allowing: .estimatedPlane, alignment: .horizontal) else { return }
         let castRay = session.raycast(result)
-        
         if let firstCast = castRay.first {
             let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
             DispatchQueue.main.async {
                 self.sceneView.positionTank(position: tappedPosition)
+                self.focusSquare.hide()
             }
             game.placed = true
         }
@@ -296,7 +297,10 @@ class GameViewController: UIViewController {
 extension GameViewController: ARSCNViewDelegate {
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        sceneView.moveShips(placed: game.placed)
+        DispatchQueue.main.async {
+            self.sceneView.moveShips(placed: self.game.placed)
+            self.updateFocusSquare(isObjectVisible: false)
+        }
     }
     
 }
@@ -328,34 +332,27 @@ extension GameViewController: JoystickSceneDelegate {
     func tapped() {
         guard sceneView.helicopter.missilesArmed else { return }
         sceneView.shootUpperGun()
-//        fire()
+        //        fire()
     }
     
     func fire() {
         guard !sceneView.missiles.isEmpty, !game.scoreUpdated else { return }
         guard let ship = sceneView.ships.first(where: { !$0.isDestroyed && !$0.targeted }) else { return }
         ship.targeted = true
-        
         guard let missile = sceneView.missiles.first(where:{ !$0.fired }) else { return }
-        
         missile.fired = true
-        
         game.valueReached = false
         missile.addCollision()
         sceneView.missileLock(ship: ship)
         missile.node.look(at: ship.node.position)
         ApacheHelicopter.speed = 0
-        
         let targetPos = ship.node.presentation.simdWorldPosition
         let currentPos = missile.node.presentation.simdWorldPosition
         let direction = simd_normalize(targetPos - currentPos)
-        
         missile.particle?.orientationDirection = SCNVector3(-direction.x, -direction.y, -direction.z)
         missile.particle?.birthRate = 1000
-        
         let displayLink = CADisplayLink(target: self, selector: #selector(updateMissilePosition))
         displayLink.preferredFramesPerSecond = 60
-        
         activeMissileTrackers[missile.id] = MissileTrackingInfo(
             missile: missile,
             target: ship,
@@ -408,7 +405,7 @@ extension GameViewController: JoystickSceneDelegate {
 extension GameViewController: SCNPhysicsContactDelegate {
     
     func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
-    
+        
         let conditionOne = (((contact.nodeA.name?.contains("Missile")) != nil) && ((contact.nodeB.name?.contains("Missile")) == nil))
         let conditionTwo = (((contact.nodeB.name?.contains("Missile")) != nil) && ((contact.nodeA.name?.contains("Missile")) == nil))
         
@@ -481,15 +478,15 @@ extension GameViewController: SCNPhysicsContactDelegate {
 extension GameViewController: ARCoachingOverlayViewDelegate {
     
     func coachingOverlayViewWillActivate(_ coachingOverlayView: ARCoachingOverlayView) {
-        //        upperControlsView.isHidden = true
+        //
     }
     
     func coachingOverlayViewDidDeactivate(_ coachingOverlayView: ARCoachingOverlayView) {
-        //        upperControlsView.isHidden = false
+        //
     }
     
     func coachingOverlayViewDidRequestSessionReset(_ coachingOverlayView: ARCoachingOverlayView) {
-        //        restartExperience()
+        //
     }
     
     func setupCoachingOverlay() {
@@ -513,5 +510,28 @@ extension GameViewController: ARCoachingOverlayViewDelegate {
     
     func setGoal() {
         coachingOverlay.goal = .horizontalPlane
+    }
+    
+    // MARK: - Focus Square
+    
+    func updateFocusSquare(isObjectVisible: Bool) {
+        if isObjectVisible || coachingOverlay.isActive {
+            focusSquare.hide()
+        } else {
+            focusSquare.unhide()
+        }
+        if let camera = session.currentFrame?.camera, case .normal = camera.trackingState,
+           let query = sceneView.getRaycastQuery(),
+           let result = sceneView.castRay(for: query).first {
+            updateQueue.async {
+                self.sceneView.scene.rootNode.addChildNode(self.focusSquare)
+                self.focusSquare.state = .detecting(raycastResult: result, camera: camera)
+            }
+        } else {
+            updateQueue.async {
+                self.focusSquare.state = .initializing
+                self.sceneView.pointOfView?.addChildNode(self.focusSquare)
+            }
+        }
     }
 }

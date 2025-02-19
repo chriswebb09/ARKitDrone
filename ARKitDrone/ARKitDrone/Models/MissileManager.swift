@@ -6,3 +6,8 @@
 //  Copyright © 2025 Christopher Webb-Orenstein. All rights reserved.
 //
 
+import  SceneKit
+
+class MissileManager {
+    
+}
