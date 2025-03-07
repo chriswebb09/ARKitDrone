@@ -132,7 +132,6 @@ class GameViewController: UIViewController {
     
     @IBOutlet weak var sceneView: GameSceneView!
     
-    
     // MARK: - ViewController Lifecycle
     
     override func viewDidLoad() {
@@ -314,11 +313,13 @@ class GameViewController: UIViewController {
         let castRay = session.raycast(result)
         
         guard let firstCast = castRay.first else { return }
-        DispatchQueue.main.async {
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
-            self.sceneView.positionTank(position: tappedPosition)
-            self.focusSquare.cleanup()
-            self.game.placed = true
+            sceneView.positionTank(position: tappedPosition)
+            focusSquare.cleanup()
+            game.placed = true
         }
     }
 }
