@@ -382,10 +382,13 @@ extension GameViewController: JoystickSceneDelegate {
         let targetPos = ship.node.presentation.simdWorldPosition
         let currentPos = missile.node.presentation.simdWorldPosition
         let direction = simd_normalize(targetPos - currentPos)
+        
         missile.particle?.orientationDirection = SCNVector3(-direction.x, -direction.y, -direction.z)
         missile.particle?.birthRate = 500
+        
         let displayLink = CADisplayLink(target: self, selector: #selector(updateMissilePosition))
         displayLink.preferredFramesPerSecond = 60
+        
         activeMissileTrackers[missile.id] = MissileTrackingInfo(
             missile: missile,
             target: ship,
@@ -410,6 +413,7 @@ extension GameViewController: JoystickSceneDelegate {
             displayLink.invalidate()
             return
         }
+        
         let missile = trackingInfo.missile
         let ship = trackingInfo.target
         if missile.hit {
@@ -417,18 +421,22 @@ extension GameViewController: JoystickSceneDelegate {
             activeMissileTrackers[missile.id] = nil
             return
         }
+        
         let deltaTime = displayLink.timestamp - trackingInfo.lastUpdateTime
         let speed: Float = 50
         let targetPos = ship.node.presentation.simdWorldPosition
         let currentPos = missile.node.presentation.simdWorldPosition
         let direction = simd_normalize(targetPos - currentPos)
         let movement = direction * speed * Float(deltaTime)
+        
         missile.node.simdWorldPosition += movement
         missile.node.look(at: ship.node.presentation.position)
         missile.particle?.orientationDirection = SCNVector3(-direction.x, -direction.y, -direction.z)
+        
         var updatedInfo = trackingInfo
         updatedInfo.frameCount += 1
         updatedInfo.lastUpdateTime = displayLink.timestamp
+        
         activeMissileTrackers[missile.id] = updatedInfo
         game.valueReached = updatedInfo.frameCount > 30
     }
@@ -445,13 +453,16 @@ extension GameViewController: SCNPhysicsContactDelegate {
         let conditionTwo = (nameB.contains("Missile") && !nameA.contains("Missile"))
         
         if (game.valueReached && (conditionOne || conditionTwo)) {
+            
             let conditionalShipNode: SCNNode! = conditionOne ? contact.nodeB : contact.nodeA
             let conditionalMissileNode: SCNNode! = conditionOne ? contact.nodeA : contact.nodeB
             
             let tempMissile = Missile.getMissile(from: conditionalMissileNode)!
             
             let canUpdateScore = tempMissile.hit == false
+            
             tempMissile.hit = true
+            
             if canUpdateScore {
                 DispatchQueue.main.async {
                     //                    self.game.playerScore = -(self.sceneView.missiles.filter { !$0.hit }.count - 8)
@@ -460,8 +471,7 @@ extension GameViewController: SCNPhysicsContactDelegate {
                     self.game.updateScoreText()
                     self.destoryedText.fadeTransition(0.001)
                     self.scoreText.fadeTransition(0.001)
-                    self.destoryedText.text = self.game.destoryedTextString
-                    self.scoreText.text = self.game.scoreTextString
+                    self.updateGameStateText()
                 }
             }
             
@@ -470,12 +480,15 @@ extension GameViewController: SCNPhysicsContactDelegate {
                 self.sceneView.positionHUD()
                 self.sceneView.helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.18))
             }
+            
             tempMissile.particle?.birthRate = 0
             tempMissile.node.removeAll()
+            
             let flashNode = SCNNode.addFlash(contactPoint: contact.contactPoint)
             sceneView.scene.rootNode.addChildNode(flashNode)
             SCNNode.runAndFadeExplosion(flashNode: flashNode)
             sceneView.addExplosion(contactPoint: contact.contactPoint)
+            
             DispatchQueue.main.async {
                 self.game.scoreUpdated = false
                 self.armMissilesButton.isEnabled = true
@@ -483,11 +496,20 @@ extension GameViewController: SCNPhysicsContactDelegate {
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 //                self.game.playerScore = -(self.sceneView.missiles.count - 8)
-                self.game.destoryedTextString = ""
-                self.destoryedText.text = self.game.destoryedTextString
-                self.destoryedText.fadeTransition(0.001)
+                self.resetDestroyedText()
             }
         }
+    }
+    
+    func updateGameStateText() {
+        destoryedText.text = game.destoryedTextString
+        scoreText.text = game.scoreTextString
+    }
+    
+    func resetDestroyedText() {
+        game.destoryedTextString = ""
+        destoryedText.text = game.destoryedTextString
+        destoryedText.fadeTransition(0.001)
     }
 }
 
@@ -536,7 +558,8 @@ extension GameViewController: ARCoachingOverlayViewDelegate {
         } else {
             focusSquare.unhide()
         }
-        if let camera = session.currentFrame?.camera, case .normal = camera.trackingState,
+        if let camera = session.currentFrame?.camera,
+           case .normal = camera.trackingState,
            let query = sceneView.getRaycastQuery(),
            let result = sceneView.castRay(for: query).first {
             updateQueue.async {
