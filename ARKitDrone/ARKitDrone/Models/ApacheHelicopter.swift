@@ -13,8 +13,6 @@ import simd
 
 class ApacheHelicopter {
     
-    // MARK: - LocalConstants
-    
     struct LocalConstants {
         static let sceneName = "art.scnassets/Apache.scn"
         static let parentModelName = "grpApache"
@@ -51,7 +49,6 @@ class ApacheHelicopter {
     var firing:Bool = false
     
     var missile1: Missile!
-    var currentMissile: Missile!
     var missile2: Missile!
     var missile3: Missile!
     var missile4: Missile = Missile()
@@ -73,7 +70,6 @@ class ApacheHelicopter {
     var missilesArmed: Bool = false
     var missileLockDirection = SCNVector3(0, 0, 1)
     var upperGun: SCNNode!
-    
     var targetPosition: SCNVector3!
     
     func spinBlades() {
@@ -156,8 +152,7 @@ class ApacheHelicopter {
         hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
         SCNTransaction.commit()
     }
-    
-    
+    static var speed: Float = 50
     var speed: Float = 2000 // Base speed
     let maxSpeed: Float = 10000.0 // Max missile speed
     // Define smooth factors for rotation
@@ -175,8 +170,6 @@ class ApacheHelicopter {
         let distance = helicopterNode.position.distance(target.position) - 4
         hud.localTranslate(by: SCNVector3(x: 0, y:0, z: -distance))
     }
-    
-    static var speed: Float = 50
     
     func update(missile: Missile, ship: Ship, offset: Int = 1, previousTime: CFAbsoluteTime) -> CFAbsoluteTime {
         let currentTime = CFAbsoluteTimeGetCurrent()
@@ -212,7 +205,7 @@ class ApacheHelicopter {
     }
     
     func shootUpperGun() {
-        let bullet = SCNNode(geometry: SCNSphere(radius: 0.002)) // Temporarily increase size to make sure it's visible
+        let bullet = SCNNode(geometry: SCNSphere(radius: 0.002))
         bullet.geometry?.firstMaterial?.diffuse.contents = UIColor.yellow
         print("Gun position: \(upperGun.presentation.worldPosition)")
         bullet.position = SCNVector3(upperGun.presentation.worldPosition.x + 0.009, upperGun.presentation.worldPosition.y + 0.07, upperGun.presentation.worldPosition.z + 0.3)
@@ -221,12 +214,12 @@ class ApacheHelicopter {
         physicsBody.isAffectedByGravity = false
         bullet.physicsBody = physicsBody
         let forwardDirection = SCNVector3(
-            -helicopterNode.presentation.transform.m31,  // x-component of the z-axis
-             -helicopterNode.presentation.transform.m32,  // y-component of the z-axis
-             -helicopterNode.presentation.transform.m33   // z-component of the z-axis
+            -helicopterNode.presentation.transform.m31,
+             -helicopterNode.presentation.transform.m32,
+             -helicopterNode.presentation.transform.m33
         )
         if forwardDirection.length() > 0.01 {
-            let impulse = forwardDirection * 200  // Adjust force if needed
+            let impulse = forwardDirection * 200
             bullet.physicsBody?.applyForce(impulse, asImpulse: true)
         } else {
             print("Warning: Forward direction is too small, helicopter rotation might be incorrect.")

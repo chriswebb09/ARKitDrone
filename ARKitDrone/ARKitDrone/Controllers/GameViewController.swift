@@ -19,7 +19,8 @@ class GameViewController: UIViewController {
     var minimap: SKShapeNode!
     var playerNode: SCNNode!
     var score: [Int] = []
-    let updateQueue = DispatchQueue(label: "com.example.apple-samplecode.arkitexample.serialSceneKitQueue")
+    
+    let updateQueue = DispatchQueue(label: "com.arkitdrone.Queue")
     
     let coachingOverlay = ARCoachingOverlayView()
     
@@ -36,6 +37,7 @@ class GameViewController: UIViewController {
     // MARK: - Private Properties
     
     var autoLock = true
+    
     private lazy var padView1: SKView = {
         var offset: CGFloat = 20
         if UIDevice.current.isIpad {
@@ -438,12 +440,16 @@ extension GameViewController: SCNPhysicsContactDelegate {
     func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
         let nameA = contact.nodeA.name ?? ""
         let nameB = contact.nodeB.name ?? ""
+        
         let conditionOne = (nameA.contains("Missile") && !nameB.contains("Missile"))
         let conditionTwo = (nameB.contains("Missile") && !nameA.contains("Missile"))
+        
         if (game.valueReached && (conditionOne || conditionTwo)) {
             let conditionalShipNode: SCNNode! = conditionOne ? contact.nodeB : contact.nodeA
             let conditionalMissileNode: SCNNode! = conditionOne ? contact.nodeA : contact.nodeB
+            
             let tempMissile = Missile.getMissile(from: conditionalMissileNode)!
+            
             let canUpdateScore = tempMissile.hit == false
             tempMissile.hit = true
             if canUpdateScore {
@@ -460,26 +466,13 @@ extension GameViewController: SCNPhysicsContactDelegate {
             }
             
             DispatchQueue.main.async {
-                let ship = Ship.getShip(from: conditionalShipNode)!
-                ship.isDestroyed = true
-                ship.square.isHidden = true
-                ship.square.removeFromParentNode()
-                ship.node.isHidden = true
-                ship.node.removeFromParentNode()
+                Ship.removeShip(conditionalShipNode: conditionalShipNode)
                 self.sceneView.positionHUD()
                 self.sceneView.helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.18))
             }
             tempMissile.particle?.birthRate = 0
             tempMissile.node.removeAll()
-            let flash = SCNLight()
-            flash.type = .omni
-            flash.color = UIColor.white
-            flash.intensity = 4000
-            flash.attenuationStartDistance = 5
-            flash.attenuationEndDistance = 15  // Ensures the light fades over distance
-            let flashNode = SCNNode()
-            flashNode.light = flash
-            flashNode.position = contact.contactPoint // Set this to the explosion's position
+            let flashNode = SCNNode.addFlash(contactPoint: contact.contactPoint)
             sceneView.scene.rootNode.addChildNode(flashNode)
             let fadeAction = SCNAction.customAction(duration: 0.1) { (node, elapsedTime) in
                 let percent = 1.0 - (elapsedTime / 0.1)

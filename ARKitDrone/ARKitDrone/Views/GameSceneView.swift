@@ -49,6 +49,8 @@ class GameSceneView: ARSCNView {
     
     var targetIndex = 0
     
+    var attack: Bool = false
+    
     static let helicopterSceneName = "art.scnassets/Helicopter.scn"
     static let targetScene = "art.scnassets/Target.scn"
     static let helicopterParentModelName = "Apache"
@@ -153,9 +155,6 @@ class GameSceneView: ARSCNView {
         ]))
     }
     
-    var attack: Bool = false
-    
-    
     func moveShips(placed: Bool) {
         var percievedCenter = SCNVector3Zero
         var percievedVelocity = SCNVector3Zero
@@ -176,11 +175,13 @@ class GameSceneView: ARSCNView {
         }
         
         if placed {
+            
             _  = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { [weak self] timer in
                 guard let self = self else { return }
                 attack = true
                 timer.invalidate()
             })
+            
             for ship in ships {
                 if attack {
                     ship.attack(target: self.helicopterNode)
@@ -234,6 +235,7 @@ class GameSceneView: ARSCNView {
             }
         }
     }
+    
     
 }
 

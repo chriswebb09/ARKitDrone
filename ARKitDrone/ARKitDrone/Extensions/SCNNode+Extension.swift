@@ -50,4 +50,17 @@ extension SCNNode {
         return (dir, pos)
     }
     
+    static func addFlash(contactPoint: SCNVector3) -> SCNNode {
+        let flash = SCNLight()
+        flash.type = .omni
+        flash.color = UIColor.white
+        flash.intensity = 4000
+        flash.attenuationStartDistance = 5
+        flash.attenuationEndDistance = 15  // Ensures the light fades over distance
+        let flashNode = SCNNode()
+        flashNode.light = flash
+        flashNode.position =  contactPoint
+        return flashNode
+    }
+    
 }
