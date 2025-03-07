@@ -58,7 +58,7 @@ class ApacheHelicopter {
     var missile8: Missile = Missile()
     var missiles: [Missile] = []
     
-    var autoLock = true 
+    var autoLock = true
     
     var rotor: SCNNode!
     var rotor2: SCNNode!

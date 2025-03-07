@@ -327,15 +327,3 @@ class GameViewController: UIViewController {
         }
     }
 }
-
-extension GameViewController: ARSCNViewDelegate {
-    
-    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        shipManager.moveShips(placed: game.placed)
-        if !game.placed && isLoaded {
-            DispatchQueue.main.async {
-                self.updateFocusSquare(isObjectVisible: false)
-            }
-        }
-    }
-}

@@ -93,7 +93,6 @@ class GameSceneView: ARSCNView {
         tankNode.physicsBody?.collisionBitMask = 2
     }
     
-    
     func positionTank(position: SCNVector3) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
