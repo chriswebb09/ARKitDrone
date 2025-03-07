@@ -50,4 +50,32 @@ extension SCNNode {
         return (dir, pos)
     }
     
+    static func addFlash(contactPoint: SCNVector3) -> SCNNode {
+        let flash = SCNLight()
+        flash.type = .omni
+        flash.color = UIColor.white
+        flash.intensity = 4000
+        flash.attenuationStartDistance = 5
+        flash.attenuationEndDistance = 15  // Ensures the light fades over distance
+        let flashNode = SCNNode()
+        flashNode.light = flash
+        flashNode.position =  contactPoint
+        return flashNode
+    }
+    
+    
+    static func runAndFadeExplosion(flashNode: SCNNode) {
+        let fadeAction = SCNAction.customAction(duration: 0.1) { (node, elapsedTime) in
+            let percent = 1.0 - (elapsedTime / 0.1)
+            node.light?.intensity = 4000 * percent
+        }
+        
+        let removeAction = SCNAction.sequence([fadeAction, SCNAction.removeFromParentNode()])
+        flashNode.runAction(removeAction)
+        flashNode.runAction(SCNAction.sequence([
+            SCNAction.wait(duration: 0.25),
+            SCNAction.removeFromParentNode()
+        ]))
+    }
+    
 }

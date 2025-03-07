@@ -9,6 +9,12 @@
 /* Begin PBXBuildFile section */
 		9412F0762D5B4BEB00D9F1BD /* Ship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9412F0752D5B4BE500D9F1BD /* Ship.swift */; };
 		941706D92972A5F400CB0308 /* ApacheHelicopter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941706D82972A5F400CB0308 /* ApacheHelicopter.swift */; };
+		94396BD02D7B365000A83CF4 /* FocusSquare+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BCF2D7B364200A83CF4 /* FocusSquare+Extension.swift */; };
+		94396BD22D7B36A300A83CF4 /* CGPoint+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BD12D7B369800A83CF4 /* CGPoint+Extension.swift */; };
+		94396BD42D7B36D500A83CF4 /* FocusCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BD32D7B36D100A83CF4 /* FocusCircle.swift */; };
+		94396BD62D7B469600A83CF4 /* GameViewController+JoystickSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BD52D7B468C00A83CF4 /* GameViewController+JoystickSceneDelegate.swift */; };
+		94396BD82D7B46F000A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BD72D7B46E400A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift */; };
+		94396BDA2D7B474900A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BD92D7B473E00A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift */; };
 		94548F022D5C68EE00A007B0 /* CollisionTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94548F012D5C68EB00A007B0 /* CollisionTypes.swift */; };
 		9455B7532D60C73F0019FE10 /* MissileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9455B7522D60C73B0019FE10 /* MissileManager.swift */; };
 		9455B7552D60C74A0019FE10 /* ShipManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9455B7542D60C7460019FE10 /* ShipManager.swift */; };
@@ -23,6 +29,7 @@
 		94A68F722C8797070059CD82 /* SCNMatrix4+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F712C8797070059CD82 /* SCNMatrix4+Extension.swift */; };
 		94A68F742C87972E0059CD82 /* SCNQuaternion+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F732C87972E0059CD82 /* SCNQuaternion+Extension.swift */; };
 		94A68F762C8797550059CD82 /* SCNVector3+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F752C8797550059CD82 /* SCNVector3+Extension.swift */; };
+		94B6E8462D7B60BA0064ABD7 /* NotificationName+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B6E8452D7B60AC0064ABD7 /* NotificationName+Extension.swift */; };
 		94C881A82D5D05C20050119D /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C881A72D5D05B50050119D /* Game.swift */; };
 		94C881AC2D5D07000050119D /* SCNMaterial+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C881AB2D5D06F40050119D /* SCNMaterial+Extension.swift */; };
 		94C881AE2D5D07450050119D /* SCNParticleSystem+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C881AD2D5D07400050119D /* SCNParticleSystem+Extension.swift */; };
@@ -53,6 +60,12 @@
 /* Begin PBXFileReference section */
 		9412F0752D5B4BE500D9F1BD /* Ship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ship.swift; sourceTree = "<group>"; };
 		941706D82972A5F400CB0308 /* ApacheHelicopter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApacheHelicopter.swift; sourceTree = "<group>"; };
+		94396BCF2D7B364200A83CF4 /* FocusSquare+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FocusSquare+Extension.swift"; sourceTree = "<group>"; };
+		94396BD12D7B369800A83CF4 /* CGPoint+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+Extension.swift"; sourceTree = "<group>"; };
+		94396BD32D7B36D100A83CF4 /* FocusCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusCircle.swift; sourceTree = "<group>"; };
+		94396BD52D7B468C00A83CF4 /* GameViewController+JoystickSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+JoystickSceneDelegate.swift"; sourceTree = "<group>"; };
+		94396BD72D7B46E400A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+ARCoachingOverlayViewDelegate.swift"; sourceTree = "<group>"; };
+		94396BD92D7B473E00A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+SCNPhysicsContactDelegate.swift"; sourceTree = "<group>"; };
 		94548F012D5C68EB00A007B0 /* CollisionTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollisionTypes.swift; sourceTree = "<group>"; };
 		9455B7522D60C73B0019FE10 /* MissileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissileManager.swift; sourceTree = "<group>"; };
 		9455B7542D60C7460019FE10 /* ShipManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShipManager.swift; sourceTree = "<group>"; };
@@ -67,6 +80,7 @@
 		94A68F712C8797070059CD82 /* SCNMatrix4+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNMatrix4+Extension.swift"; sourceTree = "<group>"; };
 		94A68F732C87972E0059CD82 /* SCNQuaternion+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNQuaternion+Extension.swift"; sourceTree = "<group>"; };
 		94A68F752C8797550059CD82 /* SCNVector3+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNVector3+Extension.swift"; sourceTree = "<group>"; };
+		94B6E8452D7B60AC0064ABD7 /* NotificationName+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationName+Extension.swift"; sourceTree = "<group>"; };
 		94C881A72D5D05B50050119D /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		94C881AB2D5D06F40050119D /* SCNMaterial+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNMaterial+Extension.swift"; sourceTree = "<group>"; };
 		94C881AD2D5D07400050119D /* SCNParticleSystem+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNParticleSystem+Extension.swift"; sourceTree = "<group>"; };
@@ -122,6 +136,8 @@
 			isa = PBXGroup;
 			children = (
 				948E91D32D6519B100DE6405 /* FocusSquare.swift */,
+				94396BD32D7B36D100A83CF4 /* FocusCircle.swift */,
+				94396BCF2D7B364200A83CF4 /* FocusSquare+Extension.swift */,
 				94CCC9112972FFB500F7D17F /* DeviceOrientation.swift */,
 				94CCC8F12972E34500F7D17F /* Joystick */,
 			);
@@ -131,6 +147,7 @@
 		94CCC8F32972E36100F7D17F /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				94CCC90F2972F43200F7D17F /* HelicopterCapable.swift */,
 				94C881A72D5D05B50050119D /* Game.swift */,
 				9455B7522D60C73B0019FE10 /* MissileManager.swift */,
 				9455B7542D60C7460019FE10 /* ShipManager.swift */,
@@ -151,7 +168,6 @@
 			isa = PBXGroup;
 			children = (
 				94F5D19B2D5CAE9B00019569 /* MinimapScene.swift */,
-				94CCC90F2972F43200F7D17F /* HelicopterCapable.swift */,
 				94CCC90D2972EB2300F7D17F /* GameSceneView.swift */,
 			);
 			path = Views;
@@ -161,6 +177,9 @@
 			isa = PBXGroup;
 			children = (
 				A7AE72C11F888EF500B015D3 /* GameViewController.swift */,
+				94396BD92D7B473E00A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift */,
+				94396BD72D7B46E400A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift */,
+				94396BD52D7B468C00A83CF4 /* GameViewController+JoystickSceneDelegate.swift */,
 				9470AE462974001A00A55134 /* MenuViewController.swift */,
 			);
 			path = Controllers;
@@ -171,6 +190,7 @@
 			children = (
 				94C881AD2D5D07400050119D /* SCNParticleSystem+Extension.swift */,
 				94F0ACB92D619A2F00658B0F /* SCNNode+Extension.swift */,
+				94B6E8452D7B60AC0064ABD7 /* NotificationName+Extension.swift */,
 				94C881AB2D5D06F40050119D /* SCNMaterial+Extension.swift */,
 				94CCC9092972E54000F7D17F /* SCNScene+Extension.swift */,
 				94A68F752C8797550059CD82 /* SCNVector3+Extension.swift */,
@@ -179,6 +199,7 @@
 				94D598432BB9037400B31874 /* SCNGeometry+Extension.swift */,
 				94DF3F072975F15F006723FC /* UIView+Extension.swift */,
 				94D630312976077000096104 /* UIFont+Extension.swift */,
+				94396BD12D7B369800A83CF4 /* CGPoint+Extension.swift */,
 				94CCC8FE2972E43500F7D17F /* FloatingPoint+Extension.swift */,
 				94CB148D2C8793BF0065E1B0 /* UIColor+Extension.swift */,
 			);
@@ -298,6 +319,7 @@
 			files = (
 				94A68F742C87972E0059CD82 /* SCNQuaternion+Extension.swift in Sources */,
 				945B16AD294EB34800482E14 /* JoystickScene.swift in Sources */,
+				94396BD22D7B36A300A83CF4 /* CGPoint+Extension.swift in Sources */,
 				94C881AE2D5D07450050119D /* SCNParticleSystem+Extension.swift in Sources */,
 				94F968A82AD7337F00D7B418 /* OcclusionNode.swift in Sources */,
 				94548F022D5C68EE00A007B0 /* CollisionTypes.swift in Sources */,
@@ -306,6 +328,7 @@
 				94CCC8F02972D97700F7D17F /* JoystickDelegate.swift in Sources */,
 				9455B7552D60C74A0019FE10 /* ShipManager.swift in Sources */,
 				94CCC8EE2972D46400F7D17F /* Missile.swift in Sources */,
+				94396BDA2D7B474900A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift in Sources */,
 				94D630322976077000096104 /* UIFont+Extension.swift in Sources */,
 				94CCC9102972F43200F7D17F /* HelicopterCapable.swift in Sources */,
 				94D598442BB9037400B31874 /* SCNGeometry+Extension.swift in Sources */,
@@ -315,6 +338,7 @@
 				94F5D19C2D5CAEA000019569 /* MinimapScene.swift in Sources */,
 				9455B7532D60C73F0019FE10 /* MissileManager.swift in Sources */,
 				94F0ACBA2D619A3800658B0F /* SCNNode+Extension.swift in Sources */,
+				94396BD82D7B46F000A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift in Sources */,
 				94CCC9122972FFB500F7D17F /* DeviceOrientation.swift in Sources */,
 				94C881A82D5D05C20050119D /* Game.swift in Sources */,
 				94CB148E2C8793BF0065E1B0 /* UIColor+Extension.swift in Sources */,
@@ -323,7 +347,11 @@
 				94C881AC2D5D07000050119D /* SCNMaterial+Extension.swift in Sources */,
 				94DF3F082975F167006723FC /* UIView+Extension.swift in Sources */,
 				9467A30D2BB93A6E0023EA62 /* Tank.swift in Sources */,
+				94396BD02D7B365000A83CF4 /* FocusSquare+Extension.swift in Sources */,
+				94396BD42D7B36D500A83CF4 /* FocusCircle.swift in Sources */,
+				94396BD62D7B469600A83CF4 /* GameViewController+JoystickSceneDelegate.swift in Sources */,
 				94A68F762C8797550059CD82 /* SCNVector3+Extension.swift in Sources */,
+				94B6E8462D7B60BA0064ABD7 /* NotificationName+Extension.swift in Sources */,
 				9488F2032D657BA6001C08D9 /* TargetNode.swift in Sources */,
 				94A68F722C8797070059CD82 /* SCNMatrix4+Extension.swift in Sources */,
 				948E91D42D6519B500DE6405 /* FocusSquare.swift in Sources */,

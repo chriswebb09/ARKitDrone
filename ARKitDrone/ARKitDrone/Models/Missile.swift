@@ -9,6 +9,16 @@
 import SceneKit
 import ARKit
 
+struct MissileTrackingInfo {
+    let missile: Missile
+    let target: Ship
+    let startTime: CFTimeInterval
+    let displayLink: CADisplayLink
+    var frameCount: Int = 0
+    var lastUpdateTime: CFTimeInterval
+}
+
+
 class Missile {
     
     var node: SCNNode!
@@ -19,6 +29,8 @@ class Missile {
     var id: String!
     var num: Int = -1
     private static var missileRegistry: [SCNNode: Missile] = [:]
+    
+    static var activeMissileTrackers: [String: MissileTrackingInfo] = [:]
     
     func setupNode(scnNode: SCNNode?, number: Int) {
         guard let scnNode = scnNode else { return }

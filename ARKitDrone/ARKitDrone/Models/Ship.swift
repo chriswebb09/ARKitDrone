@@ -179,6 +179,7 @@ class Ship {
             )
         }
         let directionToTarget = (target - node.position).normalized()
+        
         let avoidCollisions = nodes.reduce(SCNVector3Zero) { (force, shipNode) in
             let distance = node.position.distance(shipNode.position)
             if distance < 14 { // Avoid collisions if too close
@@ -186,11 +187,13 @@ class Ship {
             }
             return force
         }
+        
         let boundary = SCNVector3(
             x: max(-10, min(10, node.position.x)),
             y: max(-10, min(10, node.position.y)),
             z: max(-10, min(10, node.position.z))
         ) - node.position
+        
         let newVelocity = (perceivedCenter - node.position) * 0.1 +
         avoidCollisions * 0.1 +
         directionToTarget * 0.2 +
@@ -200,6 +203,7 @@ class Ship {
         let speed = newVelocity.length()
         
         velocity = (speed > speedLimit) ? (newVelocity / speed) * speedLimit : newVelocity
+        
         node.position += velocity
         if targetAdded {
             square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
@@ -275,23 +279,32 @@ extension Ship {
     }
     
     private func flyTowards(_ targetPosition: SCNVector3, orientation: simd_quatf, currentPos: simd_float3, targetPos: simd_float3) {
-        // Correct the direction: from the object to the target
         let targetDirection = simd_normalize(targetPos - currentPos)
-        
-        // Convert target direction to SCNVector3
         let direction = SCNVector3(x: Float(targetDirection.x), y: Float(targetDirection.y), z: Float(targetDirection.z))
-        
-        // Update the orientation if needed (optional if you want to manually handle it)
         node.simdWorldOrientation = orientation
-        
-        // Ensure the node faces the target
         node.look(at: targetPosition)
-        
-        // Scale the direction for movement speed
         velocity = direction * 5 // Adjust the speed multiplier
         
         // Update the position based on the velocity
         node.position += velocity
+    }
+    
+    static func removeShip(conditionalShipNode: SCNNode) {
+        let ship = Ship.getShip(from: conditionalShipNode)!
+        ship.isDestroyed = true
+        ship.square.isHidden = true
+        ship.square.removeFromParentNode()
+        ship.node.isHidden = true
+        ship.node.removeFromParentNode()
+    }
+    
+    func removeShip() {
+//        let ship = Ship.getShip(from: conditionalShipNode)!
+        isDestroyed = true
+        square.isHidden = true
+        square.removeFromParentNode()
+        node.isHidden = true
+        node.removeFromParentNode()
     }
 }
 

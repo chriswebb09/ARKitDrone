@@ -13,27 +13,18 @@ import ARKit
 class TargetNode: SCNNode {
     let positioningNode = SCNNode()
     var segments: [FocusSquare.Segment] = []
-    
     var isOpen = false
-    
     /// Indicates if the square is currently being animated for opening or closing.
     var isAnimating = false
-    
     /// Indicates if the square is currently changing its orientation when the camera is pointing downwards.
     var isChangingOrientation = false
-    
     /// Indicates if the camera is currently pointing towards the floor.
     var isPointingDownwards = true
-    
     static let primaryColor = UIColor.green
-    
     // Color of the focus square fill.
     static let fillColor = UIColor.green
-    
-    
     /// The focus square's most recent positions.
     var recentFocusSquarePositions: [SIMD3<Float>] = []
-    
     lazy var fillPlane: SCNNode = {
         let correctionFactor = FocusSquare.thickness / 2 // correction to align lines perfectly
         let length = CGFloat(1.0 - FocusSquare.thickness * 2 + correctionFactor)
@@ -52,9 +43,7 @@ class TargetNode: SCNNode {
     
     override init() {
         super.init()
-        
         let s1 = FocusSquare.Segment(name: "s1", corner: .topLeft, alignment: .horizontal, color: TargetNode.fillColor, thickness: 0.04)
-        
         let s2 = FocusSquare.Segment(name: "s2", corner: .topRight, alignment: .horizontal, color: TargetNode.fillColor, thickness: 0.04)
         let s3 = FocusSquare.Segment(name: "s3", corner: .topLeft, alignment: .vertical, color: TargetNode.fillColor, thickness: 0.04)
         let s4 = FocusSquare.Segment(name: "s4", corner: .topRight, alignment: .vertical, color: TargetNode.fillColor, thickness: 0.04)
@@ -74,19 +63,15 @@ class TargetNode: SCNNode {
         s6.simdPosition += [sl, sl / 2, 0]
         s7.simdPosition += [-(sl / 2 - c), sl - c, 0]
         s8.simdPosition += [sl / 2 - c, sl - c, 0]
-        
         positioningNode.eulerAngles.x = .pi / 2 // Horizontal
         positioningNode.simdScale = [1.0, 1.0, 1.0] * (FocusSquare.size * FocusSquare.scaleForClosedSquare)
         for segment in segments {
             positioningNode.addChildNode(segment)
         }
         positioningNode.addChildNode(fillPlane)
-        
         // Always render focus square on top of other content.
         displayNodeHierarchyOnTop(true)
-        
         addChildNode(positioningNode)
-        
         // Start the focus square as a billboard.
         displayAsBillboard()
         positioningNode.opacity = 1.0
@@ -112,8 +97,6 @@ class TargetNode: SCNNode {
         guard !isOpen, !isAnimating else { return }
         isOpen = true
         isAnimating = true
-        
-        // Open animation
         SCNTransaction.begin()
         SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: .easeOut)
         SCNTransaction.animationDuration = FocusSquare.animationDuration / 4
@@ -127,7 +110,6 @@ class TargetNode: SCNNode {
             self.isAnimating = false
         }
         SCNTransaction.commit()
-        
         // Add a scale/bounce animation.
         SCNTransaction.begin()
         SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: .easeOut)
@@ -213,6 +195,7 @@ class TargetNode: SCNNode {
 
 
 private func flashAnimation(duration: TimeInterval) -> SCNAction {
+    
     let action = SCNAction.customAction(duration: duration) { (node, elapsedTime) -> Void in
         let elapsedTimePercentage = elapsedTime / CGFloat(duration)
         let saturation = 2.8 * (elapsedTimePercentage - 0.5) * (elapsedTimePercentage - 0.5) + 0.3
@@ -221,5 +204,6 @@ private func flashAnimation(duration: TimeInterval) -> SCNAction {
         }
     }
     return action
+    
 }
 
