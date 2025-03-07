@@ -167,13 +167,13 @@ class GameViewController: UIViewController {
             DeviceOrientation.shared.set(orientation: .portrait)
         }
         UIApplication.shared.isIdleTimerDisabled = true
-        
+
         setupTracking()
         sceneView.setup()
         sceneView.scene.physicsWorld.contactDelegate = self
         setupPlayerNode()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() +  0.5) { [weak self] in
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self = self else { return }
             sceneView.setupShips()
             minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
@@ -181,32 +181,31 @@ class GameViewController: UIViewController {
             minimapView.presentScene(minimapScene)
             view.addSubview(minimapView)
             startMinimapUpdate()
-        }
-        sceneView.addSubview(destoryedText)
-        sceneView.addSubview(armMissilesButton)
-        sceneView.addSubview(scoreText)
-        armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
-        sceneView.isUserInteractionEnabled = true
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() +  1.5) { [weak self] in
-            guard let self = self else { return }
             setupCoachingOverlay()
-            sceneView.addSubview(padView1)
-            sceneView.addSubview(padView2)
-            setupPadScene(padView1: padView1, padView2: padView2)
-            if self.circle {
-                let focusCircle = FocusCircle()
-                sceneView.scene.rootNode.addChildNode(focusCircle)
-            } else {
-                sceneView.scene.rootNode.addChildNode(focusSquare)
-                updateFocusSquare(isObjectVisible: true)
+            sceneView.addSubview(destoryedText)
+            sceneView.addSubview(armMissilesButton)
+            sceneView.addSubview(scoreText)
+            armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
+            sceneView.isUserInteractionEnabled = true
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                guard let self = self else { return }
+                sceneView.addSubview(padView1)
+                sceneView.addSubview(padView2)
+                setupPadScene(padView1: padView1, padView2: padView2)
+                if self.circle {
+                    let focusCircle = FocusCircle()
+                    sceneView.scene.rootNode.addChildNode(focusCircle)
+                } else {
+                    sceneView.scene.rootNode.addChildNode(focusSquare)
+                    updateFocusSquare(isObjectVisible: true)
+                }
             }
-            
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() +  2.5) { [weak self] in
-            guard let self = self else { return }
-            self.isLoaded = true
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+                guard let self = self else { return }
+                self.isLoaded = true
+            }
         }
     }
     
