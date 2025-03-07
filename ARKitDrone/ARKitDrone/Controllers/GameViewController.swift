@@ -122,6 +122,7 @@ class GameViewController: UIViewController {
     }()
     
     var squareSet = false
+    var circle = false
     
     var session: ARSession {
         return sceneView.session
@@ -177,11 +178,12 @@ class GameViewController: UIViewController {
             view.addSubview(minimapView)
             startMinimapUpdate()
             setupPadScene(padView1: padView1, padView2: padView2)
-            self.sceneView.scene.rootNode.addChildNode(focusSquare)
-            
-            //            let circle = FocusCircle()
-            //            self.sceneView.scene.rootNode.addChildNode(circle)
-            
+            if circle {
+                let focusCircle = FocusCircle()
+                self.sceneView.scene.rootNode.addChildNode(focusCircle)
+            } else {
+                self.sceneView.scene.rootNode.addChildNode(focusSquare)
+            }
         }
         sceneView.addSubview(destoryedText)
         sceneView.addSubview(armMissilesButton)
@@ -216,22 +218,14 @@ class GameViewController: UIViewController {
     
     func updateMinimap() {
         guard let cameraTransform = sceneView.session.currentFrame?.camera.transform else { return }
-        
         let cameraRotation = simd_float4x4(cameraTransform.columns.0, cameraTransform.columns.1, cameraTransform.columns.2, cameraTransform.columns.3)
-        
         let playerPosition = simd_float4(playerNode.worldPosition.x, playerNode.worldPosition.y, playerNode.worldPosition.z, 1.0)
-        
         let shipPositions = sceneView.ships.filter { !$0.isDestroyed }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
-        
         let missilePositions = sceneView.missiles.filter { $0.fired && !$0.hit }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
-        
         let helcopterWorldPosition = sceneView.helicopterNode.worldPosition
-        
         let helicopterPosition: simd_float4 = game.placed ? simd_float4(helcopterWorldPosition.x, helcopterWorldPosition.y, helcopterWorldPosition.z, 1.0) : simd_float4.zero
-        
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            
             minimapScene.updateMinimap(
                 playerPosition: playerPosition,
                 helicopterPosition: helicopterPosition,
@@ -244,11 +238,8 @@ class GameViewController: UIViewController {
     }
     
     private func setupTracking() {
-        
         let configuration = ARWorldTrackingConfiguration()
-        
         configuration.planeDetection = [.horizontal]
-        
         if addsMesh {
             let sceneReconstruction: ARWorldTrackingConfiguration.SceneReconstruction = .meshWithClassification
             if ARWorldTrackingConfiguration.supportsSceneReconstruction(sceneReconstruction) {
@@ -256,14 +247,10 @@ class GameViewController: UIViewController {
             }
             configuration.frameSemantics = .sceneDepth
         }
-        
-        
         sceneView.automaticallyUpdatesLighting = false
-        
         if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
             sceneView.scene.lightingEnvironment.contents = environmentMap
         }
-        
         session.run(configuration, options: [.resetTracking, .removeExistingAnchors, .resetSceneReconstruction, .stopTrackedRaycasts])
     }
     
