@@ -56,6 +56,7 @@ class GameViewController: UIViewController {
     }()
     
     var missileManager: MissileManager!
+    var shipManager: ShipManager!
     var addLinesToPlanes = false
     var addPlanesToScene = false
     var addsMesh = false
@@ -142,6 +143,7 @@ class GameViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(missileCanHit), name: .missileCanHit, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateGameStateText), name: .updateScore, object: nil)
         missileManager = MissileManager(game: game, sceneView: sceneView)
+        shipManager = ShipManager(game: game, sceneView: sceneView)
         //        sceneView.debugOptions = .showPhysicsShapes
     }
     
@@ -175,7 +177,7 @@ class GameViewController: UIViewController {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self = self else { return }
-            sceneView.setupShips()
+            shipManager.setupShips()
             minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
             minimapScene.scaleMode = .resizeFill
             minimapView.presentScene(minimapScene)
@@ -329,7 +331,7 @@ class GameViewController: UIViewController {
 extension GameViewController: ARSCNViewDelegate {
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        sceneView.moveShips(placed: game.placed)
+        shipManager.moveShips(placed: game.placed)
         if !game.placed && isLoaded {
             DispatchQueue.main.async {
                 self.updateFocusSquare(isObjectVisible: false)
