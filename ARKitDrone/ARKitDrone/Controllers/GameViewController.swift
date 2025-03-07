@@ -11,6 +11,7 @@ import SceneKit
 import ARKit
 import SpriteKit
 
+
 class GameViewController: UIViewController {
     
     let game = Game()
@@ -68,7 +69,7 @@ class GameViewController: UIViewController {
         return view
     }()
     
-    private lazy var minimapView: SKView = {
+    lazy var minimapView: SKView = {
         let size: CGFloat = 140
         let view = SKView(frame: CGRect(
             x: UIScreen.main.bounds.width - size - 20,
@@ -81,7 +82,7 @@ class GameViewController: UIViewController {
         return view
     }()
     
-    private lazy var armMissilesButton: UIButton = {
+    lazy var armMissilesButton: UIButton = {
         let button = UIButton()
         button.setTitle(LocalConstants.buttonTitle, for: .normal)
         button.setTitleColor(UIColor.white, for: .normal)
@@ -94,7 +95,7 @@ class GameViewController: UIViewController {
         return button
     }()
     
-    private lazy var destoryedText: UILabel = {
+    lazy var destoryedText: UILabel = {
         let label = UILabel()
         label.text = ""
         label.textAlignment = .center
@@ -108,7 +109,7 @@ class GameViewController: UIViewController {
         return label
     }()
     
-    private lazy var scoreText: UILabel = {
+    lazy var scoreText: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.black)
@@ -121,11 +122,11 @@ class GameViewController: UIViewController {
     
     var squareSet = false
     
-    private var session: ARSession {
+    var session: ARSession {
         return sceneView.session
     }
     
-    @IBOutlet private weak var sceneView: GameSceneView!
+    @IBOutlet weak var sceneView: GameSceneView!
     
     
     // MARK: - ViewController Lifecycle
@@ -321,7 +322,6 @@ class GameViewController: UIViewController {
     }
 }
 
-
 extension GameViewController: ARSCNViewDelegate {
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
@@ -332,175 +332,4 @@ extension GameViewController: ARSCNViewDelegate {
             }
         }
     }
-    
 }
-
-// MARK: - JoystickSceneDelegate
-
-extension GameViewController: JoystickSceneDelegate {
-    
-    func update(xValue: Float, stickNum: Int) {
-        DispatchQueue.main.async {
-            if stickNum == 1 {
-                let scaled = (xValue) * 0.0005
-                self.sceneView.rotate(value: scaled)
-            } else if stickNum == 2 {
-                let scaled = (xValue) * 0.05
-                self.sceneView.moveSides(value: -scaled)
-            }
-        }
-    }
-    
-    func update(yValue: Float, stickNum: Int) {
-        DispatchQueue.main.async {
-            if stickNum == 2 {
-                let scaled = (yValue)
-                self.sceneView.moveForward(value: (scaled * 0.009))
-            } else if stickNum == 1 {
-                let scaled = (yValue) * 0.01
-                self.sceneView.changeAltitude(value: scaled)
-            }
-        }
-    }
-    
-    func tapped() {
-        guard sceneView.helicopter.missilesArmed else { return }
-        DispatchQueue.main.async {
-            self.sceneView.fire(game: self.game)
-            self.sceneView.addTargetToShip()
-        }
-    }
-}
-
-extension GameViewController: SCNPhysicsContactDelegate {
-    
-    func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
-        let nameA = contact.nodeA.name ?? ""
-        let nameB = contact.nodeB.name ?? ""
-        
-        let conditionOne = (nameA.contains("Missile") && !nameB.contains("Missile"))
-        let conditionTwo = (nameB.contains("Missile") && !nameA.contains("Missile"))
-        
-        if (game.valueReached && (conditionOne || conditionTwo)) {
-            
-            let conditionalShipNode: SCNNode! = conditionOne ? contact.nodeB : contact.nodeA
-            let conditionalMissileNode: SCNNode! = conditionOne ? contact.nodeA : contact.nodeB
-            
-            let tempMissile = Missile.getMissile(from: conditionalMissileNode)!
-            
-            let canUpdateScore = tempMissile.hit == false
-            
-            tempMissile.hit = true
-            
-            if canUpdateScore {
-                DispatchQueue.main.async {
-                    //                    self.game.playerScore = -(self.sceneView.missiles.filter { !$0.hit }.count - 8)
-                    self.game.playerScore += 1
-                    ApacheHelicopter.speed = 0
-                    self.game.updateScoreText()
-                    self.destoryedText.fadeTransition(0.001)
-                    self.scoreText.fadeTransition(0.001)
-                    self.updateGameStateText()
-                }
-            }
-            
-            DispatchQueue.main.async {
-                Ship.removeShip(conditionalShipNode: conditionalShipNode)
-                self.sceneView.positionHUD()
-                self.sceneView.helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.18))
-            }
-            
-            tempMissile.particle?.birthRate = 0
-            tempMissile.node.removeAll()
-            
-            let flashNode = SCNNode.addFlash(contactPoint: contact.contactPoint)
-            sceneView.scene.rootNode.addChildNode(flashNode)
-            SCNNode.runAndFadeExplosion(flashNode: flashNode)
-            sceneView.addExplosion(contactPoint: contact.contactPoint)
-            
-            DispatchQueue.main.async {
-                self.game.scoreUpdated = false
-                self.armMissilesButton.isEnabled = true
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                //                self.game.playerScore = -(self.sceneView.missiles.count - 8)
-                self.resetDestroyedText()
-            }
-        }
-    }
-    
-    func updateGameStateText() {
-        destoryedText.text = game.destoryedTextString
-        scoreText.text = game.scoreTextString
-    }
-    
-    func resetDestroyedText() {
-        game.destoryedTextString = ""
-        destoryedText.text = game.destoryedTextString
-        destoryedText.fadeTransition(0.001)
-    }
-}
-
-extension GameViewController: ARCoachingOverlayViewDelegate {
-    
-    func coachingOverlayViewWillActivate(_ coachingOverlayView: ARCoachingOverlayView) {
-        //
-    }
-    
-    func coachingOverlayViewDidDeactivate(_ coachingOverlayView: ARCoachingOverlayView) {
-        //
-    }
-    
-    func coachingOverlayViewDidRequestSessionReset(_ coachingOverlayView: ARCoachingOverlayView) {
-        //
-    }
-    
-    func setupCoachingOverlay() {
-        coachingOverlay.session = sceneView.session
-        coachingOverlay.delegate = self
-        coachingOverlay.translatesAutoresizingMaskIntoConstraints = false
-        sceneView.addSubview(coachingOverlay)
-        NSLayoutConstraint.activate([
-            coachingOverlay.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            coachingOverlay.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            coachingOverlay.widthAnchor.constraint(equalTo: view.widthAnchor),
-            coachingOverlay.heightAnchor.constraint(equalTo: view.heightAnchor)
-        ])
-        setActivatesAutomatically()
-        setGoal()
-    }
-    
-    func setActivatesAutomatically() {
-        coachingOverlay.activatesAutomatically = true
-    }
-    
-    func setGoal() {
-        coachingOverlay.goal = .horizontalPlane
-    }
-    
-    // MARK: - Focus Square
-    
-    func updateFocusSquare(isObjectVisible: Bool) {
-        if isObjectVisible || coachingOverlay.isActive {
-            focusSquare.hide()
-        } else {
-            focusSquare.unhide()
-        }
-        if let camera = session.currentFrame?.camera,
-           case .normal = camera.trackingState,
-           let query = sceneView.getRaycastQuery(),
-           let result = sceneView.castRay(for: query).first {
-            updateQueue.async {
-                self.sceneView.scene.rootNode.addChildNode(self.focusSquare)
-                self.focusSquare.state = .detecting(raycastResult: result, camera: camera)
-            }
-        } else {
-            updateQueue.async {
-                self.focusSquare.state = .initializing
-                self.sceneView.pointOfView?.addChildNode(self.focusSquare)
-            }
-        }
-    }
-}
-
