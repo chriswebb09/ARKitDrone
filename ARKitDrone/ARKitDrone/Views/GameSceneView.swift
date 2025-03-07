@@ -117,15 +117,32 @@ class GameSceneView: ARSCNView {
     }
     
     func setupHelicopterNode() {
+        // Load and clone the helicopter scene safely.
         let tempScene = SCNScene.nodeWithModelName(GameSceneView.helicopterSceneName).clone()
-        helicopterModel = tempScene.childNode(withName: GameSceneView.helicopterParentModelName, recursively: true)!
-        helicopterModel.scale = SCNVector3(0.001,0.001, 0.001)
-        helicopterModel.simdScale = SIMD3<Float>(0.001, 0.001, 0.001)
-        helicopterModel.scale = SCNVector3(x: 0.001, y: 0.001, z: 0.001)
-        helicopterNode = helicopterModel!.childNode(withName: GameSceneView.helicopterBodyName, recursively: true)
+        
+        // Retrieve the helicopter model node.
+        guard let model = tempScene.childNode(withName: GameSceneView.helicopterParentModelName, recursively: true) else {
+            fatalError("Failed to find helicopter parent model: \(GameSceneView.helicopterParentModelName)")
+        }
+        
+        helicopterModel = model
+        
+        // Define a single scale factor for the helicopter model.
+        let modelScale: Float = 0.001
+        helicopterModel.scale = SCNVector3(modelScale, modelScale, modelScale)
+        helicopterModel.simdScale = SIMD3<Float>(modelScale, modelScale, modelScale)
+        
+        // Retrieve and configure the helicopter body node.
+        guard let bodyNode = helicopterModel.childNode(withName: GameSceneView.helicopterBodyName, recursively: true) else {
+            fatalError("Failed to find helicopter body node: \(GameSceneView.helicopterBodyName)")
+        }
+        helicopterNode = bodyNode
         helicopterNode.simdEulerAngles = SIMD3<Float>(-3.0, 0, 0)
-        helicopterNode.simdScale = SIMD3<Float>(0.001, 0.00001, 0.00001)
-        helicopterNode.scale = SCNVector3(x: 0.001, y: 0.00001, z: 0.00001)
+        
+        // Define a separate scale for the helicopter body.
+        let bodyScale = SCNVector3(0.001, 0.00001, 0.00001)
+        helicopterNode.scale = bodyScale
+        helicopterNode.simdScale = SIMD3<Float>(bodyScale.x, bodyScale.y, bodyScale.z)
     }
     
     func setHelicopterProps() {
