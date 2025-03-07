@@ -39,34 +39,23 @@ extension GameViewController: JoystickSceneDelegate {
     }
     
     func tapped() {
-            guard sceneView.helicopter.missilesArmed else { return }
-            DispatchQueue.main.async {
-                self.missileManager.fire(game: self.game)
-                //(at: self.sceneView.ships[self.sceneView.targetIndex])
-                if self.sceneView.ships.count > self.sceneView.targetIndex {
-                    self.sceneView.targetIndex += 1
-                    if self.sceneView.targetIndex < self.sceneView.ships.count {
-                        if !self.sceneView.ships[self.sceneView.targetIndex].isDestroyed && !self.sceneView.ships[self.sceneView.targetIndex].targetAdded {
-                            DispatchQueue.main.async {
-                                guard self.sceneView.targetIndex < self.sceneView.ships.count else { return }
-                                let square = TargetNode()
-                                self.sceneView.ships[self.sceneView.targetIndex].square = square
-                                self.sceneView.scene.rootNode.addChildNode(square)
-                                self.sceneView.ships[self.sceneView.targetIndex].targetAdded = true
-                            }
+        guard sceneView.helicopter.missilesArmed else { return }
+        DispatchQueue.main.async {
+            self.missileManager.fire(game: self.game)
+            if self.sceneView.ships.count > self.sceneView.targetIndex {
+                self.sceneView.targetIndex += 1
+                if self.sceneView.targetIndex < self.sceneView.ships.count {
+                    if !self.sceneView.ships[self.sceneView.targetIndex].isDestroyed && !self.sceneView.ships[self.sceneView.targetIndex].targetAdded {
+                        DispatchQueue.main.async {
+                            guard self.sceneView.targetIndex < self.sceneView.ships.count else { return }
+                            let square = TargetNode()
+                            self.sceneView.ships[self.sceneView.targetIndex].square = square
+                            self.sceneView.scene.rootNode.addChildNode(square)
+                            self.sceneView.ships[self.sceneView.targetIndex].targetAdded = true
                         }
                     }
                 }
             }
         }
-    
-//    func tapped() {
-//        guard sceneView.helicopter.missilesArmed else { return }
-//        DispatchQueue.main.async {
-//
-////            self.missileManager.fireMissile(at: self.sceneView.ships[self.sceneView.targetIndex])
-////            self.sceneView.fire(game: self.game)
-//            self.sceneView.addTargetToShip()
-//        }
-//    }
+    }
 }

@@ -10,17 +10,11 @@ import ARKit
 
 extension GameViewController: ARCoachingOverlayViewDelegate {
     
-    func coachingOverlayViewWillActivate(_ coachingOverlayView: ARCoachingOverlayView) {
-        //
-    }
+    func coachingOverlayViewWillActivate(_ coachingOverlayView: ARCoachingOverlayView) { }
     
-    func coachingOverlayViewDidDeactivate(_ coachingOverlayView: ARCoachingOverlayView) {
-        //
-    }
+    func coachingOverlayViewDidDeactivate(_ coachingOverlayView: ARCoachingOverlayView) { }
     
-    func coachingOverlayViewDidRequestSessionReset(_ coachingOverlayView: ARCoachingOverlayView) {
-        //
-    }
+    func coachingOverlayViewDidRequestSessionReset(_ coachingOverlayView: ARCoachingOverlayView) { }
     
     func setupCoachingOverlay() {
         coachingOverlay.session = sceneView.session

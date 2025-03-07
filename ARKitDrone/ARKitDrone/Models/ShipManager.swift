@@ -9,6 +9,7 @@
 import SceneKit
 
 class ShipManager {
+    
     var game: Game
     var sceneView: GameSceneView
     
