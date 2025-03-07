@@ -15,9 +15,13 @@ class GameViewController: UIViewController {
     
     let game = Game()
     var focusSquare: FocusSquare! = FocusSquare()
+    
     var minimapScene: MinimapScene!
+    
     var minimap: SKShapeNode!
+    
     var playerNode: SCNNode!
+    
     var score: [Int] = []
     
     let updateQueue = DispatchQueue(label: "com.arkitdrone.Queue")
@@ -37,8 +41,6 @@ class GameViewController: UIViewController {
     // MARK: - Private Properties
     
     var autoLock = true
-    
-    
     
     private lazy var padView1: SKView = {
         var offset: CGFloat = 20
@@ -78,8 +80,6 @@ class GameViewController: UIViewController {
         view.backgroundColor = .clear
         return view
     }()
-    
-    //    private let droneQueue = DispatchQueue(label: "com.froleeyo.dronequeue")
     
     private lazy var armMissilesButton: UIButton = {
         let button = UIButton()
@@ -126,7 +126,6 @@ class GameViewController: UIViewController {
     }
     
     @IBOutlet private weak var sceneView: GameSceneView!
-    
     
     
     // MARK: - ViewController Lifecycle
@@ -226,6 +225,7 @@ class GameViewController: UIViewController {
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+            
             minimapScene.updateMinimap(
                 playerPosition: playerPosition,
                 helicopterPosition: helicopterPosition,
@@ -258,13 +258,7 @@ class GameViewController: UIViewController {
             sceneView.scene.lightingEnvironment.contents = environmentMap
         }
         
-        session.run(configuration,
-                    options: [
-                        .resetTracking,
-                        .removeExistingAnchors,
-                        .resetSceneReconstruction,
-                        .stopTrackedRaycasts
-                    ])
+        session.run(configuration, options: [.resetTracking, .removeExistingAnchors, .resetSceneReconstruction, .stopTrackedRaycasts])
     }
     
     private func setupPadScene(padView1: SKView, padView2: SKView) {
@@ -275,6 +269,7 @@ class GameViewController: UIViewController {
         scene.stickNum = 2
         padView1.presentScene(scene)
         padView1.ignoresSiblingOrder = true
+        
         let scene2 = JoystickScene()
         scene2.point = LocalConstants.joystickPoint
         scene2.size = LocalConstants.joystickSize
@@ -299,26 +294,38 @@ class GameViewController: UIViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard !game.placed, let touch = touches.first else { return }
         let tapLocation: CGPoint = touch.location(in: sceneView)
-        guard let result = sceneView.raycastQuery(from: tapLocation, allowing: .estimatedPlane, alignment: .horizontal) else { return }
+        
+        guard let result = sceneView.raycastQuery(
+            from: tapLocation,
+            allowing: .estimatedPlane,
+            alignment: .horizontal
+        ) else { return }
+        
         let castRay = session.raycast(result)
+        
         if let firstCast = castRay.first {
             DispatchQueue.main.async {
                 let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
                 self.sceneView.positionTank(position: tappedPosition)
-                self.focusSquare.hide()
-                self.focusSquare.removeAll()
-                self.focusSquare.removeFromParentNode()
+                self.cleanupFocusSquaure()
                 self.game.placed = true
             }
             
         }
     }
+    
+    func cleanupFocusSquaure() {
+        focusSquare.hide()
+        focusSquare.removeAll()
+        focusSquare.removeFromParentNode()
+    }
 }
+
 
 extension GameViewController: ARSCNViewDelegate {
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        self.sceneView.moveShips(placed: self.game.placed)
+        sceneView.moveShips(placed: game.placed)
         if !game.placed {
             DispatchQueue.main.async {
                 self.updateFocusSquare(isObjectVisible: false)
