@@ -127,7 +127,7 @@ class GameViewController: UIViewController {
     
     @IBOutlet private weak var sceneView: GameSceneView!
     
-   
+    
     
     // MARK: - ViewController Lifecycle
     
@@ -358,93 +358,11 @@ extension GameViewController: JoystickSceneDelegate {
     
     func tapped() {
         guard sceneView.helicopter.missilesArmed else { return }
-        
         DispatchQueue.main.async {
-            self.fire()
+            self.sceneView.fire(game: self.game)
             self.sceneView.addTargetToShip()
         }
     }
-    
-    func fire() {
-        
-        guard !sceneView.missiles.isEmpty, !game.scoreUpdated else { return }
-        guard sceneView.ships.count > sceneView.targetIndex else { return }
-        guard !sceneView.ships[sceneView.targetIndex].isDestroyed else { return }
-        
-        let ship = sceneView.ships[sceneView.targetIndex]
-        
-        //.first(where: { !$0.isDestroyed && !$0.targeted }) else { return }
-        ship.targeted = true
-        
-        guard let missile = sceneView.missiles.first(where:{ !$0.fired }) else { return }
-        missile.fired = true
-        game.valueReached = false
-        missile.addCollision()
-        sceneView.missileLock(ship: ship)
-        missile.node.look(at: ship.node.position)
-        
-        ApacheHelicopter.speed = 0
-        
-        let targetPos = ship.node.presentation.simdWorldPosition
-        let currentPos = missile.node.presentation.simdWorldPosition
-        let direction = simd_normalize(targetPos - currentPos)
-        
-        missile.particle?.orientationDirection = SCNVector3(-direction.x, -direction.y, -direction.z)
-        missile.particle?.birthRate = 500
-        
-        let displayLink = CADisplayLink(target: self, selector: #selector(updateMissilePosition))
-        displayLink.preferredFramesPerSecond = 60
-        
-        Missile.activeMissileTrackers[missile.id] = MissileTrackingInfo(
-            missile: missile,
-            target: ship,
-            startTime: CACurrentMediaTime(),
-            displayLink: displayLink,
-            lastUpdateTime: CACurrentMediaTime()
-        )
-        
-        displayLink.add(to: .main, forMode: .common)
-    }
-    
-   
-    
-    @objc private func updateMissilePosition(displayLink: CADisplayLink) {
-        
-        guard let trackingInfo = Missile.activeMissileTrackers.first(where: { $0.value.displayLink === displayLink })?.value else {
-            displayLink.invalidate()
-            return
-        }
-        
-        let missile = trackingInfo.missile
-        
-        let ship = trackingInfo.target
-        
-        if missile.hit {
-            displayLink.invalidate()
-            Missile.activeMissileTrackers[missile.id] = nil
-            return
-        }
-        
-        let deltaTime = displayLink.timestamp - trackingInfo.lastUpdateTime
-        let speed: Float = 50
-        
-        let targetPos = ship.node.presentation.simdWorldPosition
-        let currentPos = missile.node.presentation.simdWorldPosition
-        let direction = simd_normalize(targetPos - currentPos)
-        let movement = direction * speed * Float(deltaTime)
-        
-        missile.node.simdWorldPosition += movement
-        missile.node.look(at: ship.node.presentation.position)
-        missile.particle?.orientationDirection = SCNVector3(-direction.x, -direction.y, -direction.z)
-        
-        var updatedInfo = trackingInfo
-        updatedInfo.frameCount += 1
-        updatedInfo.lastUpdateTime = displayLink.timestamp
-        
-        Missile.activeMissileTrackers[missile.id] = updatedInfo
-        game.valueReached = updatedInfo.frameCount > 30
-    }
-    
 }
 
 extension GameViewController: SCNPhysicsContactDelegate {
@@ -579,11 +497,3 @@ extension GameViewController: ARCoachingOverlayViewDelegate {
     }
 }
 
-struct MissileTrackingInfo {
-    let missile: Missile
-    let target: Ship
-    let startTime: CFTimeInterval
-    let displayLink: CADisplayLink
-    var frameCount: Int = 0
-    var lastUpdateTime: CFTimeInterval
-}
