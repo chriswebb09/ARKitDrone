@@ -32,16 +32,13 @@ class MissileManager {
         sceneView.missileLock(ship: ship)
         missile.node.look(at: ship.node.position)
         ApacheHelicopter.speed = 0
-        
         let targetPos = ship.node.presentation.simdWorldPosition
         let currentPos = missile.node.presentation.simdWorldPosition
         let direction = simd_normalize(targetPos - currentPos)
         missile.particle?.orientationDirection = SCNVector3(-direction.x, -direction.y, -direction.z)
         missile.particle?.birthRate = 500
-        
         let displayLink = CADisplayLink(target: self, selector: #selector(updateMissilePosition))
         displayLink.preferredFramesPerSecond = 60
-        
         activeMissileTrackers[missile.id] = MissileTrackingInfo(
             missile: missile,
             target: ship,
@@ -49,7 +46,6 @@ class MissileManager {
             displayLink: displayLink,
             lastUpdateTime: CACurrentMediaTime()
         )
-        
         displayLink.add(to: .main, forMode: .common)
     }
     
@@ -58,32 +54,25 @@ class MissileManager {
             displayLink.invalidate()
             return
         }
-        
         let missile = trackingInfo.missile
         let ship = trackingInfo.target
-        
         if missile.hit {
             displayLink.invalidate()
             activeMissileTrackers[missile.id] = nil
             return
         }
-        
         let deltaTime = displayLink.timestamp - trackingInfo.lastUpdateTime
         let speed: Float = 50
-        
         let targetPos = ship.node.presentation.simdWorldPosition
         let currentPos = missile.node.presentation.simdWorldPosition
         let direction = simd_normalize(targetPos - currentPos)
         let movement = direction * speed * Float(deltaTime)
-        
         missile.node.simdWorldPosition += movement
         missile.node.look(at: ship.node.presentation.position)
         missile.particle?.orientationDirection = SCNVector3(-direction.x, -direction.y, -direction.z)
-        
         var updatedInfo = trackingInfo
         updatedInfo.frameCount += 1
         updatedInfo.lastUpdateTime = displayLink.timestamp
-        
         activeMissileTrackers[missile.id] = updatedInfo
         if updatedInfo.frameCount > 30 {
             NotificationCenter.default.post(name: .missileCanHit, object: self, userInfo: nil)
@@ -115,7 +104,6 @@ class MissileManager {
                 ship.isDestroyed = true
                 ship.removeShip()
                 self.sceneView.addExplosion(contactPoint: contact.contactPoint)
-                //                self.sceneView.addExplosion(at: contact.contactPoint)
                 self.sceneView.positionHUD()
             }
             tempMissile.particle?.birthRate = 0
