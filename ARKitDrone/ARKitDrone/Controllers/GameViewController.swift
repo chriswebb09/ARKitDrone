@@ -15,6 +15,7 @@ import SpriteKit
 class GameViewController: UIViewController {
     
     let game = Game()
+    
     var focusSquare: FocusSquare! = FocusSquare()
     
     var minimapScene: MinimapScene!
@@ -159,10 +160,12 @@ class GameViewController: UIViewController {
             DeviceOrientation.shared.set(orientation: .portrait)
         }
         UIApplication.shared.isIdleTimerDisabled = true
+        
         setupTracking()
         sceneView.setup()
         sceneView.scene.physicsWorld.contactDelegate = self
         setupPlayerNode()
+        
         DispatchQueue.main.asyncAfter(deadline: .now() +  0.5) { [weak self] in
             guard let self = self else { return }
             sceneView.addSubview(padView1)
@@ -175,6 +178,7 @@ class GameViewController: UIViewController {
             startMinimapUpdate()
             setupPadScene(padView1: padView1, padView2: padView2)
             self.sceneView.scene.rootNode.addChildNode(focusSquare)
+            
             //            let circle = FocusCircle()
             //            self.sceneView.scene.rootNode.addChildNode(circle)
             
@@ -184,6 +188,7 @@ class GameViewController: UIViewController {
         sceneView.addSubview(scoreText)
         armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
         sceneView.isUserInteractionEnabled = true
+        
         DispatchQueue.main.async {
             self.setupCoachingOverlay()
         }
@@ -294,6 +299,7 @@ class GameViewController: UIViewController {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard !game.placed, let touch = touches.first else { return }
+        
         let tapLocation: CGPoint = touch.location(in: sceneView)
         
         guard let result = sceneView.raycastQuery(
