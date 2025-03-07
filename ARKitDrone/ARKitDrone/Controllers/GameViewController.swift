@@ -54,6 +54,7 @@ class GameViewController: UIViewController {
         view.backgroundColor = .clear
         return view
     }()
+    
     var missileManager: MissileManager!
     var addLinesToPlanes = false
     var addPlanesToScene = false

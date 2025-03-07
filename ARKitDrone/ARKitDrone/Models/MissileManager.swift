@@ -8,12 +8,6 @@
 
 import  SceneKit
 
-
-extension Notification.Name {
-    static let missileCanHit = Notification.Name("MissileCanHit")
-    static let updateScore = Notification.Name("UpdateScore")
-}
-
 class MissileManager {
     var missiles: [Missile] = []
     var activeMissileTrackers: [String: MissileTrackingInfo] = [:]
