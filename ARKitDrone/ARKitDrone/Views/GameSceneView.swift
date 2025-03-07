@@ -13,7 +13,7 @@ class GameSceneView: ARSCNView {
     
     // MARK: - LocalConstants
     
-    private struct LocalConstants {
+    struct LocalConstants {
         static let sceneName =  "art.scnassets/Game.scn"
         static let tankAssetName = "art.scnassets/m1.scn"
         static let f35Scene = "art.scnassets/F-35B_Lightning_II.scn"
@@ -64,15 +64,13 @@ class GameSceneView: ARSCNView {
     
     func setup() {
         scene = SCNScene(named: LocalConstants.sceneName)!
-        tankModel = SCNScene.nodeWithModelName(LocalConstants.tankAssetName).clone()
-        tankNode = tankModel.childNode(withName: "m1tank", recursively: true)
-        tankNode.scale = SCNVector3(x: 0.1, y: 0.1, z: 0.1)
-        let physicsBody =  SCNPhysicsBody(type: .static, shape: nil)
-        tankNode.physicsBody = physicsBody
-        tankNode.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
-        tankNode.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
-        tankNode.physicsBody?.collisionBitMask = 2
+        setupTankNode()
         setupHelicopterNode()
+        setupAdditionalHelicopterComponents()
+        setupMissiles()
+    }
+    
+    private func setupAdditionalHelicopterComponents() {
         hud = helicopterModel!.childNode(withName: GameSceneView.hudNodeName, recursively: false)!
         front = helicopterNode.childNode(withName: GameSceneView.frontIRSteering, recursively: true)
         rotor = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.frontRotorName, recursively: true)
@@ -82,8 +80,19 @@ class GameSceneView: ARSCNView {
         front = helicopterNode.childNode(withName: GameSceneView.frontIRSteering, recursively: true)
         frontIR = front!.childNode(withName:GameSceneView.frontIR, recursively: true)
         upperGun = helicopterNode.childNode(withName: GameSceneView.upperGun, recursively: true)!
-        setupMissiles()
     }
+    
+    private func setupTankNode() {
+        tankModel = SCNScene.nodeWithModelName(LocalConstants.tankAssetName).clone()
+        tankNode = tankModel.childNode(withName: "m1tank", recursively: true)
+        tankNode.scale = SCNVector3(x: 0.1, y: 0.1, z: 0.1)
+        let physicsBody =  SCNPhysicsBody(type: .static, shape: nil)
+        tankNode.physicsBody = physicsBody
+        tankNode.physicsBody?.categoryBitMask = CollisionTypes.base.rawValue
+        tankNode.physicsBody?.contactTestBitMask = CollisionTypes.missile.rawValue
+        tankNode.physicsBody?.collisionBitMask = 2
+    }
+    
     
     func positionTank(position: SCNVector3) {
         DispatchQueue.main.async { [weak self] in
@@ -167,104 +176,6 @@ class GameSceneView: ARSCNView {
             SCNAction.wait(duration: 0.25),
             SCNAction.removeFromParentNode()
         ]))
-    }
-    
-    func moveShips(placed: Bool) {
-        var percievedCenter = SCNVector3Zero
-        var percievedVelocity = SCNVector3Zero
-        
-        for otherShip in ships {
-            percievedCenter = percievedCenter + otherShip.node.position
-            percievedVelocity = percievedVelocity + (otherShip.velocity)
-        }
-        
-        ships.forEach {
-            
-            $0.updateShipPosition(
-                percievedCenter: percievedCenter,
-                percievedVelocity: percievedVelocity,
-                otherShips: ships,
-                obstacles: [helicopterNode]
-            )
-        }
-        
-        if placed {
-            
-            _  = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { [weak self] timer in
-                guard let self = self else { return }
-                attack = true
-                timer.invalidate()
-            })
-            
-            for ship in ships {
-                if attack {
-                    ship.attack(target: self.helicopterNode)
-                    _  = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { [weak self] timer in
-                        guard let self = self else { return }
-                        self.attack = false
-                        timer.invalidate()
-                    })
-                }
-                
-                
-            }
-        }
-        //        if placed {
-        //            ships.forEach {
-        //                $0.updateShipPosition(target: helicopterNode.position, otherShips: self.ships)
-        //            }
-        //        } else {
-        //            ships.forEach {
-        //                $0.updateShipPosition(percievedCenter: percievedCenter, percievedVelocity: percievedVelocity, otherShips: ships, obstacles: [helicopterNode])
-        //            }
-        //        }
-    }
-    
-    func setupShips() {
-        let shipScene = SCNScene(named: LocalConstants.f35Scene)!
-        for i in 1...8 {
-            let shipNode = shipScene.rootNode.childNode(withName: LocalConstants.f35Node, recursively: true)!.clone()
-            shipNode.name = "F_35B \(i)"
-            let ship = Ship(newNode: shipNode)
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                scene.rootNode.addChildNode(ship.node)
-                ships.append(ship)
-                let randomOffset = SCNVector3(
-                    x: Float.random(in: -20.0...20.0),
-                    y: Float.random(in: -10.0...10.0),
-                    z: Float.random(in: -20.0...40.0)
-                )
-                ship.node.position = SCNVector3(x:randomOffset.x , y: randomOffset.y, z: randomOffset.z)
-                ship.node.scale = SCNVector3(x: 0.005, y: 0.005, z: 0.005)
-                if i == 1 {
-                    targetIndex = 0
-                    DispatchQueue.main.async {
-                        let square = TargetNode()
-                        ship.square = square
-                        self.scene.rootNode.addChildNode(square)
-                        ship.targetAdded = true
-                    }
-                }
-            }
-        }
-    }
-    
-    func addTargetToShip() {
-        if ships.count > targetIndex {
-            targetIndex += 1
-            if targetIndex < ships.count {
-                if !ships[targetIndex].isDestroyed && !ships[targetIndex].targetAdded {
-                    DispatchQueue.main.async {
-                        guard self.targetIndex < self.ships.count else { return }
-                        let square = TargetNode()
-                        self.ships[self.targetIndex].square = square
-                        self.scene.rootNode.addChildNode(square)
-                        self.ships[self.targetIndex].targetAdded = true
-                    }
-                }
-            }
-        }
     }
 }
 
