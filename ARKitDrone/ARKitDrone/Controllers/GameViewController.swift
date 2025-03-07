@@ -54,7 +54,7 @@ class GameViewController: UIViewController {
         view.backgroundColor = .clear
         return view
     }()
-    
+    var missileManager: MissileManager!
     var addLinesToPlanes = false
     var addPlanesToScene = false
     var addsMesh = false
@@ -137,8 +137,10 @@ class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         sceneView.delegate = self
-        NotificationCenter.default.addObserver(self, selector: #selector(missileCanHit), name: .missileCanHit, object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(missileCanHit), name: .missileCanHit, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateGameStateText), name: .updateScore, object: nil)
+        missileManager = MissileManager(game: game, sceneView: sceneView)
         //        sceneView.debugOptions = .showPhysicsShapes
     }
     

@@ -297,5 +297,14 @@ extension Ship {
         ship.node.isHidden = true
         ship.node.removeFromParentNode()
     }
+    
+    func removeShip() {
+//        let ship = Ship.getShip(from: conditionalShipNode)!
+        isDestroyed = true
+        square.isHidden = true
+        square.removeFromParentNode()
+        node.isHidden = true
+        node.removeFromParentNode()
+    }
 }
 
