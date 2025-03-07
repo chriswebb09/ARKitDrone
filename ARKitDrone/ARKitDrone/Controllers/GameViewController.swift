@@ -160,11 +160,7 @@ class GameViewController: UIViewController {
         setupTracking()
         sceneView.setup()
         sceneView.scene.physicsWorld.contactDelegate = self
-        playerNode = SCNNode(geometry: SCNSphere(radius: 0.01))
-        playerNode.name = "Player"
-        playerNode.position = SCNVector3(0, 0, 0)
-        playerNode.geometry?.firstMaterial?.transparency = 0.0
-        sceneView.scene.rootNode.addChildNode(playerNode)
+        setupPlayerNode()
         DispatchQueue.main.asyncAfter(deadline: .now() +  0.5) { [weak self] in
             guard let self = self else { return }
             sceneView.addSubview(padView1)
@@ -191,6 +187,14 @@ class GameViewController: UIViewController {
         }
     }
     
+    func setupPlayerNode() {
+        playerNode = SCNNode(geometry: SCNSphere(radius: 0.01))
+        playerNode.name = "Player"
+        playerNode.position = SCNVector3(0, 0, 0)
+        playerNode.geometry?.firstMaterial?.transparency = 0.0
+        sceneView.scene.rootNode.addChildNode(playerNode)
+    }
+    
     // MARK: - Private Methods
     
     func startMinimapUpdate() {
@@ -205,12 +209,19 @@ class GameViewController: UIViewController {
     
     func updateMinimap() {
         guard let cameraTransform = sceneView.session.currentFrame?.camera.transform else { return }
+        
         let cameraRotation = simd_float4x4(cameraTransform.columns.0, cameraTransform.columns.1, cameraTransform.columns.2, cameraTransform.columns.3)
+        
         let playerPosition = simd_float4(playerNode.worldPosition.x, playerNode.worldPosition.y, playerNode.worldPosition.z, 1.0)
+        
         let shipPositions = sceneView.ships.filter { !$0.isDestroyed }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
+        
         let missilePositions = sceneView.missiles.filter { $0.fired && !$0.hit }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
+        
         let helcopterWorldPosition = sceneView.helicopterNode.worldPosition
+        
         let helicopterPosition: simd_float4 = game.placed ? simd_float4(helcopterWorldPosition.x, helcopterWorldPosition.y, helcopterWorldPosition.z, 1.0) : simd_float4.zero
+        
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             minimapScene.updateMinimap(
@@ -345,32 +356,24 @@ extension GameViewController: JoystickSceneDelegate {
     
     func tapped() {
         guard sceneView.helicopter.missilesArmed else { return }
+        
         DispatchQueue.main.async {
             self.fire()
-            if self.sceneView.ships.count > self.sceneView.targetIndex {
-                self.sceneView.targetIndex += 1
-                if self.sceneView.targetIndex < self.sceneView.ships.count {
-                    if !self.sceneView.ships[self.sceneView.targetIndex].isDestroyed && !self.sceneView.ships[self.sceneView.targetIndex].targetAdded {
-                        DispatchQueue.main.async {
-                            guard self.sceneView.targetIndex < self.sceneView.ships.count else { return }
-                            let square = TargetNode()
-                            self.sceneView.ships[self.sceneView.targetIndex].square = square
-                            self.sceneView.scene.rootNode.addChildNode(square)
-                            self.sceneView.ships[self.sceneView.targetIndex].targetAdded = true
-                        }
-                    }
-                }
-            }
+            self.sceneView.addTargetToShip()
         }
     }
     
     func fire() {
+        
         guard !sceneView.missiles.isEmpty, !game.scoreUpdated else { return }
         guard self.sceneView.ships.count > self.sceneView.targetIndex else { return }
         guard !sceneView.ships[sceneView.targetIndex].isDestroyed else { return }
+        
         let ship = sceneView.ships[sceneView.targetIndex]
+        
         //.first(where: { !$0.isDestroyed && !$0.targeted }) else { return }
         ship.targeted = true
+        
         guard let missile = sceneView.missiles.first(where:{ !$0.fired }) else { return }
         missile.fired = true
         game.valueReached = false
@@ -424,6 +427,7 @@ extension GameViewController: JoystickSceneDelegate {
         
         let deltaTime = displayLink.timestamp - trackingInfo.lastUpdateTime
         let speed: Float = 50
+        
         let targetPos = ship.node.presentation.simdWorldPosition
         let currentPos = missile.node.presentation.simdWorldPosition
         let direction = simd_normalize(targetPos - currentPos)

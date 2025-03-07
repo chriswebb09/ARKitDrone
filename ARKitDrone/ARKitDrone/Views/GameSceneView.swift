@@ -236,6 +236,23 @@ class GameSceneView: ARSCNView {
         }
     }
     
+    func addTargetToShip() {
+        if ships.count > targetIndex {
+            targetIndex += 1
+            if targetIndex < ships.count {
+                if !ships[targetIndex].isDestroyed && !ships[targetIndex].targetAdded {
+                    DispatchQueue.main.async {
+                        guard self.targetIndex < self.ships.count else { return }
+                        let square = TargetNode()
+                        self.ships[self.targetIndex].square = square
+                        self.scene.rootNode.addChildNode(square)
+                        self.ships[self.targetIndex].targetAdded = true
+                    }
+                }
+            }
+        }
+    }
+    
     
 }
 
