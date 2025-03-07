@@ -317,15 +317,9 @@ class GameViewController: UIViewController {
         DispatchQueue.main.async {
             let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
             self.sceneView.positionTank(position: tappedPosition)
-            self.cleanupFocusSquaure()
+            self.focusSquare.cleanup()
             self.game.placed = true
         }
-    }
-    
-    func cleanupFocusSquaure() {
-        focusSquare.hide()
-        focusSquare.removeAll()
-        focusSquare.removeFromParentNode()
     }
 }
 

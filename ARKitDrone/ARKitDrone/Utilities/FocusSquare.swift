@@ -411,6 +411,12 @@ class FocusSquare: SCNNode {
         
         return node
     }()
+    
+    func cleanup() {
+        hide()
+        removeAll()
+        removeFromParentNode()
+    }
 }
 
 // MARK: - Animations and Actions
