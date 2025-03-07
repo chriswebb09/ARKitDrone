@@ -14,8 +14,15 @@ extension GameViewController: SCNPhysicsContactDelegate {
         let nameA = contact.nodeA.name ?? ""
         let nameB = contact.nodeB.name ?? ""
         
+        print(nameA)
+        print(nameB)
+        
         let conditionOne = (nameA.contains("Missile") && !nameB.contains("Missile"))
         let conditionTwo = (nameB.contains("Missile") && !nameA.contains("Missile"))
+        
+        print(game.valueReached)
+        
+        print("conditionOne \(conditionOne)")
         
         if (game.valueReached && (conditionOne || conditionTwo)) {
             

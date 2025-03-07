@@ -26,7 +26,7 @@ class GameViewController: UIViewController {
     
     var score: [Int] = []
     
-    let updateQueue = DispatchQueue(label: "com.arkitdrone.Queue")
+    let updateQueue = DispatchQueue(label: "com.arkitdrone.Queue", qos: .userInteractive)
     
     let coachingOverlay = ARCoachingOverlayView()
     
@@ -62,6 +62,8 @@ class GameViewController: UIViewController {
     var planeHeight: CGFloat = 0.01
     var anchors = [ARAnchor]()
     var nodes = [SCNNode]()
+    
+    var isLoaded = false
     
     private lazy var padView2: SKView = {
         let view = SKView(frame: CGRect(x:600, y: UIScreen.main.bounds.height - 220, width: 170, height: 170))
@@ -136,6 +138,8 @@ class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         sceneView.delegate = self
+        NotificationCenter.default.addObserver(self, selector: #selector(missileCanHit), name: .missileCanHit, object: nil)
+        
         //        sceneView.debugOptions = .showPhysicsShapes
     }
     
@@ -169,21 +173,12 @@ class GameViewController: UIViewController {
         
         DispatchQueue.main.asyncAfter(deadline: .now() +  0.5) { [weak self] in
             guard let self = self else { return }
-            sceneView.addSubview(padView1)
-            sceneView.addSubview(padView2)
             sceneView.setupShips()
             minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
             minimapScene.scaleMode = .resizeFill
             minimapView.presentScene(minimapScene)
             view.addSubview(minimapView)
             startMinimapUpdate()
-            setupPadScene(padView1: padView1, padView2: padView2)
-            if circle {
-                let focusCircle = FocusCircle()
-                self.sceneView.scene.rootNode.addChildNode(focusCircle)
-            } else {
-                self.sceneView.scene.rootNode.addChildNode(focusSquare)
-            }
         }
         sceneView.addSubview(destoryedText)
         sceneView.addSubview(armMissilesButton)
@@ -191,8 +186,25 @@ class GameViewController: UIViewController {
         armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
         sceneView.isUserInteractionEnabled = true
         
-        DispatchQueue.main.async {
-            self.setupCoachingOverlay()
+        DispatchQueue.main.asyncAfter(deadline: .now() +  1.5) { [weak self] in
+            guard let self = self else { return }
+            setupCoachingOverlay()
+            sceneView.addSubview(padView1)
+            sceneView.addSubview(padView2)
+            setupPadScene(padView1: padView1, padView2: padView2)
+            if self.circle {
+                let focusCircle = FocusCircle()
+                sceneView.scene.rootNode.addChildNode(focusCircle)
+            } else {
+                sceneView.scene.rootNode.addChildNode(focusSquare)
+                updateFocusSquare(isObjectVisible: true)
+            }
+            
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() +  2.5) { [weak self] in
+            guard let self = self else { return }
+            self.isLoaded = true
         }
     }
     
@@ -278,6 +290,10 @@ class GameViewController: UIViewController {
         updateFiredButton()
     }
     
+    @objc func missileCanHit() {
+        game.valueReached = true
+    }
+    
     func updateFiredButton() {
         sceneView.helicopter.missilesArmed = !sceneView.helicopter.missilesArmed
         let title = sceneView.helicopter.missilesAreArmed() ? LocalConstants.disarmTitle : LocalConstants.buttonTitle
@@ -317,7 +333,7 @@ extension GameViewController: ARSCNViewDelegate {
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         sceneView.moveShips(placed: game.placed)
-        if !game.placed {
+        if !game.placed && isLoaded {
             DispatchQueue.main.async {
                 self.updateFocusSquare(isObjectVisible: false)
             }

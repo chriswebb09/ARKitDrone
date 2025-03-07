@@ -8,6 +8,11 @@
 
 import  SceneKit
 
+
+extension Notification.Name {
+    static let missileCanHit = Notification.Name("MissileCanHit")
+}
+
 class MissileManager {
     
 }
