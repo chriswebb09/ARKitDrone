@@ -20,6 +20,8 @@ class Missile {
     var num: Int = -1
     private static var missileRegistry: [SCNNode: Missile] = [:]
     
+    static var activeMissileTrackers: [String: MissileTrackingInfo] = [:]
+    
     func setupNode(scnNode: SCNNode?, number: Int) {
         guard let scnNode = scnNode else { return }
         node = scnNode

@@ -38,6 +38,8 @@ class GameViewController: UIViewController {
     
     var autoLock = true
     
+    
+    
     private lazy var padView1: SKView = {
         var offset: CGFloat = 20
         if UIDevice.current.isIpad {
@@ -125,7 +127,7 @@ class GameViewController: UIViewController {
     
     @IBOutlet private weak var sceneView: GameSceneView!
     
-    private var activeMissileTrackers: [String: MissileTrackingInfo] = [:]
+   
     
     // MARK: - ViewController Lifecycle
     
@@ -171,7 +173,7 @@ class GameViewController: UIViewController {
             minimapView.presentScene(minimapScene)
             view.addSubview(minimapView)
             startMinimapUpdate()
-            setupPadScene()
+            setupPadScene(padView1: padView1, padView2: padView2)
             self.sceneView.scene.rootNode.addChildNode(focusSquare)
             //            let circle = FocusCircle()
             //            self.sceneView.scene.rootNode.addChildNode(circle)
@@ -265,7 +267,7 @@ class GameViewController: UIViewController {
                     ])
     }
     
-    private func setupPadScene() {
+    private func setupPadScene(padView1: SKView, padView2: SKView) {
         let scene = JoystickScene()
         scene.point = LocalConstants.joystickPoint
         scene.size = LocalConstants.joystickSize
@@ -366,7 +368,7 @@ extension GameViewController: JoystickSceneDelegate {
     func fire() {
         
         guard !sceneView.missiles.isEmpty, !game.scoreUpdated else { return }
-        guard self.sceneView.ships.count > self.sceneView.targetIndex else { return }
+        guard sceneView.ships.count > sceneView.targetIndex else { return }
         guard !sceneView.ships[sceneView.targetIndex].isDestroyed else { return }
         
         let ship = sceneView.ships[sceneView.targetIndex]
@@ -380,6 +382,7 @@ extension GameViewController: JoystickSceneDelegate {
         missile.addCollision()
         sceneView.missileLock(ship: ship)
         missile.node.look(at: ship.node.position)
+        
         ApacheHelicopter.speed = 0
         
         let targetPos = ship.node.presentation.simdWorldPosition
@@ -392,36 +395,33 @@ extension GameViewController: JoystickSceneDelegate {
         let displayLink = CADisplayLink(target: self, selector: #selector(updateMissilePosition))
         displayLink.preferredFramesPerSecond = 60
         
-        activeMissileTrackers[missile.id] = MissileTrackingInfo(
+        Missile.activeMissileTrackers[missile.id] = MissileTrackingInfo(
             missile: missile,
             target: ship,
             startTime: CACurrentMediaTime(),
             displayLink: displayLink,
             lastUpdateTime: CACurrentMediaTime()
         )
+        
         displayLink.add(to: .main, forMode: .common)
     }
     
-    private struct MissileTrackingInfo {
-        let missile: Missile
-        let target: Ship
-        let startTime: CFTimeInterval
-        let displayLink: CADisplayLink
-        var frameCount: Int = 0
-        var lastUpdateTime: CFTimeInterval
-    }
+   
     
     @objc private func updateMissilePosition(displayLink: CADisplayLink) {
-        guard let trackingInfo = activeMissileTrackers.first(where: { $0.value.displayLink === displayLink })?.value else {
+        
+        guard let trackingInfo = Missile.activeMissileTrackers.first(where: { $0.value.displayLink === displayLink })?.value else {
             displayLink.invalidate()
             return
         }
         
         let missile = trackingInfo.missile
+        
         let ship = trackingInfo.target
+        
         if missile.hit {
             displayLink.invalidate()
-            activeMissileTrackers[missile.id] = nil
+            Missile.activeMissileTrackers[missile.id] = nil
             return
         }
         
@@ -441,7 +441,7 @@ extension GameViewController: JoystickSceneDelegate {
         updatedInfo.frameCount += 1
         updatedInfo.lastUpdateTime = displayLink.timestamp
         
-        activeMissileTrackers[missile.id] = updatedInfo
+        Missile.activeMissileTrackers[missile.id] = updatedInfo
         game.valueReached = updatedInfo.frameCount > 30
     }
     
@@ -577,4 +577,13 @@ extension GameViewController: ARCoachingOverlayViewDelegate {
             }
         }
     }
+}
+
+struct MissileTrackingInfo {
+    let missile: Missile
+    let target: Ship
+    let startTime: CFTimeInterval
+    let displayLink: CADisplayLink
+    var frameCount: Int = 0
+    var lastUpdateTime: CFTimeInterval
 }

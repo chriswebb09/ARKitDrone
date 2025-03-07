@@ -191,8 +191,8 @@ class GameSceneView: ARSCNView {
                         timer.invalidate()
                     })
                 }
-             
-               
+                
+                
             }
         }
         //        if placed {
