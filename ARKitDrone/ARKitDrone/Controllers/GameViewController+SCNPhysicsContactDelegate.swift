@@ -37,13 +37,10 @@ extension GameViewController: SCNPhysicsContactDelegate {
                     self.destoryedText.fadeTransition(0.001)
                     self.scoreText.fadeTransition(0.001)
                     self.updateGameStateText()
+                    Ship.removeShip(conditionalShipNode: conditionalShipNode)
+                    self.sceneView.positionHUD()
+                    self.sceneView.helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.18))
                 }
-            }
-            
-            DispatchQueue.main.async {
-                Ship.removeShip(conditionalShipNode: conditionalShipNode)
-                self.sceneView.positionHUD()
-                self.sceneView.helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.18))
             }
             
             tempMissile.particle?.birthRate = 0

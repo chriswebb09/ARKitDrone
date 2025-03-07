@@ -310,14 +310,12 @@ class GameViewController: UIViewController {
         
         let castRay = session.raycast(result)
         
-        if let firstCast = castRay.first {
-            DispatchQueue.main.async {
-                let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
-                self.sceneView.positionTank(position: tappedPosition)
-                self.cleanupFocusSquaure()
-                self.game.placed = true
-            }
-            
+        guard let firstCast = castRay.first else { return }
+        DispatchQueue.main.async {
+            let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
+            self.sceneView.positionTank(position: tappedPosition)
+            self.cleanupFocusSquaure()
+            self.game.placed = true
         }
     }
     
