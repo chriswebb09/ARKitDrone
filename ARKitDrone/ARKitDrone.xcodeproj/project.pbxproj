@@ -20,6 +20,27 @@
 		9455B7552D60C74A0019FE10 /* ShipManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9455B7542D60C7460019FE10 /* ShipManager.swift */; };
 		945B16AB294E9F5B00482E14 /* Joystick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945B16AA294E9F5B00482E14 /* Joystick.swift */; };
 		945B16AD294EB34800482E14 /* JoystickScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945B16AC294EB34800482E14 /* JoystickScene.swift */; };
+		9466909F2D9E3CD700343B1B /* BitStreamCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9466909E2D9E3CD700343B1B /* BitStreamCodable.swift */; };
+		946690A02D9E3CD700343B1B /* BitStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9466909D2D9E3CD700343B1B /* BitStream.swift */; };
+		946690A52D9E3CF900343B1B /* MovementSyncSceneData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690A42D9E3CF900343B1B /* MovementSyncSceneData.swift */; };
+		946690A62D9E3CF900343B1B /* MovementSyncData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690A32D9E3CF900343B1B /* MovementSyncData.swift */; };
+		946690A72D9E3CF900343B1B /* MovementData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690A22D9E3CF900343B1B /* MovementData.swift */; };
+		946690AA2D9E3D3F00343B1B /* Data+Compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690A92D9E3D3F00343B1B /* Data+Compression.swift */; };
+		946690AC2D9E3D7A00343B1B /* GameObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690AB2D9E3D7A00343B1B /* GameObject.swift */; };
+		946690AE2D9E3D8B00343B1B /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690AD2D9E3D8B00343B1B /* Player.swift */; };
+		946690B02D9E3D9A00343B1B /* GameTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690AF2D9E3D9A00343B1B /* GameTime.swift */; };
+		946690B22D9E3DA900343B1B /* NetworkGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690B12D9E3DA900343B1B /* NetworkGame.swift */; };
+		946690B42D9E3DB400343B1B /* NetworkSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690B32D9E3DB400343B1B /* NetworkSession.swift */; };
+		946690B62D9E3DB800343B1B /* GameBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690B52D9E3DB800343B1B /* GameBrowser.swift */; };
+		946690B82D9E3DD800343B1B /* Bundle+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690B72D9E3DD800343B1B /* Bundle+Helpers.swift */; };
+		946690BB2D9E3DFA00343B1B /* Action+Signposts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690B92D9E3DFA00343B1B /* Action+Signposts.swift */; };
+		946690BC2D9E3DFA00343B1B /* SignpostData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690BA2D9E3DFA00343B1B /* SignpostData.swift */; };
+		946690BF2D9E3E5100343B1B /* GameCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690BE2D9E3E5100343B1B /* GameCommand.swift */; };
+		946690C12D9E3E9000343B1B /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690C02D9E3E9000343B1B /* GameManager.swift */; };
+		946690C32D9E3ECF00343B1B /* UserDefaults+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690C22D9E3ECF00343B1B /* UserDefaults+Helpers.swift */; };
+		946690C52D9E3FB700343B1B /* NetworkGameBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690C42D9E3FB700343B1B /* NetworkGameBrowserViewController.swift */; };
+		946690C72D9E3FE100343B1B /* GameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690C62D9E3FE100343B1B /* GameCell.swift */; };
+		946690C92D9E3FF400343B1B /* GameStartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690C82D9E3FF400343B1B /* GameStartViewController.swift */; };
 		9467A30B2BB918EE0023EA62 /* M1Tank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9467A30A2BB918EE0023EA62 /* M1Tank.swift */; };
 		9467A30D2BB93A6E0023EA62 /* Tank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9467A30C2BB93A6E0023EA62 /* Tank.swift */; };
 		9467A30F2BB93A840023EA62 /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9467A30E2BB93A840023EA62 /* Shell.swift */; };
@@ -72,6 +93,27 @@
 		9455B7542D60C7460019FE10 /* ShipManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShipManager.swift; sourceTree = "<group>"; };
 		945B16AA294E9F5B00482E14 /* Joystick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joystick.swift; sourceTree = "<group>"; };
 		945B16AC294EB34800482E14 /* JoystickScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoystickScene.swift; sourceTree = "<group>"; };
+		9466909D2D9E3CD700343B1B /* BitStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitStream.swift; sourceTree = "<group>"; };
+		9466909E2D9E3CD700343B1B /* BitStreamCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitStreamCodable.swift; sourceTree = "<group>"; };
+		946690A22D9E3CF900343B1B /* MovementData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementData.swift; sourceTree = "<group>"; };
+		946690A32D9E3CF900343B1B /* MovementSyncData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementSyncData.swift; sourceTree = "<group>"; };
+		946690A42D9E3CF900343B1B /* MovementSyncSceneData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementSyncSceneData.swift; sourceTree = "<group>"; };
+		946690A92D9E3D3F00343B1B /* Data+Compression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Compression.swift"; sourceTree = "<group>"; };
+		946690AB2D9E3D7A00343B1B /* GameObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameObject.swift; sourceTree = "<group>"; };
+		946690AD2D9E3D8B00343B1B /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+		946690AF2D9E3D9A00343B1B /* GameTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTime.swift; sourceTree = "<group>"; };
+		946690B12D9E3DA900343B1B /* NetworkGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkGame.swift; sourceTree = "<group>"; };
+		946690B32D9E3DB400343B1B /* NetworkSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSession.swift; sourceTree = "<group>"; };
+		946690B52D9E3DB800343B1B /* GameBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameBrowser.swift; sourceTree = "<group>"; };
+		946690B72D9E3DD800343B1B /* Bundle+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Helpers.swift"; sourceTree = "<group>"; };
+		946690B92D9E3DFA00343B1B /* Action+Signposts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Action+Signposts.swift"; sourceTree = "<group>"; };
+		946690BA2D9E3DFA00343B1B /* SignpostData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignpostData.swift; sourceTree = "<group>"; };
+		946690BE2D9E3E5100343B1B /* GameCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCommand.swift; sourceTree = "<group>"; };
+		946690C02D9E3E9000343B1B /* GameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
+		946690C22D9E3ECF00343B1B /* UserDefaults+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Helpers.swift"; sourceTree = "<group>"; };
+		946690C42D9E3FB700343B1B /* NetworkGameBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkGameBrowserViewController.swift; sourceTree = "<group>"; };
+		946690C62D9E3FE100343B1B /* GameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCell.swift; sourceTree = "<group>"; };
+		946690C82D9E3FF400343B1B /* GameStartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStartViewController.swift; sourceTree = "<group>"; };
 		9467A30A2BB918EE0023EA62 /* M1Tank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M1Tank.swift; sourceTree = "<group>"; };
 		9467A30C2BB93A6E0023EA62 /* Tank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tank.swift; sourceTree = "<group>"; };
 		9467A30E2BB93A840023EA62 /* Shell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
@@ -123,6 +165,34 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		946690A12D9E3CDC00343B1B /* Bit Stream */ = {
+			isa = PBXGroup;
+			children = (
+				9466909D2D9E3CD700343B1B /* BitStream.swift */,
+				9466909E2D9E3CD700343B1B /* BitStreamCodable.swift */,
+			);
+			path = "Bit Stream";
+			sourceTree = "<group>";
+		};
+		946690A82D9E3D0200343B1B /* Movement */ = {
+			isa = PBXGroup;
+			children = (
+				946690A22D9E3CF900343B1B /* MovementData.swift */,
+				946690A32D9E3CF900343B1B /* MovementSyncData.swift */,
+				946690A42D9E3CF900343B1B /* MovementSyncSceneData.swift */,
+			);
+			path = Movement;
+			sourceTree = "<group>";
+		};
+		946690BD2D9E3DFE00343B1B /* Signpost */ = {
+			isa = PBXGroup;
+			children = (
+				946690B92D9E3DFA00343B1B /* Action+Signposts.swift */,
+				946690BA2D9E3DFA00343B1B /* SignpostData.swift */,
+			);
+			path = Signpost;
+			sourceTree = "<group>";
+		};
 		94CCC8F12972E34500F7D17F /* Joystick */ = {
 			isa = PBXGroup;
 			children = (
@@ -137,7 +207,9 @@
 		94CCC8F22972E35400F7D17F /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				946690B72D9E3DD800343B1B /* Bundle+Helpers.swift */,
 				948E91D32D6519B100DE6405 /* FocusSquare.swift */,
+				946690A92D9E3D3F00343B1B /* Data+Compression.swift */,
 				94396BD32D7B36D100A83CF4 /* FocusCircle.swift */,
 				94396BCF2D7B364200A83CF4 /* FocusSquare+Extension.swift */,
 				94CCC9112972FFB500F7D17F /* DeviceOrientation.swift */,
@@ -149,9 +221,16 @@
 		94CCC8F32972E36100F7D17F /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				946690C02D9E3E9000343B1B /* GameManager.swift */,
+				946690AB2D9E3D7A00343B1B /* GameObject.swift */,
+				946690AD2D9E3D8B00343B1B /* Player.swift */,
 				94CCC90F2972F43200F7D17F /* HelicopterCapable.swift */,
 				94C881A72D5D05B50050119D /* Game.swift */,
+				946690AF2D9E3D9A00343B1B /* GameTime.swift */,
+				946690B52D9E3DB800343B1B /* GameBrowser.swift */,
+				946690B32D9E3DB400343B1B /* NetworkSession.swift */,
 				9455B7522D60C73B0019FE10 /* MissileManager.swift */,
+				946690B12D9E3DA900343B1B /* NetworkGame.swift */,
 				9455B7542D60C7460019FE10 /* ShipManager.swift */,
 				94548F012D5C68EB00A007B0 /* CollisionTypes.swift */,
 				9412F0752D5B4BE500D9F1BD /* Ship.swift */,
@@ -180,6 +259,9 @@
 			children = (
 				A7AE72C11F888EF500B015D3 /* GameViewController.swift */,
 				94B6E8472D7B68630064ABD7 /* GameViewController+ARSCNViewDelegate.swift */,
+				946690C42D9E3FB700343B1B /* NetworkGameBrowserViewController.swift */,
+				946690C82D9E3FF400343B1B /* GameStartViewController.swift */,
+				946690C62D9E3FE100343B1B /* GameCell.swift */,
 				94396BD92D7B473E00A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift */,
 				94396BD72D7B46E400A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift */,
 				94396BD52D7B468C00A83CF4 /* GameViewController+JoystickSceneDelegate.swift */,
@@ -193,6 +275,7 @@
 			children = (
 				94C881AD2D5D07400050119D /* SCNParticleSystem+Extension.swift */,
 				94F0ACB92D619A2F00658B0F /* SCNNode+Extension.swift */,
+				946690C22D9E3ECF00343B1B /* UserDefaults+Helpers.swift */,
 				94B6E8452D7B60AC0064ABD7 /* NotificationName+Extension.swift */,
 				94C881AB2D5D06F40050119D /* SCNMaterial+Extension.swift */,
 				94CCC9092972E54000F7D17F /* SCNScene+Extension.swift */,
@@ -230,6 +313,10 @@
 			children = (
 				94CCC8EA2972D14600F7D17F /* audio.m4a */,
 				A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */,
+				946690BE2D9E3E5100343B1B /* GameCommand.swift */,
+				946690BD2D9E3DFE00343B1B /* Signpost */,
+				946690A82D9E3D0200343B1B /* Movement */,
+				946690A12D9E3CDC00343B1B /* Bit Stream */,
 				94CCC9072972E4BF00F7D17F /* Controllers */,
 				94CCC9062972E4B700F7D17F /* Views */,
 				94CCC8F32972E36100F7D17F /* Models */,
@@ -272,7 +359,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 0910;
-				LastUpgradeCheck = 1540;
+				LastUpgradeCheck = 1630;
 				ORGANIZATIONNAME = "Christopher Webb-Orenstein";
 				TargetAttributes = {
 					A7AE72B91F888EF500B015D3 = {
@@ -322,12 +409,18 @@
 			files = (
 				94A68F742C87972E0059CD82 /* SCNQuaternion+Extension.swift in Sources */,
 				945B16AD294EB34800482E14 /* JoystickScene.swift in Sources */,
+				946690B62D9E3DB800343B1B /* GameBrowser.swift in Sources */,
 				94396BD22D7B36A300A83CF4 /* CGPoint+Extension.swift in Sources */,
+				946690C92D9E3FF400343B1B /* GameStartViewController.swift in Sources */,
 				94C881AE2D5D07450050119D /* SCNParticleSystem+Extension.swift in Sources */,
 				94F968A82AD7337F00D7B418 /* OcclusionNode.swift in Sources */,
 				94548F022D5C68EE00A007B0 /* CollisionTypes.swift in Sources */,
 				941706D92972A5F400CB0308 /* ApacheHelicopter.swift in Sources */,
+				946690BB2D9E3DFA00343B1B /* Action+Signposts.swift in Sources */,
+				946690BC2D9E3DFA00343B1B /* SignpostData.swift in Sources */,
 				A7AE72C21F888EF500B015D3 /* GameViewController.swift in Sources */,
+				946690C12D9E3E9000343B1B /* GameManager.swift in Sources */,
+				946690AC2D9E3D7A00343B1B /* GameObject.swift in Sources */,
 				94CCC8F02972D97700F7D17F /* JoystickDelegate.swift in Sources */,
 				9455B7552D60C74A0019FE10 /* ShipManager.swift in Sources */,
 				94CCC8EE2972D46400F7D17F /* Missile.swift in Sources */,
@@ -337,21 +430,29 @@
 				94D598442BB9037400B31874 /* SCNGeometry+Extension.swift in Sources */,
 				9467A30F2BB93A840023EA62 /* Shell.swift in Sources */,
 				94CCC90A2972E54000F7D17F /* SCNScene+Extension.swift in Sources */,
+				946690C32D9E3ECF00343B1B /* UserDefaults+Helpers.swift in Sources */,
+				946690B82D9E3DD800343B1B /* Bundle+Helpers.swift in Sources */,
 				9470AE472974001A00A55134 /* MenuViewController.swift in Sources */,
 				94F5D19C2D5CAEA000019569 /* MinimapScene.swift in Sources */,
 				9455B7532D60C73F0019FE10 /* MissileManager.swift in Sources */,
 				94F0ACBA2D619A3800658B0F /* SCNNode+Extension.swift in Sources */,
 				94396BD82D7B46F000A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift in Sources */,
+				946690C52D9E3FB700343B1B /* NetworkGameBrowserViewController.swift in Sources */,
 				94CCC9122972FFB500F7D17F /* DeviceOrientation.swift in Sources */,
 				94C881A82D5D05C20050119D /* Game.swift in Sources */,
 				94CB148E2C8793BF0065E1B0 /* UIColor+Extension.swift in Sources */,
 				9467A30B2BB918EE0023EA62 /* M1Tank.swift in Sources */,
 				94CCC90E2972EB2400F7D17F /* GameSceneView.swift in Sources */,
+				946690C72D9E3FE100343B1B /* GameCell.swift in Sources */,
 				94C881AC2D5D07000050119D /* SCNMaterial+Extension.swift in Sources */,
 				94DF3F082975F167006723FC /* UIView+Extension.swift in Sources */,
+				946690A52D9E3CF900343B1B /* MovementSyncSceneData.swift in Sources */,
+				946690A62D9E3CF900343B1B /* MovementSyncData.swift in Sources */,
+				946690A72D9E3CF900343B1B /* MovementData.swift in Sources */,
 				9467A30D2BB93A6E0023EA62 /* Tank.swift in Sources */,
 				94396BD02D7B365000A83CF4 /* FocusSquare+Extension.swift in Sources */,
 				94396BD42D7B36D500A83CF4 /* FocusCircle.swift in Sources */,
+				946690B42D9E3DB400343B1B /* NetworkSession.swift in Sources */,
 				94396BD62D7B469600A83CF4 /* GameViewController+JoystickSceneDelegate.swift in Sources */,
 				94A68F762C8797550059CD82 /* SCNVector3+Extension.swift in Sources */,
 				94B6E8482D7B68680064ABD7 /* GameViewController+ARSCNViewDelegate.swift in Sources */,
@@ -360,9 +461,16 @@
 				94A68F722C8797070059CD82 /* SCNMatrix4+Extension.swift in Sources */,
 				948E91D42D6519B500DE6405 /* FocusSquare.swift in Sources */,
 				9412F0762D5B4BEB00D9F1BD /* Ship.swift in Sources */,
+				946690BF2D9E3E5100343B1B /* GameCommand.swift in Sources */,
+				946690AE2D9E3D8B00343B1B /* Player.swift in Sources */,
 				A7AE72BE1F888EF500B015D3 /* AppDelegate.swift in Sources */,
 				94E5448F29672EE200158DA2 /* JoystickSceneDelegate.swift in Sources */,
 				94CCC8FF2972E43500F7D17F /* FloatingPoint+Extension.swift in Sources */,
+				946690B22D9E3DA900343B1B /* NetworkGame.swift in Sources */,
+				9466909F2D9E3CD700343B1B /* BitStreamCodable.swift in Sources */,
+				946690A02D9E3CD700343B1B /* BitStream.swift in Sources */,
+				946690B02D9E3D9A00343B1B /* GameTime.swift in Sources */,
+				946690AA2D9E3D3F00343B1B /* Data+Compression.swift in Sources */,
 				945B16AB294E9F5B00482E14 /* Joystick.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -425,6 +533,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 9LZ34BLS2W;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -488,6 +597,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 9LZ34BLS2W;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -521,7 +631,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.FroleeyoDefaultCompany.Rollaball;
+				PRODUCT_BUNDLE_IDENTIFIER = com.FCompany.Rollaball;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -544,7 +654,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.FroleeyoDefaultCompany.Rollaball;
+				PRODUCT_BUNDLE_IDENTIFIER = com.FCompany.Rollaball;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

@@ -197,8 +197,8 @@ class TargetNode: SCNNode {
 private func flashAnimation(duration: TimeInterval) -> SCNAction {
     
     let action = SCNAction.customAction(duration: duration) { (node, elapsedTime) -> Void in
-        let elapsedTimePercentage = elapsedTime / CGFloat(duration)
-        let saturation = 2.8 * (elapsedTimePercentage - 0.5) * (elapsedTimePercentage - 0.5) + 0.3
+//        let elapsedTimePercentage = elapsedTime / CGFloat(duration)
+//        let saturation = 2.8 * (elapsedTimePercentage - 0.5) * (elapsedTimePercentage - 0.5) + 0.3
         if let material = node.geometry?.firstMaterial {
             material.diffuse.contents = TargetNode.fillColor.withAlphaComponent(1.0)
         }

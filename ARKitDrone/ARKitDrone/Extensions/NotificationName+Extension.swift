@@ -12,3 +12,7 @@ extension Notification.Name {
     static let missileCanHit = Notification.Name("MissileCanHit")
     static let updateScore = Notification.Name("UpdateScore")
 }
+
+
+var joystickNotificationName = NSNotification.Name("joystickNotificationName")
+let joystickVelocityMultiplier: CGFloat = 0.00006

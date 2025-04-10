@@ -25,6 +25,9 @@ class MenuViewController: UIViewController {
         }
     }
     
+//    let gameStartViewContoller = GameStartViewController()
+//    var overlayView: UIView?
+    
     // MARK: - ViewController Lifecycle
     
     override func viewDidLoad() {
@@ -40,6 +43,8 @@ class MenuViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [self] in
             newGameButton.isHidden = true
             performSegue(withIdentifier: LocalConstants.goToGameSegue, sender: self)
+//            gameStartViewContoller.delegate = self
+//
         }
     }
     
