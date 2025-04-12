@@ -128,42 +128,7 @@ class GameSceneView: ARSCNView {
         }
         return helicopter
     }
-    
-//    func setupMissiles() {
-//        let missile1Node = wingR!.childNode(withName: ApacheHelicopter.LocalConstants.missile1, recursively: false)!
-//        missile1.setupNode(scnNode: missile1Node, number: 1)
-//        let missile2Node = wingR?.childNode(withName: ApacheHelicopter.LocalConstants.missile2, recursively: false)!
-//        missile2.setupNode(scnNode:missile2Node, number: 2)
-//        missile3.setupNode(scnNode: wingR!.childNode(withName: ApacheHelicopter.LocalConstants.missile3, recursively: false), number: 3)
-//        missile4.setupNode(scnNode: wingR.childNode(withName: ApacheHelicopter.LocalConstants.missile4, recursively: true), number: 4)
-//        missile5.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile5, recursively: true), number: 5)
-//        missile6.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile6, recursively: true), number: 6)
-//        missile7.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile7, recursively: true), number: 7)
-//        missile8.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile8, recursively: true), number: 8)
-//    }
-    
-//    func setHelicopterProps() {
-//        helicopter.hud = hud
-//        missiles =  [missile1, missile2, missile3, missile4, missile5, missile6, missile7, missile8]
-//        helicopter.missile1 = missile1
-//        helicopter.helicopterNode = helicopterNode
-//        helicopter.front = front
-//        helicopter.frontIR = frontIR
-//        helicopter.upperGun = upperGun
-//        helicopter.missile1 = missile1
-//        helicopter.missile2 = missile2
-//        helicopter.missile3 = missile3
-//        helicopter.missile4 = missile4
-//        helicopter.missile5 = missile5
-//        helicopter.missile6 = missile6
-//        helicopter.missile7 = missile7
-//        helicopter.missile8 = missile8
-//        helicopter.missiles = missiles
-//        helicopter.rotor = rotor
-//        helicopter.rotor2 = rotor2
-//        helicopter.setup(with: helicopterNode)
-//    }
-//    
+
     func addExplosion(contactPoint: SCNVector3) {
         let explosion = SCNParticleSystem.createExplosion()
         let explosionNode = SCNNode()
