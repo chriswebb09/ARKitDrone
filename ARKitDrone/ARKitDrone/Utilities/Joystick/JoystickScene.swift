@@ -36,12 +36,15 @@ class JoystickScene: SKScene {
        
         DispatchQueue.main.async {
             let joystickVelocity = self.joystick.velocity
+            
             if joystickVelocity != .zero {
                 let isVertical = abs(joystickVelocity.y) > abs(joystickVelocity.x)
                 if isVertical {
-                    self.joystickDelegate?.update(yValue: Float(joystickVelocity.y), stickNum: self.stickNum)
+                    var test = SIMD3<Float>(x: 0, y: 0, z: Float(joystickVelocity.y))
+                    self.joystickDelegate?.update(yValue: Float(joystickVelocity.y), velocity: test, angular:Float(self.joystick.angularVelocity), stickNum: self.stickNum)
                 } else {
-                    self.joystickDelegate?.update(xValue: Float(joystickVelocity.x), stickNum: self.stickNum)
+                    var test = SIMD3<Float>(x: Float(joystickVelocity.x), y: 0, z: 0)
+                    self.joystickDelegate?.update(xValue: Float(joystickVelocity.x), velocity:test, angular: Float(self.joystick.angularVelocity), stickNum: self.stickNum)
                 }
             }
         }

@@ -9,6 +9,7 @@
 import  SceneKit
 
 class MissileManager {
+    
     var missiles: [Missile] = []
     var activeMissileTrackers: [String: MissileTrackingInfo] = [:]
     var game: Game
@@ -20,12 +21,12 @@ class MissileManager {
     }
     
     func fire(game: Game) {
-        guard !sceneView.missiles.isEmpty, !game.scoreUpdated else { return }
+        guard !sceneView.helicopter.missiles.isEmpty, !game.scoreUpdated else { return }
         guard sceneView.ships.count > sceneView.targetIndex else { return }
         guard !sceneView.ships[sceneView.targetIndex].isDestroyed else { return }
         let ship = sceneView.ships[sceneView.targetIndex]
         ship.targeted = true
-        guard let missile = sceneView.missiles.first(where: { !$0.fired }) else { return }
+        guard let missile = sceneView.helicopter.missiles.first(where: { !$0.fired }) else { return }
         missile.fired = true
         game.valueReached = false
         missile.addCollision()

@@ -22,8 +22,7 @@ class ApacheHelicopter {
         static let frontRotorName = "FrontRotor"
         static let tailRotorName = "TailRotor"
         static let hudNodeName = "hud"
-        static let frontIRSteering = "FrontIRSteering"
-        
+        static let frontIRSteering = "FrontIRS"
         static let missile1 = "Missile1"
         static let missile2 = "Missile2"
         static let missile3 = "Missile3"
@@ -48,9 +47,9 @@ class ApacheHelicopter {
     var parentModelNode: SCNNode!
     var firing:Bool = false
     
-    var missile1: Missile!
-    var missile2: Missile!
-    var missile3: Missile!
+    var missile1: Missile = Missile()
+    var missile2: Missile = Missile()
+    var missile3: Missile = Missile()
     var missile4: Missile = Missile()
     var missile5: Missile = Missile()
     var missile6: Missile = Missile()
@@ -71,6 +70,20 @@ class ApacheHelicopter {
     var missileLockDirection = SCNVector3(0, 0, 1)
     var upperGun: SCNNode!
     var targetPosition: SCNVector3!
+    
+    static var speed: Float = 50
+    var speed: Float = 2000 // Base speed
+    let maxSpeed: Float = 10000.0 // Max missile speed
+    
+    // Define smooth factors for rotation
+    let rotationSmoothFactor: Float = 0.005 // Lower = smoother turns
+    
+    init() {
+        parentModelNode = setupHelicopterModel()
+        helicopterNode = setupHelicopterNode(helicopterModel: parentModelNode)
+        setupAdditionalHelicopterComponents()
+        setup(with: helicopterNode)
+    }
     
     func spinBlades() {
         DispatchQueue.global(qos: .userInteractive).async {
@@ -94,6 +107,78 @@ class ApacheHelicopter {
         hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
         spinBlades()
     }
+    
+    //    private func setupAdditionalHelicopterComponents() {
+    //        hud = helicopterModel!.childNode(withName: GameSceneView.hudNodeName, recursively: false)!
+    //        front = helicopterNode.childNode(withName: GameSceneView.frontIRSteering, recursively: true)
+    //        rotor = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.frontRotorName, recursively: true)
+    //        rotor2 = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.tailRotorName, recursively: true)
+    //        wingL = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.wingLName, recursively: true)
+    //        wingR = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.wingRName, recursively: true)
+    //        front = helicopterNode.childNode(withName: GameSceneView.frontIRSteering, recursively: true)
+    //        frontIR = front!.childNode(withName:GameSceneView.frontIR, recursively: true)
+    //        upperGun = helicopterNode.childNode(withName: GameSceneView.upperGun, recursively: true)!
+    //    }
+    
+    func setupMissiles() {
+//        let missile1Node = wingR!.childNode(withName: ApacheHelicopter.LocalConstants.missile1, recursively: false)!
+//        missile1.setupNode(scnNode: missile1Node, number: 1)
+//        let missile2Node = wingR?.childNode(withName: ApacheHelicopter.LocalConstants.missile2, recursively: false)!
+//        missile2.setupNode(scnNode:missile2Node, number: 2)
+        missile1.setupNode(scnNode: wingR!.childNode(withName: ApacheHelicopter.LocalConstants.missile1, recursively: true), number: 1)
+        missile2.setupNode(scnNode: wingR.childNode(withName: ApacheHelicopter.LocalConstants.missile2, recursively: true), number: 2)
+        missile3.setupNode(scnNode: wingR!.childNode(withName: ApacheHelicopter.LocalConstants.missile3, recursively: true), number: 3)
+        missile4.setupNode(scnNode: wingR.childNode(withName: ApacheHelicopter.LocalConstants.missile4, recursively: true), number: 4)
+        missile5.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile5, recursively: true), number: 5)
+        missile6.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile6, recursively: true), number: 6)
+        missile7.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile7, recursively: true), number: 7)
+        missile8.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile8, recursively: true), number: 8)
+        missiles =  [missile1, missile2, missile3, missile4, missile5, missile6, missile7, missile8]
+    }
+    
+    func setupAdditionalHelicopterComponents() {
+        hud = parentModelNode!.childNode(withName: GameSceneView.hudNodeName, recursively: false)!
+        front = helicopterNode.childNode(withName: GameSceneView.frontIRSteering, recursively: true)
+        rotor = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.frontRotorName, recursively: true)
+        rotor2 = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.tailRotorName, recursively: true)
+        wingL = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.wingLName, recursively: true)
+        wingR = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.wingRName, recursively: true)
+        front = helicopterNode.childNode(withName: GameSceneView.frontIRSteering, recursively: true)
+        frontIR = front!.childNode(withName:GameSceneView.frontIR, recursively: true)
+        upperGun = helicopterNode.childNode(withName: GameSceneView.upperGun, recursively: true)!
+    }
+    
+    
+    func setHelicopterProps() {
+//        DispatchQueue.main.async {
+//            self.parentModelNode = self.setupHelicopterModel()
+//            self.helicopterNode = self.setupHelicopterNode(helicopterModel: self.parentModelNode)
+//        }
+//        DispatchQueue.main.async {
+//            self.setup(with: self.helicopterNode)
+//        }
+        
+//        hud = hud
+       
+//        missile1 = missile1
+//        helicopterNode = helicopterNode
+//        front = front
+//        frontIR = frontIR
+//        upperGun = upperGun
+//        missile1 = missile1
+//        missile2 = missile2
+//        missile3 = missile3
+//        missile4 = missile4
+//        missile5 = missile5
+//        helicopter.missile6 = missile6
+//        helicopter.missile7 = missile7
+//        helicopter.missile8 = missile8
+//        helicopter.missiles = missiles
+//        helicopter.rotor = rotor
+//        helicopter.rotor2 = rotor2
+//        helicopter.setup(with: helicopterNode)
+    }
+    
     
     func toggleArmMissile() {
         missilesArmed = !missilesArmed
@@ -152,12 +237,6 @@ class ApacheHelicopter {
         hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
         SCNTransaction.commit()
     }
-    static var speed: Float = 50
-    var speed: Float = 2000 // Base speed
-    let maxSpeed: Float = 10000.0 // Max missile speed
-    // Define smooth factors for rotation
-    let rotationSmoothFactor: Float = 0.005 // Lower = smoother turns
-    
     
     func lockOn(ship: Ship) {
         guard helicopterNode != nil else { return }
@@ -231,6 +310,30 @@ class ApacheHelicopter {
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             bullet.removeFromParentNode()
         }
+    }
+    
+    func setupHelicopterModel() -> SCNNode {
+        let tempScene = SCNScene.nodeWithModelName(GameSceneView.helicopterSceneName).clone()
+        guard let model = tempScene.childNode(withName: GameSceneView.helicopterParentModelName, recursively: true) else {
+            fatalError("Failed to find helicopter parent model: \(GameSceneView.helicopterParentModelName)")
+        }
+        let helicopterModel = model
+        let modelScale: Float = 0.001
+        helicopterModel.scale = SCNVector3(modelScale, modelScale, modelScale)
+        helicopterModel.simdScale = SIMD3<Float>(modelScale, modelScale, modelScale)
+        return helicopterModel
+    }
+    
+    func setupHelicopterNode(helicopterModel: SCNNode) -> SCNNode {
+        guard let bodyNode = helicopterModel.childNode(withName: GameSceneView.helicopterBodyName, recursively: true) else {
+            fatalError("Failed to find helicopter body node: \(GameSceneView.helicopterBodyName)")
+        }
+        let helicopterNode = bodyNode
+        helicopterNode.simdEulerAngles = SIMD3<Float>(-3.0, 0, 0)
+        let bodyScale = SCNVector3(0.001, 0.00001, 0.00001)
+        helicopterNode.scale = bodyScale
+        helicopterNode.simdScale = SIMD3<Float>(bodyScale.x, bodyScale.y, bodyScale.z)
+        return helicopterNode
     }
     
 }

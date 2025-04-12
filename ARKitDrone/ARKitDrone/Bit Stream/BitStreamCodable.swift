@@ -19,6 +19,7 @@ protocol BitStreamDecodable {
 typealias BitStreamCodable = BitStreamEncodable & BitStreamDecodable
 
 extension BitStreamEncodable where Self: Encodable {
+    
     func encode(to bitStream: inout WritableBitStream) throws {
         let encoder = PropertyListEncoder()
         encoder.outputFormat = .binary

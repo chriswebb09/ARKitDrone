@@ -11,12 +11,7 @@ import MultipeerConnectivity
 import simd
 import ARKit
 import os.signpost
-
-protocol NetworkSessionDelegate: AnyObject {
-    func networkSession(_ session: NetworkSession, received command: GameCommand)
-    func networkSession(_ session: NetworkSession, joining player: Player)
-    func networkSession(_ session: NetworkSession, leaving player: Player)
-}
+import os.log
 
 // kMCSessionMaximumNumberOfPeers is the maximum number in a session; because we only track
 // others and not ourself, decrement the constant for our purposes.
@@ -24,7 +19,7 @@ private let maxPeers = 4
 //kMCSessionMaximumNumberOfPeers - 1
 //
 class NetworkSession: NSObject {
-
+    
     let myself: Player
     private var peers: Set<Player> = []
     
@@ -48,23 +43,16 @@ class NetworkSession: NSObject {
         // a significant build error and we should crash.
         self.appIdentifier = Bundle.main.appIdentifier!
         os_log("my appIdentifier is %s", self.appIdentifier)
-        
         super.init()
-        
         self.session.delegate = self
-        
     }
-    
     
     // for use when acting as game server
     func startAdvertising() {
         guard serviceAdvertiser == nil else { return } // already advertising
-        
         os_log(.info, "ADVERTISING %@", myself.peerID)
         let discoveryInfo: [String: String] = [MultiuserAttribute.appIdentifier: appIdentifier]
-        let advertiser = MCNearbyServiceAdvertiser(peer: myself.peerID,
-                                                   discoveryInfo: discoveryInfo,
-                                                   serviceType: MultiuserService.playerService)
+        let advertiser = MCNearbyServiceAdvertiser(peer: myself.peerID, discoveryInfo: discoveryInfo, serviceType: MultiuserService.playerService)
         advertiser.delegate = self
         advertiser.startAdvertisingPeer()
         serviceAdvertiser = advertiser
@@ -78,7 +66,11 @@ class NetworkSession: NSObject {
     
     // MARK: Actions
     func send(action: Action) {
-        guard !peers.isEmpty else { return }
+        os_log(.info, "sending action: %s", String(describing: action))
+        guard !peers.isEmpty else {
+            os_log(.error, "no peers ", String(describing: action))
+            return
+        }
         do {
             var bits = WritableBitStream()
             try action.encode(to: &bits)
@@ -86,12 +78,10 @@ class NetworkSession: NSObject {
             let peerIds = peers.map { $0.peerID }
             try session.send(data, toPeers: peerIds, with: .reliable)
             if action.description != "physics" {
-                os_signpost(.event, log: .network_data_sent, name: .network_action_sent, signpostID: .network_data_sent,
-                            "Action : %s", action.description)
+                os_signpost(.event, log: .network_data_sent, name: .network_action_sent, signpostID: .network_data_sent, "Action : %s", action.description)
             } else {
                 let bytes = Int32(exactly: data.count) ?? Int32.max
-                os_signpost(.event, log: .network_data_sent, name: .network_physics_sent, signpostID: .network_data_sent,
-                            "%d Bytes Sent", bytes)
+                os_signpost(.event, log: .network_data_sent, name: .network_physics_sent, signpostID: .network_data_sent, "%d Bytes Sent", bytes)
             }
         } catch {
             os_log(.error, "sending failed: %s", "\(error)")
@@ -99,6 +89,7 @@ class NetworkSession: NSObject {
     }
     
     func send(action: Action, to player: Player) {
+        os_log(.info, "sending action: %s to player %s", String(describing: action), player.username)
         do {
             var bits = WritableBitStream()
             try action.encode(to: &bits)
@@ -148,19 +139,17 @@ class NetworkSession: NSObject {
             return
         }
         do {
+//            os_log(.info, "received from %@", peerID)
             var bits = ReadableBitStream(data: data)
             let action = try Action(from: &bits)
             let command = GameCommand(player: player, action: action)
             delegate?.networkSession(self, received: command)
-            
             if action.description != "physics" {
-                os_signpost(.event, log: .network_data_received, name: .network_action_received, signpostID: .network_data_received,
-                            "Action : %s", action.description)
+                os_signpost(.event, log: .network_data_received, name: .network_action_received, signpostID: .network_data_received, "Action : %s", action.description)
             } else {
                 let peerID = Int32(truncatingIfNeeded: peerID.displayName.hashValue)
                 let bytes = Int32(exactly: data.count) ?? Int32.max
-                os_signpost(.event, log: .network_data_received, name: .network_physics_received, signpostID: .network_data_received,
-                            "%d Bytes Sent from %d", bytes, peerID)
+                os_signpost(.event, log: .network_data_received, name: .network_physics_received, signpostID: .network_data_received, "%d Bytes Sent from %d", bytes, peerID)
             }
         } catch {
             os_log(.error, "deserialization error: %s", "\(error)")
@@ -195,28 +184,25 @@ extension NetworkSession: MCSessionDelegate {
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        os_log(.info, "peer %@ sent a stream named %s", peerID, peerID)
+        os_log(.info, "did receive data from peer %@", peerID)
         receive(data: data, from: peerID)
     }
     
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
-        os_log(.info, "peer %@ sent a stream named %s", peerID, streamName)
+        os_log(.info, "peer %@ sent a stream named %zzs", peerID, streamName)
     }
     
     func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
         os_log(.info, "peer %@ started sending a resource named %s", peerID, resourceName)
     }
     
-    func session(_ session: MCSession,
-                 didFinishReceivingResourceWithName resourceName: String,
-                 fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
+    func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
         os_log(.info, "peer %@ finished sending a resource named %s", peerID, resourceName)
         if let error = error {
             os_log(.error, "failed to receive resource: %s", "\(error)")
             return
         }
         guard let url = localURL else { os_log(.error, "what what no url?"); return }
-        
         do {
             // .mappedIfSafe makes the initializer attempt to map the file directly into memory
             // using mmap(2), rather than serially copying the bytes into memory.
@@ -233,24 +219,25 @@ extension NetworkSession: MCSessionDelegate {
 
 
 extension NetworkSession: MCNearbyServiceBrowserDelegate {
-    
     /// - Tag: FoundPeer
+    
     public func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
-        print("public func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?)")
+        os_log(.info, "found peer named %@", peerID)
         // Invite the new peer to the session.
         browser.invitePeer(peerID, to: session, withContext: nil, timeout: 10)
     }
     
     public func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
-        print("  public func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) ")
+        os_log(.info, "lost peer named %@", peerID)
+//        print("  public func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) ")
         // This app doesn't do anything with non-invited peers, so there's nothing to do here.
     }
-    
 }
 
 extension NetworkSession: MCNearbyServiceAdvertiserDelegate {
     
     /// - Tag: AcceptInvite
+    
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
         print("func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {")
         // Call handler to accept invitation and join the session.

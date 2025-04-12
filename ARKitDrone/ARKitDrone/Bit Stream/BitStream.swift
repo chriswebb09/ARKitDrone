@@ -143,6 +143,7 @@ struct WritableBitStream {
 }
 
 struct ReadableBitStream {
+    
     var bytes = [UInt8]()
     var endBitIndex: Int
     var currentBit = 0

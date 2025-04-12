@@ -9,23 +9,11 @@ import Foundation
 import MultipeerConnectivity
 import os.log
 
-struct MultiuserService {
-    static let playerService = "multiuser-p"
-    static let spectatorService = "multiuser-s"
-}
-
-struct MultiuserAttribute {
-    static let name = "MultiuserAttributeName"
-    static let appIdentifier = "AppIdentifierAttributeName"
-}
-
-protocol GameBrowserDelegate: AnyObject {
-    func gameBrowser(_ browser: GameBrowser, sawGames: [NetworkGame])
-}
-
 class GameBrowser: NSObject {
+    
     private let myself: Player
     private let serviceBrowser: MCNearbyServiceBrowser
+    
     weak var delegate: GameBrowserDelegate?
 
     fileprivate var games: Set<NetworkGame> = []
@@ -57,6 +45,7 @@ class GameBrowser: NSObject {
 
 /// - Tag: GameBrowser-MCNearbyServiceBrowserDelegate
 extension GameBrowser: MCNearbyServiceBrowserDelegate {
+    
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
         os_log(.info, "found peer %@", peerID)
         guard peerID != myself.peerID else {
@@ -86,9 +75,6 @@ extension GameBrowser: MCNearbyServiceBrowserDelegate {
     }
     
     func refresh() {
-        print("is refreshing")
-        print(serviceBrowser.myPeerID)
-        print(serviceBrowser.serviceType)
         delegate?.gameBrowser(self, sawGames: Array(games))
     }
 }

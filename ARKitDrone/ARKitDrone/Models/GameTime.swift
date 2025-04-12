@@ -8,6 +8,7 @@ Central static class to keep track of game time.
 import Foundation
 
 class GameTime {
+    
     //! The start time of the app.
     // Note: Uninitialized time/startTime are set to -1.0 so it can be checked in a lazy initialization
     private static var startTime = TimeInterval(-1.0)
@@ -25,6 +26,7 @@ class GameTime {
     private(set) static var frameCount = 0
     
     private static var levelStartTime = TimeInterval(-1.0)
+    
     static var timeSinceLevelStart: TimeInterval { return GameTime.time - levelStartTime }
     
     static func setLevelStartTime() {
@@ -37,7 +39,6 @@ class GameTime {
             self.time = time
             return
         }
-        
         deltaTime = time - self.time
         timeSinceStart = time - self.startTime
         self.time = time

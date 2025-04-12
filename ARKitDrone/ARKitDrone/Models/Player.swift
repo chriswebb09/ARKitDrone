@@ -24,6 +24,7 @@ struct Player {
 }
 
 extension Player: Hashable {
+    
     static func == (lhs: Player, rhs: Player) -> Bool {
         return lhs.peerID == rhs.peerID
     }

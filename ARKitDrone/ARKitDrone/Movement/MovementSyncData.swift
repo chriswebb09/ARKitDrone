@@ -22,7 +22,6 @@ extension MovementSyncData: BitStreamCodable {
     
     func encode(to bitStream: inout WritableBitStream) throws {
         bitStream.appendUInt32(UInt32(packetNumber), numberOfBits: MovementSyncData.packetNumberBits)
-        
         let nodeCount = nodeData.count
         bitStream.appendUInt32(UInt32(nodeCount), numberOfBits: MovementSyncData.nodeCountBits)
         for node in nodeData {
@@ -32,7 +31,6 @@ extension MovementSyncData: BitStreamCodable {
     
     init(from bitStream: inout ReadableBitStream) throws {
         packetNumber = Int(try bitStream.readUInt32(numberOfBits: MovementSyncData.packetNumberBits))
-        
         let nodeCount = Int(try bitStream.readUInt32(numberOfBits: MovementSyncData.nodeCountBits))
         nodeData = []
         for _ in 0..<nodeCount {

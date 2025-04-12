@@ -10,7 +10,7 @@ import UIKit
 import SceneKit
 import ARKit
 import SpriteKit
-
+import os.log
 
 class GameViewController: UIViewController {
     
@@ -24,7 +24,6 @@ class GameViewController: UIViewController {
         case setupLevel
         case gameInProgress
     }
-    
     
     var gameManager: GameManager? {
         didSet {
@@ -43,7 +42,6 @@ class GameViewController: UIViewController {
     }
     
     var sessionState: SessionState = .setup
-    
     
     let game = Game()
     
@@ -144,7 +142,14 @@ class GameViewController: UIViewController {
             name: "AvenirNext-Bold",
             size: 30
         )
-        label.frame = CGRect(origin: CGPoint(x: UIScreen.main.bounds.width / 2 - 200, y:  UIScreen.main.bounds.origin.y + 100), size: CGSize(width: 400, height: 60))
+        label.frame = CGRect(origin:
+                                CGPoint(
+                                    x: UIScreen.main.bounds.width / 2 - 200,
+                                    y:  UIScreen.main.bounds.origin.y + 100),
+                             size:
+                                CGSize(width: 400, height: 60
+                                      )
+        )
         return label
     }()
     
@@ -164,8 +169,9 @@ class GameViewController: UIViewController {
     
     var squareSet = false
     var circle = false
+    var showPhysicsShapes = false
     
-    private let myself = UserDefaults.standard.myself
+    let myself = UserDefaults.standard.myself
     
     var session: ARSession {
         return sceneView.session
@@ -183,7 +189,9 @@ class GameViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(updateGameStateText), name: .updateScore, object: nil)
         missileManager = MissileManager(game: game, sceneView: sceneView)
         shipManager = ShipManager(game: game, sceneView: sceneView)
-        //        sceneView.debugOptions = .showPhysicsShapes
+        if showPhysicsShapes {
+            sceneView.debugOptions = .showPhysicsShapes
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -211,46 +219,41 @@ class GameViewController: UIViewController {
             DeviceOrientation.shared.set(orientation: .portrait)
         }
         UIApplication.shared.isIdleTimerDisabled = true
-        
-        setupTracking()
-        sceneView.setup()
-        sceneView.scene.physicsWorld.contactDelegate = self
-        setupPlayerNode()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            guard let self = self else { return }
-            shipManager.setupShips()
-            minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
-            minimapScene.scaleMode = .resizeFill
-            minimapView.presentScene(minimapScene)
-            view.addSubview(minimapView)
-            startMinimapUpdate()
-            setupCoachingOverlay()
-            sceneView.addSubview(destoryedText)
-            sceneView.addSubview(armMissilesButton)
-            sceneView.addSubview(scoreText)
-            armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
-            sceneView.isUserInteractionEnabled = true
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-                guard let self = self else { return }
-                sceneView.addSubview(padView1)
-                sceneView.addSubview(padView2)
-                setupPadScene(padView1: padView1, padView2: padView2)
-                if self.circle {
-                    let focusCircle = FocusCircle()
-                    sceneView.scene.rootNode.addChildNode(focusCircle)
-                } else {
-                    sceneView.scene.rootNode.addChildNode(focusSquare)
-                    updateFocusSquare(isObjectVisible: true)
-                }
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-                guard let self = self else { return }
-                self.isLoaded = true
-            }
+        resetTracking()
+        DispatchQueue.main.async {
+            self.sceneView.scene.rootNode.addChildNode(self.focusSquare)
         }
+        sceneView.scene.physicsWorld.contactDelegate = self
+        
+        
+        //                            sceneView.scene.rootNode.addChildNode(focusSquare)
+        //                            updateFocusSquare(isObjectVisible: true)
+        //        setupPlayerNode()
+        //        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+        //            guard let self = self else { return }
+        //            shipManager.setupShips()
+        //            minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
+        //            minimapScene.scaleMode = .resizeFill
+        //            minimapView.presentScene(minimapScene)
+        //            view.addSubview(minimapView)
+        //            startMinimapUpdate()
+        //            setupCoachingOverlay()
+        //            sceneView.addSubview(destoryedText)
+        //            sceneView.addSubview(armMissilesButton)
+        //            sceneView.addSubview(scoreText)
+        //            armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
+        //            sceneView.isUserInteractionEnabled = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            sceneView.addSubview(padView1)
+            sceneView.addSubview(padView2)
+            setupPadScene(padView1: padView1, padView2: padView2)
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            guard let self = self else { return }
+            self.isLoaded = true
+        }
+        //        }
     }
     
     func setupPlayerNode() {
@@ -278,13 +281,12 @@ class GameViewController: UIViewController {
         self.gameManager = GameManager(sceneView: sceneView, session: gameSession)
     }
     
-    
     func updateMinimap() {
         guard let cameraTransform = sceneView.session.currentFrame?.camera.transform else { return }
         let cameraRotation = simd_float4x4(cameraTransform.columns.0, cameraTransform.columns.1, cameraTransform.columns.2, cameraTransform.columns.3)
         let playerPosition = simd_float4(playerNode.worldPosition.x, playerNode.worldPosition.y, playerNode.worldPosition.z, 1.0)
         let shipPositions = sceneView.ships.filter { !$0.isDestroyed }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
-        let missilePositions = sceneView.missiles.filter { $0.fired && !$0.hit }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
+        let missilePositions = sceneView.helicopter.missiles.filter { $0.fired && !$0.hit }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
         let helcopterWorldPosition = sceneView.helicopterNode.worldPosition
         let helicopterPosition: simd_float4 = game.placed ? simd_float4(helcopterWorldPosition.x, helcopterWorldPosition.y, helcopterWorldPosition.z, 1.0) : simd_float4.zero
         DispatchQueue.main.async { [weak self] in
@@ -300,7 +302,7 @@ class GameViewController: UIViewController {
         }
     }
     
-    private func setupTracking() {
+    func resetTracking() {
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = [.horizontal]
         if addsMesh {
@@ -321,8 +323,19 @@ class GameViewController: UIViewController {
         camera.exposureOffset = -1
         camera.minimumExposure = -1
         camera.maximumExposure = 3
-        session.run(configuration, options: [.resetTracking, .removeExistingAnchors, .resetSceneReconstruction, .stopTrackedRaycasts])
+        session.run(
+            configuration,
+            options: [
+                .resetTracking,
+                .removeExistingAnchors,
+                .resetSceneReconstruction,
+                .stopTrackedRaycasts
+            ]
+        )
+        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
     }
+    
+    
     
     private func setupPadScene(padView1: SKView, padView2: SKView) {
         let scene = JoystickScene()
@@ -332,7 +345,6 @@ class GameViewController: UIViewController {
         scene.stickNum = 2
         padView1.presentScene(scene)
         padView1.ignoresSiblingOrder = true
-        
         let scene2 = JoystickScene()
         scene2.point = LocalConstants.joystickPoint
         scene2.size = LocalConstants.joystickSize
@@ -369,9 +381,7 @@ class GameViewController: UIViewController {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard !game.placed, let touch = touches.first else { return }
-        
         let tapLocation: CGPoint = touch.location(in: sceneView)
-        
         guard let result = sceneView.raycastQuery(
             from: tapLocation,
             allowing: .estimatedPlane,
@@ -379,75 +389,63 @@ class GameViewController: UIViewController {
         ) else { return }
         
         let castRay = session.raycast(result)
-        
         guard let firstCast = castRay.first else { return }
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
-            sceneView.positionTank(position: tappedPosition)
+            let anchor = ARAnchor.init(name: "Heli", transform: firstCast.worldTransform)
+            self.sceneView.session.add(anchor: anchor)
+            sceneView.helicopter = sceneView.positionTank(position: tappedPosition)
+            let addTank = AddNodeAction(simdWorldTransform: firstCast.worldTransform, eulerAngles: SIMD3<Float>(0, focusSquare.eulerAngles.y + 180.0 * .pi / 180, 0))
+            os_log(.info, "sending add tank")
+            // send add tank action to all peer
+            self.gameManager?.send(addNode: addTank)
             focusSquare.cleanup()
             game.placed = true
         }
+
+        
     }
-    
-    private func process(boardAction: BoardSetupAction, from peer: Player) {
-        switch boardAction {
-        case .boardLocation(let location):
-            switch location {
-            case .worldMapData(let data):
-               // os_log(.info, "Received WorldMap data. Size: %d", data.count)
-                loadWorldMap(from: data)
-            case .manual:
-                //os_log(.info, "Received a manual board placement")
-                sessionState = .lookingForSurface
-            }
-        case .requestBoardLocation:
-            sendWorldTo(peer: peer)
-        }
-    }
-    
     
     func sendWorldTo(peer: Player) {
         guard let gameManager = gameManager, gameManager.isServer else {
-            print("not the server")
+            os_log(.error, "i'm not the server")
             return
         }
-            
-            //os_log(.error, "i'm not the server"); return }
         
         switch UserDefaults.standard.boardLocatingMode {
         case .worldMap:
-//            os_log(.info, "generating worldmap for %s", "\(peer)")
+            os_log(.info, "generating worldmap for %s", "\(peer)")
             getCurrentWorldMapData { data, error in
                 if let error = error {
-//                    os_log(.error, "didn't work! %s", "\(error)")
+                    os_log(.error, "didn't work! %s", "\(error)")
                     return
                 }
                 guard let data = data else {
+                    os_log(.error, "no data!")
                     return
                 }
-                
-//                os_log(.error, "no data!"); return }
-//                os_log(.info, "got a compressed map, sending to %s", "\(peer)")
+                os_log(.info, "got a compressed map, sending to %s", "\(peer)")
                 let location = GameBoardLocation.worldMapData(data)
                 DispatchQueue.main.async {
-//                    os_log(.info, "sending worldmap to %s", "\(peer)")
+                    os_log(.info, "sending worldmap to %s", "\(peer)")
                     gameManager.send(boardAction: .boardLocation(location), to: peer)
                 }
             }
         case .manual:
+            os_log(.info, "manual board location")
             gameManager.send(boardAction: .boardLocation(.manual), to: peer)
         }
     }
     
     func loadWorldMap(from archivedData: Data) {
         do {
+            os_log(.info, "loading world map")
             let uncompressedData = try archivedData.decompressed()
             guard let worldMap = try NSKeyedUnarchiver.unarchivedObject(ofClass: ARWorldMap.self, from: uncompressedData) else {
-//                os_log(.error, "The WorldMap received couldn't be read")
+                os_log(.error, "The WorldMap received couldn't be read")
                 DispatchQueue.main.async {
-//                    self.showAlert(title: "An error occured while loading the WorldMap (Failed to read)")
                     self.sessionState = .setup
                 }
                 return
@@ -459,39 +457,48 @@ class GameViewController: UIViewController {
                 configuration.planeDetection = .horizontal
                 configuration.initialWorldMap = worldMap
                 
-                self.sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
-                
+                self.sceneView.session.run(configuration, options:
+                                            [.resetTracking,
+                                                .removeExistingAnchors])
                 self.sessionState = .localizingToBoard
+                guard let camera = self.sceneView.pointOfView?.camera else {
+                    fatalError("Expected a valid `pointOfView` from the scene.")
+                }
+                camera.wantsHDR = true
+                camera.exposureOffset = -1
+                camera.minimumExposure = -1
+                camera.maximumExposure = 3
+                os_log(.info, "running session")
             }
         } catch {
-//            os_log(.error, "The WorldMap received couldn't be decompressed")
+            os_log(.error, "The WorldMap received couldn't be decompressed")
             DispatchQueue.main.async {
-//                self.showAlert(title: "An error occured while loading the WorldMap (Failed to decompress)")
                 self.sessionState = .setup
             }
         }
     }
     
     func getCurrentWorldMapData(_ closure: @escaping (Data?, Error?) -> Void) {
-//        os_log(.info, "in getCurrentWordMapData")
+        os_log(.info, "in getCurrentWordMapData")
         // When loading a map, send the loaded map and not the current extended map
         if let targetWorldMap = targetWorldMap {
-//            os_log(.info, "using existing worldmap, not asking session for a new one.")
+            os_log(.info, "using existing worldmap, not asking session for a new one.")
             compressMap(map: targetWorldMap, closure)
             return
         } else {
-//            os_log(.info, "asking ARSession for the world map")
+            os_log(.info, "asking ARSession for the world map")
             sceneView.session.getCurrentWorldMap { map, error in
-                // os_log(.info, "ARSession getCurrentWorldMap returned")
+                os_log(.info, "ARSession getCurrentWorldMap returned")
+                
                 if let error = error {
-                   // os_log(.error, "didn't work! %s", "\(error)")
+                    os_log(.error, "didn't work! %s", "\(error)")
                     closure(nil, error)
                 }
                 guard let map = map else {
+                    os_log(.error, "no map either!")
                     return
                 }
-//                os_log(.error, "no map either!"); return }
-//                os_log(.info, "got a worldmap, compressing it")
+                os_log(.info, "got a worldmap, compressing it")
                 self.compressMap(map: map, closure)
             }
         }
@@ -501,101 +508,14 @@ class GameViewController: UIViewController {
         DispatchQueue.global().async {
             do {
                 let data = try NSKeyedArchiver.archivedData(withRootObject: map, requiringSecureCoding: true)
-                //os_log(.info, "data size is %d", data.count)
+                os_log(.info, "data size is %d", data.count)
                 let compressedData = data.compressed()
-               // os_log(.info, "compressed size is %d", compressedData.count)
+                os_log(.info, "compressed size is %d", compressedData.count)
                 closure(compressedData, nil)
             } catch {
-//                os_log(.error, "archiving failed %s", "\(error)")
+                os_log(.error, "archiving failed %s", "\(error)")
                 closure(nil, error)
             }
         }
     }
-}
-
-extension GameViewController: GameStartViewControllerDelegate {
-    
-    private func createGameManager(for session: NetworkSession?) {
-        gameManager = GameManager(sceneView: sceneView,
-                                  session: session)
-        gameManager?.start()
-        setupViews()
-//        startARSession()
-    }
-    
-    func gameStartViewController(_ _: UIViewController, didPressStartSoloGameButton: UIButton) {
-        hideOverlay()
-        createGameManager(for: nil)
-    }
-    
-    func gameStartViewController(_ _: UIViewController, didStart game: NetworkSession) {
-        hideOverlay()
-        createGameManager(for: game)
-    }
-    
-    func gameStartViewController(_ _: UIViewController, didSelect game: NetworkSession) {
-        hideOverlay()
-        createGameManager(for: game)
-    }
-    
-    
-//    func gameStartViewController(_ gameStartViewController: UIViewController, didPressStartSoloGameButton: UIButton) {
-//        print("gameStartViewController(_ gameStartViewController: UIViewController, didPressStartSoloGameButton: UIButton)")
-//        hideOverlay()
-//        setupViews()
-//    }
-//    
-//    func gameStartViewController(_ gameStartViewController: UIViewController, didStart game: NetworkSession) {
-//        print("gameStartViewController(_ gameStartViewController: UIViewController, didStart game: NetworkSession)")
-//        hideOverlay()
-//        setupViews()
-//    }
-//    
-//    func gameStartViewController(_ gameStartViewController: UIViewController, didSelect game: NetworkSession) {
-//        print("gameStartViewController(_ gameStartViewController: UIViewController, didSelect game: NetworkSession)")
-//        hideOverlay()
-//        setupViews()
-//    }
-    
-    
-}
-
-extension GameViewController: GameManagerDelegate {
-    func manager(_ manager: GameManager, addTank: AddTankNodeAction) {
-        //
-    }
-    
-    func manager(_ manager: GameManager, received boardAction: BoardSetupAction, from player: Player) {
-        DispatchQueue.main.async {
-            self.process(boardAction: boardAction, from: player)
-        }
-    }
-    
-    func manager(_ manager: GameManager, joiningPlayer player: Player) {
-        //
-    }
-    
-    func manager(_ manager: GameManager, leavingPlayer player: Player) {
-        //
-    }
-    
-    func manager(_ manager: GameManager, joiningHost host: Player) {
-        // MARK: request worldmap when joining the host
-        DispatchQueue.main.async {
-            if self.sessionState == .waitingForBoard {
-                manager.send(boardAction: .requestBoardLocation)
-            }
-            guard !UserDefaults.standard.disableInGameUI else { return }
-        }
-    }
-    
-    func manager(_ manager: GameManager, leavingHost host: Player) {
-        //
-    }
-    
-    func managerDidStartGame(_ manager: GameManager) {
-        //
-    }
-    
-    
 }

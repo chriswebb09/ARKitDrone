@@ -14,11 +14,12 @@ import UIKit
 
 extension GameViewController: JoystickSceneDelegate {
     
-    func update(xValue: Float, stickNum: Int) {
+    func update(yValue xValue: Float,  velocity: SIMD3<Float>, angular: Float, stickNum: Int) {
         DispatchQueue.main.async {
             if stickNum == 1 {
                 let scaled = (xValue) * 0.0005
                 self.sceneView.rotate(value: scaled)
+                
             } else if stickNum == 2 {
                 let scaled = (xValue) * 0.05
                 self.sceneView.moveSides(value: -scaled)
@@ -26,11 +27,23 @@ extension GameViewController: JoystickSceneDelegate {
         }
     }
     
-    func update(yValue: Float, stickNum: Int) {
+    func update(xValue yValue: Float,  velocity: SIMD3<Float>,  angular: Float, stickNum: Int) {
         DispatchQueue.main.async {
             if stickNum == 2 {
-                let scaled = (yValue)
-                self.sceneView.moveForward(value: (scaled * 0.009))
+                let scaled = (yValue) * 0.009
+                
+                let velocity = SIMD3<Float>(Float(velocity.x), Float(velocity.y), Float(0))
+   
+                let v = GameVelocity(vector: velocity)
+//                let angular = Float(data.angular)
+                let shouldBeSent = MoveData(velocity: v, angular: angular)
+                self.sceneView.moveForward(value: shouldBeSent.velocity.vector.y)
+                
+                DispatchQueue.main.async {
+                    self.gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
+                }
+                
+                
             } else if stickNum == 1 {
                 let scaled = (yValue) * 0.01
                 self.sceneView.changeAltitude(value: scaled)

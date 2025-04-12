@@ -10,11 +10,8 @@ import simd
 import SceneKit
 import os.log
 
-protocol MovementSyncSceneDataDelegate: AnyObject {
-    func hasNetworkDelayStatusChanged(hasNetworkDelay: Bool)
-}
-
 class MovementSyncSceneData {
+    
     private let lock = NSLock() // need thread protection because add used in main thread, while pack used in render update thread
     
     // Non-projectile sync
@@ -86,7 +83,6 @@ class MovementSyncSceneData {
                 if !justUpdatedHalfway {
                     apply(packet: oldestData)
                     packetQueue.removeFirst()
-                    
                     updateObjectsFromData(isHalfway: true)
                     justUpdatedHalfway = true
                 }

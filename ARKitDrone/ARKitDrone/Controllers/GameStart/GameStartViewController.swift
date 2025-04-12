@@ -10,15 +10,10 @@ import UIKit
 import Foundation
 import os.log
 
-protocol GameStartViewControllerDelegate: AnyObject {
-    func gameStartViewController(_ gameStartViewController: UIViewController, didPressStartSoloGameButton: UIButton)
-    func gameStartViewController(_ gameStartViewController: UIViewController, didStart game: NetworkSession)
-    func gameStartViewController(_ gameStartViewController: UIViewController, didSelect game: NetworkSession)
-}
-
 class GameStartViewController: UIViewController {
     
     weak var delegate: GameStartViewControllerDelegate?
+    
     var gameBrowser: GameBrowser?
     
     private let myself = UserDefaults.standard.myself
@@ -50,15 +45,12 @@ class GameStartViewController: UIViewController {
         super.viewDidLoad()
         view.addSubview(hostButton)
         view.addSubview(joinButton)
-        
         gameBrowser = GameBrowser(myself: myself)
         browserController.browser = gameBrowser
-        self.addChild(browserController)
-        
+        addChild(browserController)
         browserContainerView = browserController.view
         view.addSubview(browserContainerView)
         browserContainerView.isHidden = true
-        
         view.backgroundColor = .white
         setupButtons()
         setupBrowserView()
@@ -73,7 +65,7 @@ class GameStartViewController: UIViewController {
             hostButton.heightAnchor.constraint(equalToConstant: 50)
         ])
         hostButton.addTarget(self, action: #selector(hostButtonPressed), for: .touchUpInside)
-        
+
         joinButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             joinButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -113,16 +105,12 @@ class GameStartViewController: UIViewController {
     
     @objc func hostButtonPressed() {
         startGame(with: myself)
-//        DispatchQueue.main.async {
-//            self.browserContainerView.isHidden = !self.browserContainerView.isHidden
-//        }
     }
     
     @objc func joinButtonPressed() {
         gameBrowser?.refresh()
         DispatchQueue.main.async {
-            self.browserContainerView.isHidden = false 
-//            self.browserContainerView.isHidden = !self.browserContainerView.isHidden
+            self.browserContainerView.isHidden = false
         }
     }
     

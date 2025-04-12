@@ -20,6 +20,7 @@ class M1AbramsTank {
         static let maingun = "gun"
         static let body = "body"
     }
+    
     var tankRotateAngle: Double = 0.0
     private var tankNode: SCNNode!
     private var tracksNode: SCNNode!
@@ -27,6 +28,7 @@ class M1AbramsTank {
     private var mainGunNode: SCNNode!
     private var maxUp: Float = -0.133
     private var maxDown: Float = 0.133
+    
     var position: SCNVector3 = SCNVector3Zero
     var firingRange: Float = 20.0
     var moveSpeed: Float = 0.5     // Speed of movement
@@ -40,7 +42,6 @@ class M1AbramsTank {
         turretNode = tankNode.childNode(withName: LocalConstants.turret, recursively: true)
         mainGunNode = turretNode.childNode(withName: LocalConstants.maingun, recursively: true)
         tankNode.transform = transform
-        //        tankNode.simdScale = SIMD3<Float>(repeating: 0.04)
         tankNode.simdEulerAngles = SIMD3<Float>(-1.7, 0, 0)
         scene.rootNode.addChildNode(tankNode)
     }

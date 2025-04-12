@@ -14,17 +14,6 @@ import ARKit
 import AVFoundation
 import os.signpost
 
-protocol GameManagerDelegate: AnyObject {
-    func manager(_ manager: GameManager, received: BoardSetupAction, from: Player)
-    func manager(_ manager: GameManager, joiningPlayer player: Player)
-    func manager(_ manager: GameManager, leavingPlayer player: Player)
-    func manager(_ manager: GameManager, joiningHost host: Player)
-    func manager(_ manager: GameManager, leavingHost host: Player)
-    func managerDidStartGame(_ manager: GameManager)
-    
-    func manager(_ manager: GameManager, addTank: AddTankNodeAction)
-}
-
 /// - Tag: GameManager
 class GameManager: NSObject {
     // don't execute any code from SCNView renderer until this is true
@@ -40,9 +29,9 @@ class GameManager: NSObject {
     private let commandsLock = NSLock()
     
     private let movementSyncData = MovementSyncSceneData()
-
+    
     let currentPlayer = UserDefaults.standard.myself
-
+    
     let isNetworked: Bool
     let isServer: Bool
     
@@ -52,14 +41,15 @@ class GameManager: NSObject {
         
         self.isNetworked = session != nil
         self.isServer = session?.isServer ?? true // Solo game act like a server
-        
+//        movementSyncData.delegate = self
         super.init()
         
         self.session?.delegate = self
     }
-
+    
     func queueAction(gameAction: GameAction) {
-        commandsLock.lock(); defer { commandsLock.unlock() }
+        commandsLock.lock()
+        defer { commandsLock.unlock() }
         gameCommands.append(GameCommand(player: currentPlayer, action: .gameAction(gameAction)))
     }
     
@@ -85,13 +75,17 @@ class GameManager: NSObject {
     }
     
     weak var delegate: GameManagerDelegate?
-
+    
     func send(gameAction: GameAction) {
         session?.send(action: .gameAction(gameAction))
     }
     
-    func send(addTankAction: AddTankNodeAction) {
-        session?.send(action: .addTank(addTankAction))
+    func send(completed: CompletedAction) {
+        session?.send(action: .completed(completed))
+    }
+    
+    func send(addNode: AddNodeAction) {
+        session?.send(action: .addNode(addNode))
     }
     
     func send(boardAction: BoardSetupAction) {
@@ -111,25 +105,33 @@ class GameManager: NSObject {
         
         switch command.action {
         case .gameAction(let gameAction):
+            os_log(.info, "game action for %s", command.player?.username ?? "unknown")
             // should controll tank here
+            
             guard let player = command.player else { return }
+            
             if case let .joyStickMoved(data) = gameAction {
-                self.moveTank(player: player, movement: data)
+                self.delegate?.manager(self, moveNode: data)
             }
         case .boardSetup(let boardAction):
+            os_log(.info, "board setup for %s", command.player?.username ?? "unknown")
             if let player = command.player {
                 delegate?.manager(self, received: boardAction, from: player)
             }
-        case .addTank(let addTankAction):
+        case .addNode(let addNode):
+            os_log(.info, "add node for %s", command.player?.username ?? "unknown")
             if let player = command.player {
+                delegate?.manager(self, addNode: addNode)
                 // should send create tank action here
-                let tankNode = SCNNode()
-                tankNode.simdWorldTransform = addTankAction.simdWorldTransform
-                tankNode.eulerAngles = SCNVector3(addTankAction.eulerAngles.x, addTankAction.eulerAngles.y, addTankAction.eulerAngles.z)
-                print(self.scene.rootNode.simdWorldTransform)
-                tankNode.scale = SCNVector3(0.0002, 0.0002, 0.0002)
-                self.createTank(tankNode: tankNode, owner: player)
+                //                let tankNode = SCNNode()
+                //                tankNode.simdWorldTransform = addTankAction.simdWorldTransform
+                //                tankNode.eulerAngles = SCNVector3(addTankAction.eulerAngles.x, addTankAction.eulerAngles.y, addTankAction.eulerAngles.z)
+                //                print(self.scene.rootNode.simdWorldTransform)
+                //                tankNode.scale = SCNVector3(0.0002, 0.0002, 0.0002)
+                //                self.createTank(tankNode: tankNode, owner: player)
             }
+        case .completed(let completed):
+            print("completed")
         }
     }
     
@@ -138,6 +140,7 @@ class GameManager: NSObject {
     /// - Tag: GameManager-update
     func update(timeDelta: TimeInterval) {
         processCommandQueue()
+        syncMovement()
     }
     
     private func processCommandQueue() {
@@ -146,7 +149,10 @@ class GameManager: NSObject {
         // inner function lets us take advantage of the defer keyword
         // for lock management.
         func nextCommand() -> GameCommand? {
-            commandsLock.lock(); defer { commandsLock.unlock() }
+            commandsLock.lock()
+            defer {
+                commandsLock.unlock()
+            }
             if gameCommands.isEmpty {
                 return nil
             } else {
@@ -169,35 +175,50 @@ class GameManager: NSObject {
         isInitialized = true
     }
     
-    func createTank(tankNode: SCNNode, owner: Player?) {
-        let tank = GameObject(node: tankNode, index: 0, alive: true, owner: owner)
-        // insert new Tank() to game scene
-        self.tanks.insert(tank)
+    func moveTank(player: Player, movement: MoveData, sceneView: GameSceneView? = nil) {
+        os_log(.info, "move Tank")
         DispatchQueue.main.async {
-            self.scene.rootNode.addChildNode(tankNode)
+            if let sceneView = sceneView {
+                let x = sceneView.competitor.helicopterNode.position.x + movement.velocity.vector.x
+                let y = sceneView.competitor.helicopterNode.position.y + movement.velocity.vector.y
+                let z = sceneView.competitor.helicopterNode.position.z + movement.velocity.vector.y
+                sceneView.competitor.helicopterNode.position = SCNVector3(x: x, y: y, z: z)
+                sceneView.competitor.helicopterNode.eulerAngles.y = movement.angular
+            }
         }
+        
+        //    func createTank(tankNode: SCNNode, owner: Player?) {
+        //        let tank = GameObject(node: tankNode, index: 0, alive: true, owner: owner)
+        //        // insert new Tank() to game scene
+        //        self.tanks.insert(tank)
+        //        DispatchQueue.main.async {
+        //            self.scene.rootNode.addChildNode(tankNode)
+        //        }
+        //    }
+        //
+        //    func moveTank(player: Player, movement: MoveData) {
+        //        let tank = self.tanks.filter { $0.owner == player}
+        //        tank.forEach { (tank) in
+        //
+        //            let x = tank.objectRootNode.position.x + movement.velocity.vector.x * Float(joystickVelocityMultiplier)
+        //            let y = tank.objectRootNode.position.y + movement.velocity.vector.y * Float(joystickVelocityMultiplier)
+        //            let z = tank.objectRootNode.position.z - movement.velocity.vector.y * Float(joystickVelocityMultiplier)
+        //
+        //            let angular = movement.angular
+        //
+        //            tank.objectRootNode.position = SCNVector3(x: x, y: y, z: z)
+        //            tank.objectRootNode.eulerAngles.y = angular + Float(180.0 * .pi / 180)
+        //        }
+        //    }
+        
     }
-    
-    func moveTank(player: Player, movement: MoveData) {
-            let tank = self.tanks.filter { $0.owner == player}
-            tank.forEach { (tank) in
-                
-                let x = tank.objectRootNode.position.x + movement.velocity.vector.x * Float(joystickVelocityMultiplier)
-                let y = tank.objectRootNode.position.y + movement.velocity.vector.y * Float(joystickVelocityMultiplier)
-                let z = tank.objectRootNode.position.z - movement.velocity.vector.y * Float(joystickVelocityMultiplier)
-
-                let angular = movement.angular
-
-                tank.objectRootNode.position = SCNVector3(x: x, y: y, z: z)
-                tank.objectRootNode.eulerAngles.y = angular + Float(180.0 * .pi / 180)
-        }
-    }
-    
 }
-
 extension GameManager: NetworkSessionDelegate {
     func networkSession(_ session: NetworkSession, received command: GameCommand) {
-        commandsLock.lock(); defer { commandsLock.unlock() }
+        commandsLock.lock()
+        defer {
+            commandsLock.unlock()
+        }
         if case Action.gameAction(.joyStickMoved(_)) = command.action {
             gameCommands.append(command)
         } else {

@@ -2,14 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>Reason for using Bonjour that the user can understand</string>
-	<key>NSBonjourServices</key>
-	<array>
-    	<string>_multiuser-p._tcp</string>
-    	<string>__multiuser-p._udp</string>
-	</array>
-
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -28,8 +20,15 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_multiuser-p._tcp</string>
+		<string>__multiuser-p._udp</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>This application will use the camera for Augmented Reality.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Reason for using Bonjour that the user can understand</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

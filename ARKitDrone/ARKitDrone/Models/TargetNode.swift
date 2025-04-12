@@ -9,20 +9,28 @@
 import SceneKit
 import ARKit
 
-
 class TargetNode: SCNNode {
+    
     let positioningNode = SCNNode()
+    
     var segments: [FocusSquare.Segment] = []
+    
     var isOpen = false
+    
     /// Indicates if the square is currently being animated for opening or closing.
     var isAnimating = false
+    
     /// Indicates if the square is currently changing its orientation when the camera is pointing downwards.
     var isChangingOrientation = false
+    
     /// Indicates if the camera is currently pointing towards the floor.
     var isPointingDownwards = true
+    
     static let primaryColor = UIColor.green
+    
     // Color of the focus square fill.
     static let fillColor = UIColor.green
+    
     /// The focus square's most recent positions.
     var recentFocusSquarePositions: [SIMD3<Float>] = []
     lazy var fillPlane: SCNNode = {

@@ -50,6 +50,15 @@
 		94A68F722C8797070059CD82 /* SCNMatrix4+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F712C8797070059CD82 /* SCNMatrix4+Extension.swift */; };
 		94A68F742C87972E0059CD82 /* SCNQuaternion+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F732C87972E0059CD82 /* SCNQuaternion+Extension.swift */; };
 		94A68F762C8797550059CD82 /* SCNVector3+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F752C8797550059CD82 /* SCNVector3+Extension.swift */; };
+		94B173E32DA9CC420015DC0D /* GameViewController+GameManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B173E22DA9CC390015DC0D /* GameViewController+GameManagerDelegate.swift */; };
+		94B173E52DA9CCD30015DC0D /* GameViewController+GameStartViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B173E42DA9CCCC0015DC0D /* GameViewController+GameStartViewControllerDelegate.swift */; };
+		94B173E72DAA30540015DC0D /* GameStartViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B173E62DAA30520015DC0D /* GameStartViewControllerDelegate.swift */; };
+		94B173E92DAA308E0015DC0D /* GameBrowserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B173E82DAA308D0015DC0D /* GameBrowserDelegate.swift */; };
+		94B173EB2DAA30D90015DC0D /* NetworkSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B173EA2DAA30D70015DC0D /* NetworkSessionDelegate.swift */; };
+		94B173EF2DAA321B0015DC0D /* GameManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B173EE2DAA321A0015DC0D /* GameManagerDelegate.swift */; };
+		94B173F52DAA34A70015DC0D /* MovementSyncSceneDataDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B173F42DAA34A60015DC0D /* MovementSyncSceneDataDelegate.swift */; };
+		94B173F72DAA35240015DC0D /* MultiuserAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B173F62DAA35230015DC0D /* MultiuserAttribute.swift */; };
+		94B173F92DAA353F0015DC0D /* MultiuserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B173F82DAA353D0015DC0D /* MultiuserService.swift */; };
 		94B6E8462D7B60BA0064ABD7 /* NotificationName+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B6E8452D7B60AC0064ABD7 /* NotificationName+Extension.swift */; };
 		94B6E8482D7B68680064ABD7 /* GameViewController+ARSCNViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B6E8472D7B68630064ABD7 /* GameViewController+ARSCNViewDelegate.swift */; };
 		94C881A82D5D05C20050119D /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C881A72D5D05B50050119D /* Game.swift */; };
@@ -123,6 +132,15 @@
 		94A68F712C8797070059CD82 /* SCNMatrix4+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNMatrix4+Extension.swift"; sourceTree = "<group>"; };
 		94A68F732C87972E0059CD82 /* SCNQuaternion+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNQuaternion+Extension.swift"; sourceTree = "<group>"; };
 		94A68F752C8797550059CD82 /* SCNVector3+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNVector3+Extension.swift"; sourceTree = "<group>"; };
+		94B173E22DA9CC390015DC0D /* GameViewController+GameManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+GameManagerDelegate.swift"; sourceTree = "<group>"; };
+		94B173E42DA9CCCC0015DC0D /* GameViewController+GameStartViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+GameStartViewControllerDelegate.swift"; sourceTree = "<group>"; };
+		94B173E62DAA30520015DC0D /* GameStartViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStartViewControllerDelegate.swift; sourceTree = "<group>"; };
+		94B173E82DAA308D0015DC0D /* GameBrowserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameBrowserDelegate.swift; sourceTree = "<group>"; };
+		94B173EA2DAA30D70015DC0D /* NetworkSessionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSessionDelegate.swift; sourceTree = "<group>"; };
+		94B173EE2DAA321A0015DC0D /* GameManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManagerDelegate.swift; sourceTree = "<group>"; };
+		94B173F42DAA34A60015DC0D /* MovementSyncSceneDataDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementSyncSceneDataDelegate.swift; sourceTree = "<group>"; };
+		94B173F62DAA35230015DC0D /* MultiuserAttribute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiuserAttribute.swift; sourceTree = "<group>"; };
+		94B173F82DAA353D0015DC0D /* MultiuserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiuserService.swift; sourceTree = "<group>"; };
 		94B6E8452D7B60AC0064ABD7 /* NotificationName+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationName+Extension.swift"; sourceTree = "<group>"; };
 		94B6E8472D7B68630064ABD7 /* GameViewController+ARSCNViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+ARSCNViewDelegate.swift"; sourceTree = "<group>"; };
 		94C881A72D5D05B50050119D /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
@@ -180,6 +198,7 @@
 				946690A22D9E3CF900343B1B /* MovementData.swift */,
 				946690A32D9E3CF900343B1B /* MovementSyncData.swift */,
 				946690A42D9E3CF900343B1B /* MovementSyncSceneData.swift */,
+				94B173F42DAA34A60015DC0D /* MovementSyncSceneDataDelegate.swift */,
 			);
 			path = Movement;
 			sourceTree = "<group>";
@@ -191,6 +210,66 @@
 				946690BA2D9E3DFA00343B1B /* SignpostData.swift */,
 			);
 			path = Signpost;
+			sourceTree = "<group>";
+		};
+		94B173EC2DAA31A90015DC0D /* GameStart */ = {
+			isa = PBXGroup;
+			children = (
+				946690C82D9E3FF400343B1B /* GameStartViewController.swift */,
+				94B173E62DAA30520015DC0D /* GameStartViewControllerDelegate.swift */,
+			);
+			path = GameStart;
+			sourceTree = "<group>";
+		};
+		94B173ED2DAA31DB0015DC0D /* GameBrowser */ = {
+			isa = PBXGroup;
+			children = (
+				94B173E82DAA308D0015DC0D /* GameBrowserDelegate.swift */,
+				946690B52D9E3DB800343B1B /* GameBrowser.swift */,
+				94B173F82DAA353D0015DC0D /* MultiuserService.swift */,
+				94B173F62DAA35230015DC0D /* MultiuserAttribute.swift */,
+			);
+			path = GameBrowser;
+			sourceTree = "<group>";
+		};
+		94B173F02DAA32440015DC0D /* GameManager */ = {
+			isa = PBXGroup;
+			children = (
+				946690C02D9E3E9000343B1B /* GameManager.swift */,
+				94B173EE2DAA321A0015DC0D /* GameManagerDelegate.swift */,
+			);
+			path = GameManager;
+			sourceTree = "<group>";
+		};
+		94B173F12DAA33590015DC0D /* NetworkSession */ = {
+			isa = PBXGroup;
+			children = (
+				946690B32D9E3DB400343B1B /* NetworkSession.swift */,
+				94B173EA2DAA30D70015DC0D /* NetworkSessionDelegate.swift */,
+			);
+			path = NetworkSession;
+			sourceTree = "<group>";
+		};
+		94B173F22DAA33F10015DC0D /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				A7AE72C11F888EF500B015D3 /* GameViewController.swift */,
+				94396BD92D7B473E00A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift */,
+				94B173E42DA9CCCC0015DC0D /* GameViewController+GameStartViewControllerDelegate.swift */,
+				94396BD52D7B468C00A83CF4 /* GameViewController+JoystickSceneDelegate.swift */,
+				94B173E22DA9CC390015DC0D /* GameViewController+GameManagerDelegate.swift */,
+				94396BD72D7B46E400A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift */,
+				94B6E8472D7B68630064ABD7 /* GameViewController+ARSCNViewDelegate.swift */,
+			);
+			path = Game;
+			sourceTree = "<group>";
+		};
+		94B173F32DAA34490015DC0D /* NetworkGameBrowser */ = {
+			isa = PBXGroup;
+			children = (
+				946690C42D9E3FB700343B1B /* NetworkGameBrowserViewController.swift */,
+			);
+			path = NetworkGameBrowser;
 			sourceTree = "<group>";
 		};
 		94CCC8F12972E34500F7D17F /* Joystick */ = {
@@ -221,14 +300,14 @@
 		94CCC8F32972E36100F7D17F /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				946690C02D9E3E9000343B1B /* GameManager.swift */,
+				94B173F02DAA32440015DC0D /* GameManager */,
 				946690AB2D9E3D7A00343B1B /* GameObject.swift */,
 				946690AD2D9E3D8B00343B1B /* Player.swift */,
 				94CCC90F2972F43200F7D17F /* HelicopterCapable.swift */,
 				94C881A72D5D05B50050119D /* Game.swift */,
 				946690AF2D9E3D9A00343B1B /* GameTime.swift */,
-				946690B52D9E3DB800343B1B /* GameBrowser.swift */,
-				946690B32D9E3DB400343B1B /* NetworkSession.swift */,
+				94B173ED2DAA31DB0015DC0D /* GameBrowser */,
+				94B173F12DAA33590015DC0D /* NetworkSession */,
 				9455B7522D60C73B0019FE10 /* MissileManager.swift */,
 				946690B12D9E3DA900343B1B /* NetworkGame.swift */,
 				9455B7542D60C7460019FE10 /* ShipManager.swift */,
@@ -248,6 +327,7 @@
 		94CCC9062972E4B700F7D17F /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				946690C62D9E3FE100343B1B /* GameCell.swift */,
 				94F5D19B2D5CAE9B00019569 /* MinimapScene.swift */,
 				94CCC90D2972EB2300F7D17F /* GameSceneView.swift */,
 			);
@@ -257,14 +337,9 @@
 		94CCC9072972E4BF00F7D17F /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				A7AE72C11F888EF500B015D3 /* GameViewController.swift */,
-				94B6E8472D7B68630064ABD7 /* GameViewController+ARSCNViewDelegate.swift */,
-				946690C42D9E3FB700343B1B /* NetworkGameBrowserViewController.swift */,
-				946690C82D9E3FF400343B1B /* GameStartViewController.swift */,
-				946690C62D9E3FE100343B1B /* GameCell.swift */,
-				94396BD92D7B473E00A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift */,
-				94396BD72D7B46E400A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift */,
-				94396BD52D7B468C00A83CF4 /* GameViewController+JoystickSceneDelegate.swift */,
+				94B173F22DAA33F10015DC0D /* Game */,
+				94B173F32DAA34490015DC0D /* NetworkGameBrowser */,
+				94B173EC2DAA31A90015DC0D /* GameStart */,
 				9470AE462974001A00A55134 /* MenuViewController.swift */,
 			);
 			path = Controllers;
@@ -365,7 +440,6 @@
 					A7AE72B91F888EF500B015D3 = {
 						CreatedOnToolsVersion = 9.1;
 						LastSwiftMigration = "";
-						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -409,9 +483,11 @@
 			files = (
 				94A68F742C87972E0059CD82 /* SCNQuaternion+Extension.swift in Sources */,
 				945B16AD294EB34800482E14 /* JoystickScene.swift in Sources */,
+				94B173E52DA9CCD30015DC0D /* GameViewController+GameStartViewControllerDelegate.swift in Sources */,
 				946690B62D9E3DB800343B1B /* GameBrowser.swift in Sources */,
 				94396BD22D7B36A300A83CF4 /* CGPoint+Extension.swift in Sources */,
 				946690C92D9E3FF400343B1B /* GameStartViewController.swift in Sources */,
+				94B173E72DAA30540015DC0D /* GameStartViewControllerDelegate.swift in Sources */,
 				94C881AE2D5D07450050119D /* SCNParticleSystem+Extension.swift in Sources */,
 				94F968A82AD7337F00D7B418 /* OcclusionNode.swift in Sources */,
 				94548F022D5C68EE00A007B0 /* CollisionTypes.swift in Sources */,
@@ -422,6 +498,7 @@
 				946690C12D9E3E9000343B1B /* GameManager.swift in Sources */,
 				946690AC2D9E3D7A00343B1B /* GameObject.swift in Sources */,
 				94CCC8F02972D97700F7D17F /* JoystickDelegate.swift in Sources */,
+				94B173E32DA9CC420015DC0D /* GameViewController+GameManagerDelegate.swift in Sources */,
 				9455B7552D60C74A0019FE10 /* ShipManager.swift in Sources */,
 				94CCC8EE2972D46400F7D17F /* Missile.swift in Sources */,
 				94396BDA2D7B474900A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift in Sources */,
@@ -429,6 +506,7 @@
 				94CCC9102972F43200F7D17F /* HelicopterCapable.swift in Sources */,
 				94D598442BB9037400B31874 /* SCNGeometry+Extension.swift in Sources */,
 				9467A30F2BB93A840023EA62 /* Shell.swift in Sources */,
+				94B173F72DAA35240015DC0D /* MultiuserAttribute.swift in Sources */,
 				94CCC90A2972E54000F7D17F /* SCNScene+Extension.swift in Sources */,
 				946690C32D9E3ECF00343B1B /* UserDefaults+Helpers.swift in Sources */,
 				946690B82D9E3DD800343B1B /* Bundle+Helpers.swift in Sources */,
@@ -452,13 +530,17 @@
 				9467A30D2BB93A6E0023EA62 /* Tank.swift in Sources */,
 				94396BD02D7B365000A83CF4 /* FocusSquare+Extension.swift in Sources */,
 				94396BD42D7B36D500A83CF4 /* FocusCircle.swift in Sources */,
+				94B173EB2DAA30D90015DC0D /* NetworkSessionDelegate.swift in Sources */,
+				94B173F92DAA353F0015DC0D /* MultiuserService.swift in Sources */,
 				946690B42D9E3DB400343B1B /* NetworkSession.swift in Sources */,
 				94396BD62D7B469600A83CF4 /* GameViewController+JoystickSceneDelegate.swift in Sources */,
 				94A68F762C8797550059CD82 /* SCNVector3+Extension.swift in Sources */,
 				94B6E8482D7B68680064ABD7 /* GameViewController+ARSCNViewDelegate.swift in Sources */,
+				94B173EF2DAA321B0015DC0D /* GameManagerDelegate.swift in Sources */,
 				94B6E8462D7B60BA0064ABD7 /* NotificationName+Extension.swift in Sources */,
 				9488F2032D657BA6001C08D9 /* TargetNode.swift in Sources */,
 				94A68F722C8797070059CD82 /* SCNMatrix4+Extension.swift in Sources */,
+				94B173F52DAA34A70015DC0D /* MovementSyncSceneDataDelegate.swift in Sources */,
 				948E91D42D6519B500DE6405 /* FocusSquare.swift in Sources */,
 				9412F0762D5B4BEB00D9F1BD /* Ship.swift in Sources */,
 				946690BF2D9E3E5100343B1B /* GameCommand.swift in Sources */,
@@ -472,6 +554,7 @@
 				946690B02D9E3D9A00343B1B /* GameTime.swift in Sources */,
 				946690AA2D9E3D3F00343B1B /* Data+Compression.swift in Sources */,
 				945B16AB294E9F5B00482E14 /* Joystick.swift in Sources */,
+				94B173E92DAA308E0015DC0D /* GameBrowserDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -623,6 +706,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 9LZ34BLS2W;
 				INFOPLIST_FILE = ARKitDrone/Info.plist;
@@ -631,8 +715,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.FCompany.Rollaball;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Froleeyo.ARKitDrone2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -646,16 +731,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 9LZ34BLS2W;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ARKitDrone/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.FCompany.Rollaball;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Froleeyo.ARKitDrone2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;

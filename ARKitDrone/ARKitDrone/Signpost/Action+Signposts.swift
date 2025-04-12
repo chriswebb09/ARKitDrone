@@ -15,7 +15,7 @@ extension Action: CustomStringConvertible {
             case .joyStickMoved:
                 return "joy stick moved"
             case .movement(_):
-                return "joy stick moved"
+                return "moved"
             }
         case .boardSetup(let setup):
             switch setup {
@@ -24,8 +24,10 @@ extension Action: CustomStringConvertible {
             case .boardLocation:
                 return "boardLocation"
             }
-        case .addTank:
-            return "tank added"
+        case .addNode:
+            return "node added"
+        case .completed(_):
+            return "Completed"
         }
     }
 }

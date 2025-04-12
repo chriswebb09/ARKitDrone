@@ -1,0 +1,92 @@
+//
+//  GameViewController+GameManagerDelegate.swift
+//  ARKitDrone
+//
+//  Created by Christopher Webb on 4/11/25.
+//  Copyright © 2025 Christopher Webb-Orenstein. All rights reserved.
+//
+
+import Foundation
+import os.log
+import SceneKit
+
+extension GameViewController: GameManagerDelegate {
+    func manager(_ manager: GameManager, moveNode: MoveData) {
+        os_log(.info, "move forward gfrom jostick joystick")
+        DispatchQueue.main.async {
+            self.sceneView.competitor.moveForward(value: moveNode.velocity.vector.x / 10)
+        }
+    }
+    
+    func manager(_ manager: GameManager, completed: CompletedAction) {
+        print("completed")
+    }
+    
+    private func process(boardAction: BoardSetupAction, from peer: Player) {
+        os_log(.info, "GameManagerDelegate board setup action")
+        switch boardAction {
+        case .boardLocation(let location):
+            switch location {
+            case .worldMapData(let data):
+                os_log(.info, "Received WorldMap data. Size: %d", data.count)
+                loadWorldMap(from: data)
+            case .manual:
+                os_log(.info, "Received a manual board placement")
+                sessionState = .lookingForSurface
+            }
+        case .requestBoardLocation:
+            os_log(.info, "sending world to peer")
+            sendWorldTo(peer: peer)
+        }
+    }
+    
+    func manager(_ manager: GameManager, addNode: AddNodeAction) {
+        os_log(.info, "GameManagerDelegate adding node")
+        let tappedPosition = SCNVector3.positionFromTransform(addNode.simdWorldTransform)
+        DispatchQueue.main.async {
+            let apache: ApacheHelicopter = self.sceneView.positionTank(position: tappedPosition)
+            
+            let square = TargetNode()
+            self.sceneView.scene.rootNode.addChildNode(square)
+            self.sceneView.competitor = apache
+            square.simdScale = [20.0, 20.0, 20.0]
+            square.unhide()
+            square.displayNodeHierarchyOnTop(true)
+            square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
+            //            square.recentFocusSquarePositions = Array(square.recentFocusSquarePositions.suffix(10))
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = 0.01
+            //            square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
+            square.position = SCNVector3(x: apache.helicopterNode.position.x, y: apache.helicopterNode.position.y + 1, z: apache.helicopterNode.position.z)
+            SCNTransaction.commit()
+            let endPos = SIMD3<Float>(x: tappedPosition.x, y: tappedPosition.y, z: tappedPosition.z)
+            self.gameManager?.send(completed:CompletedAction.init(position: endPos))
+        }
+    }
+    
+    func manager(_ manager: GameManager, received boardAction: BoardSetupAction, from player: Player) {
+        os_log(.info, "GameManagerDelegate received action")
+        DispatchQueue.main.async {
+            self.process(boardAction: boardAction, from: player)
+        }
+    }
+    
+    func manager(_ manager: GameManager, joiningPlayer player: Player) { }
+    
+    func manager(_ manager: GameManager, leavingPlayer player: Player) { }
+    
+    func manager(_ manager: GameManager, joiningHost host: Player) {
+        os_log(.info, "GameManagerDelegate joining host")
+        // MARK: request worldmap when joining the host
+        DispatchQueue.main.async {
+            if self.sessionState == .waitingForBoard {
+                manager.send(boardAction: .requestBoardLocation)
+            }
+            guard !UserDefaults.standard.disableInGameUI else { return }
+        }
+    }
+    
+    func manager(_ manager: GameManager, leavingHost host: Player) { }
+    
+    func managerDidStartGame(_ manager: GameManager) { }
+}

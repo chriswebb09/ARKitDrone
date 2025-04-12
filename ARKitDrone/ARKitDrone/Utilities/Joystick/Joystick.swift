@@ -20,7 +20,7 @@ class Joystick: SKNode {
     
     private let backdropNode, thumbNode: SKSpriteNode
     private var isTracking: Bool = false
-    private var angularVelocity: CGFloat = 0.0
+    var angularVelocity: CGFloat = 0.0
     
     var velocity: CGPoint = .zero
     

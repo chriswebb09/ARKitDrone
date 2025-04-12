@@ -8,6 +8,89 @@ Representations for game events, related data, and their encoding.
 import Foundation
 import simd
 import SceneKit
+import ARKit
+
+class BoardAnchor: ARAnchor, @unchecked Sendable {
+    let size: CGSize
+    
+    init(transform: float4x4, size: CGSize) {
+        self.size = size
+        super.init(name: "Board", transform: transform)
+    }
+    
+    override class var supportsSecureCoding: Bool {
+        return true
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        self.size = aDecoder.decodeCGSize(forKey: "size")
+        super.init(coder: aDecoder)
+    }
+    
+    // this is guaranteed to be called with something of the same class
+    required init(anchor: ARAnchor) {
+        let other = anchor as! BoardAnchor
+        self.size = other.size
+        super.init(anchor: other)
+    }
+    
+    override func encode(with aCoder: NSCoder) {
+        super.encode(with: aCoder)
+        aCoder.encode(size, forKey: "size")
+    }
+}
+
+extension ARWorldMap {
+    var boardAnchor: BoardAnchor? {
+        return anchors.compactMap { $0 as? BoardAnchor }.first
+    }
+    
+    var keyPositionAnchors: [KeyPositionAnchor] {
+        return anchors.compactMap { $0 as? KeyPositionAnchor }
+    }
+}
+
+import ARKit
+
+class KeyPositionAnchor: ARAnchor, @unchecked Sendable {
+    let image: UIImage
+    let mappingStatus: ARFrame.WorldMappingStatus
+    
+    init(image: UIImage, transform: float4x4, mappingStatus: ARFrame.WorldMappingStatus) {
+        self.image = image
+        self.mappingStatus = mappingStatus
+        super.init(name: "KeyPosition", transform: transform)
+    }
+    
+    override class var supportsSecureCoding: Bool {
+        return true
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        if let image = aDecoder.decodeObject(of: UIImage.self, forKey: "image") {
+            self.image = image
+            let mappingValue = aDecoder.decodeInteger(forKey: "mappingStatus")
+            self.mappingStatus = ARFrame.WorldMappingStatus(rawValue: mappingValue) ?? .notAvailable
+        } else {
+            return nil
+        }
+        super.init(coder: aDecoder)
+    }
+    
+    // this is guaranteed to be called with something of the same class
+    required init(anchor: ARAnchor) {
+        let other = anchor as! KeyPositionAnchor
+        self.image = other.image
+        self.mappingStatus = other.mappingStatus
+        super.init(anchor: other)
+    }
+    
+    override func encode(with aCoder: NSCoder) {
+        super.encode(with: aCoder)
+        aCoder.encode(image, forKey: "image")
+        aCoder.encode(mappingStatus.rawValue, forKey: "mappingStatus")
+    }
+}
 
 /// - Tag: GameCommand
 struct GameCommand {
@@ -164,28 +247,6 @@ extension GameVelocity: BitStreamCodable {
 private let velocityCompressor = FloatCompressor(minValue: -50.0, maxValue: 50.0, bits: 16)
 private let angularVelocityAxisCompressor = FloatCompressor(minValue: -1.0, maxValue: 1.0, bits: 12)
 
-//struct MoveData {
-//    var velocity: float3
-//    var angular: Float
-//
-//    init(velocity: float3, angular: Float) {
-//        self.velocity = velocity
-//        self.angular = angular
-//    }
-//}
-//
-//extension MoveData: BitStreamCodable {
-//    init(from bitStream: inout ReadableBitStream) throws {
-//        velocity = try velocityCompressor.readFloat3(from: &bitStream)
-//        angular = try angularVelocityAxisCompressor.read(from: &bitStream)
-//    }
-//
-//    func encode(to bitStream: inout WritableBitStream) throws {
-//        velocityCompressor.write(velocity, to: &bitStream)
-//        angularVelocityAxisCompressor.write(angular, to: &bitStream)
-//    }
-//}
-
 struct MoveData {
     var velocity: GameVelocity
     var angular: Float
@@ -203,12 +264,12 @@ extension MoveData: BitStreamCodable {
     }
 }
 
-struct AddTankNodeAction {
+struct AddNodeAction {
     var simdWorldTransform: float4x4
     var eulerAngles: SIMD3<Float>
 }
 
-extension AddTankNodeAction: BitStreamCodable {
+extension AddNodeAction: BitStreamCodable {
     init(from bitStream: inout ReadableBitStream) throws {
         simdWorldTransform = try float4x4(from: &bitStream)
         eulerAngles = try SIMD3<Float>(from: &bitStream)
@@ -222,12 +283,26 @@ extension AddTankNodeAction: BitStreamCodable {
 
 enum GameAction {
     case joyStickMoved(MoveData)
-    
     case movement(MovementSyncData)
+    
     
     private enum CodingKey: UInt32, CaseIterable {
         case move
 //        case fire
+    }
+}
+
+struct CompletedAction {
+    var position: SIMD3<Float>
+}
+
+extension CompletedAction: BitStreamCodable {
+    func encode(to bitStream: inout WritableBitStream) throws {
+        position.encode(to: &bitStream)
+    }
+    
+    init(from bitStream: inout ReadableBitStream) throws {
+        position = try SIMD3<Float>(from: &bitStream)
     }
 }
 
@@ -256,10 +331,12 @@ extension GameAction: BitStreamCodable {
     }
     
 }
+
 enum Action {
     case gameAction(GameAction)
     case boardSetup(BoardSetupAction)
-    case addTank(AddTankNodeAction)
+    case addNode(AddNodeAction)
+    case completed(CompletedAction)
 }
 
 extension Action: BitStreamCodable {
@@ -267,6 +344,7 @@ extension Action: BitStreamCodable {
         case gameAction
         case boardSetup
         case addTank
+        case completed
     }
     
     func encode(to bitStream: inout WritableBitStream) throws {
@@ -277,9 +355,12 @@ extension Action: BitStreamCodable {
         case .boardSetup(let boardSetup):
             bitStream.appendEnum(CodingKey.boardSetup)
             boardSetup.encode(to: &bitStream)
-        case .addTank(let addTankAction):
+        case .addNode(let addTankAction):
             bitStream.appendEnum(CodingKey.addTank)
             try addTankAction.encode(to: &bitStream)
+        case .completed(let completedAction):
+            bitStream.appendEnum(CodingKey.completed)
+            try completedAction.encode(to: &bitStream)
         }
     }
     
@@ -293,8 +374,11 @@ extension Action: BitStreamCodable {
             let boardAction = try BoardSetupAction(from: &bitStream)
             self = .boardSetup(boardAction)
         case .addTank:
-            let addTankAction = try AddTankNodeAction(from: &bitStream)
-            self = .addTank(addTankAction)
+            let addNodeAction = try AddNodeAction(from: &bitStream)
+            self = .addNode(addNodeAction)
+        case .completed:
+            let completedAction = try CompletedAction(from: &bitStream)
+            self = .completed(completedAction)
         }
     }
     
