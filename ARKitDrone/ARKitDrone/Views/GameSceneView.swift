@@ -69,24 +69,7 @@ class GameSceneView: ARSCNView {
         scene = SCNScene(named: LocalConstants.sceneName)!
         tankModel = SCNScene.nodeWithModelName(GameSceneView.tankAssetName).clone()
         tankNode = setupTankNode(tankModel: tankModel)
-//        helicopterModel = helicopter.setupHelicopterModel()
-      
-//        helicopterNode = helicopter.setupHelicopterNode(helicopterModel: helicopterModel)
-//        helicopter.setupAdditionalHelicopterComponents()
-//        helicopter.setupMissiles()
     }
-//    
-//    private func setupAdditionalHelicopterComponents() {
-//        hud = helicopterModel!.childNode(withName: GameSceneView.hudNodeName, recursively: false)!
-//        front = helicopterNode.childNode(withName: GameSceneView.frontIRSteering, recursively: true)
-//        rotor = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.frontRotorName, recursively: true)
-//        rotor2 = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.tailRotorName, recursively: true)
-//        wingL = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.wingLName, recursively: true)
-//        wingR = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.wingRName, recursively: true)
-//        front = helicopterNode.childNode(withName: GameSceneView.frontIRSteering, recursively: true)
-//        frontIR = front!.childNode(withName:GameSceneView.frontIR, recursively: true)
-//        upperGun = helicopterNode.childNode(withName: GameSceneView.upperGun, recursively: true)!
-//    }
     
     private func setupTankNode(tankModel: SCNNode) -> SCNNode {
         let tankNode = tankModel.childNode(withName: "m1tank", recursively: true)!
