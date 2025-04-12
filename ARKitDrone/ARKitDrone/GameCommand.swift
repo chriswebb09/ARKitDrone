@@ -274,21 +274,10 @@ enum Direction: BitStreamCodable {
         case .side:
             self = .side
         }
-//        case .requestBoardLocation:
-//            self = .requestBoardLocation
-//        case .boardLocation:
-//            let location = try GameBoardLocation(from: &bitStream)
-//            self = .boardLocation(location)
-//        }
     }
     
     func encode(to bitStream: inout WritableBitStream) {
         switch self {
-//        case .requestBoardLocation:
-//            bitStream.appendEnum(CodingKey.requestBoardLocation)
-//        case .boardLocation(let location):
-//            bitStream.appendEnum(CodingKey.boardLocation)
-//            location.encode(to: &bitStream)
         case .forward:
             bitStream.appendEnum(CodingKey.forward)
         case .altitude:

@@ -17,36 +17,23 @@ extension GameViewController: JoystickSceneDelegate {
     func update(yValue: Float,  velocity: SIMD3<Float>, angular: Float, stickNum: Int) {
         DispatchQueue.main.async {
             if stickNum == 2 {
-                let scaled = (yValue) * 0.0005
-                
+               /// let scaled = (yValue) * 0.0005
                 let velocity = SIMD3<Float>(Float(velocity.x), Float(velocity.y), Float(0))
-   
                 let v = GameVelocity(vector: velocity)
-//                let angular = Float(data.angular)
                 let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .forward)
                 DispatchQueue.main.async {
                     self.sceneView.helicopter.moveForward(value: velocity.y)
                     self.gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
                 }
-                
-                
-//                self.sceneView.rotate(value: scaled)
-                
             } else if stickNum == 1 {
-                let scaled = (yValue) * 0.05
-                
+                //let scaled = (yValue) * 0.05
                 let velocity = SIMD3<Float>(Float(velocity.x), Float(velocity.y), Float(0))
-   
                 let v = GameVelocity(vector: velocity)
-//                let angular = Float(data.angular)
                 let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .altitude)
                 DispatchQueue.main.async {
                     self.sceneView.helicopter.changeAltitude(value: velocity.y)
                     self.gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
                 }
-                
-                
-//                self.sceneView.moveSides(value: -scaled)
             }
         }
     }
@@ -54,35 +41,26 @@ extension GameViewController: JoystickSceneDelegate {
     func update(xValue: Float,  velocity: SIMD3<Float>,  angular: Float, stickNum: Int) {
         DispatchQueue.main.async {
             if stickNum == 1 {
-                let scaled = (xValue) * 0.01
+               // let scaled = (xValue) * 0.01
                 
                 let velocity = SIMD3<Float>(Float(velocity.x), Float(velocity.y), Float(0))
-   
-                let v = GameVelocity(vector: velocity)
-//                let angular = Float(data.angular)
-                let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .side)
-              
                 
+                let v = GameVelocity(vector: velocity)
+                
+                let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .side)
                 DispatchQueue.main.async {
                     self.sceneView.helicopter.moveSides(value: velocity.x)
                     self.gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
                 }
-                
-                
             } else if stickNum == 2 {
-                let scaled = (xValue) * 0.01
+                //let scaled = (xValue) * 0.01
                 let velocity = SIMD3<Float>(Float(velocity.x), Float(velocity.y), Float(0))
-   
                 let v = GameVelocity(vector: velocity)
-//                let angular = Float(data.angular)
                 let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .rotation)
                 DispatchQueue.main.async {
-                    
                     self.sceneView.helicopter.rotate(value: velocity.x)
                     self.gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
                 }
-                
-//                self.sceneView.changeAltitude(value: scaled)
             }
         }
     }

@@ -139,7 +139,7 @@ class NetworkSession: NSObject {
             return
         }
         do {
-//            os_log(.info, "received from %@", peerID)
+            os_log(.info, "received from %@", peerID)
             var bits = ReadableBitStream(data: data)
             let action = try Action(from: &bits)
             let command = GameCommand(player: player, action: action)
@@ -189,7 +189,7 @@ extension NetworkSession: MCSessionDelegate {
     }
     
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
-        os_log(.info, "peer %@ sent a stream named %zzs", peerID, streamName)
+        os_log(.info, "peer %@ sent a stream named %s", peerID, streamName)
     }
     
     func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
@@ -239,7 +239,6 @@ extension NetworkSession: MCNearbyServiceAdvertiserDelegate {
     /// - Tag: AcceptInvite
     
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
-        print("func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {")
         // Call handler to accept invitation and join the session.
         invitationHandler(true, self.session)
     }

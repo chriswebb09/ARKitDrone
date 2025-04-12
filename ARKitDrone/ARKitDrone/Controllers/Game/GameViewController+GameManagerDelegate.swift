@@ -12,9 +12,7 @@ import SceneKit
 
 extension GameViewController: GameManagerDelegate {
     
-    func manager(_ manager: GameManager, hasNetworkDelay: Bool) {
-        
-    }
+    func manager(_ manager: GameManager, hasNetworkDelay: Bool) { }
     
     func manager(_ manager: GameManager, moveNode: MoveData) {
         os_log(.info, "move forward from joytick %s", String.init(describing: moveNode))
@@ -48,16 +46,20 @@ extension GameViewController: GameManagerDelegate {
     
     func manager(_ manager: GameManager, completed: CompletedAction) {
         print("completed")
+        
+        sessionState = .gameInProgress
     }
     
     private func process(boardAction: BoardSetupAction, from peer: Player) {
-        os_log(.info, "GameManagerDelegate board setup action")
+        os_log(.info, "board setup action from %s", peer.username)
         switch boardAction {
         case .boardLocation(let location):
+            os_log(.info, "board location")
             switch location {
             case .worldMapData(let data):
                 os_log(.info, "Received WorldMap data. Size: %d", data.count)
                 loadWorldMap(from: data)
+                sessionState = .lookingForSurface
             case .manual:
                 os_log(.info, "Received a manual board placement")
                 sessionState = .lookingForSurface
@@ -69,11 +71,10 @@ extension GameViewController: GameManagerDelegate {
     }
     
     func manager(_ manager: GameManager, addNode: AddNodeAction) {
-        os_log(.info, "GameManagerDelegate adding node")
+        os_log(.info, "adding node")
         let tappedPosition = SCNVector3.positionFromTransform(addNode.simdWorldTransform)
         DispatchQueue.main.async {
             let apache: ApacheHelicopter = self.sceneView.positionTank(position: tappedPosition)
-            
             let square = TargetNode()
             self.sceneView.scene.rootNode.addChildNode(square)
             self.sceneView.competitor = apache
@@ -81,10 +82,8 @@ extension GameViewController: GameManagerDelegate {
             square.unhide()
             square.displayNodeHierarchyOnTop(true)
             square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
-            //            square.recentFocusSquarePositions = Array(square.recentFocusSquarePositions.suffix(10))
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 0.01
-            //            square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
             square.position = SCNVector3(x: apache.helicopterNode.position.x, y: apache.helicopterNode.position.y + 1, z: apache.helicopterNode.position.z)
             SCNTransaction.commit()
             let endPos = SIMD3<Float>(x: tappedPosition.x, y: tappedPosition.y, z: tappedPosition.z)
@@ -92,8 +91,9 @@ extension GameViewController: GameManagerDelegate {
         }
     }
     
+    
     func manager(_ manager: GameManager, received boardAction: BoardSetupAction, from player: Player) {
-        os_log(.info, "GameManagerDelegate received action")
+        os_log(.info, "received action to process %s", String(describing: boardAction))
         DispatchQueue.main.async {
             self.process(boardAction: boardAction, from: player)
         }
@@ -109,12 +109,14 @@ extension GameViewController: GameManagerDelegate {
         DispatchQueue.main.async {
             if self.sessionState == .waitingForBoard {
                 manager.send(boardAction: .requestBoardLocation)
-            }
-            guard !UserDefaults.standard.disableInGameUI else { return }
+            } 
+            //guard !UserDefaults.standard.disableInGameUI else { return }
         }
     }
     
     func manager(_ manager: GameManager, leavingHost host: Player) { }
     
-    func managerDidStartGame(_ manager: GameManager) { }
+    func managerDidStartGame(_ manager: GameManager) {
+    
+    }
 }

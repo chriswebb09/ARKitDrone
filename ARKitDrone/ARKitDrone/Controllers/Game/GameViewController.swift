@@ -401,6 +401,7 @@ class GameViewController: UIViewController {
             os_log(.info, "sending add tank")
             // send add tank action to all peer
             self.gameManager?.send(addNode: addTank)
+            
             focusSquare.cleanup()
             game.placed = true
         }
@@ -453,14 +454,29 @@ class GameViewController: UIViewController {
             
             DispatchQueue.main.async {
                 self.targetWorldMap = worldMap
+                ///self.sceneView.debugOptions  = []
+                /// self.sessionState = .localizingToBoard
                 let configuration = ARWorldTrackingConfiguration()
-                configuration.planeDetection = .horizontal
                 configuration.initialWorldMap = worldMap
+                configuration.planeDetection = [.horizontal, .vertical]
+                self.sceneView.automaticallyUpdatesLighting = false
+                if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
+                    self.sceneView.scene.lightingEnvironment.contents = environmentMap
+                }
+//                session.run(
+//                    configuration,
+//                    options: [
+//                        .resetTracking,
+//                        .removeExistingAnchors,
+//                        .resetSceneReconstruction,
+//                        .stopTrackedRaycasts
+//                    ]
+//                )
+//             kedRaycasts])
+
+              
+               
                 
-                self.sceneView.session.run(configuration, options:
-                                            [.resetTracking,
-                                                .removeExistingAnchors])
-                self.sessionState = .localizingToBoard
                 guard let camera = self.sceneView.pointOfView?.camera else {
                     fatalError("Expected a valid `pointOfView` from the scene.")
                 }
@@ -468,7 +484,13 @@ class GameViewController: UIViewController {
                 camera.exposureOffset = -1
                 camera.minimumExposure = -1
                 camera.maximumExposure = 3
-                os_log(.info, "running session")
+                self.sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors, .resetSceneReconstruction, .stopTrackedRaycasts])
+                self.sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
+                os_log(.info, "running session completed board setup")
+                DispatchQueue.main.async {
+                    self.sceneView.scene.rootNode.addChildNode(self.focusSquare)
+                    self.updateFocusSquare(isObjectVisible: false)
+                }
             }
         } catch {
             os_log(.error, "The WorldMap received couldn't be decompressed")

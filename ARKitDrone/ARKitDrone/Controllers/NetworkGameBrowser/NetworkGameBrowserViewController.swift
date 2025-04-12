@@ -65,12 +65,7 @@ class NetworkGameBrowserViewController: UIViewController {
 extension NetworkGameBrowserViewController: GameBrowserDelegate {
     
     func gameBrowser(_ browser: GameBrowser, sawGames games: [NetworkGame]) {
-        print("func gameBrowser(_ browser: GameBrowser, sawGames games: [NetworkGame]) {")
-        if UserDefaults.standard.gameRoomMode {
-//            self.games = games.filter { $0.location == location }
-        } else {
-            self.games = games
-        }
+        self.games = games
         tableView.reloadData()
     }
 }
