@@ -30,7 +30,7 @@ class MissileManager {
         missile.fired = true
         game.valueReached = false
         missile.addCollision()
-        sceneView.missileLock(ship: ship)
+//        sceneView.missileLock(ship: ship)
         missile.node.look(at: ship.node.position)
         ApacheHelicopter.speed = 0
         let targetPos = ship.node.presentation.simdWorldPosition
@@ -96,7 +96,7 @@ class MissileManager {
                     self.game.playerScore += 1
                     ApacheHelicopter.speed = 0
                     self.game.updateScoreText()
-                    self.sceneView.positionHUD()
+//                    self.sceneView.positionHUD()
                     NotificationCenter.default.post(name: .updateScore, object: self, userInfo: nil)
                 }
             }
@@ -105,7 +105,7 @@ class MissileManager {
                 ship.isDestroyed = true
                 ship.removeShip()
                 self.sceneView.addExplosion(contactPoint: contact.contactPoint)
-                self.sceneView.positionHUD()
+//                self.sceneView.positionHUD()
             }
             tempMissile.particle?.birthRate = 0
             tempMissile.node.removeAll()

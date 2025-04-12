@@ -34,7 +34,14 @@ extension GameViewController: ARSCNViewDelegate {
         os_signpost(.end, log: .render_loop, name: .logic_update, signpostID: .render_loop,
                     "Game logic update finished")
     }
-    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
-        
-    }
+//    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+//        
+//    }
+//    
+    func sessionShouldAttemptRelocalization(_ session: ARSession) -> Bool {
+           return true
+       }
+       
 }
+
+

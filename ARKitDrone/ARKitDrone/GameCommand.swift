@@ -247,19 +247,76 @@ extension GameVelocity: BitStreamCodable {
 private let velocityCompressor = FloatCompressor(minValue: -50.0, maxValue: 50.0, bits: 16)
 private let angularVelocityAxisCompressor = FloatCompressor(minValue: -1.0, maxValue: 1.0, bits: 12)
 
+
+enum Direction: BitStreamCodable {
+    case forward
+    case altitude
+    case rotation
+    case side
+    
+    enum CodingKey: UInt32, CaseIterable {
+        case forward
+        case altitude
+        case rotation
+        case side
+    }
+    
+    init(from bitStream: inout ReadableBitStream) throws {
+        let key: CodingKey = try bitStream.readEnum()
+        switch key {
+            
+        case .forward:
+            self = .forward
+        case .altitude:
+            self = .altitude
+        case .rotation:
+            self = .rotation
+        case .side:
+            self = .side
+        }
+//        case .requestBoardLocation:
+//            self = .requestBoardLocation
+//        case .boardLocation:
+//            let location = try GameBoardLocation(from: &bitStream)
+//            self = .boardLocation(location)
+//        }
+    }
+    
+    func encode(to bitStream: inout WritableBitStream) {
+        switch self {
+//        case .requestBoardLocation:
+//            bitStream.appendEnum(CodingKey.requestBoardLocation)
+//        case .boardLocation(let location):
+//            bitStream.appendEnum(CodingKey.boardLocation)
+//            location.encode(to: &bitStream)
+        case .forward:
+            bitStream.appendEnum(CodingKey.forward)
+        case .altitude:
+            bitStream.appendEnum(CodingKey.altitude)
+        case .rotation:
+            bitStream.appendEnum(CodingKey.rotation)
+        case .side:
+            bitStream.appendEnum(CodingKey.side)
+        }
+    }
+}
+
 struct MoveData {
     var velocity: GameVelocity
     var angular: Float
+    var direction: Direction?
 }
 
 extension MoveData: BitStreamCodable {
     init(from bitStream: inout ReadableBitStream) throws {
         velocity = try GameVelocity(from: &bitStream)
+        direction = try Direction(from: &bitStream)
         angular = try bitStream.readFloat()
     }
 
     func encode(to bitStream: inout WritableBitStream) throws {
         velocity.encode(to: &bitStream)
+        direction?.encode(to: &bitStream)
         bitStream.appendFloat(angular)
     }
 }
@@ -284,7 +341,6 @@ extension AddNodeAction: BitStreamCodable {
 enum GameAction {
     case joyStickMoved(MoveData)
     case movement(MovementSyncData)
-    
     
     private enum CodingKey: UInt32, CaseIterable {
         case move

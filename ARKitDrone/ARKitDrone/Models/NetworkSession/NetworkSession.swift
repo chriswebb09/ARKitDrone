@@ -184,7 +184,7 @@ extension NetworkSession: MCSessionDelegate {
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        os_log(.info, "did receive data from peer %@", peerID)
+       //os_log(.info, "did receive data from peer %@", peerID)
         receive(data: data, from: peerID)
     }
     

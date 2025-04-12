@@ -18,4 +18,5 @@ protocol GameManagerDelegate: AnyObject {
     func manager(_ manager: GameManager, addNode: AddNodeAction)
     func manager(_ manager: GameManager, completed: CompletedAction)
     func manager(_ manager: GameManager, moveNode: MoveData)
+    func manager(_ manager: GameManager, hasNetworkDelay: Bool)
 }

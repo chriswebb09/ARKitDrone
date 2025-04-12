@@ -11,11 +11,41 @@ import os.log
 import SceneKit
 
 extension GameViewController: GameManagerDelegate {
+    
+    func manager(_ manager: GameManager, hasNetworkDelay: Bool) {
+        
+    }
+    
     func manager(_ manager: GameManager, moveNode: MoveData) {
-        os_log(.info, "move forward gfrom jostick joystick")
-        DispatchQueue.main.async {
-            self.sceneView.competitor.moveForward(value: moveNode.velocity.vector.x / 10)
+        os_log(.info, "move forward from joytick %s", String.init(describing: moveNode))
+        if let dir = moveNode.direction {
+            switch dir {
+            case .forward:
+                DispatchQueue.main.async {
+                    self.sceneView.competitor.moveForward(value: moveNode.velocity.vector.y / 100)
+                }
+            case .altitude:
+                DispatchQueue.main.async {
+                    self.sceneView.competitor.changeAltitude(value: moveNode.velocity.vector.y / 100)
+                }
+            case .rotation:
+                print("rotate")
+                
+                DispatchQueue.main.async {
+                    self.sceneView.competitor.rotate(value: moveNode.velocity.vector.x / 100)
+                }
+            case .side:
+                DispatchQueue.main.async {
+                    self.sceneView.competitor.moveSides(value: moveNode.velocity.vector.x / 100)
+                }
+            }
+            
+        } else {
+            DispatchQueue.main.async {
+                self.sceneView.competitor.moveForward(value: moveNode.velocity.vector.y / 100)
+            }
         }
+        
     }
     
     func manager(_ manager: GameManager, completed: CompletedAction) {
@@ -49,7 +79,7 @@ extension GameViewController: GameManagerDelegate {
             let square = TargetNode()
             self.sceneView.scene.rootNode.addChildNode(square)
             self.sceneView.competitor = apache
-            square.simdScale = [20.0, 20.0, 20.0]
+            square.simdScale = [1.0, 1.0, 1.0]
             square.unhide()
             square.displayNodeHierarchyOnTop(true)
             square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)

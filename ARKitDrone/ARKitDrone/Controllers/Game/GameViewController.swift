@@ -78,7 +78,7 @@ class GameViewController: UIViewController {
         if UIDevice.current.isIpad {
             offset = 220
         }
-        let view = SKView(frame: CGRect(x:60, y: UIScreen.main.bounds.height - 220, width: 170, height: 170))
+        let view = SKView(frame: CGRect(x:60, y: UIScreen.main.bounds.height - 220, width: 200, height: 200))
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
         return view
@@ -97,7 +97,7 @@ class GameViewController: UIViewController {
     var isLoaded = false
     
     private lazy var padView2: SKView = {
-        let view = SKView(frame: CGRect(x:600, y: UIScreen.main.bounds.height - 220, width: 170, height: 170))
+        let view = SKView(frame: CGRect(x:600, y: UIScreen.main.bounds.height - 220, width: 200, height: 200))
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
         return view

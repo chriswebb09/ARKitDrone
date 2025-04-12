@@ -84,44 +84,44 @@ class GameSceneView: ARSCNView {
     }
 }
 
-// MARK: - HelicopterCapable
-
-extension GameSceneView: HelicopterCapable {
-    
-    func shootUpperGun() {
-        helicopter.shootUpperGun()
-    }
-    
-    func missileLock(ship: Ship) {
-        helicopter.lockOn(ship: ship)
-    }
-    
-    func positionHUD() {
-        helicopter.updateHUD()
-        helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.16))
-    }
-    
-    func missilesArmed() -> Bool {
-        return helicopter.missilesAreArmed()
-    }
-    
-    func rotate(value: Float) {
-        helicopter.rotate(value: value)
-    }
-    
-    func moveForward(value: Float) {
-        helicopter.moveForward(value: value)
-    }
-    
-    func changeAltitude(value: Float) {
-        helicopter.changeAltitude(value: -value)
-    }
-    
-    func moveSides(value: Float) {
-        helicopter.moveSides(value: value)
-    }
-    
-    func toggleArmMissiles() {
-        helicopter.toggleArmMissile()
-    }
-}
+//// MARK: - HelicopterCapable
+//
+//extension GameSceneView: HelicopterCapable {
+//    
+//    func shootUpperGun() {
+//        helicopter.shootUpperGun()
+//    }
+//    
+//    func missileLock(ship: Ship) {
+//        helicopter.lockOn(ship: ship)
+//    }
+//    
+//    func positionHUD() {
+//        helicopter.updateHUD()
+//        helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.16))
+//    }
+//    
+//    func missilesArmed() -> Bool {
+//        return helicopter.missilesAreArmed()
+//    }
+//    
+//    func rotate(value: Float) {
+//        helicopter.rotate(value: value)
+//    }
+//    
+//    func moveForward(value: Float) {
+//        helicopter.moveForward(value: value)
+//    }
+//    
+//    func changeAltitude(value: Float) {
+//        helicopter.changeAltitude(value: -value)
+//    }
+//    
+//    func moveSides(value: Float) {
+//        helicopter.moveSides(value: value)
+//    }
+//    
+//    func toggleArmMissiles() {
+//        helicopter.toggleArmMissile()
+//    }
+//}

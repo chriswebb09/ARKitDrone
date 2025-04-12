@@ -41,7 +41,7 @@ class GameManager: NSObject {
         
         self.isNetworked = session != nil
         self.isServer = session?.isServer ?? true // Solo game act like a server
-//        movementSyncData.delegate = self
+        
         super.init()
         
         self.session?.delegate = self
@@ -62,7 +62,11 @@ class GameManager: NSObject {
         if isNetworked && movementSyncData.isInitialized {
             if isServer {
                 let movementData = movementSyncData.generateData()
-                session?.send(action: .gameAction(.movement(movementData)))
+                session?.send(action:
+                        .gameAction(
+                            .movement(movementData)
+                        )
+                )
             } else {
                 movementSyncData.updateFromReceivedData()
             }
@@ -99,29 +103,37 @@ class GameManager: NSObject {
     // MARK: - inbound from network
     private func process(command: GameCommand) {
         os_signpost(.begin, log: .render_loop, name: .process_command, signpostID: .render_loop,
-                    "Action : %s", command.action.description)
+                    "Action End : %s", command.action.description)
         defer { os_signpost(.end, log: .render_loop, name: .process_command, signpostID: .render_loop,
-                            "Action : %s", command.action.description) }
+                            "Action End: %s", command.action.description) }
         
         switch command.action {
         case .gameAction(let gameAction):
-            os_log(.info, "game action for %s", command.player?.username ?? "unknown")
+            os_log(.info, "game action from %s for %s", command.player?.username ?? "unknown", String(describing: gameAction))
             // should controll tank here
             
             guard let player = command.player else { return }
             
             if case let .joyStickMoved(data) = gameAction {
-                self.delegate?.manager(self, moveNode: data)
+                DispatchQueue.main.async {
+                    self.delegate?.manager(self, moveNode: data)
+                }
             }
+            
+//            if case let .movement(movementSyncData) = gameAction {
+//                self.delegate?.manager(self, received: movementSyncData, from: player)
+//            }
         case .boardSetup(let boardAction):
-            os_log(.info, "board setup for %s", command.player?.username ?? "unknown")
+            os_log(.info, "board setup with %s", command.player?.username ?? "unknown")
             if let player = command.player {
                 delegate?.manager(self, received: boardAction, from: player)
             }
         case .addNode(let addNode):
-            os_log(.info, "add node for %s", command.player?.username ?? "unknown")
+            os_log(.info, "add node from %s using %@", command.player?.username ?? "unknown", String(describing: addNode))
             if let player = command.player {
-                delegate?.manager(self, addNode: addNode)
+                DispatchQueue.main.async {
+                    self.delegate?.manager(self, addNode: addNode)
+                }
             }
         case .completed(let completed):
             print("completed")
@@ -133,7 +145,7 @@ class GameManager: NSObject {
     /// - Tag: GameManager-update
     func update(timeDelta: TimeInterval) {
         processCommandQueue()
-        syncMovement()
+//       / syncMovement()
     }
     
     private func processCommandQueue() {
@@ -163,7 +175,7 @@ class GameManager: NSObject {
         if let session = session, session.isServer {
             session.startAdvertising()
         }
-        
+        movementSyncData.delegate = self
         delegate?.managerDidStartGame(self)
         isInitialized = true
     }
@@ -209,6 +221,14 @@ extension GameManager: NetworkSessionDelegate {
         } else {
             delegate?.manager(self, leavingPlayer: player)
         }
+    }
+    
+}
+
+
+extension GameManager: MovementSyncSceneDataDelegate {
+    func hasNetworkDelayStatusChanged(hasNetworkDelay: Bool) {
+        delegate?.manager(self, hasNetworkDelay: hasNetworkDelay)
     }
     
 }
