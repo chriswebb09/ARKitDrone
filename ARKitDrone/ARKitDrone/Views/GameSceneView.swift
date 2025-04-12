@@ -102,7 +102,7 @@ class GameSceneView: ARSCNView {
     func positionTank(position: SCNVector3) -> ApacheHelicopter {
         var helicopter = ApacheHelicopter()
 //        scene = SCNScene(named: LocalConstants.sceneName)!
-        helicopter.setHelicopterProps()
+//        helicopter.setHelicopterProps()
 //        helicopterModel = helicopter.setupHelicopterModel()
         //        tankNode = setupTankNode(tankModel: tankModel)
 //        helicopterNode = helicopter.setupHelicopterNode(helicopterModel: helicopterModel)

@@ -107,24 +107,8 @@ class ApacheHelicopter {
         hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
         spinBlades()
     }
-    
-    //    private func setupAdditionalHelicopterComponents() {
-    //        hud = helicopterModel!.childNode(withName: GameSceneView.hudNodeName, recursively: false)!
-    //        front = helicopterNode.childNode(withName: GameSceneView.frontIRSteering, recursively: true)
-    //        rotor = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.frontRotorName, recursively: true)
-    //        rotor2 = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.tailRotorName, recursively: true)
-    //        wingL = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.wingLName, recursively: true)
-    //        wingR = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.wingRName, recursively: true)
-    //        front = helicopterNode.childNode(withName: GameSceneView.frontIRSteering, recursively: true)
-    //        frontIR = front!.childNode(withName:GameSceneView.frontIR, recursively: true)
-    //        upperGun = helicopterNode.childNode(withName: GameSceneView.upperGun, recursively: true)!
-    //    }
-    
+
     func setupMissiles() {
-//        let missile1Node = wingR!.childNode(withName: ApacheHelicopter.LocalConstants.missile1, recursively: false)!
-//        missile1.setupNode(scnNode: missile1Node, number: 1)
-//        let missile2Node = wingR?.childNode(withName: ApacheHelicopter.LocalConstants.missile2, recursively: false)!
-//        missile2.setupNode(scnNode:missile2Node, number: 2)
         missile1.setupNode(scnNode: wingR!.childNode(withName: ApacheHelicopter.LocalConstants.missile1, recursively: true), number: 1)
         missile2.setupNode(scnNode: wingR.childNode(withName: ApacheHelicopter.LocalConstants.missile2, recursively: true), number: 2)
         missile3.setupNode(scnNode: wingR!.childNode(withName: ApacheHelicopter.LocalConstants.missile3, recursively: true), number: 3)
@@ -146,37 +130,6 @@ class ApacheHelicopter {
         front = helicopterNode.childNode(withName: GameSceneView.frontIRSteering, recursively: true)
         frontIR = front!.childNode(withName:GameSceneView.frontIR, recursively: true)
         upperGun = helicopterNode.childNode(withName: GameSceneView.upperGun, recursively: true)!
-    }
-    
-    
-    func setHelicopterProps() {
-//        DispatchQueue.main.async {
-//            self.parentModelNode = self.setupHelicopterModel()
-//            self.helicopterNode = self.setupHelicopterNode(helicopterModel: self.parentModelNode)
-//        }
-//        DispatchQueue.main.async {
-//            self.setup(with: self.helicopterNode)
-//        }
-        
-//        hud = hud
-       
-//        missile1 = missile1
-//        helicopterNode = helicopterNode
-//        front = front
-//        frontIR = frontIR
-//        upperGun = upperGun
-//        missile1 = missile1
-//        missile2 = missile2
-//        missile3 = missile3
-//        missile4 = missile4
-//        missile5 = missile5
-//        helicopter.missile6 = missile6
-//        helicopter.missile7 = missile7
-//        helicopter.missile8 = missile8
-//        helicopter.missiles = missiles
-//        helicopter.rotor = rotor
-//        helicopter.rotor2 = rotor2
-//        helicopter.setup(with: helicopterNode)
     }
     
     
