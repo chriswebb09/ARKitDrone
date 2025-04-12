@@ -64,7 +64,7 @@ extension GameViewController: JoystickSceneDelegate {
               
                 
                 DispatchQueue.main.async {
-                    self.sceneView.helicopter.moveSides(value: velocity.y)
+                    self.sceneView.helicopter.moveSides(value: velocity.x)
                     self.gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
                 }
                 

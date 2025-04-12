@@ -17,8 +17,6 @@ extension GameViewController: ARSCNViewDelegate {
         DispatchQueue.main.async {
             self.updateFocusSquare(isObjectVisible: false)
         }
-        
-        
         os_signpost(.begin, log: .render_loop, name: .render_loop, signpostID: .render_loop,
                     "Render loop started")
         os_signpost(.begin, log: .render_loop, name: .logic_update, signpostID: .render_loop,
@@ -30,7 +28,6 @@ extension GameViewController: ARSCNViewDelegate {
                 self.gameManager?.update(timeDelta: GameTime.deltaTime)
             }
         }
-        
         os_signpost(.end, log: .render_loop, name: .logic_update, signpostID: .render_loop,
                     "Game logic update finished")
     }

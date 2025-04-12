@@ -22,17 +22,15 @@ extension GameViewController: GameManagerDelegate {
             switch dir {
             case .forward:
                 DispatchQueue.main.async {
-                    self.sceneView.competitor.moveForward(value: moveNode.velocity.vector.y / 100)
+                    self.sceneView.competitor.moveForward(value: (moveNode.velocity.vector.y / 500))
                 }
             case .altitude:
                 DispatchQueue.main.async {
                     self.sceneView.competitor.changeAltitude(value: moveNode.velocity.vector.y / 100)
                 }
             case .rotation:
-                print("rotate")
-                
                 DispatchQueue.main.async {
-                    self.sceneView.competitor.rotate(value: moveNode.velocity.vector.x / 100)
+                    self.sceneView.competitor.rotate(value: moveNode.velocity.vector.x / 500)
                 }
             case .side:
                 DispatchQueue.main.async {
@@ -42,7 +40,7 @@ extension GameViewController: GameManagerDelegate {
             
         } else {
             DispatchQueue.main.async {
-                self.sceneView.competitor.moveForward(value: moveNode.velocity.vector.y / 100)
+                self.sceneView.competitor.moveForward(value: moveNode.velocity.vector.y / 500)
             }
         }
         
