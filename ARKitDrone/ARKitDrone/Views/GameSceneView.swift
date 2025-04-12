@@ -28,41 +28,11 @@ class GameSceneView: ARSCNView {
     var tankModel: SCNNode!
     var tankNode: SCNNode!
     var helicopterNode: SCNNode!
-    var helicopterModel: SCNNode!
-    var frontIR: SCNNode!
-    var hud: SCNNode!
-    var wingL: SCNNode!
-    var wingR: SCNNode!
-    var front: SCNNode!
-    var rotor: SCNNode!
-    var rotor2: SCNNode!
-    var upperGun: SCNNode!
-    
-//    var missile1: Missile = Missile()
-//    var missile2: Missile = Missile()
-//    var missile3: Missile = Missile()
-//    var missile4: Missile = Missile()
-//    var missile5: Missile = Missile()
-//    var missile6: Missile = Missile()
-//    var missile7: Missile = Missile()
-//    var missile8: Missile = Missile()
-//    
-//    var missiles: [Missile] = []
-    
     var targetIndex = 0
     
     var attack: Bool = false
     
-    static let helicopterSceneName = "art.scnassets/Helicopter.scn"
-    static let targetScene = "art.scnassets/Target.scn"
-    static let helicopterParentModelName = "Apache"
-    static let hudNodeName = "hud"
-    static let helicopterBodyName = "Body"
-    static let frontRotorName = "FrontRotor"
-    static let tailRotorName = "TailRotor"
-    static let frontIR = "FrontIR"
-    static let frontIRSteering = "FrontIRSteering"
-    static let upperGun = "UpperGun"
+ 
     var competitor: ApacheHelicopter!
     
     func setup() {
@@ -84,28 +54,17 @@ class GameSceneView: ARSCNView {
     
     func positionTank(position: SCNVector3) -> ApacheHelicopter {
         var helicopter = ApacheHelicopter()
-//        scene = SCNScene(named: LocalConstants.sceneName)!
-//        helicopter.setHelicopterProps()
-//        helicopterModel = helicopter.setupHelicopterModel()
-        //        tankNode = setupTankNode(tankModel: tankModel)
-//        helicopterNode = helicopter.setupHelicopterNode(helicopterModel: helicopterModel)
-//        helicopter.setupAdditionalHelicopterComponents()
-     //   helicopter.setupMissiles()
-      //  helicopter.setupAdditionalHelicopterComponents()
-        //        tankModel = SCNScene.nodeWithModelName(GameSceneView.tankAssetName).clone()
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-//            setHelicopterProps()
-            //helicopter.setHelicopterProps()
+
+
             helicopter.helicopterNode.scale = SCNVector3(x: 0.0005, y: 0.0005, z: 0.0005)
             scene.rootNode.addChildNode(helicopter.hud)
-            //            scene.rootNode.addChildNode(tankNode)
+
             scene.rootNode.addChildNode(helicopter.helicopterNode)
             //            tankNode.position = position
             helicopter.helicopterNode.position =  SCNVector3(x:position.x, y:position.y + 0.5, z: position.z - 0.2)
             helicopter.helicopterNode.simdPivot.columns.3.x = -0.5
-            //            tankNode.simdPivot.columns.3.x = -0.5
-            //            tankNode.scale = SCNVector3(x: 0.07, y: 0.07, z: 0.07)
             helicopter.updateHUD()
             helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.44))
         }
