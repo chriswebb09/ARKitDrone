@@ -122,13 +122,6 @@ class GameManager: NSObject {
             os_log(.info, "add node for %s", command.player?.username ?? "unknown")
             if let player = command.player {
                 delegate?.manager(self, addNode: addNode)
-                // should send create tank action here
-                //                let tankNode = SCNNode()
-                //                tankNode.simdWorldTransform = addTankAction.simdWorldTransform
-                //                tankNode.eulerAngles = SCNVector3(addTankAction.eulerAngles.x, addTankAction.eulerAngles.y, addTankAction.eulerAngles.z)
-                //                print(self.scene.rootNode.simdWorldTransform)
-                //                tankNode.scale = SCNVector3(0.0002, 0.0002, 0.0002)
-                //                self.createTank(tankNode: tankNode, owner: player)
             }
         case .completed(let completed):
             print("completed")
@@ -186,30 +179,6 @@ class GameManager: NSObject {
                 sceneView.competitor.helicopterNode.eulerAngles.y = movement.angular
             }
         }
-        
-        //    func createTank(tankNode: SCNNode, owner: Player?) {
-        //        let tank = GameObject(node: tankNode, index: 0, alive: true, owner: owner)
-        //        // insert new Tank() to game scene
-        //        self.tanks.insert(tank)
-        //        DispatchQueue.main.async {
-        //            self.scene.rootNode.addChildNode(tankNode)
-        //        }
-        //    }
-        //
-        //    func moveTank(player: Player, movement: MoveData) {
-        //        let tank = self.tanks.filter { $0.owner == player}
-        //        tank.forEach { (tank) in
-        //
-        //            let x = tank.objectRootNode.position.x + movement.velocity.vector.x * Float(joystickVelocityMultiplier)
-        //            let y = tank.objectRootNode.position.y + movement.velocity.vector.y * Float(joystickVelocityMultiplier)
-        //            let z = tank.objectRootNode.position.z - movement.velocity.vector.y * Float(joystickVelocityMultiplier)
-        //
-        //            let angular = movement.angular
-        //
-        //            tank.objectRootNode.position = SCNVector3(x: x, y: y, z: z)
-        //            tank.objectRootNode.eulerAngles.y = angular + Float(180.0 * .pi / 180)
-        //        }
-        //    }
         
     }
 }
