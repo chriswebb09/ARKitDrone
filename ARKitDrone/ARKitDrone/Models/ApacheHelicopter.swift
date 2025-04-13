@@ -85,6 +85,7 @@ class ApacheHelicopter {
         helicopterNode = setupHelicopterNode(helicopterModel: parentModelNode)
         setupAdditionalHelicopterComponents()
         setup(with: helicopterNode)
+        setupMissiles()
     }
     
     func spinBlades() {

@@ -29,17 +29,13 @@ class Joystick: SKNode {
     
     weak var delegate: JoystickDelegate?
     
-    override init() {
-        
-        self.thumbNode =  SKSpriteNode(imageNamed: LocalConstants.imageJoystickName)
-        thumbNode.size = CGSize(width:  thumbNode.size.width  + 10, height: thumbNode.size.height  + 10)
-        self.backdropNode = SKSpriteNode(imageNamed: LocalConstants.imageDpadName)
-        backdropNode.size = CGSize(width:  backdropNode.size.width  + 10, height: backdropNode.size.height  + 10)
+    init(thumbNode: SKSpriteNode = SKSpriteNode(imageNamed: LocalConstants.imageJoystickName), backdropNode: SKSpriteNode = SKSpriteNode(imageNamed: LocalConstants.imageDpadName)) {
+        self.thumbNode = thumbNode
+        self.backdropNode = backdropNode
         super.init()
-        isUserInteractionEnabled = true
         addChild(self.backdropNode)
         addChild(self.thumbNode)
-        
+        isUserInteractionEnabled = true
     }
     
     required init(coder aDecoder: NSCoder) {
@@ -66,18 +62,24 @@ class Joystick: SKNode {
         self.updateJoystick(touchPoint: touchPoint)
     }
     
-    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        //        super.touchesEnded(touches, with: event)
-        if self.velocity == .zero {
+        super.touchesEnded(touches, with: event)
+        print("touches ended")
+        DispatchQueue.main.async {
             self.delegate?.tapped()
+            if self.velocity == .zero {
+                
+            }
+            self.resetVelocity()
         }
-        self.resetVelocity()
+//        self.resetVelocity()
+        
     }
-    
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        //        super.touchesCancelled(touches, with: event)
-        self.resetVelocity()
+        super.touchesCancelled(touches, with: event)
+        DispatchQueue.main.async {
+            self.resetVelocity()
+        }
     }
     
     // MARK: - Private
@@ -95,13 +97,10 @@ class Joystick: SKNode {
         easeOut.timingMode = .easeOut
         thumbNode.removeAllActions()
         self.thumbNode.run(easeOut)
-        
     }
-    
     
     private func updateJoystick(touchPoint: CGPoint) {
         guard isTracking else { return }
-        
         // Use actual thumb position for velocity calculations
         // This approach gives a more direct control feel
         //  let thumbWidth = thumbNode.size.width / 2
@@ -121,14 +120,12 @@ class Joystick: SKNode {
             thumbNode.position = CGPoint(x: newX, y: newY)
             
         }
-        
         // Set velocity directly based on thumb position
         // This preserves the original behavior while adding the multiplier
         velocity = CGPoint(
             x: thumbNode.position.x * LocalConstants.velocityMultiplier,
             y: thumbNode.position.y * LocalConstants.velocityMultiplier
         )
-        
         angularVelocity = atan2(velocity.y, velocity.x)
     }
 }

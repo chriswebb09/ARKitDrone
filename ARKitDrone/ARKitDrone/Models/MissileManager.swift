@@ -21,6 +21,7 @@ class MissileManager {
     }
     
     func fire(game: Game) {
+        print("fire")
         guard !sceneView.helicopter.missiles.isEmpty, !game.scoreUpdated else { return }
         guard sceneView.ships.count > sceneView.targetIndex else { return }
         guard !sceneView.ships[sceneView.targetIndex].isDestroyed else { return }
@@ -30,7 +31,7 @@ class MissileManager {
         missile.fired = true
         game.valueReached = false
         missile.addCollision()
-//        sceneView.missileLock(ship: ship)
+        //        sceneView.missileLock(ship: ship)
         missile.node.look(at: ship.node.position)
         ApacheHelicopter.speed = 0
         let targetPos = ship.node.presentation.simdWorldPosition
@@ -51,6 +52,7 @@ class MissileManager {
     }
     
     @objc private func updateMissilePosition(displayLink: CADisplayLink) {
+        print("updateMissilePosition")
         guard let trackingInfo = activeMissileTrackers.first(where: { $0.value.displayLink === displayLink })?.value else {
             displayLink.invalidate()
             return
@@ -96,7 +98,7 @@ class MissileManager {
                     self.game.playerScore += 1
                     ApacheHelicopter.speed = 0
                     self.game.updateScoreText()
-//                    self.sceneView.positionHUD()
+                    //                    self.sceneView.positionHUD()
                     NotificationCenter.default.post(name: .updateScore, object: self, userInfo: nil)
                 }
             }
@@ -105,7 +107,7 @@ class MissileManager {
                 ship.isDestroyed = true
                 ship.removeShip()
                 self.sceneView.addExplosion(contactPoint: contact.contactPoint)
-//                self.sceneView.positionHUD()
+                //                self.sceneView.positionHUD()
             }
             tempMissile.particle?.birthRate = 0
             tempMissile.node.removeAll()
