@@ -22,7 +22,7 @@ class ApacheHelicopter {
         static let frontRotorName = "FrontRotor"
         static let tailRotorName = "TailRotor"
         static let hudNodeName = "hud"
-        static let frontIRSteering = "FrontIRS"
+        static let frontIRSteering = "FrontIRSteering"
         static let missile1 = "Missile1"
         static let missile2 = "Missile2"
         static let missile3 = "Missile3"
@@ -31,29 +31,20 @@ class ApacheHelicopter {
         static let missile6 = "Missile6"
         static let missile7 = "Missile7"
         static let missile8 = "Missile8"
-        
         static let frontIR = "FrontIR"
         static let audioFileName = "audio.m4a"
         static let upperGun = "UpperGun"
-        
+        static let helicopterSceneName = "art.scnassets/Helicopter.scn"
+        static let targetScene = "art.scnassets/Target.scn"
+        static let helicopterParentModelName = "Apache"
+        static let helicopterBodyName = "Body"
         static let activeEmitterRate: CGFloat = 1000
         static let angleConversion = SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float.pi, z: 0 , w: 0)
         static let negativeAngleConversion = SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float.pi, z: 0 , w: 0)
         static let altitudeAngleConversion = SCNQuaternion.angleConversion(x: 0.001 * Float.pi, y:0, z: 0 , w: 0)
         static let negativeAltitudeAngleConversion = SCNQuaternion.angleConversion(x: -0.001 * Float.pi, y:0, z: 0 , w: 0)
     }
-    
-    static let helicopterSceneName = "art.scnassets/Helicopter.scn"
-    static let targetScene = "art.scnassets/Target.scn"
-    static let helicopterParentModelName = "Apache"
-    static let hudNodeName = "hud"
-    static let helicopterBodyName = "Body"
-    static let frontRotorName = "FrontRotor"
-    static let tailRotorName = "TailRotor"
-    static let frontIR = "FrontIR"
-    static let frontIRSteering = "FrontIRSteering"
-    static let upperGun = "UpperGun"
-    
+
     var helicopterNode: SCNNode!
     var parentModelNode: SCNNode!
     var firing:Bool = false
@@ -132,15 +123,15 @@ class ApacheHelicopter {
     }
     
     func setupAdditionalHelicopterComponents() {
-        hud = parentModelNode!.childNode(withName: ApacheHelicopter.hudNodeName, recursively: false)!
-        front = helicopterNode.childNode(withName: ApacheHelicopter.frontIRSteering, recursively: true)
-        rotor = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.frontRotorName, recursively: true)
-        rotor2 = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.tailRotorName, recursively: true)
-        wingL = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.wingLName, recursively: true)
-        wingR = helicopterNode.childNode(withName: ApacheHelicopter.LocalConstants.wingRName, recursively: true)
-        front = helicopterNode.childNode(withName: ApacheHelicopter.frontIRSteering, recursively: true)
-        frontIR = front!.childNode(withName:ApacheHelicopter.frontIR, recursively: true)
-        upperGun = helicopterNode.childNode(withName: ApacheHelicopter.upperGun, recursively: true)!
+        hud = parentModelNode!.childNode(withName: LocalConstants.hudNodeName, recursively: false)!
+        front = helicopterNode.childNode(withName: LocalConstants.frontIRSteering, recursively: true)
+        rotor = helicopterNode.childNode(withName: LocalConstants.frontRotorName, recursively: true)
+        rotor2 = helicopterNode.childNode(withName: LocalConstants.tailRotorName, recursively: true)
+        wingL = helicopterNode.childNode(withName: LocalConstants.wingLName, recursively: true)
+        wingR = helicopterNode.childNode(withName: LocalConstants.wingRName, recursively: true)
+        front = helicopterNode.childNode(withName: LocalConstants.frontIRSteering, recursively: true)
+        frontIR = front.childNode(withName:LocalConstants.frontIR, recursively: false)
+        upperGun = helicopterNode.childNode(withName: LocalConstants.upperGun, recursively: true)!
     }
     
     
@@ -277,9 +268,9 @@ class ApacheHelicopter {
     }
     
     func setupHelicopterModel() -> SCNNode {
-        let tempScene = SCNScene.nodeWithModelName(ApacheHelicopter.helicopterSceneName).clone()
-        guard let model = tempScene.childNode(withName: ApacheHelicopter.helicopterParentModelName, recursively: true) else {
-            fatalError("Failed to find helicopter parent model: \(ApacheHelicopter.helicopterParentModelName)")
+        let tempScene = SCNScene.nodeWithModelName(LocalConstants.helicopterSceneName).clone()
+        guard let model = tempScene.childNode(withName: LocalConstants.helicopterParentModelName, recursively: true) else {
+            fatalError("Failed to find helicopter parent model: \(LocalConstants.helicopterParentModelName)")
         }
         let helicopterModel = model
         let modelScale: Float = 0.001
@@ -289,8 +280,8 @@ class ApacheHelicopter {
     }
     
     func setupHelicopterNode(helicopterModel: SCNNode) -> SCNNode {
-        guard let bodyNode = helicopterModel.childNode(withName: ApacheHelicopter.helicopterBodyName, recursively: true) else {
-            fatalError("Failed to find helicopter body node: \(ApacheHelicopter.helicopterBodyName)")
+        guard let bodyNode = helicopterModel.childNode(withName: LocalConstants.helicopterBodyName, recursively: true) else {
+            fatalError("Failed to find helicopter body node: \(LocalConstants.helicopterBodyName)")
         }
         let helicopterNode = bodyNode
         helicopterNode.simdEulerAngles = SIMD3<Float>(-3.0, 0, 0)

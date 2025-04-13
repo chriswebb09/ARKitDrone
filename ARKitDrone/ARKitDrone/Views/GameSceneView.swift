@@ -15,11 +15,11 @@ class GameSceneView: ARSCNView {
     
     struct LocalConstants {
         static let sceneName =  "art.scnassets/Game.scn"
-        
         static let f35Scene = "art.scnassets/F-35B_Lightning_II.scn"
         static let f35Node = "F_35B_Lightning_II"
+        static let tankAssetName = "art.scnassets/m1.scn"
     }
-    static let tankAssetName = "art.scnassets/m1.scn"
+   
     var ships: [Ship] = [Ship]()
     var helicopter = ApacheHelicopter()
     var tankModel: SCNNode!
@@ -31,7 +31,7 @@ class GameSceneView: ARSCNView {
     
     func setup() {
         scene = SCNScene(named: LocalConstants.sceneName)!
-        tankModel = SCNScene.nodeWithModelName(GameSceneView.tankAssetName).clone()
+        tankModel = SCNScene.nodeWithModelName(LocalConstants.tankAssetName).clone()
         tankNode = setupTankNode(tankModel: tankModel)
     }
     

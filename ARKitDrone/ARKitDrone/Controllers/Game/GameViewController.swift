@@ -239,7 +239,7 @@ class GameViewController: UIViewController {
         sceneView.addSubview(armMissilesButton)
         sceneView.addSubview(scoreText)
         armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
-       // guard let self = self else { return }
+        // guard let self = self else { return }
         self.isLoaded = true
         if UIDevice.current.userInterfaceIdiom == .phone {
             DeviceOrientation.shared.set(orientation: .landscapeRight)
@@ -248,22 +248,22 @@ class GameViewController: UIViewController {
         }
         self.focusSquare.hide()
         self.sceneView.scene.rootNode.addChildNode(self.focusSquare)
-//        sceneView.isUserInteractionEnabled = true
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-//            guard let self = self else { return }
-//            
-//            //            minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
-//            //            minimapScene.scaleMode = .resizeFill
-//            //            minimapView.presentScene(minimapScene)
-//            //            view.addSubview(minimapView)
-//            //            startMinimapUpdate()
-//            
-//            
-//        }
+        //        sceneView.isUserInteractionEnabled = true
+        //        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+        //            guard let self = self else { return }
+        //
+        //            //            minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
+        //            //            minimapScene.scaleMode = .resizeFill
+        //            //            minimapView.presentScene(minimapScene)
+        //            //            view.addSubview(minimapView)
+        //            //            startMinimapUpdate()
+        //
+        //
+        //        }
         
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-//           
-//        }
+        //        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+        //
+        //        }
     }
     
     func setupPlayerNode() {
@@ -327,10 +327,10 @@ class GameViewController: UIViewController {
             }
             configuration.frameSemantics = .sceneDepth
         }
-        //        sceneView.automaticallyUpdatesLighting = false
-        //        if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
-        //            sceneView.scene.lightingEnvironment.contents = environmentMap
-        //        }
+        sceneView.automaticallyUpdatesLighting = false
+        if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
+            sceneView.scene.lightingEnvironment.contents = environmentMap
+        }
         guard let camera = sceneView.pointOfView?.camera else {
             fatalError("Expected a valid `pointOfView` from the scene.")
         }
@@ -347,12 +347,10 @@ class GameViewController: UIViewController {
                 .stopTrackedRaycasts
             ]
         )
-        //        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
     }
     
     private func setupPadScene(padView1: SKView, padView2: SKView) {
         let scene = JoystickScene()
-        
         scene.point = LocalConstants.joystickPoint
         scene.size = LocalConstants.joystickSize
         scene.joystickDelegate = self
@@ -370,10 +368,6 @@ class GameViewController: UIViewController {
         padView2.preferredFramesPerSecond = 30
         padView2.presentScene(scene2)
         padView2.ignoresSiblingOrder = true
-      
-      
-      
-   
     }
     
     // MARK: - Actions
@@ -416,10 +410,7 @@ class GameViewController: UIViewController {
         
         let castRay = session.raycast(result)
         guard let firstCast = castRay.first else { return }
-        //         guard let self = self else { return }
         let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
-        //  let anchor = ARAnchor.init(name: "Heli", transform: firstCast.worldTransform)
-        //sceneView.session.add(anchor: anchor)
         sceneView.helicopter = sceneView.positionHelicopter(position: tappedPosition)
         let angles =  SIMD3<Float>(0, focusSquare.eulerAngles.y + 180.0 * .pi / 180, 0)
         let addNode = AddNodeAction(
@@ -483,9 +474,9 @@ class GameViewController: UIViewController {
                 configuration.initialWorldMap = worldMap
                 configuration.planeDetection = [.horizontal, .vertical]
                 sceneView.automaticallyUpdatesLighting = false
-                //                if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
-                //                    sceneView.scene.lightingEnvironment.contents = environmentMap
-                //                }
+                if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
+                    sceneView.scene.lightingEnvironment.contents = environmentMap
+                }
                 guard let camera = self.sceneView.pointOfView?.camera else {
                     fatalError("Expected a valid `pointOfView` from the scene.")
                 }

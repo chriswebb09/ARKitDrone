@@ -15,7 +15,6 @@ import UIKit
 extension GameViewController: JoystickSceneDelegate {
     
     func update(yValue: Float,  velocity: SIMD3<Float>, angular: Float, stickNum: Int) {
-        //guard let self = self else { return }
         let v = GameVelocity(vector: velocity)
         if stickNum == 2 {
             let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .forward)
@@ -29,7 +28,6 @@ extension GameViewController: JoystickSceneDelegate {
     }
     
     func update(xValue: Float,  velocity: SIMD3<Float>,  angular: Float, stickNum: Int) {
-       // guard let self = self else { return }
         let v = GameVelocity(vector: velocity)
         var shouldBeSent: MoveData!
         if stickNum == 1 {
@@ -43,23 +41,23 @@ extension GameViewController: JoystickSceneDelegate {
     }
     
     func tapped() {
-//        guard sceneView.helicopter.missilesArmed else { return }
-//        DispatchQueue.main.async { [weak self] in
-//            guard let self = self else { return }
-//            missileManager.fire(game: game)
-//            if sceneView.ships.count > sceneView.targetIndex {
-//                sceneView.targetIndex += 1
-//                if sceneView.targetIndex < sceneView.ships.count {
-//                    let canAddTarget = !sceneView.ships[sceneView.targetIndex].isDestroyed && !sceneView.ships[sceneView.targetIndex].targetAdded
-//                    if canAddTarget {
-//                        guard sceneView.targetIndex < sceneView.ships.count else { return }
-//                        let square = TargetNode()
-//                        sceneView.ships[sceneView.targetIndex].square = square
-//                        sceneView.scene.rootNode.addChildNode(square)
-//                        sceneView.ships[sceneView.targetIndex].targetAdded = true
-//                    }
-//                }
-//            }
-//        }
+        guard sceneView.helicopter.missilesArmed else { return }
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            missileManager.fire(game: game)
+            if sceneView.ships.count > sceneView.targetIndex {
+                sceneView.targetIndex += 1
+                if sceneView.targetIndex < sceneView.ships.count {
+                    let canAddTarget = !sceneView.ships[sceneView.targetIndex].isDestroyed && !sceneView.ships[sceneView.targetIndex].targetAdded
+                    if canAddTarget {
+                        guard sceneView.targetIndex < sceneView.ships.count else { return }
+                        let square = TargetNode()
+                        sceneView.ships[sceneView.targetIndex].square = square
+                        sceneView.scene.rootNode.addChildNode(square)
+                        sceneView.ships[sceneView.targetIndex].targetAdded = true
+                    }
+                }
+            }
+        }
     }
 }

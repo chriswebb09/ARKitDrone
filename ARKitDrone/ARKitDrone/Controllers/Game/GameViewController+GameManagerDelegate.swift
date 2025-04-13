@@ -16,35 +16,26 @@ extension GameViewController: GameManagerDelegate {
     
     func manager(_ manager: GameManager, moveNode: MoveData) {
         os_log(.info, "move forward from joytick %s", String.init(describing: moveNode))
-        if let dir = moveNode.direction {
-            switch dir {
-            case .forward:
-                // DispatchQueue.main.async {
-                self.sceneView.competitor.moveForward(value: (moveNode.velocity.vector.y / 500))
-                // }
-            case .altitude:
-                //                DispatchQueue.main.async {
-                self.sceneView.competitor.changeAltitude(value: moveNode.velocity.vector.y / 100)
-                //                }
-            case .rotation:
-                //  DispatchQueue.main.async {
-                self.sceneView.competitor.rotate(value: moveNode.velocity.vector.x / 500)
-                // }
-            case .side:
-                //DispatchQueue.main.async {
-                self.sceneView.competitor.moveSides(value: moveNode.velocity.vector.x / 100)
-                // }
+        DispatchQueue.main.async {
+            if let dir = moveNode.direction {
+                switch dir {
+                case .forward:
+                    self.sceneView.competitor.moveForward(value: (moveNode.velocity.vector.y))
+                case .altitude:
+                    self.sceneView.competitor.changeAltitude(value: moveNode.velocity.vector.y)
+                case .rotation:
+                    self.sceneView.competitor.rotate(value: moveNode.velocity.vector.x)
+                case .side:
+                    self.sceneView.competitor.moveSides(value: moveNode.velocity.vector.x)
+                }
+            } else {
+                self.sceneView.competitor.moveForward(value: moveNode.velocity.vector.y)
             }
-            
-        } else {
-            self.sceneView.competitor.moveForward(value: moveNode.velocity.vector.y / 500)
         }
-        
     }
     
     func manager(_ manager: GameManager, completed: CompletedAction) {
         print("completed")
-        
         sessionState = .gameInProgress
     }
     
@@ -88,7 +79,6 @@ extension GameViewController: GameManagerDelegate {
             self.gameManager?.send(completed:CompletedAction.init(position: endPos))
         }
     }
-    
     
     func manager(_ manager: GameManager, received boardAction: BoardSetupAction, from player: Player) {
         os_log(.info, "received action to process %s", String(describing: boardAction))

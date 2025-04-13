@@ -38,6 +38,16 @@ class GameStartViewController: UIViewController {
         return button
     }()
     
+    let soloButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.backgroundColor = UIColor(red: 78/255, green: 142/255, blue: 240/255, alpha: 1.0)
+        button.setTitle("Solo Game", for: .normal)
+        button.tintColor = .white
+        button.layer.cornerRadius = 12
+        button.clipsToBounds = true
+        return button
+    }()
+    
     var browserContainerView: UIView!
     let browserController = NetworkGameBrowserViewController()
     
@@ -45,6 +55,7 @@ class GameStartViewController: UIViewController {
         super.viewDidLoad()
         view.addSubview(hostButton)
         view.addSubview(joinButton)
+        view.addSubview(soloButton)
         gameBrowser = GameBrowser(myself: myself)
         browserController.browser = gameBrowser
         addChild(browserController)
@@ -74,6 +85,15 @@ class GameStartViewController: UIViewController {
             joinButton.heightAnchor.constraint(equalToConstant: 50)
         ])
         joinButton.addTarget(self, action: #selector(joinButtonPressed), for: .touchUpInside)
+        
+        soloButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            soloButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            soloButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -250),
+            soloButton.widthAnchor.constraint(equalToConstant: 150),
+            soloButton.heightAnchor.constraint(equalToConstant: 50)
+        ])
+        soloButton.addTarget(self, action: #selector(soloButtonPressed), for: .touchUpInside)
 
     }
     
@@ -101,6 +121,10 @@ class GameStartViewController: UIViewController {
             self.joinButton.isHidden = !forSetup
             self.hostButton.isHidden = !forSetup
         }, completion: nil)
+    }
+    
+    @objc func soloButtonPressed(button: UIButton) {
+        delegate?.gameStartViewController(self, didPressStartSoloGameButton: button)
     }
     
     @objc func hostButtonPressed() {
