@@ -397,12 +397,15 @@ class GameViewController: UIViewController {
             guard let self = self else { return }
             let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
             let anchor = ARAnchor.init(name: "Heli", transform: firstCast.worldTransform)
-            self.sceneView.session.add(anchor: anchor)
+            sceneView.session.add(anchor: anchor)
             sceneView.helicopter = sceneView.positionHelicopter(position: tappedPosition)
-            let addTank = AddNodeAction(simdWorldTransform: firstCast.worldTransform, eulerAngles: SIMD3<Float>(0, focusSquare.eulerAngles.y + 180.0 * .pi / 180, 0))
-            os_log(.info, "sending add tank")
-            // send add tank action to all peer
-            self.gameManager?.send(addNode: addTank)
+            let angles =  SIMD3<Float>(0, focusSquare.eulerAngles.y + 180.0 * .pi / 180, 0)
+            let addNode = AddNodeAction(
+                simdWorldTransform: firstCast.worldTransform,
+                eulerAngles: angles
+            )
+            os_log(.info, "sending add node")
+            gameManager?.send(addNode: addNode)
             focusSquare.cleanup()
             game.placed = true
         }
@@ -451,14 +454,15 @@ class GameViewController: UIViewController {
                 return
             }
             
-            DispatchQueue.main.async {
-                self.targetWorldMap = worldMap
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                targetWorldMap = worldMap
                 let configuration = ARWorldTrackingConfiguration()
                 configuration.initialWorldMap = worldMap
                 configuration.planeDetection = [.horizontal, .vertical]
-                self.sceneView.automaticallyUpdatesLighting = false
+                sceneView.automaticallyUpdatesLighting = false
                 if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
-                    self.sceneView.scene.lightingEnvironment.contents = environmentMap
+                    sceneView.scene.lightingEnvironment.contents = environmentMap
                 }
                 guard let camera = self.sceneView.pointOfView?.camera else {
                     fatalError("Expected a valid `pointOfView` from the scene.")
@@ -467,7 +471,7 @@ class GameViewController: UIViewController {
                 camera.exposureOffset = -1
                 camera.minimumExposure = -1
                 camera.maximumExposure = 3
-                self.sceneView.session.run(
+                sceneView.session.run(
                     configuration,
                     options: [
                         .resetTracking,
@@ -476,12 +480,10 @@ class GameViewController: UIViewController {
                         .stopTrackedRaycasts
                     ]
                 )
-                self.sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
+                sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
                 os_log(.info, "running session completed board setup")
-                DispatchQueue.main.async {
-                    self.sceneView.scene.rootNode.addChildNode(self.focusSquare)
-                    self.updateFocusSquare(isObjectVisible: false)
-                }
+                sceneView.scene.rootNode.addChildNode(focusSquare)
+                updateFocusSquare(isObjectVisible: false)
             }
         } catch {
             os_log(.error, "The WorldMap received couldn't be decompressed")
