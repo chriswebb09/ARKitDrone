@@ -8,19 +8,22 @@
 
 import Foundation
 import SpriteKit
-
+import os.log
 
 class Joystick: SKNode {
     
     private struct LocalConstants {
-        static let kThumbSpringBack: Double =  0.3
+        static let kThumbSpringBack: Double =  0.2
         static let imageJoystickName: String = "joystick.png"
         static let imageDpadName: String = "dpad.png"
+        static let velocityMultiplier: CGFloat = 2
     }
     
     private let backdropNode, thumbNode: SKSpriteNode
+    
     private var isTracking: Bool = false
-    private var angularVelocity: CGFloat = 0.0
+    
+    var angularVelocity: CGFloat = 0.0
     
     var velocity: CGPoint = .zero
     
@@ -42,36 +45,36 @@ class Joystick: SKNode {
     // MARK: - Touches Lifecycle
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-
-        DispatchQueue.main.async {
-            guard let touch = touches.first else { return }
-            let touchPoint = touch.location(in: self)
-            if !self.isTracking, self.thumbNode.frame.contains(touchPoint) {
-                self.isTracking = true
-            }
+        //        super.touchesBegan(touches, with: event)
+        guard let touch = touches.first else { return }
+        let touchPoint = touch.location(in: self)
+        if !self.isTracking,
+           self.backdropNode.frame.contains(touchPoint) {
+            self.isTracking = true
+            updateJoystick(touchPoint: touchPoint)
         }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesMoved(touches, with: event)
-        DispatchQueue.main.async {
-            guard let touch = touches.first else { return }
-            let touchPoint = touch.location(in: self)
-            self.updateJoystick(touchPoint: touchPoint)
-        }
+        //        super.touchesMoved(touches, with: event)
+        guard let touch = touches.first else { return }
+        let touchPoint = touch.location(in: self)
+        self.updateJoystick(touchPoint: touchPoint)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
+        print("touches ended")
         DispatchQueue.main.async {
+            self.delegate?.tapped()
             if self.velocity == .zero {
-                self.delegate?.tapped()
+                
             }
             self.resetVelocity()
         }
+//        self.resetVelocity()
+        
     }
-    
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
         DispatchQueue.main.async {
@@ -82,26 +85,47 @@ class Joystick: SKNode {
     // MARK: - Private
     
     private func resetVelocity() {
-        isTracking = false
-        velocity = .zero
+        if !Thread.isMainThread {
+            DispatchQueue.main.async {
+                self.resetVelocity()
+            }
+            return
+        }
+        self.isTracking = false
+        self.velocity = .zero
         let easeOut = SKAction.move(to: .zero, duration: LocalConstants.kThumbSpringBack)
         easeOut.timingMode = .easeOut
-        thumbNode.run(easeOut)
+        thumbNode.removeAllActions()
+        self.thumbNode.run(easeOut)
     }
     
     private func updateJoystick(touchPoint: CGPoint) {
-        let thumbWidth = thumbNode.size.width
-        let anchor = CGPoint.zero
-        let distance = touchPoint.distance(to: thumbNode.position)
-        if isTracking, distance < thumbWidth {
+        guard isTracking else { return }
+        // Use actual thumb position for velocity calculations
+        // This approach gives a more direct control feel
+        //  let thumbWidth = thumbNode.size.width / 2
+        let maxDistance = backdropNode.size.width / 2 - 10
+        
+        let dx = touchPoint.x
+        let dy = touchPoint.y
+        let distance = sqrt(dx * dx + dy * dy)
+        let angle = atan2(dy, dx)
+        
+        // Position the thumb
+        if distance < maxDistance {
             thumbNode.position = touchPoint
         } else {
-            let angle = atan2(touchPoint.y - anchor.y, touchPoint.x - anchor.x)
-            let clampedX = anchor.x + cos(angle) * thumbWidth
-            let clampedY = anchor.y + sin(angle) * thumbWidth
-            thumbNode.position = CGPoint(x: clampedX, y: clampedY)
+            let newX = cos(angle) * maxDistance
+            let newY = sin(angle) * maxDistance
+            thumbNode.position = CGPoint(x: newX, y: newY)
+            
         }
-        velocity = thumbNode.position - anchor
+        // Set velocity directly based on thumb position
+        // This preserves the original behavior while adding the multiplier
+        velocity = CGPoint(
+            x: thumbNode.position.x * LocalConstants.velocityMultiplier,
+            y: thumbNode.position.y * LocalConstants.velocityMultiplier
+        )
         angularVelocity = atan2(velocity.y, velocity.x)
     }
 }

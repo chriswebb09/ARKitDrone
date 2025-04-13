@@ -56,10 +56,13 @@ class MinimapScene: SKScene {
             let invertedHelicopterYPosition = -CGFloat(transformedHelicopterPosition.z * 5)
             helicopterDot?.position = CGPoint(x: CGFloat(transformedHelicopterPosition.x) * scale, y: invertedHelicopterYPosition * scale)
         }
+        
         shipDots.forEach { $0.removeFromParent() }
         shipDots.removeAll()
+        
         missileDots.forEach { $0.removeFromParent() }
         missileDots.removeAll()
+        
         for shipPosition in ships {
             let transformedShipPosition = applyCameraRotation(position: shipPosition, cameraRotation: cameraRotation)
             let invertedYPosition = -CGFloat(transformedShipPosition.z * 0.45)

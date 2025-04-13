@@ -10,6 +10,7 @@ import Foundation
 import ARKit
 
 class OcclusionNode: SCNNode {
+    
     private var meshNode: SCNNode!
     private var visible: Bool = false
     
@@ -36,11 +37,7 @@ class OcclusionNode: SCNNode {
     
     private func getGeometry(from meshAnchor: ARMeshAnchor) -> SCNGeometry {
         let meshGeometry = SCNGeometry(from: meshAnchor.geometry)
-        if visible {
-            meshGeometry.materials = [SCNMaterial.visibleMesh]
-        } else {
-            meshGeometry.materials = [SCNMaterial.occluder]
-        }
+        meshGeometry.materials = visible ? [SCNMaterial.visibleMesh] : [SCNMaterial.occluder]
         return meshGeometry
     }
     
@@ -51,13 +48,4 @@ class OcclusionNode: SCNNode {
     }
 }
 
-extension SCNGeometry {
-    
-    convenience init(from arGeometry: ARMeshGeometry) {
-        let verticesSource = SCNGeometrySource(arGeometry.vertices, semantic: .vertex)
-        let normalsSource = SCNGeometrySource(arGeometry.normals, semantic: .normal)
-        let faces = SCNGeometryElement(arGeometry.faces)
-        self.init(sources: [verticesSource, normalsSource], elements: [faces])
-    }
-}
 

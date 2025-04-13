@@ -9,6 +9,7 @@
 import SceneKit
 
 class Game {
+    
     var playerScore: Int = 0
     var playerName: String!
     var playerWonGame: Bool = false

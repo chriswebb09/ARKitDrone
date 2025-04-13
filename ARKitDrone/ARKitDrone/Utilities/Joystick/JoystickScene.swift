@@ -18,31 +18,30 @@ class JoystickScene: SKScene {
     
     private lazy var joystick: Joystick = {
         let joystick = Joystick()
-        joystick.position = CGPoint(x: 90, y: 85)
+        joystick.position = CGPoint(x: 90, y: 80)
         joystick.delegate = self
         return joystick
     }()
     
     override func didMove(to view: SKView) {
         super.didMove(to: view)
-        DispatchQueue.main.async {
-            self.backgroundColor = .clear
-            self.setupJoystick()
-        }
+        self.backgroundColor = .clear
+        self.setupJoystick()
     }
     
     override func update(_ currentTime: CFTimeInterval) {
         super.update(currentTime)
        
-        DispatchQueue.main.async {
-            let joystickVelocity = self.joystick.velocity
-            if joystickVelocity != .zero {
-                let isVertical = abs(joystickVelocity.y) > abs(joystickVelocity.x)
-                if isVertical {
-                    self.joystickDelegate?.update(yValue: Float(joystickVelocity.y), stickNum: self.stickNum)
-                } else {
-                    self.joystickDelegate?.update(xValue: Float(joystickVelocity.x), stickNum: self.stickNum)
-                }
+        let joystickVelocity = self.joystick.velocity
+        
+        if joystickVelocity != .zero {
+            let isVertical = abs(joystickVelocity.y) > abs(joystickVelocity.x)
+            if isVertical {
+                let test = SIMD3<Float>(x: 0, y: Float(joystickVelocity.y), z: Float(joystickVelocity.y))
+                self.joystickDelegate?.update(yValue: Float(joystickVelocity.y), velocity: test, angular:Float(self.joystick.angularVelocity), stickNum: self.stickNum)
+            } else {
+                let test = SIMD3<Float>(x: Float(joystickVelocity.x), y: 0, z: 0)
+                self.joystickDelegate?.update(xValue: Float(joystickVelocity.x), velocity:test, angular: Float(self.joystick.angularVelocity), stickNum: self.stickNum)
             }
         }
     }

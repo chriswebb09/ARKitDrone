@@ -11,6 +11,7 @@ import SceneKit
 class ShipManager {
     
     var game: Game
+    
     var sceneView: GameSceneView
     
     init(game: Game, sceneView: GameSceneView) {
@@ -21,7 +22,7 @@ class ShipManager {
     
     func setupShips() {
         let shipScene = SCNScene(named: GameSceneView.LocalConstants.f35Scene)!
-        for i in 1...8 {
+        for i in 1...3 {
             let shipNode = shipScene.rootNode.childNode(withName: GameSceneView.LocalConstants.f35Node, recursively: true)!.clone()
             shipNode.name = "F_35B \(i)"
             let ship = Ship(newNode: shipNode)
@@ -81,51 +82,35 @@ class ShipManager {
     func moveShips(placed: Bool) {
         var percievedCenter = SCNVector3Zero
         var percievedVelocity = SCNVector3Zero
-        
         for otherShip in sceneView.ships {
             percievedCenter = percievedCenter + otherShip.node.position
             percievedVelocity = percievedVelocity + (otherShip.velocity)
         }
-        
         sceneView.ships.forEach {
-            
             $0.updateShipPosition(
                 percievedCenter: percievedCenter,
                 percievedVelocity: percievedVelocity,
                 otherShips: sceneView.ships,
-                obstacles: [sceneView.helicopterNode]
+                obstacles: [sceneView.helicopter.helicopterNode]
             )
         }
         
         if placed {
-            
-            _  = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { [weak self] timer in
+            _  = Timer.scheduledTimer(withTimeInterval: 0.9, repeats: false, block: { [weak self] timer in
                 guard let self = self else { return }
                 sceneView.attack = true
                 timer.invalidate()
             })
-            
             for ship in sceneView.ships {
                 if sceneView.attack {
-                    ship.attack(target: self.sceneView.helicopterNode)
+                    ship.attack(target: self.sceneView.helicopter.helicopterNode)
                     _  = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { [weak self] timer in
                         guard let self = self else { return }
                         sceneView.attack = false
                         timer.invalidate()
                     })
                 }
-                
-                
             }
         }
-        //        if placed {
-        //            ships.forEach {
-        //                $0.updateShipPosition(target: helicopterNode.position, otherShips: self.ships)
-        //            }
-        //        } else {
-        //            ships.forEach {
-        //                $0.updateShipPosition(percievedCenter: percievedCenter, percievedVelocity: percievedVelocity, otherShips: ships, obstacles: [helicopterNode])
-        //            }
-        //        }
     }
 }
