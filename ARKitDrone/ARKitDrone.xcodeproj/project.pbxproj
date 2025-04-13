@@ -27,6 +27,8 @@
 		94423DE42DAB43BB007B5945 /* GameAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DE32DAB43B8007B5945 /* GameAction.swift */; };
 		94423DE62DAB43ED007B5945 /* Action.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DE52DAB43EB007B5945 /* Action.swift */; };
 		94423DE82DAB4434007B5945 /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DE72DAB4432007B5945 /* Direction.swift */; };
+		94423DEB2DAB4597007B5945 /* FloatCompressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DEA2DAB4594007B5945 /* FloatCompressor.swift */; };
+		94423DED2DAB45C7007B5945 /* WritableBitStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DEC2DAB45C6007B5945 /* WritableBitStream.swift */; };
 		94548F022D5C68EE00A007B0 /* CollisionTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94548F012D5C68EB00A007B0 /* CollisionTypes.swift */; };
 		9455B7532D60C73F0019FE10 /* MissileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9455B7522D60C73B0019FE10 /* MissileManager.swift */; };
 		9455B7552D60C74A0019FE10 /* ShipManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9455B7542D60C7460019FE10 /* ShipManager.swift */; };
@@ -121,6 +123,8 @@
 		94423DE32DAB43B8007B5945 /* GameAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameAction.swift; sourceTree = "<group>"; };
 		94423DE52DAB43EB007B5945 /* Action.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Action.swift; sourceTree = "<group>"; };
 		94423DE72DAB4432007B5945 /* Direction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Direction.swift; sourceTree = "<group>"; };
+		94423DEA2DAB4594007B5945 /* FloatCompressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatCompressor.swift; sourceTree = "<group>"; };
+		94423DEC2DAB45C6007B5945 /* WritableBitStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritableBitStream.swift; sourceTree = "<group>"; };
 		94548F012D5C68EB00A007B0 /* CollisionTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollisionTypes.swift; sourceTree = "<group>"; };
 		9455B7522D60C73B0019FE10 /* MissileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissileManager.swift; sourceTree = "<group>"; };
 		9455B7542D60C7460019FE10 /* ShipManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShipManager.swift; sourceTree = "<group>"; };
@@ -230,6 +234,8 @@
 			isa = PBXGroup;
 			children = (
 				9466909D2D9E3CD700343B1B /* BitStream.swift */,
+				94423DEC2DAB45C6007B5945 /* WritableBitStream.swift */,
+				94423DEA2DAB4594007B5945 /* FloatCompressor.swift */,
 				9466909E2D9E3CD700343B1B /* BitStreamCodable.swift */,
 			);
 			path = "Bit Stream";
@@ -532,6 +538,7 @@
 				94396BD22D7B36A300A83CF4 /* CGPoint+Extension.swift in Sources */,
 				946690C92D9E3FF400343B1B /* GameStartViewController.swift in Sources */,
 				94B173E72DAA30540015DC0D /* GameStartViewControllerDelegate.swift in Sources */,
+				94423DED2DAB45C7007B5945 /* WritableBitStream.swift in Sources */,
 				94C881AE2D5D07450050119D /* SCNParticleSystem+Extension.swift in Sources */,
 				94F968A82AD7337F00D7B418 /* OcclusionNode.swift in Sources */,
 				94548F022D5C68EE00A007B0 /* CollisionTypes.swift in Sources */,
@@ -575,6 +582,7 @@
 				946690C72D9E3FE100343B1B /* GameCell.swift in Sources */,
 				94C881AC2D5D07000050119D /* SCNMaterial+Extension.swift in Sources */,
 				94DF3F082975F167006723FC /* UIView+Extension.swift in Sources */,
+				94423DEB2DAB4597007B5945 /* FloatCompressor.swift in Sources */,
 				946690A52D9E3CF900343B1B /* MovementSyncSceneData.swift in Sources */,
 				946690A62D9E3CF900343B1B /* MovementSyncData.swift in Sources */,
 				946690A72D9E3CF900343B1B /* MovementData.swift in Sources */,

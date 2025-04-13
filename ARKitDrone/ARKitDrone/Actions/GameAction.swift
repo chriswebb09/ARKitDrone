@@ -15,10 +15,9 @@ enum GameAction {
     
     private enum CodingKey: UInt32, CaseIterable {
         case move
-//        case fire
+        case fire
     }
 }
-
 
 extension GameAction: BitStreamCodable {
     
@@ -28,7 +27,6 @@ extension GameAction: BitStreamCodable {
         case .joyStickMoved(let data):
             bitStream.appendEnum(CodingKey.move)
             try data.encode(to: &bitStream)
-            
         case .movement(let data):
             bitStream.appendEnum(CodingKey.move)
             try data.encode(to: &bitStream)
@@ -41,6 +39,9 @@ extension GameAction: BitStreamCodable {
         case .move:
             let data = try MoveData(from: &bitStream)
             self = .joyStickMoved(data)
+        case .fire:
+            let movement = try MovementSyncData(from: &bitStream)
+            self = .movement(movement)
         }
     }
     

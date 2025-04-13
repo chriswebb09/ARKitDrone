@@ -27,7 +27,6 @@ struct MovementData: CustomStringConvertible {
         let eul = eulerAngles
         return "pos:\(pos.x),\(pos.y),\(pos.z), rot:\(eul.x),\(eul.y),\(eul.z)"
     }
-    
 }
 
 extension MovementData {
