@@ -15,51 +15,33 @@ import UIKit
 extension GameViewController: JoystickSceneDelegate {
     
     func update(yValue: Float,  velocity: SIMD3<Float>, angular: Float, stickNum: Int) {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let v = GameVelocity(vector: velocity)
             if stickNum == 2 {
-                let velocity = SIMD3<Float>(Float(velocity.x), Float(velocity.y), Float(0))
-                let v = GameVelocity(vector: velocity)
                 let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .forward)
-                DispatchQueue.main.async {
-                    self.sceneView.helicopter.moveForward(value: velocity.y)
-                    self.gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
-                }
+                sceneView.helicopter.moveForward(value: velocity.y)
+                gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
             } else if stickNum == 1 {
-                //let scaled = (yValue) * 0.05
-                let velocity = SIMD3<Float>(Float(velocity.x), Float(velocity.y), Float(0))
-                let v = GameVelocity(vector: velocity)
                 let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .altitude)
-                DispatchQueue.main.async {
-                    self.sceneView.helicopter.changeAltitude(value: velocity.y)
-                    self.gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
-                }
+                sceneView.helicopter.changeAltitude(value: velocity.y)
+                gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
             }
         }
     }
     
     func update(xValue: Float,  velocity: SIMD3<Float>,  angular: Float, stickNum: Int) {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let v = GameVelocity(vector: velocity)
             if stickNum == 1 {
-               // let scaled = (xValue) * 0.01
-                
-                let velocity = SIMD3<Float>(Float(velocity.x), Float(velocity.y), Float(0))
-                
-                let v = GameVelocity(vector: velocity)
-                
                 let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .side)
-                DispatchQueue.main.async {
-                    self.sceneView.helicopter.moveSides(value: velocity.x)
-                    self.gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
-                }
+                sceneView.helicopter.moveSides(value: velocity.x)
+                gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
             } else if stickNum == 2 {
-                //let scaled = (xValue) * 0.01
-                let velocity = SIMD3<Float>(Float(velocity.x), Float(velocity.y), Float(0))
-                let v = GameVelocity(vector: velocity)
                 let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .rotation)
-                DispatchQueue.main.async {
-                    self.sceneView.helicopter.rotate(value: velocity.x)
-                    self.gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
-                }
+                sceneView.helicopter.rotate(value: velocity.x)
+                gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
             }
         }
     }
@@ -72,13 +54,11 @@ extension GameViewController: JoystickSceneDelegate {
                 self.sceneView.targetIndex += 1
                 if self.sceneView.targetIndex < self.sceneView.ships.count {
                     if !self.sceneView.ships[self.sceneView.targetIndex].isDestroyed && !self.sceneView.ships[self.sceneView.targetIndex].targetAdded {
-                        DispatchQueue.main.async {
-                            guard self.sceneView.targetIndex < self.sceneView.ships.count else { return }
-                            let square = TargetNode()
-                            self.sceneView.ships[self.sceneView.targetIndex].square = square
-                            self.sceneView.scene.rootNode.addChildNode(square)
-                            self.sceneView.ships[self.sceneView.targetIndex].targetAdded = true
-                        }
+                        guard self.sceneView.targetIndex < self.sceneView.ships.count else { return }
+                        let square = TargetNode()
+                        self.sceneView.ships[self.sceneView.targetIndex].square = square
+                        self.sceneView.scene.rootNode.addChildNode(square)
+                        self.sceneView.ships[self.sceneView.targetIndex].targetAdded = true
                     }
                 }
             }
