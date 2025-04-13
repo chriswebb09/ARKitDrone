@@ -73,11 +73,13 @@ class GameViewController: UIViewController {
     var autoLock = true
     
     private lazy var padView1: SKView = {
-        var offset: CGFloat = 20
+        var offset: CGFloat = 160
+        var sizeOffset: CGFloat = 170
         if UIDevice.current.isIpad {
             offset = 220
+            sizeOffset = 200
         }
-        let frame = CGRect(x:60, y: UIScreen.main.bounds.height - 220, width: 200, height: 200)
+        let frame = CGRect(x:60, y: UIScreen.main.bounds.height - offset, width: sizeOffset, height: sizeOffset)
         let view = SKView(frame:frame)
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
@@ -97,7 +99,13 @@ class GameViewController: UIViewController {
     var isLoaded = false
     
     private lazy var padView2: SKView = {
-        let frame = CGRect(x:600, y: UIScreen.main.bounds.height - 220, width: 200, height: 200)
+        var offset: CGFloat = 160
+        var sizeOffset: CGFloat = 170
+        if UIDevice.current.isIpad {
+            offset = 220
+            sizeOffset = 200
+        }
+        let frame = CGRect(x:600, y: UIScreen.main.bounds.height - offset, width: sizeOffset, height: sizeOffset)
         let view = SKView(frame: frame)
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
@@ -186,6 +194,7 @@ class GameViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        DeviceOrientation.shared.set(orientation: .landscapeRight)
         sceneView.delegate = self
         sceneView.autoenablesDefaultLighting = true
         NotificationCenter.default.addObserver(self, selector: #selector(missileCanHit), name: .missileCanHit, object: nil)
@@ -204,7 +213,7 @@ class GameViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
-      
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -224,7 +233,7 @@ class GameViewController: UIViewController {
         sceneView.scene.physicsWorld.contactDelegate = self
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self = self else { return }
-            shipManager.setupShips()
+            
             //            minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
             //            minimapScene.scaleMode = .resizeFill
             //            minimapView.presentScene(minimapScene)
@@ -413,6 +422,7 @@ class GameViewController: UIViewController {
             gameManager?.send(addNode: addNode)
             focusSquare.cleanup()
             game.placed = true
+            shipManager.setupShips()
         }
     }
     

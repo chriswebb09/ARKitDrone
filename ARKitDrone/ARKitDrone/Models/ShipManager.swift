@@ -91,7 +91,7 @@ class ShipManager {
                 percievedCenter: percievedCenter,
                 percievedVelocity: percievedVelocity,
                 otherShips: sceneView.ships,
-                obstacles: [sceneView.helicopterNode]
+                obstacles: [sceneView.helicopter.helicopterNode]
             )
         }
         
@@ -104,7 +104,7 @@ class ShipManager {
             
             for ship in sceneView.ships {
                 if sceneView.attack {
-                    ship.attack(target: self.sceneView.helicopterNode)
+                    ship.attack(target: self.sceneView.helicopter.helicopterNode)
                     _  = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { [weak self] timer in
                         guard let self = self else { return }
                         sceneView.attack = false

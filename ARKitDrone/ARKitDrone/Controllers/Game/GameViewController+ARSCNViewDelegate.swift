@@ -14,7 +14,11 @@ extension GameViewController: ARSCNViewDelegate {
     // MARK: - ARSCNViewDelegate
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        
         DispatchQueue.main.async {
+            if self.game.placed {
+                self.shipManager.moveShips(placed: self.game.placed)
+            }
             self.updateFocusSquare(isObjectVisible: self.game.placed)
         }
         os_signpost(.begin, log: .render_loop, name: .render_loop, signpostID: .render_loop, "Render loop started")
