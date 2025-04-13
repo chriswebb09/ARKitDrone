@@ -16,31 +16,32 @@ extension GameViewController: GameManagerDelegate {
     
     func manager(_ manager: GameManager, moveNode: MoveData) {
         os_log(.info, "move forward from joytick %s", String.init(describing: moveNode))
-        if let dir = moveNode.direction {
-            switch dir {
-            case .forward:
-                DispatchQueue.main.async {
+        DispatchQueue.main.async {
+            if let dir = moveNode.direction {
+                switch dir {
+                case .forward:
+                    // DispatchQueue.main.async {
                     self.sceneView.competitor.moveForward(value: (moveNode.velocity.vector.y / 500))
-                }
-            case .altitude:
-                DispatchQueue.main.async {
+                    // }
+                case .altitude:
+                    //                DispatchQueue.main.async {
                     self.sceneView.competitor.changeAltitude(value: moveNode.velocity.vector.y / 100)
-                }
-            case .rotation:
-                DispatchQueue.main.async {
+                    //                }
+                case .rotation:
+                    //  DispatchQueue.main.async {
                     self.sceneView.competitor.rotate(value: moveNode.velocity.vector.x / 500)
-                }
-            case .side:
-                DispatchQueue.main.async {
+                    // }
+                case .side:
+                    //DispatchQueue.main.async {
                     self.sceneView.competitor.moveSides(value: moveNode.velocity.vector.x / 100)
+                    // }
                 }
-            }
-            
-        } else {
-            DispatchQueue.main.async {
+                
+            } else {
                 self.sceneView.competitor.moveForward(value: moveNode.velocity.vector.y / 500)
             }
         }
+        
         
     }
     
@@ -109,7 +110,7 @@ extension GameViewController: GameManagerDelegate {
         DispatchQueue.main.async {
             if self.sessionState == .waitingForBoard {
                 manager.send(boardAction: .requestBoardLocation)
-            } 
+            }
             //guard !UserDefaults.standard.disableInGameUI else { return }
         }
     }
@@ -117,6 +118,6 @@ extension GameViewController: GameManagerDelegate {
     func manager(_ manager: GameManager, leavingHost host: Player) { }
     
     func managerDidStartGame(_ manager: GameManager) {
-    
+        
     }
 }

@@ -229,7 +229,7 @@ class GameViewController: UIViewController {
     func setupViews() {
         UIApplication.shared.isIdleTimerDisabled = true
         resetTracking()
-        setupPlayerNode()
+        //        setupPlayerNode()
         sceneView.scene.physicsWorld.contactDelegate = self
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self = self else { return }
@@ -245,13 +245,11 @@ class GameViewController: UIViewController {
             sceneView.addSubview(scoreText)
             armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
             sceneView.isUserInteractionEnabled = true
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self] in
-            guard let self = self else { return }
             sceneView.addSubview(padView1)
             sceneView.addSubview(padView2)
             setupPadScene(padView1: padView1, padView2: padView2)
         }
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             self.isLoaded = true
@@ -326,10 +324,10 @@ class GameViewController: UIViewController {
             }
             configuration.frameSemantics = .sceneDepth
         }
-        sceneView.automaticallyUpdatesLighting = false
-        if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
-            sceneView.scene.lightingEnvironment.contents = environmentMap
-        }
+        //        sceneView.automaticallyUpdatesLighting = false
+        //        if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
+        //            sceneView.scene.lightingEnvironment.contents = environmentMap
+        //        }
         guard let camera = sceneView.pointOfView?.camera else {
             fatalError("Expected a valid `pointOfView` from the scene.")
         }
@@ -346,7 +344,7 @@ class GameViewController: UIViewController {
                 .stopTrackedRaycasts
             ]
         )
-        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
+        //        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
     }
     
     private func setupPadScene(padView1: SKView, padView2: SKView) {
@@ -406,10 +404,10 @@ class GameViewController: UIViewController {
         
         let castRay = session.raycast(result)
         guard let firstCast = castRay.first else { return }
-//         guard let self = self else { return }
+        //         guard let self = self else { return }
         let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
-        let anchor = ARAnchor.init(name: "Heli", transform: firstCast.worldTransform)
-        sceneView.session.add(anchor: anchor)
+        //  let anchor = ARAnchor.init(name: "Heli", transform: firstCast.worldTransform)
+        //sceneView.session.add(anchor: anchor)
         sceneView.helicopter = sceneView.positionHelicopter(position: tappedPosition)
         let angles =  SIMD3<Float>(0, focusSquare.eulerAngles.y + 180.0 * .pi / 180, 0)
         let addNode = AddNodeAction(
@@ -473,9 +471,9 @@ class GameViewController: UIViewController {
                 configuration.initialWorldMap = worldMap
                 configuration.planeDetection = [.horizontal, .vertical]
                 sceneView.automaticallyUpdatesLighting = false
-                if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
-                    sceneView.scene.lightingEnvironment.contents = environmentMap
-                }
+                //                if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
+                //                    sceneView.scene.lightingEnvironment.contents = environmentMap
+                //                }
                 guard let camera = self.sceneView.pointOfView?.camera else {
                     fatalError("Expected a valid `pointOfView` from the scene.")
                 }
@@ -492,7 +490,7 @@ class GameViewController: UIViewController {
                         .stopTrackedRaycasts
                     ]
                 )
-                sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
+                sceneView.debugOptions = []
                 os_log(.info, "running session completed board setup")
                 sceneView.scene.rootNode.addChildNode(focusSquare)
                 updateFocusSquare(isObjectVisible: false)

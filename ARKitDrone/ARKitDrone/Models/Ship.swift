@@ -239,17 +239,17 @@ extension Ship {
     }
     
     private func fireAt(_ target: SCNNode) {
-        let missile = createMissile()
-        missile.position = self.node.position
-        let targetPos = target.presentation.simdWorldPosition
-        let currentPos = missile.presentation.simdWorldPosition
-        let targetDirection = simd_normalize(currentPos - targetPos)
-        let direction = SCNVector3(x: -Float(targetDirection.x), y: -Float(targetDirection.y), z: -Float(targetDirection.z))
-        missile.simdWorldOrientation = target.simdWorldOrientation
-        missile.look(at: target.position)
-        missile.physicsBody?.applyForce(direction * 1000, at: target.presentation.position, asImpulse: true)
-        missile.simdWorldOrientation = target.simdWorldOrientation
-        missile.look(at: target.position)
+//        let missile = createMissile()
+//        missile.position = self.node.position
+//        let targetPos = target.presentation.simdWorldPosition
+//        let currentPos = missile.presentation.simdWorldPosition
+//        let targetDirection = simd_normalize(currentPos - targetPos)
+//        let direction = SCNVector3(x: -Float(targetDirection.x), y: -Float(targetDirection.y), z: -Float(targetDirection.z))
+//        missile.simdWorldOrientation = target.simdWorldOrientation
+//        missile.look(at: target.position)
+//        missile.physicsBody?.applyForce(direction * 1000, at: target.presentation.position, asImpulse: true)
+//        missile.simdWorldOrientation = target.simdWorldOrientation
+//        missile.look(at: target.position)
     }
     
     private func createMissile() -> SCNNode {
