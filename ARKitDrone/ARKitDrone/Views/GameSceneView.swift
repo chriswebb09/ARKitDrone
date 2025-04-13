@@ -19,20 +19,14 @@ class GameSceneView: ARSCNView {
         static let f35Scene = "art.scnassets/F-35B_Lightning_II.scn"
         static let f35Node = "F_35B_Lightning_II"
     }
-    
     static let tankAssetName = "art.scnassets/m1.scn"
-    
     var ships: [Ship] = [Ship]()
-    
     var helicopter = ApacheHelicopter()
     var tankModel: SCNNode!
     var tankNode: SCNNode!
     var helicopterNode: SCNNode!
     var targetIndex = 0
-    
     var attack: Bool = false
-    
- 
     var competitor: ApacheHelicopter!
     
     func setup() {

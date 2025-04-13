@@ -229,15 +229,14 @@ class GameViewController: UIViewController {
         }
         setupPlayerNode()
         sceneView.scene.physicsWorld.contactDelegate = self
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self = self else { return }
             shipManager.setupShips()
-            minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
-            minimapScene.scaleMode = .resizeFill
-            minimapView.presentScene(minimapScene)
-            view.addSubview(minimapView)
-            startMinimapUpdate()
+            //            minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
+            //            minimapScene.scaleMode = .resizeFill
+            //            minimapView.presentScene(minimapScene)
+            //            view.addSubview(minimapView)
+            //            startMinimapUpdate()
             setupCoachingOverlay()
             sceneView.addSubview(destoryedText)
             sceneView.addSubview(armMissilesButton)
@@ -245,7 +244,6 @@ class GameViewController: UIViewController {
             armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
             sceneView.isUserInteractionEnabled = true
         }
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             sceneView.addSubview(padView1)
@@ -280,15 +278,19 @@ class GameViewController: UIViewController {
     
     @objc func startGame() {
         let gameSession = NetworkSession(myself: myself, asServer: true, host: myself)
-        self.gameManager = GameManager(sceneView: sceneView, session: gameSession)
+        gameManager = GameManager(sceneView: sceneView, session: gameSession)
     }
     
     func updateMinimap() {
-        guard let cameraTransform = sceneView.session.currentFrame?.camera.transform else { return }
-        let cameraRotation = simd_float4x4(cameraTransform.columns.0, cameraTransform.columns.1, cameraTransform.columns.2, cameraTransform.columns.3)
+        guard let camTransform = sceneView.session.currentFrame?.camera.transform else { return }
+        let cameraRotation = simd_float4x4(camTransform.columns.0, camTransform.columns.1, camTransform.columns.2, camTransform.columns.3)
         let playerPosition = simd_float4(playerNode.worldPosition.x, playerNode.worldPosition.y, playerNode.worldPosition.z, 1.0)
-        let shipPositions = sceneView.ships.filter { !$0.isDestroyed }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
-        let missilePositions = sceneView.helicopter.missiles.filter { $0.fired && !$0.hit }.map { simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0) }
+        let shipPositions = sceneView.ships.filter { !$0.isDestroyed }.map {
+            simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0)
+        }
+        let missilePositions = sceneView.helicopter.missiles.filter { $0.fired && !$0.hit }.map {
+            simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0)
+        }
         let helcopterWorldPosition = sceneView.helicopterNode.worldPosition
         let helicopterPosition: simd_float4 = game.placed ? simd_float4(helcopterWorldPosition.x, helcopterWorldPosition.y, helcopterWorldPosition.z, 1.0) : simd_float4.zero
         DispatchQueue.main.async { [weak self] in

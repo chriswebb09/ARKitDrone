@@ -34,15 +34,15 @@ extension GameViewController: JoystickSceneDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             let v = GameVelocity(vector: velocity)
+            var shouldBeSent: MoveData!
             if stickNum == 1 {
-                let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .side)
+                shouldBeSent = MoveData(velocity: v, angular: angular, direction: .side)
                 sceneView.helicopter.moveSides(value: velocity.x)
-                gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
             } else if stickNum == 2 {
-                let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .rotation)
+                shouldBeSent = MoveData(velocity: v, angular: angular, direction: .rotation)
                 sceneView.helicopter.rotate(value: velocity.x)
-                gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
             }
+            gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
         }
     }
     
