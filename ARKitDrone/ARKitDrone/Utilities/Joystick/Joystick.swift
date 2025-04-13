@@ -12,7 +12,7 @@ import SpriteKit
 class Joystick: SKNode {
     
     private struct LocalConstants {
-        static let kThumbSpringBack: Double =  0.01
+        static let kThumbSpringBack: Double =  0.04
         static let imageJoystickName: String = "joystick.png"
         static let imageDpadName: String = "dpad.png"
     }
@@ -27,13 +27,18 @@ class Joystick: SKNode {
     
     weak var delegate: JoystickDelegate?
     
-    init(thumbNode: SKSpriteNode = SKSpriteNode(imageNamed: LocalConstants.imageJoystickName), backdropNode: SKSpriteNode = SKSpriteNode(imageNamed: LocalConstants.imageDpadName)) {
+    init(thumbNode: SKSpriteNode = SKSpriteNode(imageNamed: LocalConstants.imageJoystickName),
+         backdropNode: SKSpriteNode = SKSpriteNode(imageNamed: LocalConstants.imageDpadName)) {
+        
         self.thumbNode = thumbNode
+        thumbNode.size = CGSize(width:  thumbNode.size.width  + 10, height: thumbNode.size.height  + 10)
         self.backdropNode = backdropNode
+        backdropNode.size = CGSize(width:  backdropNode.size.width  + 10, height: backdropNode.size.height  + 10)
         super.init()
+        isUserInteractionEnabled = true
         addChild(self.backdropNode)
         addChild(self.thumbNode)
-        isUserInteractionEnabled = true
+      
     }
     
     required init(coder aDecoder: NSCoder) {
@@ -44,75 +49,83 @@ class Joystick: SKNode {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-
-        DispatchQueue.main.async {
-            guard let touch = touches.first else { return }
-            let touchPoint = touch.location(in: self)
-            if !self.isTracking, self.thumbNode.frame.contains(touchPoint) {
-                self.isTracking = true
-            }
+        guard let touch = touches.first else { return }
+        let touchPoint = touch.location(in: self)
+        if !self.isTracking,
+           self.thumbNode.frame.contains(touchPoint) {
+            self.isTracking = true
         }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
-        DispatchQueue.main.async {
-            guard let touch = touches.first else { return }
-            let touchPoint = touch.location(in: self)
-            self.updateJoystick(touchPoint: touchPoint)
-        }
+        guard let touch = touches.first else { return }
+        let touchPoint = touch.location(in: self)
+        self.updateJoystick(touchPoint: touchPoint)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        DispatchQueue.main.async {
-            if self.velocity == .zero {
-                self.delegate?.tapped()
-            }
-            self.resetVelocity()
+        if self.velocity == .zero {
+            self.delegate?.tapped()
         }
+        self.resetVelocity()
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
-        DispatchQueue.main.async {
-            self.resetVelocity()
-        }
+        self.resetVelocity()
     }
     
     // MARK: - Private
     
     private func resetVelocity() {
-        DispatchQueue.main.async {
-            self.isTracking = false
-            self.velocity = .zero
-            let easeOut = SKAction.move(to: .zero, duration: LocalConstants.kThumbSpringBack)
-            easeOut.timingMode = .easeOut
-            self.thumbNode.run(easeOut)
-        }
+        self.isTracking = false
+        self.velocity = .zero
+        let easeOut = SKAction.move(to: .zero, duration: LocalConstants.kThumbSpringBack)
+        easeOut.timingMode = .easeOut
+        thumbNode.removeAllActions()
+        self.thumbNode.run(easeOut)
+        
     }
     
     private func updateJoystick(touchPoint: CGPoint) {
-        let thumbWidth = thumbNode.size.width - 10
+        let thumbWidth = thumbNode.size.width
         let anchor = CGPoint.zero
-        let distance = touchPoint.distance(to: thumbNode.position)
-        if isTracking, distance < thumbWidth {
-            DispatchQueue.main.async {
-                self.thumbNode.position = touchPoint
-            }
+        let dx = touchPoint.x
+        let dy = touchPoint.y
+        let distance = hypot(dx, dy)
+
+        if isTracking && distance < thumbWidth {
+            thumbNode.position = touchPoint
         } else {
-            DispatchQueue.main.async {
-                let angle = atan2(touchPoint.y - anchor.y, touchPoint.x - anchor.x)
-                let clampedX = anchor.x + cos(angle) * thumbWidth
-                let clampedY = anchor.y + sin(angle) * thumbWidth
-                self.thumbNode.position = CGPoint(x: clampedX, y: clampedY)
-            }
+            let angle = atan2(dy, dx)
+            thumbNode.position = CGPoint(
+                x: cos(angle) * thumbWidth,
+                y: sin(angle) * thumbWidth
+            )
         }
-        DispatchQueue.main.async {
-            self.velocity = self.thumbNode.position - anchor
-            self.angularVelocity = atan2(self.velocity.y, self.velocity.x)
-        }
+
+        let velocityX = thumbNode.position.x
+        let velocityY = thumbNode.position.y
+
+        velocity = CGPoint(x: velocityX, y: velocityY)
+        angularVelocity = atan2(velocityY, velocityX)
     }
+//        let thumbWidth = thumbNode.size.width
+//        let anchor = CGPoint.zero
+//        let distance = touchPoint.distance(to: thumbNode.position)
+//        if isTracking, distance < thumbWidth {
+//            self.thumbNode.position = touchPoint
+//        } else {
+//            let angle = atan2(touchPoint.y - anchor.y, touchPoint.x - anchor.x)
+//            let clampedX = anchor.x + cos(angle) * thumbWidth
+//            let clampedY = anchor.y + sin(angle) * thumbWidth
+//            self.thumbNode.position = CGPoint(x: clampedX, y: clampedY)
+//        }
+//        self.velocity = self.thumbNode.position - anchor
+//        self.angularVelocity = atan2(self.velocity.y, self.velocity.x)
+//    }
 }
 
 private extension CGPoint {

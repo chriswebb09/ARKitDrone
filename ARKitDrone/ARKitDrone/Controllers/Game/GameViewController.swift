@@ -61,7 +61,7 @@ class GameViewController: UIViewController {
     // MARK: - LocalConstants
     
     private struct LocalConstants {
-        static let joystickSize = CGSize(width: 180, height: 180)
+        static let joystickSize = CGSize(width: 190, height: 190)
         static let joystickPoint = CGPoint(x: 0, y: 0)
         static let environmentalMap = "Models.scnassets/sharedImages/environment_blur.exr"
         static let buttonTitle = "Arm Missiles".uppercased()
@@ -77,7 +77,7 @@ class GameViewController: UIViewController {
         var sizeOffset: CGFloat = 200
         if UIDevice.current.isIpad {
             offset = 220
-            sizeOffset = 200
+            sizeOffset = 220
         }
         let frame = CGRect(x:60, y: UIScreen.main.bounds.height - offset, width: sizeOffset, height: sizeOffset)
         let view = SKView(frame:frame)
@@ -103,7 +103,7 @@ class GameViewController: UIViewController {
         var sizeOffset: CGFloat = 200
         if UIDevice.current.isIpad {
             offset = 220
-            sizeOffset = 200
+            sizeOffset = 220
         }
         let frame = CGRect(x:600, y: UIScreen.main.bounds.height - offset, width: sizeOffset, height: sizeOffset)
         let view = SKView(frame: frame)
@@ -406,24 +406,21 @@ class GameViewController: UIViewController {
         
         let castRay = session.raycast(result)
         guard let firstCast = castRay.first else { return }
-        
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
-            let anchor = ARAnchor.init(name: "Heli", transform: firstCast.worldTransform)
-            sceneView.session.add(anchor: anchor)
-            sceneView.helicopter = sceneView.positionHelicopter(position: tappedPosition)
-            let angles =  SIMD3<Float>(0, focusSquare.eulerAngles.y + 180.0 * .pi / 180, 0)
-            let addNode = AddNodeAction(
-                simdWorldTransform: firstCast.worldTransform,
-                eulerAngles: angles
-            )
-            os_log(.info, "sending add node")
-            gameManager?.send(addNode: addNode)
-            focusSquare.cleanup()
-            game.placed = true
-            shipManager.setupShips()
-        }
+//         guard let self = self else { return }
+        let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
+        let anchor = ARAnchor.init(name: "Heli", transform: firstCast.worldTransform)
+        sceneView.session.add(anchor: anchor)
+        sceneView.helicopter = sceneView.positionHelicopter(position: tappedPosition)
+        let angles =  SIMD3<Float>(0, focusSquare.eulerAngles.y + 180.0 * .pi / 180, 0)
+        let addNode = AddNodeAction(
+            simdWorldTransform: firstCast.worldTransform,
+            eulerAngles: angles
+        )
+        os_log(.info, "sending add node")
+        gameManager?.send(addNode: addNode)
+        focusSquare.cleanup()
+        game.placed = true
+        shipManager.setupShips()
     }
     
     func sendWorldTo(peer: Player) {

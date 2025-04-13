@@ -205,7 +205,7 @@ class Ship {
             square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
             SCNTransaction.begin()
             square.simdScale = [1.0, 1.0, 1.0]
-            SCNTransaction.animationDuration = 0.3
+            SCNTransaction.animationDuration = 0.4
             square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
             square.simdWorldPosition = node.simdWorldPosition
             square.simdWorldOrientation = node.simdWorldOrientation

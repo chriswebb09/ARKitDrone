@@ -25,10 +25,8 @@ class JoystickScene: SKScene {
     
     override func didMove(to view: SKView) {
         super.didMove(to: view)
-        DispatchQueue.main.async {
-            self.backgroundColor = .clear
-            self.setupJoystick()
-        }
+        self.backgroundColor = .clear
+        self.setupJoystick()
     }
     
     override func update(_ currentTime: CFTimeInterval) {

@@ -22,7 +22,7 @@ class ShipManager {
     
     func setupShips() {
         let shipScene = SCNScene(named: GameSceneView.LocalConstants.f35Scene)!
-        for i in 1...4 {
+        for i in 1...3 {
             let shipNode = shipScene.rootNode.childNode(withName: GameSceneView.LocalConstants.f35Node, recursively: true)!.clone()
             shipNode.name = "F_35B \(i)"
             let ship = Ship(newNode: shipNode)
@@ -96,7 +96,7 @@ class ShipManager {
         }
         
         if placed {
-            _  = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { [weak self] timer in
+            _  = Timer.scheduledTimer(withTimeInterval: 0.9, repeats: false, block: { [weak self] timer in
                 guard let self = self else { return }
                 sceneView.attack = true
                 timer.invalidate()
