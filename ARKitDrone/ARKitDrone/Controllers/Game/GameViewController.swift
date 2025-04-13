@@ -40,24 +40,6 @@ class GameViewController: UIViewController {
         }
     }
     
-    var sessionState: SessionState = .setup
-    
-    let game = Game()
-    
-    var focusSquare: FocusSquare! = FocusSquare()
-    
-    var minimapScene: MinimapScene!
-    
-    var minimap: SKShapeNode!
-    
-    var playerNode: SCNNode!
-    
-    var score: [Int] = []
-    
-    let updateQueue = DispatchQueue(label: "com.arkitdrone.Queue", qos: .userInteractive)
-    
-    let coachingOverlay = ARCoachingOverlayView()
-    
     // MARK: - LocalConstants
     
     private struct LocalConstants {
@@ -69,8 +51,6 @@ class GameViewController: UIViewController {
     }
     
     // MARK: - Private Properties
-    
-    var autoLock = true
     
     private lazy var padView1: SKView = {
         var offset: CGFloat = 180
@@ -85,18 +65,6 @@ class GameViewController: UIViewController {
         view.backgroundColor = .clear
         return view
     }()
-    
-    var missileManager: MissileManager!
-    var shipManager: ShipManager!
-    var addLinesToPlanes = false
-    var addPlanesToScene = false
-    var addsMesh = false
-    var planeNodesCount = 0
-    var planeHeight: CGFloat = 0.01
-    var anchors = [ARAnchor]()
-    var nodes = [SCNNode]()
-    
-    var isLoaded = false
     
     private lazy var padView2: SKView = {
         var offset: CGFloat = 180
@@ -124,9 +92,6 @@ class GameViewController: UIViewController {
         view.backgroundColor = .clear
         return view
     }()
-    
-    // used when state is localizingToWorldMap or localizingToSavedMap
-    var targetWorldMap: ARWorldMap?
     
     lazy var armMissilesButton: UIButton = {
         let button = UIButton()
@@ -175,15 +140,37 @@ class GameViewController: UIViewController {
         return label
     }()
     
+    
+    
+    let coachingOverlay = ARCoachingOverlayView()
+    
+    var sessionState: SessionState = .setup
+    
+    let game = Game()
+    
+    var focusSquare: FocusSquare! = FocusSquare()
+    
+    var minimapScene: MinimapScene!
+    
+    var minimap: SKShapeNode!
+    
+    var playerNode: SCNNode!
+    
+    var score: [Int] = []
+    
+    let updateQueue = DispatchQueue(label: "com.arkitdrone.Queue", qos: .userInteractive)
+    
+    // used when state is localizingToWorldMap or localizingToSavedMap
+    var targetWorldMap: ARWorldMap?
     let gameStartViewContoller = GameStartViewController()
     var overlayView: UIView?
-    
     var squareSet = false
-    var circle = false
     var showPhysicsShapes = false
-    
+    var missileManager: MissileManager!
+    var shipManager: ShipManager!
+    var addsMesh = false
+    var isLoaded = false
     let myself = UserDefaults.standard.myself
-    
     var session: ARSession {
         return sceneView.session
     }
@@ -239,27 +226,14 @@ class GameViewController: UIViewController {
         sceneView.addSubview(armMissilesButton)
         sceneView.addSubview(scoreText)
         armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
-        // guard let self = self else { return }
         self.isLoaded = true
         if UIDevice.current.userInterfaceIdiom == .phone {
             DeviceOrientation.shared.set(orientation: .landscapeRight)
         } else {
             DeviceOrientation.shared.set(orientation: .portrait)
         }
-        self.focusSquare.hide()
-        self.sceneView.scene.rootNode.addChildNode(self.focusSquare)
-        //        sceneView.isUserInteractionEnabled = true
-        //        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-        //            guard let self = self else { return }
-        //
-        //            //            minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
-        //            //            minimapScene.scaleMode = .resizeFill
-        //            //            minimapView.presentScene(minimapScene)
-        //            //            view.addSubview(minimapView)
-        //            //            startMinimapUpdate()
-        //
-        //
-        //        }
+        focusSquare.hide()
+        sceneView.scene.rootNode.addChildNode(focusSquare)
     }
     
     func setupPlayerNode() {
