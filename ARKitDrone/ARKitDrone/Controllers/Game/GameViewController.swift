@@ -61,7 +61,7 @@ class GameViewController: UIViewController {
     // MARK: - LocalConstants
     
     private struct LocalConstants {
-        static let joystickSize = CGSize(width: 170, height: 170)
+        static let joystickSize = CGSize(width: 180, height: 180)
         static let joystickPoint = CGPoint(x: 0, y: 0)
         static let environmentalMap = "Models.scnassets/sharedImages/environment_blur.exr"
         static let buttonTitle = "Arm Missiles".uppercased()
@@ -73,8 +73,8 @@ class GameViewController: UIViewController {
     var autoLock = true
     
     private lazy var padView1: SKView = {
-        var offset: CGFloat = 160
-        var sizeOffset: CGFloat = 170
+        var offset: CGFloat = 180
+        var sizeOffset: CGFloat = 200
         if UIDevice.current.isIpad {
             offset = 220
             sizeOffset = 200
@@ -99,8 +99,8 @@ class GameViewController: UIViewController {
     var isLoaded = false
     
     private lazy var padView2: SKView = {
-        var offset: CGFloat = 160
-        var sizeOffset: CGFloat = 170
+        var offset: CGFloat = 180
+        var sizeOffset: CGFloat = 200
         if UIDevice.current.isIpad {
             offset = 220
             sizeOffset = 200

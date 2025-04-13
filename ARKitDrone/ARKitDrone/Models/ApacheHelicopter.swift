@@ -156,7 +156,7 @@ class ApacheHelicopter {
         guard helicopterNode != nil else { return }
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.3
-        let localAngleConversion = SCNQuaternion.angleConversion(x: 0, y:  -(0.35 * value) * Float(Double.pi), z: 0, w: 0)
+        let localAngleConversion = SCNQuaternion.angleConversion(x: 0, y:  (-(0.001 * value) * Float(Double.pi)) * 0.5, z: 0, w: 0)
         let locationRotation = SCNQuaternion.getQuaternion(from: localAngleConversion)
         helicopterNode.localRotate(by: locationRotation)
         updateHUD()
@@ -166,7 +166,7 @@ class ApacheHelicopter {
     
     func moveForward(value: Float) {
         guard helicopterNode != nil else { return }
-        let val = value / 8
+        let val = value / 1000
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.3
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y: 0, z: -val))
@@ -177,7 +177,7 @@ class ApacheHelicopter {
     
     func changeAltitude(value: Float) {
         guard helicopterNode != nil else { return }
-        let val = (value / 30.0)
+        let val = (value / 100)
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.3
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y:val, z:0))
@@ -193,7 +193,7 @@ class ApacheHelicopter {
     
     func moveSides(value: Float) {
         guard helicopterNode != nil else { return }
-        let val = -(value / 150)
+        let val = -(value / 250)
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 0.15
         helicopterNode.localTranslate(by: SCNVector3(x: val, y: 0, z: 0))

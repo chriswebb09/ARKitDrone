@@ -22,7 +22,7 @@ class ShipManager {
     
     func setupShips() {
         let shipScene = SCNScene(named: GameSceneView.LocalConstants.f35Scene)!
-        for i in 1...8 {
+        for i in 1...4 {
             let shipNode = shipScene.rootNode.childNode(withName: GameSceneView.LocalConstants.f35Node, recursively: true)!.clone()
             shipNode.name = "F_35B \(i)"
             let ship = Ship(newNode: shipNode)
@@ -121,7 +121,7 @@ class ShipManager {
         //            }
         //        } else {
         //            ships.forEach {
-        //                $0.updateShipPosition(percievedCenter: percievedCenter, percievedVelocity: percievedVelocity, otherShips: ships, obstacles: [helicopterNode])
+        //                $0.updateShipPox5sition(percievedCenter: percievedCenter, percievedVelocity: percievedVelocity, otherShips: ships, obstacles: [helicopterNode])
         //            }
         //        }
     }

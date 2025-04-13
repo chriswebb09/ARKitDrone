@@ -20,7 +20,7 @@ extension GameViewController: JoystickSceneDelegate {
             let v = GameVelocity(vector: velocity)
             if stickNum == 2 {
                 let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .forward)
-                sceneView.helicopter.moveForward(value: velocity.y)
+                sceneView.helicopter.moveForward(value: (velocity.y * 0.95))
                 gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
             } else if stickNum == 1 {
                 let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .altitude)

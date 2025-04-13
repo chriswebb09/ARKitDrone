@@ -12,7 +12,7 @@ import SpriteKit
 class Joystick: SKNode {
     
     private struct LocalConstants {
-        static let kThumbSpringBack: Double =  0.3
+        static let kThumbSpringBack: Double =  0.01
         static let imageJoystickName: String = "joystick.png"
         static let imageDpadName: String = "dpad.png"
     }
@@ -83,27 +83,35 @@ class Joystick: SKNode {
     // MARK: - Private
     
     private func resetVelocity() {
-        isTracking = false
-        velocity = .zero
-        let easeOut = SKAction.move(to: .zero, duration: LocalConstants.kThumbSpringBack)
-        easeOut.timingMode = .easeOut
-        thumbNode.run(easeOut)
+        DispatchQueue.main.async {
+            self.isTracking = false
+            self.velocity = .zero
+            let easeOut = SKAction.move(to: .zero, duration: LocalConstants.kThumbSpringBack)
+            easeOut.timingMode = .easeOut
+            self.thumbNode.run(easeOut)
+        }
     }
     
     private func updateJoystick(touchPoint: CGPoint) {
-        let thumbWidth = thumbNode.size.width
+        let thumbWidth = thumbNode.size.width - 10
         let anchor = CGPoint.zero
         let distance = touchPoint.distance(to: thumbNode.position)
         if isTracking, distance < thumbWidth {
-            thumbNode.position = touchPoint
+            DispatchQueue.main.async {
+                self.thumbNode.position = touchPoint
+            }
         } else {
-            let angle = atan2(touchPoint.y - anchor.y, touchPoint.x - anchor.x)
-            let clampedX = anchor.x + cos(angle) * thumbWidth
-            let clampedY = anchor.y + sin(angle) * thumbWidth
-            thumbNode.position = CGPoint(x: clampedX, y: clampedY)
+            DispatchQueue.main.async {
+                let angle = atan2(touchPoint.y - anchor.y, touchPoint.x - anchor.x)
+                let clampedX = anchor.x + cos(angle) * thumbWidth
+                let clampedY = anchor.y + sin(angle) * thumbWidth
+                self.thumbNode.position = CGPoint(x: clampedX, y: clampedY)
+            }
         }
-        velocity = thumbNode.position - anchor
-        angularVelocity = atan2(velocity.y, velocity.x)
+        DispatchQueue.main.async {
+            self.velocity = self.thumbNode.position - anchor
+            self.angularVelocity = atan2(self.velocity.y, self.velocity.x)
+        }
     }
 }
 
