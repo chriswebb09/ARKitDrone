@@ -9,20 +9,28 @@
 import SceneKit
 import ARKit
 
-
 class TargetNode: SCNNode {
+    
     let positioningNode = SCNNode()
+    
     var segments: [FocusSquare.Segment] = []
+    
     var isOpen = false
+    
     /// Indicates if the square is currently being animated for opening or closing.
     var isAnimating = false
+    
     /// Indicates if the square is currently changing its orientation when the camera is pointing downwards.
     var isChangingOrientation = false
+    
     /// Indicates if the camera is currently pointing towards the floor.
     var isPointingDownwards = true
+    
     static let primaryColor = UIColor.green
+    
     // Color of the focus square fill.
     static let fillColor = UIColor.green
+    
     /// The focus square's most recent positions.
     var recentFocusSquarePositions: [SIMD3<Float>] = []
     lazy var fillPlane: SCNNode = {
@@ -197,8 +205,8 @@ class TargetNode: SCNNode {
 private func flashAnimation(duration: TimeInterval) -> SCNAction {
     
     let action = SCNAction.customAction(duration: duration) { (node, elapsedTime) -> Void in
-        let elapsedTimePercentage = elapsedTime / CGFloat(duration)
-        let saturation = 2.8 * (elapsedTimePercentage - 0.5) * (elapsedTimePercentage - 0.5) + 0.3
+//        let elapsedTimePercentage = elapsedTime / CGFloat(duration)
+//        let saturation = 2.8 * (elapsedTimePercentage - 0.5) * (elapsedTimePercentage - 0.5) + 0.3
         if let material = node.geometry?.firstMaterial {
             material.diffuse.contents = TargetNode.fillColor.withAlphaComponent(1.0)
         }

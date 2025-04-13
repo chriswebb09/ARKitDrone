@@ -8,6 +8,7 @@
 import SceneKit
 
 extension SCNNode {
+    
     func removeAll() {
         isHidden = true
         removeAllAnimations()
@@ -69,7 +70,6 @@ extension SCNNode {
             let percent = 1.0 - (elapsedTime / 0.1)
             node.light?.intensity = 4000 * percent
         }
-        
         let removeAction = SCNAction.sequence([fadeAction, SCNAction.removeFromParentNode()])
         flashNode.runAction(removeAction)
         flashNode.runAction(SCNAction.sequence([
@@ -78,4 +78,13 @@ extension SCNNode {
         ]))
     }
     
+    func generateMovementData(isAlive: Bool) -> MovementData? {
+        return MovementData(node: self, alive: isAlive)
+    }
+    
+    func apply(movementData nodeData: MovementData, isHalfway: Bool) {
+        guard nodeData.isAlive else { return }
+        self.simdWorldPosition = nodeData.position
+        self.simdEulerAngles = nodeData.eulerAngles
+    }
 }

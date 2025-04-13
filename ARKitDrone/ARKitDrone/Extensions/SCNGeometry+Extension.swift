@@ -150,3 +150,13 @@ extension SCNGeometry {
     }
 }
 
+
+extension SCNGeometry {
+    
+    convenience init(from arGeometry: ARMeshGeometry) {
+        let verticesSource = SCNGeometrySource(arGeometry.vertices, semantic: .vertex)
+        let normalsSource = SCNGeometrySource(arGeometry.normals, semantic: .normal)
+        let faces = SCNGeometryElement(arGeometry.faces)
+        self.init(sources: [verticesSource, normalsSource], elements: [faces])
+    }
+}

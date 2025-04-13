@@ -82,7 +82,7 @@ extension FocusCircle {
             super.init()
             
             let radius: CGFloat = 0.1
-            let arcThickness: CGFloat = 0.01
+//            let arcThickness: CGFloat = 0.01
             let startAngle: CGFloat
             let endAngle: CGFloat
             let quadrantOffset: SCNVector3

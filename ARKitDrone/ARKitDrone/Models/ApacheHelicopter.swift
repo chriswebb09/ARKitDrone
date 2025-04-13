@@ -23,7 +23,6 @@ class ApacheHelicopter {
         static let tailRotorName = "TailRotor"
         static let hudNodeName = "hud"
         static let frontIRSteering = "FrontIRSteering"
-        
         static let missile1 = "Missile1"
         static let missile2 = "Missile2"
         static let missile3 = "Missile3"
@@ -32,25 +31,27 @@ class ApacheHelicopter {
         static let missile6 = "Missile6"
         static let missile7 = "Missile7"
         static let missile8 = "Missile8"
-        
         static let frontIR = "FrontIR"
         static let audioFileName = "audio.m4a"
         static let upperGun = "UpperGun"
-        
+        static let helicopterSceneName = "art.scnassets/Helicopter.scn"
+        static let targetScene = "art.scnassets/Target.scn"
+        static let helicopterParentModelName = "Apache"
+        static let helicopterBodyName = "Body"
         static let activeEmitterRate: CGFloat = 1000
         static let angleConversion = SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float.pi, z: 0 , w: 0)
         static let negativeAngleConversion = SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float.pi, z: 0 , w: 0)
         static let altitudeAngleConversion = SCNQuaternion.angleConversion(x: 0.001 * Float.pi, y:0, z: 0 , w: 0)
         static let negativeAltitudeAngleConversion = SCNQuaternion.angleConversion(x: -0.001 * Float.pi, y:0, z: 0 , w: 0)
     }
-    
+
     var helicopterNode: SCNNode!
     var parentModelNode: SCNNode!
     var firing:Bool = false
     
-    var missile1: Missile!
-    var missile2: Missile!
-    var missile3: Missile!
+    var missile1: Missile = Missile()
+    var missile2: Missile = Missile()
+    var missile3: Missile = Missile()
     var missile4: Missile = Missile()
     var missile5: Missile = Missile()
     var missile6: Missile = Missile()
@@ -71,6 +72,21 @@ class ApacheHelicopter {
     var missileLockDirection = SCNVector3(0, 0, 1)
     var upperGun: SCNNode!
     var targetPosition: SCNVector3!
+    
+    static var speed: Float = 50
+    var speed: Float = 2000 // Base speed
+    let maxSpeed: Float = 10000.0 // Max missile speed
+    
+    // Define smooth factors for rotation
+    let rotationSmoothFactor: Float = 0.005 // Lower = smoother turns
+    
+    init() {
+        parentModelNode = setupHelicopterModel()
+        helicopterNode = setupHelicopterNode(helicopterModel: parentModelNode)
+        setupAdditionalHelicopterComponents()
+        setup(with: helicopterNode)
+        setupMissiles()
+    }
     
     func spinBlades() {
         DispatchQueue.global(qos: .userInteractive).async {
@@ -94,6 +110,31 @@ class ApacheHelicopter {
         hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
         spinBlades()
     }
+
+    func setupMissiles() {
+        missile1.setupNode(scnNode: wingR!.childNode(withName: ApacheHelicopter.LocalConstants.missile1, recursively: true), number: 1)
+        missile2.setupNode(scnNode: wingR.childNode(withName: ApacheHelicopter.LocalConstants.missile2, recursively: true), number: 2)
+        missile3.setupNode(scnNode: wingR!.childNode(withName: ApacheHelicopter.LocalConstants.missile3, recursively: true), number: 3)
+        missile4.setupNode(scnNode: wingR.childNode(withName: ApacheHelicopter.LocalConstants.missile4, recursively: true), number: 4)
+        missile5.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile5, recursively: true), number: 5)
+        missile6.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile6, recursively: true), number: 6)
+        missile7.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile7, recursively: true), number: 7)
+        missile8.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile8, recursively: true), number: 8)
+        missiles =  [missile1, missile2, missile3, missile4, missile5, missile6, missile7, missile8]
+    }
+    
+    func setupAdditionalHelicopterComponents() {
+        hud = parentModelNode!.childNode(withName: LocalConstants.hudNodeName, recursively: false)!
+        front = helicopterNode.childNode(withName: LocalConstants.frontIRSteering, recursively: true)
+        rotor = helicopterNode.childNode(withName: LocalConstants.frontRotorName, recursively: true)
+        rotor2 = helicopterNode.childNode(withName: LocalConstants.tailRotorName, recursively: true)
+        wingL = helicopterNode.childNode(withName: LocalConstants.wingLName, recursively: true)
+        wingR = helicopterNode.childNode(withName: LocalConstants.wingRName, recursively: true)
+        front = helicopterNode.childNode(withName: LocalConstants.frontIRSteering, recursively: true)
+        frontIR = front.childNode(withName:LocalConstants.frontIR, recursively: false)
+        upperGun = helicopterNode.childNode(withName: LocalConstants.upperGun, recursively: true)!
+    }
+    
     
     func toggleArmMissile() {
         missilesArmed = !missilesArmed
@@ -106,8 +147,8 @@ class ApacheHelicopter {
     func rotate(value: Float) {
         guard helicopterNode != nil else { return }
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.3
-        let localAngleConversion = SCNQuaternion.angleConversion(x: 0, y:  -(0.35 * value) * Float(Double.pi), z: 0, w: 0)
+        SCNTransaction.animationDuration = 0.1
+        let localAngleConversion = SCNQuaternion.angleConversion(x: 0, y:  (-(0.001 * value) * Float(Double.pi)) * 0.5, z: 0, w: 0)
         let locationRotation = SCNQuaternion.getQuaternion(from: localAngleConversion)
         helicopterNode.localRotate(by: locationRotation)
         updateHUD()
@@ -117,9 +158,9 @@ class ApacheHelicopter {
     
     func moveForward(value: Float) {
         guard helicopterNode != nil else { return }
-        let val = value / 8
+        let val = value / 2000
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.3
+        SCNTransaction.animationDuration = 0.05
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y: 0, z: -val))
         updateHUD()
         hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
@@ -128,9 +169,9 @@ class ApacheHelicopter {
     
     func changeAltitude(value: Float) {
         guard helicopterNode != nil else { return }
-        let val = (value / 30.0)
+        let val = (value / 2000)
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.3
+        SCNTransaction.animationDuration = 0.1
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y:val, z:0))
         updateHUD()
         hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
@@ -144,20 +185,14 @@ class ApacheHelicopter {
     
     func moveSides(value: Float) {
         guard helicopterNode != nil else { return }
-        let val = -(value / 150)
+        let val = -(value / 1000)
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.15
+        SCNTransaction.animationDuration = 0.1
         helicopterNode.localTranslate(by: SCNVector3(x: val, y: 0, z: 0))
         updateHUD()
         hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
         SCNTransaction.commit()
     }
-    static var speed: Float = 50
-    var speed: Float = 2000 // Base speed
-    let maxSpeed: Float = 10000.0 // Max missile speed
-    // Define smooth factors for rotation
-    let rotationSmoothFactor: Float = 0.005 // Lower = smoother turns
-    
     
     func lockOn(ship: Ship) {
         guard helicopterNode != nil else { return }
@@ -231,6 +266,30 @@ class ApacheHelicopter {
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             bullet.removeFromParentNode()
         }
+    }
+    
+    func setupHelicopterModel() -> SCNNode {
+        let tempScene = SCNScene.nodeWithModelName(LocalConstants.helicopterSceneName).clone()
+        guard let model = tempScene.childNode(withName: LocalConstants.helicopterParentModelName, recursively: true) else {
+            fatalError("Failed to find helicopter parent model: \(LocalConstants.helicopterParentModelName)")
+        }
+        let helicopterModel = model
+        let modelScale: Float = 0.001
+        helicopterModel.scale = SCNVector3(modelScale, modelScale, modelScale)
+        helicopterModel.simdScale = SIMD3<Float>(modelScale, modelScale, modelScale)
+        return helicopterModel
+    }
+    
+    func setupHelicopterNode(helicopterModel: SCNNode) -> SCNNode {
+        guard let bodyNode = helicopterModel.childNode(withName: LocalConstants.helicopterBodyName, recursively: true) else {
+            fatalError("Failed to find helicopter body node: \(LocalConstants.helicopterBodyName)")
+        }
+        let helicopterNode = bodyNode
+        helicopterNode.simdEulerAngles = SIMD3<Float>(-3.0, 0, 0)
+        let bodyScale = SCNVector3(0.001, 0.00001, 0.00001)
+        helicopterNode.scale = bodyScale
+        helicopterNode.simdScale = SIMD3<Float>(bodyScale.x, bodyScale.y, bodyScale.z)
+        return helicopterNode
     }
     
 }

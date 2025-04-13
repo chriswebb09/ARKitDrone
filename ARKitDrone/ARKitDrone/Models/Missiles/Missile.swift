@@ -9,16 +9,6 @@
 import SceneKit
 import ARKit
 
-struct MissileTrackingInfo {
-    let missile: Missile
-    let target: Ship
-    let startTime: CFTimeInterval
-    let displayLink: CADisplayLink
-    var frameCount: Int = 0
-    var lastUpdateTime: CFTimeInterval
-}
-
-
 class Missile {
     
     var node: SCNNode!
@@ -45,19 +35,12 @@ class Missile {
         node.physicsBody?.collisionBitMask = 2
         setParticle()
         Missile.missileRegistry[node] = self
-        //        exhaustNode = SCNNode()
-        //        exhaustNode.position = node.position
-        //        exhaustNode.position = SCNVector3(node.position.x, node.position.y, node.position.z + 1.4) // Adjust to match missile model
-        //        node.addChildNode(exhaustNode)
-        //        exhaustNode.transform = node.presentation.worldTransform
-        //        setParticle()
     }
     
     deinit {
         if let node = node {
             Missile.missileRegistry.removeValue(forKey: node)
         }
-    // Clean up when object is destroyed
     }
     
     func setParticle() {
@@ -79,11 +62,6 @@ class Missile {
         SCNTransaction.animationDuration = 3
         node.localTranslate(by: SCNVector3(x: x, y: y, z: -100000))
         SCNTransaction.commit()
-        //        self.fired = true
-        //        Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { timer in
-        //            self.node.removeFromParentNode()
-        //            self.fired = true
-        //        }
     }
     
     func addCollision() {
