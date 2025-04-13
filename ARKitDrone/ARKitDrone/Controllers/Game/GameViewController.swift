@@ -465,7 +465,15 @@ class GameViewController: UIViewController {
                 camera.exposureOffset = -1
                 camera.minimumExposure = -1
                 camera.maximumExposure = 3
-                self.sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors, .resetSceneReconstruction, .stopTrackedRaycasts])
+                self.sceneView.session.run(
+                    configuration,
+                    options: [
+                        .resetTracking,
+                        .removeExistingAnchors,
+                        .resetSceneReconstruction,
+                        .stopTrackedRaycasts
+                    ]
+                )
                 self.sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
                 os_log(.info, "running session completed board setup")
                 DispatchQueue.main.async {
