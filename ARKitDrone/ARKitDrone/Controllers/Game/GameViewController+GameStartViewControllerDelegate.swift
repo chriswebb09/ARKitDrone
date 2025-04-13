@@ -15,7 +15,6 @@ extension GameViewController: GameStartViewControllerDelegate {
         setupViews()
         gameManager = GameManager(sceneView: sceneView, session: session)
         gameManager?.start()
-        
     }
     
     func gameStartViewController(_ _: UIViewController, didPressStartSoloGameButton: UIButton) {

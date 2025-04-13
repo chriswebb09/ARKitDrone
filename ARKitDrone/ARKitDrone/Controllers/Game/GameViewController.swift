@@ -260,10 +260,6 @@ class GameViewController: UIViewController {
         //
         //
         //        }
-        
-        //        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-        //
-        //        }
     }
     
     func setupPlayerNode() {

@@ -11,7 +11,9 @@ import  SceneKit
 class MissileManager {
     
     var missiles: [Missile] = []
+    
     var activeMissileTrackers: [String: MissileTrackingInfo] = [:]
+    
     var game: Game
     var sceneView: GameSceneView
     
