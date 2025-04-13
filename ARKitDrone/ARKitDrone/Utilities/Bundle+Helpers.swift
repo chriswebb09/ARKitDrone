@@ -13,7 +13,6 @@ extension Bundle {
         guard let bundleName = infoDictionary[kCFBundleIdentifierKey as String] else { return nil }
         guard let buildNumber = infoDictionary[kCFBundleVersionKey as String] else { return nil }
         guard let fullVersion = infoDictionary["CFBundleShortVersionString"] else { return nil }
-
         return "\(bundleName): \(fullVersion)-(\(buildNumber))"
     }
 }

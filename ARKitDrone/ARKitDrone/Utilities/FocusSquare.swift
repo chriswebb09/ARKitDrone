@@ -55,11 +55,9 @@ class FocusSquare: SCNNode {
     var state: State = .initializing {
         didSet {
             guard state != oldValue else { return }
-            
             switch state {
             case .initializing:
                 displayAsBillboard()
-                
             case let .detecting(raycastResult, camera):
                 if let planeAnchor = raycastResult.anchor as? ARPlaneAnchor {
                     displayAsClosed(for: raycastResult, planeAnchor: planeAnchor, camera: camera)
@@ -160,7 +158,6 @@ class FocusSquare: SCNNode {
     /// Hides the focus square.
     func hide() {
         guard action(forKey: "hide") == nil else { return }
-        
         displayNodeHierarchyOnTop(false)
         runAction(.fadeOut(duration: 0.5), forKey: "hide")
     }
@@ -168,7 +165,6 @@ class FocusSquare: SCNNode {
     /// Unhides the focus square.
     func unhide() {
         guard action(forKey: "unhide") == nil else { return }
-        
         displayNodeHierarchyOnTop(true)
         runAction(.fadeIn(duration: 0.5), forKey: "unhide")
     }

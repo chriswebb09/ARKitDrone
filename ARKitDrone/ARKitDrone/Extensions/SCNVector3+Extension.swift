@@ -8,15 +8,11 @@
 
 import SceneKit
 
-func +(left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-    return SCNVector3(left.x + right.x, left.y + right.y, left.z + right.z)
-}
-
-func +=( left: inout SCNVector3, right: SCNVector3) {
-    left = left + right
-}
-
 extension SCNVector3 {
+    
+    public func toSimd() -> SIMD3<Float> {
+        return SIMD3<Float>(self)
+    }
     
     static func -(left: SCNVector3, right: SCNVector3) -> SCNVector3 {
         return SCNVector3(left.x - right.x, left.y - right.y, left.z - right.z)
@@ -129,6 +125,14 @@ extension SCNVector3 {
     }
 }
 
+func +(left: SCNVector3, right: SCNVector3) -> SCNVector3 {
+    return SCNVector3(left.x + right.x, left.y + right.y, left.z + right.z)
+}
+
+func +=( left: inout SCNVector3, right: SCNVector3) {
+    left = left + right
+}
+
 /**
  * Multiplies a SCNVector3 with another.
  */
@@ -234,13 +238,6 @@ func SCNVector3Project(_ vectorToProject: SCNVector3, projectionVector: SCNVecto
     return v
 }
 
-
-extension SCNVector3 {
-    
-    public func toSimd() -> SIMD3<Float> {
-        return SIMD3<Float>(self)
-    }
-}
 
 func / (left: SCNVector3, right: Int) -> SCNVector3 {
     return SCNVector3(x: left.x / Float(right), y: left.y / Float(right), z: left.z / Float(right))
