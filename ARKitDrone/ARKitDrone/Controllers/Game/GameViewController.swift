@@ -231,36 +231,39 @@ class GameViewController: UIViewController {
         resetTracking()
         //        setupPlayerNode()
         sceneView.scene.physicsWorld.contactDelegate = self
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            guard let self = self else { return }
-            
-            //            minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
-            //            minimapScene.scaleMode = .resizeFill
-            //            minimapView.presentScene(minimapScene)
-            //            view.addSubview(minimapView)
-            //            startMinimapUpdate()
-            setupCoachingOverlay()
-            sceneView.addSubview(destoryedText)
-            sceneView.addSubview(armMissilesButton)
-            sceneView.addSubview(scoreText)
-            armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
-            sceneView.isUserInteractionEnabled = true
-            sceneView.addSubview(padView1)
-            sceneView.addSubview(padView2)
-            setupPadScene(padView1: padView1, padView2: padView2)
+        sceneView.addSubview(padView1)
+        sceneView.addSubview(padView2)
+        setupPadScene(padView1: padView1, padView2: padView2)
+        setupCoachingOverlay()
+        sceneView.addSubview(destoryedText)
+        sceneView.addSubview(armMissilesButton)
+        sceneView.addSubview(scoreText)
+        armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
+       // guard let self = self else { return }
+        self.isLoaded = true
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            DeviceOrientation.shared.set(orientation: .landscapeRight)
+        } else {
+            DeviceOrientation.shared.set(orientation: .portrait)
         }
+        self.focusSquare.hide()
+        self.sceneView.scene.rootNode.addChildNode(self.focusSquare)
+//        sceneView.isUserInteractionEnabled = true
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+//            guard let self = self else { return }
+//            
+//            //            minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
+//            //            minimapScene.scaleMode = .resizeFill
+//            //            minimapView.presentScene(minimapScene)
+//            //            view.addSubview(minimapView)
+//            //            startMinimapUpdate()
+//            
+//            
+//        }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
-            self.isLoaded = true
-            if UIDevice.current.userInterfaceIdiom == .phone {
-                DeviceOrientation.shared.set(orientation: .landscapeRight)
-            } else {
-                DeviceOrientation.shared.set(orientation: .portrait)
-            }
-            self.focusSquare.hide()
-            self.sceneView.scene.rootNode.addChildNode(self.focusSquare)
-        }
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+//           
+//        }
     }
     
     func setupPlayerNode() {
@@ -349,10 +352,13 @@ class GameViewController: UIViewController {
     
     private func setupPadScene(padView1: SKView, padView2: SKView) {
         let scene = JoystickScene()
+        
         scene.point = LocalConstants.joystickPoint
         scene.size = LocalConstants.joystickSize
         scene.joystickDelegate = self
         scene.stickNum = 2
+        scene.scaleMode = .resizeFill
+        padView1.preferredFramesPerSecond = 30
         padView1.presentScene(scene)
         padView1.ignoresSiblingOrder = true
         let scene2 = JoystickScene()
@@ -360,8 +366,14 @@ class GameViewController: UIViewController {
         scene2.size = LocalConstants.joystickSize
         scene2.joystickDelegate = self
         scene2.stickNum = 1
+        scene2.scaleMode = .resizeFill
+        padView2.preferredFramesPerSecond = 30
         padView2.presentScene(scene2)
         padView2.ignoresSiblingOrder = true
+      
+      
+      
+   
     }
     
     // MARK: - Actions

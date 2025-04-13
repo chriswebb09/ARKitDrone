@@ -9,6 +9,7 @@
 import Foundation
 import SpriteKit
 import os.log
+
 class Joystick: SKNode {
     
     private struct LocalConstants {
@@ -48,7 +49,7 @@ class Joystick: SKNode {
     // MARK: - Touches Lifecycle
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
+//        super.touchesBegan(touches, with: event)
         guard let touch = touches.first else { return }
         let touchPoint = touch.location(in: self)
         if !self.isTracking,
@@ -58,18 +59,8 @@ class Joystick: SKNode {
         }
     }
     
-    //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-    //        super.touchesBegan(touches, with: event)
-    //        guard let touch = touches.first else { return }
-    //        let touchPoint = touch.location(in: self)
-    //        if !self.isTracking,
-    //           self.thumbNode.frame.contains(touchPoint) {
-    //            self.isTracking = true
-    //        }
-    //    }
-    
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesMoved(touches, with: event)
+//        super.touchesMoved(touches, with: event)
         guard let touch = touches.first else { return }
         let touchPoint = touch.location(in: self)
         self.updateJoystick(touchPoint: touchPoint)
@@ -77,7 +68,7 @@ class Joystick: SKNode {
     
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event)
+//        super.touchesEnded(touches, with: event)
         if self.velocity == .zero {
             self.delegate?.tapped()
         }
@@ -85,7 +76,7 @@ class Joystick: SKNode {
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesCancelled(touches, with: event)
+//        super.touchesCancelled(touches, with: event)
         self.resetVelocity()
     }
     
@@ -114,7 +105,7 @@ class Joystick: SKNode {
            // Use actual thumb position for velocity calculations
            // This approach gives a more direct control feel
          //  let thumbWidth = thumbNode.size.width / 2
-           let maxDistance = backdropNode.size.width / 2
+           let maxDistance = backdropNode.size.width / 2 - 10
            
            let dx = touchPoint.x
            let dy = touchPoint.y
@@ -128,6 +119,7 @@ class Joystick: SKNode {
                let newX = cos(angle) * maxDistance
                let newY = sin(angle) * maxDistance
                thumbNode.position = CGPoint(x: newX, y: newY)
+               
            }
            
            // Set velocity directly based on thumb position

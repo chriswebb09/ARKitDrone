@@ -127,12 +127,12 @@ class GameManager: NSObject {
             }
         case .addNode(let addNode):
             os_log(.info, "add node from %s using %@", command.player?.username ?? "unknown", String(describing: addNode))
-            if let player = command.player {
+            if command.player != nil {
                 DispatchQueue.main.async {
                     self.delegate?.manager(self, addNode: addNode)
                 }
             }
-        case .completed(let completed):
+        case .completed(_):
             print("completed")
         }
     }

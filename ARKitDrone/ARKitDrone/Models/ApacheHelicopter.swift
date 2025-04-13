@@ -168,7 +168,7 @@ class ApacheHelicopter {
         guard helicopterNode != nil else { return }
         let val = value / 2000
         SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.1
+        SCNTransaction.animationDuration = 0.05
         helicopterNode.localTranslate(by: SCNVector3(x: 0, y: 0, z: -val))
         updateHUD()
         hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))

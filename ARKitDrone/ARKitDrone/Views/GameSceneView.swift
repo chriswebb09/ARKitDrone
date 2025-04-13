@@ -48,16 +48,14 @@ class GameSceneView: ARSCNView {
     
     func positionHelicopter(position: SCNVector3) -> ApacheHelicopter {
         let helicopter = ApacheHelicopter()
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            helicopter.helicopterNode.scale = SCNVector3(x: 0.0005, y: 0.0005, z: 0.0005)
-            scene.rootNode.addChildNode(helicopter.hud)
-            scene.rootNode.addChildNode(helicopter.helicopterNode)
-            helicopter.helicopterNode.position =  SCNVector3(x:position.x, y:position.y + 0.5, z: position.z - 0.2)
-            helicopter.helicopterNode.simdPivot.columns.3.x = -0.5
-            helicopter.updateHUD()
-            helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.44))
-        }
+//        guard let self = self else { return }
+        helicopter.helicopterNode.scale = SCNVector3(x: 0.0005, y: 0.0005, z: 0.0005)
+        scene.rootNode.addChildNode(helicopter.hud)
+        scene.rootNode.addChildNode(helicopter.helicopterNode)
+        helicopter.helicopterNode.position =  SCNVector3(x:position.x, y:position.y + 0.5, z: position.z - 0.2)
+        helicopter.helicopterNode.simdPivot.columns.3.x = -0.5
+        helicopter.updateHUD()
+        helicopter.hud.localTranslate(by: SCNVector3(x: 0, y: 0, z: -0.44))
         return helicopter
     }
 

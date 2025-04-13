@@ -25,9 +25,7 @@ extension GameViewController: ARSCNViewDelegate {
         os_signpost(.begin, log: .render_loop, name: .logic_update, signpostID: .render_loop, "Game logic update started")
         if let gameManager = self.gameManager, gameManager.isInitialized {
             GameTime.updateAtTime(time: time)
-            DispatchQueue.main.async {
-                self.gameManager?.update(timeDelta: GameTime.deltaTime)
-            }
+            self.gameManager?.update(timeDelta: GameTime.deltaTime)
         }
         os_signpost(.end, log: .render_loop, name: .logic_update, signpostID: .render_loop, "Game logic update finished")
     }
