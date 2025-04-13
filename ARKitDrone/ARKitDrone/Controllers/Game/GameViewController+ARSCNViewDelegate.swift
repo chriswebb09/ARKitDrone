@@ -14,7 +14,6 @@ extension GameViewController: ARSCNViewDelegate {
     // MARK: - ARSCNViewDelegate
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        
         DispatchQueue.main.async {
             if self.game.placed {
                 self.shipManager.moveShips(placed: self.game.placed)

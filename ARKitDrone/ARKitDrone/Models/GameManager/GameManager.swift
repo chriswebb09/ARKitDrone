@@ -40,9 +40,7 @@ class GameManager: NSObject {
         self.session = session
         self.isNetworked = session != nil
         self.isServer = session?.isServer ?? true // Solo game act like a server
-        
         super.init()
-        
         self.session?.delegate = self
     }
     

@@ -101,7 +101,6 @@ class ShipManager {
                 sceneView.attack = true
                 timer.invalidate()
             })
-            
             for ship in sceneView.ships {
                 if sceneView.attack {
                     ship.attack(target: self.sceneView.helicopter.helicopterNode)
@@ -111,18 +110,7 @@ class ShipManager {
                         timer.invalidate()
                     })
                 }
-                
-                
             }
         }
-        //        if placed {
-        //            ships.forEach {
-        //                $0.updateShipPosition(target: helicopterNode.position, otherShips: self.ships)
-        //            }
-        //        } else {
-        //            ships.forEach {
-        //                $0.updateShipPox5sition(percievedCenter: percievedCenter, percievedVelocity: percievedVelocity, otherShips: ships, obstacles: [helicopterNode])
-        //            }
-        //        }
     }
 }
