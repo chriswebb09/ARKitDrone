@@ -195,19 +195,21 @@ class GameViewController: UIViewController {
         if showPhysicsShapes {
             sceneView.debugOptions = .showPhysicsShapes
         }
+        overlayView = gameStartViewContoller.view
+        gameStartViewContoller.delegate = self
+        view.addSubview(overlayView!)
+        view.bringSubviewToFront(overlayView!)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+      
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        overlayView = gameStartViewContoller.view
-        gameStartViewContoller.delegate = self
-        view.addSubview(overlayView!)
-        view.bringSubviewToFront(overlayView!)
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -216,17 +218,8 @@ class GameViewController: UIViewController {
     }
     
     func setupViews() {
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            DeviceOrientation.shared.set(orientation: .landscapeRight)
-        } else {
-            DeviceOrientation.shared.set(orientation: .portrait)
-        }
         UIApplication.shared.isIdleTimerDisabled = true
         resetTracking()
-        DispatchQueue.main.async {
-            self.sceneView.scene.rootNode.addChildNode(self.focusSquare)
-            self.updateFocusSquare(isObjectVisible: true)
-        }
         setupPlayerNode()
         sceneView.scene.physicsWorld.contactDelegate = self
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
@@ -244,15 +237,22 @@ class GameViewController: UIViewController {
             armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
             sceneView.isUserInteractionEnabled = true
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self] in
             guard let self = self else { return }
             sceneView.addSubview(padView1)
             sceneView.addSubview(padView2)
             setupPadScene(padView1: padView1, padView2: padView2)
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             self.isLoaded = true
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                DeviceOrientation.shared.set(orientation: .landscapeRight)
+            } else {
+                DeviceOrientation.shared.set(orientation: .portrait)
+            }
+            self.focusSquare.hide()
+            self.sceneView.scene.rootNode.addChildNode(self.focusSquare)
         }
     }
     
@@ -368,12 +368,16 @@ class GameViewController: UIViewController {
     }
     
     func hideOverlay() {
-        UIView.transition(with: view, duration: 1.0, options: [.transitionCrossDissolve], animations: {
-            self.overlayView!.isHidden = true
-        }) { _ in
-            self.overlayView!.isUserInteractionEnabled = false
-            UIApplication.shared.isIdleTimerDisabled = true
-        }
+        UIView.transition(
+            with: view,
+            duration: 1.0,
+            options: [.transitionCrossDissolve],
+            animations: {
+                self.overlayView!.isHidden = true
+            }) { _ in
+                self.overlayView!.isUserInteractionEnabled = false
+                UIApplication.shared.isIdleTimerDisabled = true
+            }
     }
     
     func updateFiredButton() {

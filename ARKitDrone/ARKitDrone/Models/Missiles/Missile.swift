@@ -9,16 +9,6 @@
 import SceneKit
 import ARKit
 
-struct MissileTrackingInfo {
-    let missile: Missile
-    let target: Ship
-    let startTime: CFTimeInterval
-    let displayLink: CADisplayLink
-    var frameCount: Int = 0
-    var lastUpdateTime: CFTimeInterval
-}
-
-
 class Missile {
     
     var node: SCNNode!

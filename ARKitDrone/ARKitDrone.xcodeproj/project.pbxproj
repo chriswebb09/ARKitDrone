@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9412F0762D5B4BEB00D9F1BD /* Ship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9412F0752D5B4BE500D9F1BD /* Ship.swift */; };
 		941706D92972A5F400CB0308 /* ApacheHelicopter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941706D82972A5F400CB0308 /* ApacheHelicopter.swift */; };
+		94316FAD2DAB569F0002BAF8 /* MissileTrackingInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94316FAC2DAB569E0002BAF8 /* MissileTrackingInfo.swift */; };
 		94396BD02D7B365000A83CF4 /* FocusSquare+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BCF2D7B364200A83CF4 /* FocusSquare+Extension.swift */; };
 		94396BD22D7B36A300A83CF4 /* CGPoint+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BD12D7B369800A83CF4 /* CGPoint+Extension.swift */; };
 		94396BD42D7B36D500A83CF4 /* FocusCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BD32D7B36D100A83CF4 /* FocusCircle.swift */; };
@@ -103,6 +104,7 @@
 /* Begin PBXFileReference section */
 		9412F0752D5B4BE500D9F1BD /* Ship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ship.swift; sourceTree = "<group>"; };
 		941706D82972A5F400CB0308 /* ApacheHelicopter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApacheHelicopter.swift; sourceTree = "<group>"; };
+		94316FAC2DAB569E0002BAF8 /* MissileTrackingInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissileTrackingInfo.swift; sourceTree = "<group>"; };
 		94396BCF2D7B364200A83CF4 /* FocusSquare+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FocusSquare+Extension.swift"; sourceTree = "<group>"; };
 		94396BD12D7B369800A83CF4 /* CGPoint+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+Extension.swift"; sourceTree = "<group>"; };
 		94396BD32D7B36D100A83CF4 /* FocusCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusCircle.swift; sourceTree = "<group>"; };
@@ -207,6 +209,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		94316FAE2DAB56BE0002BAF8 /* Missiles */ = {
+			isa = PBXGroup;
+			children = (
+				94CCC8ED2972D46400F7D17F /* Missile.swift */,
+				94316FAC2DAB569E0002BAF8 /* MissileTrackingInfo.swift */,
+			);
+			path = Missiles;
+			sourceTree = "<group>";
+		};
 		94423DE92DAB4467007B5945 /* Actions */ = {
 			isa = PBXGroup;
 			children = (
@@ -358,7 +369,7 @@
 				94548F012D5C68EB00A007B0 /* CollisionTypes.swift */,
 				9412F0752D5B4BE500D9F1BD /* Ship.swift */,
 				941706D82972A5F400CB0308 /* ApacheHelicopter.swift */,
-				94CCC8ED2972D46400F7D17F /* Missile.swift */,
+				94316FAE2DAB56BE0002BAF8 /* Missiles */,
 				94F968A72AD7337F00D7B418 /* OcclusionNode.swift */,
 				9488F2022D657BA2001C08D9 /* TargetNode.swift */,
 				9467A30A2BB918EE0023EA62 /* M1Tank.swift */,
@@ -555,6 +566,7 @@
 				94B173F72DAA35240015DC0D /* MultiuserAttribute.swift in Sources */,
 				94CCC90A2972E54000F7D17F /* SCNScene+Extension.swift in Sources */,
 				94423DE82DAB4434007B5945 /* Direction.swift in Sources */,
+				94316FAD2DAB569F0002BAF8 /* MissileTrackingInfo.swift in Sources */,
 				946690C32D9E3ECF00343B1B /* UserDefaults+Helpers.swift in Sources */,
 				946690B82D9E3DD800343B1B /* Bundle+Helpers.swift in Sources */,
 				9470AE472974001A00A55134 /* MenuViewController.swift in Sources */,

@@ -78,9 +78,6 @@ extension SCNNode {
         ]))
     }
     
-}
-
-extension SCNNode {
     func generateMovementData(isAlive: Bool) -> MovementData? {
         return MovementData(node: self, alive: isAlive)
     }
