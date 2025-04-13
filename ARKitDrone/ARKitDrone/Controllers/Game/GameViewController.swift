@@ -31,7 +31,6 @@ class GameViewController: UIViewController {
                 sessionState = .setup
                 return
             }
-            
             if manager.isNetworked && !manager.isServer {
                 sessionState = .waitingForBoard
             } else {
@@ -144,9 +143,10 @@ class GameViewController: UIViewController {
             name: "AvenirNext-Bold",
             size: 30
         )
+        let bounds = UIScreen.main.bounds
         let origin = CGPoint(
-            x: UIScreen.main.bounds.width / 2 - 200,
-            y:  UIScreen.main.bounds.origin.y + 100
+            x: bounds.width / 2 - 200,
+            y: bounds.minY + 100
         )
         let size =  CGSize(
             width: 400,
@@ -283,7 +283,8 @@ class GameViewController: UIViewController {
     
     func updateMinimap() {
         guard let camTransform = sceneView.session.currentFrame?.camera.transform else { return }
-        let cameraRotation = simd_float4x4(camTransform.columns.0, camTransform.columns.1, camTransform.columns.2, camTransform.columns.3)
+        let camColumn = camTransform.columns
+        let cameraRotation = simd_float4x4(camColumn.0, camColumn.1, camColumn.2, camColumn.3)
         let playerPosition = simd_float4(playerNode.worldPosition.x, playerNode.worldPosition.y, playerNode.worldPosition.z, 1.0)
         let shipPositions = sceneView.ships.filter { !$0.isDestroyed }.map {
             simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0)
@@ -291,13 +292,13 @@ class GameViewController: UIViewController {
         let missilePositions = sceneView.helicopter.missiles.filter { $0.fired && !$0.hit }.map {
             simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0)
         }
-        let helcopterWorldPosition = sceneView.helicopterNode.worldPosition
-        let helicopterPosition: simd_float4 = game.placed ? simd_float4(helcopterWorldPosition.x, helcopterWorldPosition.y, helcopterWorldPosition.z, 1.0) : simd_float4.zero
+        let heliWorldPos = sceneView.helicopterNode.worldPosition
+        let heliPos: simd_float4 = game.placed ? simd_float4(heliWorldPos.x, heliWorldPos.y, heliWorldPos.z, 1.0) : simd_float4.zero
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             minimapScene.updateMinimap(
                 playerPosition: playerPosition,
-                helicopterPosition: helicopterPosition,
+                helicopterPosition: heliPos,
                 ships: shipPositions,
                 missiles: missilePositions,
                 cameraRotation: cameraRotation,
