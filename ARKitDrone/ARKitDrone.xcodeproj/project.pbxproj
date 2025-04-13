@@ -56,8 +56,6 @@
 		946690C52D9E3FB700343B1B /* NetworkGameBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690C42D9E3FB700343B1B /* NetworkGameBrowserViewController.swift */; };
 		946690C72D9E3FE100343B1B /* GameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690C62D9E3FE100343B1B /* GameCell.swift */; };
 		946690C92D9E3FF400343B1B /* GameStartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690C82D9E3FF400343B1B /* GameStartViewController.swift */; };
-		9467A30B2BB918EE0023EA62 /* M1Tank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9467A30A2BB918EE0023EA62 /* M1Tank.swift */; };
-		9467A30F2BB93A840023EA62 /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9467A30E2BB93A840023EA62 /* Shell.swift */; };
 		9470AE472974001A00A55134 /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9470AE462974001A00A55134 /* MenuViewController.swift */; };
 		9488F2032D657BA6001C08D9 /* TargetNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9488F2022D657BA2001C08D9 /* TargetNode.swift */; };
 		948E91D42D6519B500DE6405 /* FocusSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948E91D32D6519B100DE6405 /* FocusSquare.swift */; };
@@ -151,8 +149,6 @@
 		946690C42D9E3FB700343B1B /* NetworkGameBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkGameBrowserViewController.swift; sourceTree = "<group>"; };
 		946690C62D9E3FE100343B1B /* GameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCell.swift; sourceTree = "<group>"; };
 		946690C82D9E3FF400343B1B /* GameStartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStartViewController.swift; sourceTree = "<group>"; };
-		9467A30A2BB918EE0023EA62 /* M1Tank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M1Tank.swift; sourceTree = "<group>"; };
-		9467A30E2BB93A840023EA62 /* Shell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
 		9470AE462974001A00A55134 /* MenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
 		9488F2022D657BA2001C08D9 /* TargetNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetNode.swift; sourceTree = "<group>"; };
 		948E91D32D6519B100DE6405 /* FocusSquare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSquare.swift; sourceTree = "<group>"; };
@@ -372,8 +368,6 @@
 				94316FAE2DAB56BE0002BAF8 /* Missiles */,
 				94F968A72AD7337F00D7B418 /* OcclusionNode.swift */,
 				9488F2022D657BA2001C08D9 /* TargetNode.swift */,
-				9467A30A2BB918EE0023EA62 /* M1Tank.swift */,
-				9467A30E2BB93A840023EA62 /* Shell.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -562,7 +556,6 @@
 				94D630322976077000096104 /* UIFont+Extension.swift in Sources */,
 				94423DDE2DAB433E007B5945 /* CompletedAction.swift in Sources */,
 				94D598442BB9037400B31874 /* SCNGeometry+Extension.swift in Sources */,
-				9467A30F2BB93A840023EA62 /* Shell.swift in Sources */,
 				94B173F72DAA35240015DC0D /* MultiuserAttribute.swift in Sources */,
 				94CCC90A2972E54000F7D17F /* SCNScene+Extension.swift in Sources */,
 				94423DE82DAB4434007B5945 /* Direction.swift in Sources */,
@@ -580,7 +573,6 @@
 				94C881A82D5D05C20050119D /* Game.swift in Sources */,
 				94CB148E2C8793BF0065E1B0 /* UIColor+Extension.swift in Sources */,
 				94423DD22DAB41BC007B5945 /* BoardAnchor.swift in Sources */,
-				9467A30B2BB918EE0023EA62 /* M1Tank.swift in Sources */,
 				94423DE62DAB43ED007B5945 /* Action.swift in Sources */,
 				94423DE42DAB43BB007B5945 /* GameAction.swift in Sources */,
 				94CCC90E2972EB2400F7D17F /* GameSceneView.swift in Sources */,
