@@ -48,17 +48,19 @@ extension GameViewController: JoystickSceneDelegate {
     
     func tapped() {
         guard sceneView.helicopter.missilesArmed else { return }
-        DispatchQueue.main.async {
-            self.missileManager.fire(game: self.game)
-            if self.sceneView.ships.count > self.sceneView.targetIndex {
-                self.sceneView.targetIndex += 1
-                if self.sceneView.targetIndex < self.sceneView.ships.count {
-                    if !self.sceneView.ships[self.sceneView.targetIndex].isDestroyed && !self.sceneView.ships[self.sceneView.targetIndex].targetAdded {
-                        guard self.sceneView.targetIndex < self.sceneView.ships.count else { return }
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            missileManager.fire(game: game)
+            if sceneView.ships.count > sceneView.targetIndex {
+                sceneView.targetIndex += 1
+                if sceneView.targetIndex < sceneView.ships.count {
+                    let canAddTarget = !sceneView.ships[sceneView.targetIndex].isDestroyed && !sceneView.ships[sceneView.targetIndex].targetAdded
+                    if canAddTarget {
+                        guard sceneView.targetIndex < sceneView.ships.count else { return }
                         let square = TargetNode()
-                        self.sceneView.ships[self.sceneView.targetIndex].square = square
-                        self.sceneView.scene.rootNode.addChildNode(square)
-                        self.sceneView.ships[self.sceneView.targetIndex].targetAdded = true
+                        sceneView.ships[sceneView.targetIndex].square = square
+                        sceneView.scene.rootNode.addChildNode(square)
+                        sceneView.ships[sceneView.targetIndex].targetAdded = true
                     }
                 }
             }
