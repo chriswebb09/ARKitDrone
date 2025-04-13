@@ -56,7 +56,6 @@
 		946690C72D9E3FE100343B1B /* GameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690C62D9E3FE100343B1B /* GameCell.swift */; };
 		946690C92D9E3FF400343B1B /* GameStartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946690C82D9E3FF400343B1B /* GameStartViewController.swift */; };
 		9467A30B2BB918EE0023EA62 /* M1Tank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9467A30A2BB918EE0023EA62 /* M1Tank.swift */; };
-		9467A30D2BB93A6E0023EA62 /* Tank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9467A30C2BB93A6E0023EA62 /* Tank.swift */; };
 		9467A30F2BB93A840023EA62 /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9467A30E2BB93A840023EA62 /* Shell.swift */; };
 		9470AE472974001A00A55134 /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9470AE462974001A00A55134 /* MenuViewController.swift */; };
 		9488F2032D657BA6001C08D9 /* TargetNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9488F2022D657BA2001C08D9 /* TargetNode.swift */; };
@@ -85,7 +84,6 @@
 		94CCC8FF2972E43500F7D17F /* FloatingPoint+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC8FE2972E43500F7D17F /* FloatingPoint+Extension.swift */; };
 		94CCC90A2972E54000F7D17F /* SCNScene+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC9092972E54000F7D17F /* SCNScene+Extension.swift */; };
 		94CCC90E2972EB2400F7D17F /* GameSceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC90D2972EB2300F7D17F /* GameSceneView.swift */; };
-		94CCC9102972F43200F7D17F /* HelicopterCapable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC90F2972F43200F7D17F /* HelicopterCapable.swift */; };
 		94CCC9122972FFB500F7D17F /* DeviceOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CCC9112972FFB500F7D17F /* DeviceOrientation.swift */; };
 		94D598442BB9037400B31874 /* SCNGeometry+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D598432BB9037400B31874 /* SCNGeometry+Extension.swift */; };
 		94D630322976077000096104 /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D630312976077000096104 /* UIFont+Extension.swift */; };
@@ -152,7 +150,6 @@
 		946690C62D9E3FE100343B1B /* GameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCell.swift; sourceTree = "<group>"; };
 		946690C82D9E3FF400343B1B /* GameStartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStartViewController.swift; sourceTree = "<group>"; };
 		9467A30A2BB918EE0023EA62 /* M1Tank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M1Tank.swift; sourceTree = "<group>"; };
-		9467A30C2BB93A6E0023EA62 /* Tank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tank.swift; sourceTree = "<group>"; };
 		9467A30E2BB93A840023EA62 /* Shell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
 		9470AE462974001A00A55134 /* MenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
 		9488F2022D657BA2001C08D9 /* TargetNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetNode.swift; sourceTree = "<group>"; };
@@ -181,7 +178,6 @@
 		94CCC8FE2972E43500F7D17F /* FloatingPoint+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FloatingPoint+Extension.swift"; sourceTree = "<group>"; };
 		94CCC9092972E54000F7D17F /* SCNScene+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNScene+Extension.swift"; sourceTree = "<group>"; };
 		94CCC90D2972EB2300F7D17F /* GameSceneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSceneView.swift; sourceTree = "<group>"; };
-		94CCC90F2972F43200F7D17F /* HelicopterCapable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelicopterCapable.swift; sourceTree = "<group>"; };
 		94CCC9112972FFB500F7D17F /* DeviceOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceOrientation.swift; sourceTree = "<group>"; };
 		94D598432BB9037400B31874 /* SCNGeometry+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNGeometry+Extension.swift"; sourceTree = "<group>"; };
 		94D630312976077000096104 /* UIFont+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
@@ -352,7 +348,6 @@
 				94B173F02DAA32440015DC0D /* GameManager */,
 				946690AB2D9E3D7A00343B1B /* GameObject.swift */,
 				946690AD2D9E3D8B00343B1B /* Player.swift */,
-				94CCC90F2972F43200F7D17F /* HelicopterCapable.swift */,
 				94C881A72D5D05B50050119D /* Game.swift */,
 				946690AF2D9E3D9A00343B1B /* GameTime.swift */,
 				94B173ED2DAA31DB0015DC0D /* GameBrowser */,
@@ -368,7 +363,6 @@
 				9488F2022D657BA2001C08D9 /* TargetNode.swift */,
 				9467A30A2BB918EE0023EA62 /* M1Tank.swift */,
 				9467A30E2BB93A840023EA62 /* Shell.swift */,
-				9467A30C2BB93A6E0023EA62 /* Tank.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -555,7 +549,6 @@
 				94CCC8EE2972D46400F7D17F /* Missile.swift in Sources */,
 				94396BDA2D7B474900A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift in Sources */,
 				94D630322976077000096104 /* UIFont+Extension.swift in Sources */,
-				94CCC9102972F43200F7D17F /* HelicopterCapable.swift in Sources */,
 				94423DDE2DAB433E007B5945 /* CompletedAction.swift in Sources */,
 				94D598442BB9037400B31874 /* SCNGeometry+Extension.swift in Sources */,
 				9467A30F2BB93A840023EA62 /* Shell.swift in Sources */,
@@ -586,7 +579,6 @@
 				946690A52D9E3CF900343B1B /* MovementSyncSceneData.swift in Sources */,
 				946690A62D9E3CF900343B1B /* MovementSyncData.swift in Sources */,
 				946690A72D9E3CF900343B1B /* MovementData.swift in Sources */,
-				9467A30D2BB93A6E0023EA62 /* Tank.swift in Sources */,
 				94396BD02D7B365000A83CF4 /* FocusSquare+Extension.swift in Sources */,
 				94396BD42D7B36D500A83CF4 /* FocusCircle.swift in Sources */,
 				94B173EB2DAA30D90015DC0D /* NetworkSessionDelegate.swift in Sources */,

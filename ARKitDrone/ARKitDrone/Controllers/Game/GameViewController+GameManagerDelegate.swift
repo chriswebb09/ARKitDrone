@@ -74,7 +74,7 @@ extension GameViewController: GameManagerDelegate {
         os_log(.info, "adding node")
         let tappedPosition = SCNVector3.positionFromTransform(addNode.simdWorldTransform)
         DispatchQueue.main.async {
-            let apache: ApacheHelicopter = self.sceneView.positionTank(position: tappedPosition)
+            let apache: ApacheHelicopter = self.sceneView.positionHelicopter(position: tappedPosition)
             let square = TargetNode()
             self.sceneView.scene.rootNode.addChildNode(square)
             self.sceneView.competitor = apache

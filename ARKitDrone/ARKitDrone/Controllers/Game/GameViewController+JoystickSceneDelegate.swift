@@ -17,7 +17,6 @@ extension GameViewController: JoystickSceneDelegate {
     func update(yValue: Float,  velocity: SIMD3<Float>, angular: Float, stickNum: Int) {
         DispatchQueue.main.async {
             if stickNum == 2 {
-               /// let scaled = (yValue) * 0.0005
                 let velocity = SIMD3<Float>(Float(velocity.x), Float(velocity.y), Float(0))
                 let v = GameVelocity(vector: velocity)
                 let shouldBeSent = MoveData(velocity: v, angular: angular, direction: .forward)

@@ -14,11 +14,9 @@ extension GameViewController: ARSCNViewDelegate {
     // MARK: - ARSCNViewDelegate
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        
         DispatchQueue.main.async {
             self.updateFocusSquare(isObjectVisible: self.game.placed)
         }
-        
         os_signpost(.begin, log: .render_loop, name: .render_loop, signpostID: .render_loop, "Render loop started")
         os_signpost(.begin, log: .render_loop, name: .logic_update, signpostID: .render_loop, "Game logic update started")
         if let gameManager = self.gameManager, gameManager.isInitialized {

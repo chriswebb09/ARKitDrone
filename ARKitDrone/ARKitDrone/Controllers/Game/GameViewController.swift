@@ -78,7 +78,8 @@ class GameViewController: UIViewController {
         if UIDevice.current.isIpad {
             offset = 220
         }
-        let view = SKView(frame: CGRect(x:60, y: UIScreen.main.bounds.height - 220, width: 200, height: 200))
+        let frame = CGRect(x:60, y: UIScreen.main.bounds.height - 220, width: 200, height: 200)
+        let view = SKView(frame:frame)
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
         return view
@@ -97,7 +98,8 @@ class GameViewController: UIViewController {
     var isLoaded = false
     
     private lazy var padView2: SKView = {
-        let view = SKView(frame: CGRect(x:600, y: UIScreen.main.bounds.height - 220, width: 200, height: 200))
+        let frame = CGRect(x:600, y: UIScreen.main.bounds.height - 220, width: 200, height: 200)
+        let view = SKView(frame: frame)
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
         return view
@@ -142,14 +144,15 @@ class GameViewController: UIViewController {
             name: "AvenirNext-Bold",
             size: 30
         )
-        label.frame = CGRect(origin:
-                                CGPoint(
-                                    x: UIScreen.main.bounds.width / 2 - 200,
-                                    y:  UIScreen.main.bounds.origin.y + 100),
-                             size:
-                                CGSize(width: 400, height: 60
-                                      )
+        let origin = CGPoint(
+            x: UIScreen.main.bounds.width / 2 - 200,
+            y:  UIScreen.main.bounds.origin.y + 100
         )
+        let size =  CGSize(
+            width: 400,
+            height: 60
+        )
+        label.frame = CGRect(origin: origin, size: size)
         return label
     }()
     
@@ -222,27 +225,27 @@ class GameViewController: UIViewController {
         resetTracking()
         DispatchQueue.main.async {
             self.sceneView.scene.rootNode.addChildNode(self.focusSquare)
+            self.updateFocusSquare(isObjectVisible: true)
         }
+        setupPlayerNode()
         sceneView.scene.physicsWorld.contactDelegate = self
         
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self = self else { return }
+            shipManager.setupShips()
+            minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
+            minimapScene.scaleMode = .resizeFill
+            minimapView.presentScene(minimapScene)
+            view.addSubview(minimapView)
+            startMinimapUpdate()
+            setupCoachingOverlay()
+            sceneView.addSubview(destoryedText)
+            sceneView.addSubview(armMissilesButton)
+            sceneView.addSubview(scoreText)
+            armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
+            sceneView.isUserInteractionEnabled = true
+        }
         
-        //                            sceneView.scene.rootNode.addChildNode(focusSquare)
-        //                            updateFocusSquare(isObjectVisible: true)
-        //        setupPlayerNode()
-        //        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-        //            guard let self = self else { return }
-        //            shipManager.setupShips()
-        //            minimapScene = MinimapScene(size: CGSize(width: 140, height: 140))
-        //            minimapScene.scaleMode = .resizeFill
-        //            minimapView.presentScene(minimapScene)
-        //            view.addSubview(minimapView)
-        //            startMinimapUpdate()
-        //            setupCoachingOverlay()
-        //            sceneView.addSubview(destoryedText)
-        //            sceneView.addSubview(armMissilesButton)
-        //            sceneView.addSubview(scoreText)
-        //            armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
-        //            sceneView.isUserInteractionEnabled = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             sceneView.addSubview(padView1)
@@ -253,7 +256,6 @@ class GameViewController: UIViewController {
             guard let self = self else { return }
             self.isLoaded = true
         }
-        //        }
     }
     
     func setupPlayerNode() {
@@ -335,8 +337,6 @@ class GameViewController: UIViewController {
         sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
     }
     
-    
-    
     private func setupPadScene(padView1: SKView, padView2: SKView) {
         let scene = JoystickScene()
         scene.point = LocalConstants.joystickPoint
@@ -396,17 +396,14 @@ class GameViewController: UIViewController {
             let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
             let anchor = ARAnchor.init(name: "Heli", transform: firstCast.worldTransform)
             self.sceneView.session.add(anchor: anchor)
-            sceneView.helicopter = sceneView.positionTank(position: tappedPosition)
+            sceneView.helicopter = sceneView.positionHelicopter(position: tappedPosition)
             let addTank = AddNodeAction(simdWorldTransform: firstCast.worldTransform, eulerAngles: SIMD3<Float>(0, focusSquare.eulerAngles.y + 180.0 * .pi / 180, 0))
             os_log(.info, "sending add tank")
             // send add tank action to all peer
             self.gameManager?.send(addNode: addTank)
-            
             focusSquare.cleanup()
             game.placed = true
         }
-
-        
     }
     
     func sendWorldTo(peer: Player) {
@@ -454,8 +451,6 @@ class GameViewController: UIViewController {
             
             DispatchQueue.main.async {
                 self.targetWorldMap = worldMap
-                ///self.sceneView.debugOptions  = []
-                /// self.sessionState = .localizingToBoard
                 let configuration = ARWorldTrackingConfiguration()
                 configuration.initialWorldMap = worldMap
                 configuration.planeDetection = [.horizontal, .vertical]
@@ -463,20 +458,6 @@ class GameViewController: UIViewController {
                 if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
                     self.sceneView.scene.lightingEnvironment.contents = environmentMap
                 }
-//                session.run(
-//                    configuration,
-//                    options: [
-//                        .resetTracking,
-//                        .removeExistingAnchors,
-//                        .resetSceneReconstruction,
-//                        .stopTrackedRaycasts
-//                    ]
-//                )
-//             kedRaycasts])
-
-              
-               
-                
                 guard let camera = self.sceneView.pointOfView?.camera else {
                     fatalError("Expected a valid `pointOfView` from the scene.")
                 }
@@ -511,7 +492,6 @@ class GameViewController: UIViewController {
             os_log(.info, "asking ARSession for the world map")
             sceneView.session.getCurrentWorldMap { map, error in
                 os_log(.info, "ARSession getCurrentWorldMap returned")
-                
                 if let error = error {
                     os_log(.error, "didn't work! %s", "\(error)")
                     closure(nil, error)

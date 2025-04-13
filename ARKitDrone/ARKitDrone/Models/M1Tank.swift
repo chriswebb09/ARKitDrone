@@ -47,7 +47,7 @@ class M1AbramsTank {
     }
 }
 
-extension M1AbramsTank: Tank {
+extension M1AbramsTank {
     
     func place(transform: float4x4) {
         tankNode.transform = SCNMatrix4(transform)

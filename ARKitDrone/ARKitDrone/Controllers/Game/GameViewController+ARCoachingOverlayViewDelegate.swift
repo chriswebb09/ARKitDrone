@@ -47,7 +47,6 @@ extension GameViewController: ARCoachingOverlayViewDelegate {
         } else {
             focusSquare.unhide()
         }
-//        dump(session.currentFrame?.camera)
         if let camera = session.currentFrame?.camera,
            case .normal = camera.trackingState,
            let query = sceneView.getRaycastQuery(),

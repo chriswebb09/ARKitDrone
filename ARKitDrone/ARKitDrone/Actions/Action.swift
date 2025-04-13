@@ -16,6 +16,7 @@ enum Action {
 }
 
 extension Action: BitStreamCodable {
+    
     private enum CodingKey: UInt32, CaseIterable {
         case gameAction
         case boardSetup
