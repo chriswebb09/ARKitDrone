@@ -54,7 +54,6 @@ class GameObject: NSObject {
     
     func generateMovementData() -> MovementData? {
         return objectRootNode.generateMovementData(isAlive: isAlive)
-        //objectRootNode.map { MovementData(node: $0, alive: isAlive) }
     }
 }
 

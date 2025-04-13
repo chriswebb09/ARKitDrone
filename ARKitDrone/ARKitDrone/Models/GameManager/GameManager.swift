@@ -38,7 +38,6 @@ class GameManager: NSObject {
     init(sceneView: SCNView, session: NetworkSession?) {
         self.scene = sceneView.scene!
         self.session = session
-        
         self.isNetworked = session != nil
         self.isServer = session?.isServer ?? true // Solo game act like a server
         
@@ -49,30 +48,31 @@ class GameManager: NSObject {
     
     func queueAction(gameAction: GameAction) {
         commandsLock.lock()
-        defer { commandsLock.unlock() }
+        defer {
+            commandsLock.unlock()
+        }
         gameCommands.append(GameCommand(player: currentPlayer, action: .gameAction(gameAction)))
     }
     
     private func syncMovement() {
-        os_signpost(.begin, log: .render_loop, name: .physics_sync, signpostID: .render_loop,
-                    "Movement sync started")
-        defer { os_signpost(.end, log: .render_loop, name: .physics_sync, signpostID: .render_loop,
-                            "Movement sync finished") }
+        os_signpost(.begin, log: .render_loop, name: .physics_sync, signpostID: .render_loop, "Movement sync started")
+        defer {
+            os_signpost(.end, log: .render_loop, name: .physics_sync, signpostID: .render_loop, "Movement sync finished")
+        }
         
         if isNetworked && movementSyncData.isInitialized {
             if isServer {
                 let movementData = movementSyncData.generateData()
-                session?.send(action:
-                        .gameAction(
-                            .movement(movementData)
-                        )
+                session?.send(
+                    action: .gameAction(
+                        .movement(movementData)
+                    )
                 )
             } else {
                 movementSyncData.updateFromReceivedData()
             }
         }
     }
-    
     
     func resetWorld(sceneView: SCNView) {
         self.scene = sceneView.scene!
@@ -102,18 +102,15 @@ class GameManager: NSObject {
     
     // MARK: - inbound from network
     private func process(command: GameCommand) {
-        os_signpost(.begin, log: .render_loop, name: .process_command, signpostID: .render_loop,
-                    "Action End : %s", command.action.description)
-        defer { os_signpost(.end, log: .render_loop, name: .process_command, signpostID: .render_loop,
-                            "Action End: %s", command.action.description) }
+        os_signpost(.begin, log: .render_loop, name: .process_command, signpostID: .render_loop, "Action End : %s", command.action.description)
+        defer {
+            os_signpost(.end, log: .render_loop, name: .process_command, signpostID: .render_loop, "Action End: %s", command.action.description)
+        }
         
         switch command.action {
         case .gameAction(let gameAction):
             os_log(.info, "game action from %s for %s", command.player?.username ?? "unknown", String(describing: gameAction))
-            // should controll tank here
-            
             guard let player = command.player else { return }
-            
             if case let .joyStickMoved(data) = gameAction {
                 DispatchQueue.main.async {
                     self.delegate?.manager(self, moveNode: data)
@@ -178,20 +175,6 @@ class GameManager: NSObject {
         movementSyncData.delegate = self
         delegate?.managerDidStartGame(self)
         isInitialized = true
-    }
-    
-    func moveTank(player: Player, movement: MoveData, sceneView: GameSceneView? = nil) {
-        os_log(.info, "move Tank")
-        DispatchQueue.main.async {
-            if let sceneView = sceneView {
-                let x = sceneView.competitor.helicopterNode.position.x + movement.velocity.vector.x
-                let y = sceneView.competitor.helicopterNode.position.y + movement.velocity.vector.y
-                let z = sceneView.competitor.helicopterNode.position.z + movement.velocity.vector.y
-                sceneView.competitor.helicopterNode.position = SCNVector3(x: x, y: y, z: z)
-                sceneView.competitor.helicopterNode.eulerAngles.y = movement.angular
-            }
-        }
-        
     }
 }
 extension GameManager: NetworkSessionDelegate {
