@@ -15,6 +15,18 @@
 		94396BD62D7B469600A83CF4 /* GameViewController+JoystickSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BD52D7B468C00A83CF4 /* GameViewController+JoystickSceneDelegate.swift */; };
 		94396BD82D7B46F000A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BD72D7B46E400A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift */; };
 		94396BDA2D7B474900A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BD92D7B473E00A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift */; };
+		94423DD22DAB41BC007B5945 /* BoardAnchor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DD12DAB41B8007B5945 /* BoardAnchor.swift */; };
+		94423DD42DAB41DD007B5945 /* KeyPositionAnchor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DD32DAB41DD007B5945 /* KeyPositionAnchor.swift */; };
+		94423DD62DAB4214007B5945 /* ARWorldMap+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DD52DAB420C007B5945 /* ARWorldMap+Extension.swift */; };
+		94423DD82DAB425A007B5945 /* GameBoardLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DD72DAB4255007B5945 /* GameBoardLocation.swift */; };
+		94423DDA2DAB42C1007B5945 /* BoardSetupAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DD92DAB42BE007B5945 /* BoardSetupAction.swift */; };
+		94423DDC2DAB42F6007B5945 /* GameVelocity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DDB2DAB42F5007B5945 /* GameVelocity.swift */; };
+		94423DDE2DAB433E007B5945 /* CompletedAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DDD2DAB433C007B5945 /* CompletedAction.swift */; };
+		94423DE02DAB4360007B5945 /* MoveData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DDF2DAB435F007B5945 /* MoveData.swift */; };
+		94423DE22DAB438B007B5945 /* AddNodeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DE12DAB4388007B5945 /* AddNodeAction.swift */; };
+		94423DE42DAB43BB007B5945 /* GameAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DE32DAB43B8007B5945 /* GameAction.swift */; };
+		94423DE62DAB43ED007B5945 /* Action.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DE52DAB43EB007B5945 /* Action.swift */; };
+		94423DE82DAB4434007B5945 /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DE72DAB4432007B5945 /* Direction.swift */; };
 		94548F022D5C68EE00A007B0 /* CollisionTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94548F012D5C68EB00A007B0 /* CollisionTypes.swift */; };
 		9455B7532D60C73F0019FE10 /* MissileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9455B7522D60C73B0019FE10 /* MissileManager.swift */; };
 		9455B7552D60C74A0019FE10 /* ShipManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9455B7542D60C7460019FE10 /* ShipManager.swift */; };
@@ -97,6 +109,18 @@
 		94396BD52D7B468C00A83CF4 /* GameViewController+JoystickSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+JoystickSceneDelegate.swift"; sourceTree = "<group>"; };
 		94396BD72D7B46E400A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+ARCoachingOverlayViewDelegate.swift"; sourceTree = "<group>"; };
 		94396BD92D7B473E00A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+SCNPhysicsContactDelegate.swift"; sourceTree = "<group>"; };
+		94423DD12DAB41B8007B5945 /* BoardAnchor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardAnchor.swift; sourceTree = "<group>"; };
+		94423DD32DAB41DD007B5945 /* KeyPositionAnchor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPositionAnchor.swift; sourceTree = "<group>"; };
+		94423DD52DAB420C007B5945 /* ARWorldMap+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARWorldMap+Extension.swift"; sourceTree = "<group>"; };
+		94423DD72DAB4255007B5945 /* GameBoardLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameBoardLocation.swift; sourceTree = "<group>"; };
+		94423DD92DAB42BE007B5945 /* BoardSetupAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardSetupAction.swift; sourceTree = "<group>"; };
+		94423DDB2DAB42F5007B5945 /* GameVelocity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameVelocity.swift; sourceTree = "<group>"; };
+		94423DDD2DAB433C007B5945 /* CompletedAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedAction.swift; sourceTree = "<group>"; };
+		94423DDF2DAB435F007B5945 /* MoveData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveData.swift; sourceTree = "<group>"; };
+		94423DE12DAB4388007B5945 /* AddNodeAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNodeAction.swift; sourceTree = "<group>"; };
+		94423DE32DAB43B8007B5945 /* GameAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameAction.swift; sourceTree = "<group>"; };
+		94423DE52DAB43EB007B5945 /* Action.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Action.swift; sourceTree = "<group>"; };
+		94423DE72DAB4432007B5945 /* Direction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Direction.swift; sourceTree = "<group>"; };
 		94548F012D5C68EB00A007B0 /* CollisionTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollisionTypes.swift; sourceTree = "<group>"; };
 		9455B7522D60C73B0019FE10 /* MissileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissileManager.swift; sourceTree = "<group>"; };
 		9455B7542D60C7460019FE10 /* ShipManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShipManager.swift; sourceTree = "<group>"; };
@@ -183,6 +207,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		94423DE92DAB4467007B5945 /* Actions */ = {
+			isa = PBXGroup;
+			children = (
+				946690BE2D9E3E5100343B1B /* GameCommand.swift */,
+				94423DE72DAB4432007B5945 /* Direction.swift */,
+				94423DE52DAB43EB007B5945 /* Action.swift */,
+				94423DE32DAB43B8007B5945 /* GameAction.swift */,
+				94423DE12DAB4388007B5945 /* AddNodeAction.swift */,
+				94423DDF2DAB435F007B5945 /* MoveData.swift */,
+				94423DDD2DAB433C007B5945 /* CompletedAction.swift */,
+				94423DDB2DAB42F5007B5945 /* GameVelocity.swift */,
+				94423DD92DAB42BE007B5945 /* BoardSetupAction.swift */,
+				94423DD72DAB4255007B5945 /* GameBoardLocation.swift */,
+				94423DD32DAB41DD007B5945 /* KeyPositionAnchor.swift */,
+				94423DD12DAB41B8007B5945 /* BoardAnchor.swift */,
+			);
+			path = Actions;
+			sourceTree = "<group>";
+		};
 		946690A12D9E3CDC00343B1B /* Bit Stream */ = {
 			isa = PBXGroup;
 			children = (
@@ -350,6 +393,7 @@
 			children = (
 				94C881AD2D5D07400050119D /* SCNParticleSystem+Extension.swift */,
 				94F0ACB92D619A2F00658B0F /* SCNNode+Extension.swift */,
+				94423DD52DAB420C007B5945 /* ARWorldMap+Extension.swift */,
 				946690C22D9E3ECF00343B1B /* UserDefaults+Helpers.swift */,
 				94B6E8452D7B60AC0064ABD7 /* NotificationName+Extension.swift */,
 				94C881AB2D5D06F40050119D /* SCNMaterial+Extension.swift */,
@@ -388,7 +432,7 @@
 			children = (
 				94CCC8EA2972D14600F7D17F /* audio.m4a */,
 				A7AE72BD1F888EF500B015D3 /* AppDelegate.swift */,
-				946690BE2D9E3E5100343B1B /* GameCommand.swift */,
+				94423DE92DAB4467007B5945 /* Actions */,
 				946690BD2D9E3DFE00343B1B /* Signpost */,
 				946690A82D9E3D0200343B1B /* Movement */,
 				946690A12D9E3CDC00343B1B /* Bit Stream */,
@@ -495,6 +539,7 @@
 				946690BB2D9E3DFA00343B1B /* Action+Signposts.swift in Sources */,
 				946690BC2D9E3DFA00343B1B /* SignpostData.swift in Sources */,
 				A7AE72C21F888EF500B015D3 /* GameViewController.swift in Sources */,
+				94423DE02DAB4360007B5945 /* MoveData.swift in Sources */,
 				946690C12D9E3E9000343B1B /* GameManager.swift in Sources */,
 				946690AC2D9E3D7A00343B1B /* GameObject.swift in Sources */,
 				94CCC8F02972D97700F7D17F /* JoystickDelegate.swift in Sources */,
@@ -504,14 +549,17 @@
 				94396BDA2D7B474900A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift in Sources */,
 				94D630322976077000096104 /* UIFont+Extension.swift in Sources */,
 				94CCC9102972F43200F7D17F /* HelicopterCapable.swift in Sources */,
+				94423DDE2DAB433E007B5945 /* CompletedAction.swift in Sources */,
 				94D598442BB9037400B31874 /* SCNGeometry+Extension.swift in Sources */,
 				9467A30F2BB93A840023EA62 /* Shell.swift in Sources */,
 				94B173F72DAA35240015DC0D /* MultiuserAttribute.swift in Sources */,
 				94CCC90A2972E54000F7D17F /* SCNScene+Extension.swift in Sources */,
+				94423DE82DAB4434007B5945 /* Direction.swift in Sources */,
 				946690C32D9E3ECF00343B1B /* UserDefaults+Helpers.swift in Sources */,
 				946690B82D9E3DD800343B1B /* Bundle+Helpers.swift in Sources */,
 				9470AE472974001A00A55134 /* MenuViewController.swift in Sources */,
 				94F5D19C2D5CAEA000019569 /* MinimapScene.swift in Sources */,
+				94423DD82DAB425A007B5945 /* GameBoardLocation.swift in Sources */,
 				9455B7532D60C73F0019FE10 /* MissileManager.swift in Sources */,
 				94F0ACBA2D619A3800658B0F /* SCNNode+Extension.swift in Sources */,
 				94396BD82D7B46F000A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift in Sources */,
@@ -519,7 +567,10 @@
 				94CCC9122972FFB500F7D17F /* DeviceOrientation.swift in Sources */,
 				94C881A82D5D05C20050119D /* Game.swift in Sources */,
 				94CB148E2C8793BF0065E1B0 /* UIColor+Extension.swift in Sources */,
+				94423DD22DAB41BC007B5945 /* BoardAnchor.swift in Sources */,
 				9467A30B2BB918EE0023EA62 /* M1Tank.swift in Sources */,
+				94423DE62DAB43ED007B5945 /* Action.swift in Sources */,
+				94423DE42DAB43BB007B5945 /* GameAction.swift in Sources */,
 				94CCC90E2972EB2400F7D17F /* GameSceneView.swift in Sources */,
 				946690C72D9E3FE100343B1B /* GameCell.swift in Sources */,
 				94C881AC2D5D07000050119D /* SCNMaterial+Extension.swift in Sources */,
@@ -533,6 +584,7 @@
 				94B173EB2DAA30D90015DC0D /* NetworkSessionDelegate.swift in Sources */,
 				94B173F92DAA353F0015DC0D /* MultiuserService.swift in Sources */,
 				946690B42D9E3DB400343B1B /* NetworkSession.swift in Sources */,
+				94423DDC2DAB42F6007B5945 /* GameVelocity.swift in Sources */,
 				94396BD62D7B469600A83CF4 /* GameViewController+JoystickSceneDelegate.swift in Sources */,
 				94A68F762C8797550059CD82 /* SCNVector3+Extension.swift in Sources */,
 				94B6E8482D7B68680064ABD7 /* GameViewController+ARSCNViewDelegate.swift in Sources */,
@@ -542,15 +594,19 @@
 				94A68F722C8797070059CD82 /* SCNMatrix4+Extension.swift in Sources */,
 				94B173F52DAA34A70015DC0D /* MovementSyncSceneDataDelegate.swift in Sources */,
 				948E91D42D6519B500DE6405 /* FocusSquare.swift in Sources */,
+				94423DDA2DAB42C1007B5945 /* BoardSetupAction.swift in Sources */,
 				9412F0762D5B4BEB00D9F1BD /* Ship.swift in Sources */,
 				946690BF2D9E3E5100343B1B /* GameCommand.swift in Sources */,
+				94423DE22DAB438B007B5945 /* AddNodeAction.swift in Sources */,
 				946690AE2D9E3D8B00343B1B /* Player.swift in Sources */,
+				94423DD62DAB4214007B5945 /* ARWorldMap+Extension.swift in Sources */,
 				A7AE72BE1F888EF500B015D3 /* AppDelegate.swift in Sources */,
 				94E5448F29672EE200158DA2 /* JoystickSceneDelegate.swift in Sources */,
 				94CCC8FF2972E43500F7D17F /* FloatingPoint+Extension.swift in Sources */,
 				946690B22D9E3DA900343B1B /* NetworkGame.swift in Sources */,
 				9466909F2D9E3CD700343B1B /* BitStreamCodable.swift in Sources */,
 				946690A02D9E3CD700343B1B /* BitStream.swift in Sources */,
+				94423DD42DAB41DD007B5945 /* KeyPositionAnchor.swift in Sources */,
 				946690B02D9E3D9A00343B1B /* GameTime.swift in Sources */,
 				946690AA2D9E3D3F00343B1B /* Data+Compression.swift in Sources */,
 				945B16AB294E9F5B00482E14 /* Joystick.swift in Sources */,

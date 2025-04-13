@@ -29,11 +29,11 @@ extension StaticString {
 
 extension OSLog {
     // Custom log objects to use to classify signposts
-    static let preload_assets = OSLog(subsystem: "SwiftShot", category: "Preload")
-    static let setup_level = OSLog(subsystem: "SwiftShot", category: "LevelSetup")
-    static let render_loop = OSLog(subsystem: "SwiftShot", category: "RenderLoop")
-    static let network_data_sent = OSLog(subsystem: "SwiftShot", category: "NetworkDataSent")
-    static let network_data_received = OSLog(subsystem: "SwiftShot", category: "NetworkDataReceived")
+    static let preload_assets = OSLog(subsystem: "ARDrone", category: "Preload")
+    static let setup_level = OSLog(subsystem: "ARDrone", category: "LevelSetup")
+    static let render_loop = OSLog(subsystem: "ARDrone", category: "RenderLoop")
+    static let network_data_sent = OSLog(subsystem: "ARDrone", category: "NetworkDataSent")
+    static let network_data_received = OSLog(subsystem: "ARDrone", category: "NetworkDataReceived")
 }
 
 extension OSSignpostID {
