@@ -63,7 +63,10 @@ class GameSceneView: ARView {
                 tankRootEntity.name = "Tank"
                 tankRootEntity.scale = SIMD3<Float>(repeating: 0.1)
                 tankRootEntity.isEnabled = true
-                tankRootEntity.transform.rotation = simd_quatf(angle: -Float.pi / 2, axis: SIMD3<Float>(1, 0, 0))
+                tankRootEntity.transform.rotation = simd_quatf(
+                    angle: -Float.pi / 2,
+                    axis: SIMD3<Float>(1, 0, 0)
+                )
                 if let bodyEntity = tankRootEntity.findEntity(named: "body") {
                     let bounds = bodyEntity.visualBounds(relativeTo: nil).extents
                     bodyEntity.components.set(CollisionComponent(shapes: [.generateBox(size: bounds)]))
@@ -96,7 +99,11 @@ class GameSceneView: ARView {
             return nil
         }
         helicopterAnchor?.removeFromParent()
-        let helicopterPosition = SIMD3<Float>(x: position.x, y: position.y + 0.5, z: position.z - 0.2)
+        let helicopterPosition = SIMD3<Float>(
+            x: position.x,
+            y: position.y + 0.5,
+            z: position.z - 0.2
+        )
         helicopterAnchor = AnchorEntity(world: helicopterPosition)
         heliEntity.position = .zero
         helicopterAnchor?.addChild(heliEntity)
@@ -111,7 +118,10 @@ class GameSceneView: ARView {
     func addExplosion(at position: SIMD3<Float>) {
         // RealityKit doesn't support SceneKit-style particle systems
         // You need to use a custom 3D animation, sound, or a visual trick instead.
-        let sphere = ModelEntity(mesh: .generateSphere(radius: 0.02), materials: [SimpleMaterial(color: .orange, isMetallic: false)])
+        let sphere = ModelEntity(
+            mesh: .generateSphere(radius: 0.02),
+            materials: [SimpleMaterial(color: .orange, isMetallic: false)]
+        )
         let explosionAnchor = AnchorEntity(world: position)
         explosionAnchor.addChild(sphere)
         scene.anchors.append(explosionAnchor)

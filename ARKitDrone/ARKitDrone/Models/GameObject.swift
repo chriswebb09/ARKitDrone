@@ -50,16 +50,34 @@ class GameObject: NSObject {
             objectRootEntity.transform.translation = (nodeData.position + currentPos) * 0.5
             // Convert euler angles to quaternion for RealityKit
             let newEuler = (nodeData.eulerAngles + currentRot) * 0.5
-            objectRootEntity.transform.rotation = simd_quatf(angle: newEuler.y, axis: SIMD3(0, 1, 0)) *
-                                                  simd_quatf(angle: newEuler.x, axis: SIMD3(1, 0, 0)) *
-                                                  simd_quatf(angle: newEuler.z, axis: SIMD3(0, 0, 1))
+            objectRootEntity.transform.rotation = simd_quatf(
+                angle: newEuler.y,
+                axis: SIMD3(0, 1, 0)
+            ) *
+            simd_quatf(
+                angle: newEuler.x,
+                axis: SIMD3(1, 0, 0)
+            ) *
+            simd_quatf(
+                angle: newEuler.z,
+                axis: SIMD3(0, 0, 1)
+            )
         } else {
             // Direct positioning
             objectRootEntity.transform.translation = nodeData.position
             // Convert euler angles to quaternion for RealityKit
-            objectRootEntity.transform.rotation = simd_quatf(angle: nodeData.eulerAngles.y, axis: SIMD3(0, 1, 0)) *
-                                                  simd_quatf(angle: nodeData.eulerAngles.x, axis: SIMD3(1, 0, 0)) *
-                                                  simd_quatf(angle: nodeData.eulerAngles.z, axis: SIMD3(0, 0, 1))
+            objectRootEntity.transform.rotation = simd_quatf(
+                angle: nodeData.eulerAngles.y,
+                axis: SIMD3(0, 1, 0)
+            ) *
+            simd_quatf(
+                angle: nodeData.eulerAngles.x,
+                axis: SIMD3(1, 0, 0)
+            ) *
+            simd_quatf(
+                angle: nodeData.eulerAngles.z,
+                axis: SIMD3(0, 0, 1)
+            )
         }
     }
     

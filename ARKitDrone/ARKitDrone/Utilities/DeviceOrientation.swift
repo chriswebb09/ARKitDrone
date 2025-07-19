@@ -26,7 +26,10 @@ final class DeviceOrientation {
         if #available(iOS 16.0, *) {
             windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: orientation))
         } else {
-            UIDevice.current.setValue(orientation.toUIInterfaceOrientation.rawValue, forKey: "orientation")
+            UIDevice.current.setValue(
+                orientation.toUIInterfaceOrientation.rawValue,
+                forKey: "orientation"
+            )
         }
     }
     

@@ -15,10 +15,8 @@ extension ParticleEmitterComponent {
     static func createExplosion() -> ParticleEmitterComponent {
         // Create particle emitter with simple configuration
         // Note: RealityKit's ParticleEmitterComponent has limited customization compared to SceneKit
-        
         // Create basic particle emitter component
         let particles = ParticleEmitterComponent()
-        
         return particles
     }
     
@@ -27,10 +25,8 @@ extension ParticleEmitterComponent {
         // RealityKit's ParticleEmitterComponent has very limited configuration
         // We'll create a basic emitter and rely on distance culling for optimization
         let particles = ParticleEmitterComponent()
-        
         // Note: RealityKit doesn't support custom textures on ParticleEmitterComponent
         // For custom particle effects, you'd need to create a custom Material/Shader
-        
         return particles
     }
     
@@ -88,7 +84,6 @@ class Explosion {
         // Add particle emitter
         let explosion = ParticleEmitterComponent.createExplosion()
         explosionEntity.components.set(explosion)
-        
         return explosionEntity
     }
     

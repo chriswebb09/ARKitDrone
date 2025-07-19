@@ -61,9 +61,18 @@ class ApacheHelicopter {
             let model = entity.findEntity(named: "Model")
             self.helicopter = model?.findEntity(named: "Apache")
             // Apply helicopter orientation correction
-            let originalRotation = simd_quatf(real: 0.7071069, imag: SIMD3<Float>(-0.70710665, 0.0, 0.0))
-            let faceUserRotation = simd_quatf(angle: .pi, axis: [0, 1, 0])
-            let levelNose = simd_quatf(angle: .pi / 2, axis: [1, 0, 0])
+            let originalRotation = simd_quatf(
+                real: 0.7071069,
+                imag: SIMD3<Float>(-0.70710665, 0.0, 0.0)
+            )
+            let faceUserRotation = simd_quatf(
+                angle: .pi,
+                axis: [0, 1, 0]
+            )
+            let levelNose = simd_quatf(
+                angle: .pi / 2,
+                axis: [1, 0, 0]
+            )
             let correctionRotation = originalRotation * faceUserRotation * levelNose
             self.helicopter?.scale = SIMD3<Float>(repeating: 0.4)
             self.helicopter?.transform.rotation = correctionRotation
@@ -146,7 +155,10 @@ class ApacheHelicopter {
         rotorTimer?.invalidate()
         // Create a timer to manually rotate the rotors - ensure it runs on main thread
         DispatchQueue.main.async { [weak self] in
-            self?.rotorTimer = Timer.scheduledTimer(withTimeInterval: 1.0/30.0, repeats: true) { [weak self] timer in
+            self?.rotorTimer = Timer.scheduledTimer(
+                withTimeInterval: 1.0/30.0,
+                repeats: true
+            ) { [weak self] timer in
                 guard let self = self else {
                     timer.invalidate()
                     return
@@ -175,8 +187,14 @@ class ApacheHelicopter {
         if rotorAngle > .pi * 2 { rotorAngle -= .pi * 2 }
         if tailRotorAngle > .pi * 2 { tailRotorAngle -= .pi * 2 }
         // Apply rotations
-        rotor.transform.rotation = simd_quatf(angle: rotorAngle, axis: [0, 1, 0]) // Y-axis
-        tailRotor.transform.rotation = simd_quatf(angle: tailRotorAngle, axis: [1, 0, 0]) // X-axis
+        rotor.transform.rotation = simd_quatf(
+            angle: rotorAngle,
+            axis: [0, 1, 0]
+        ) // Y-axis
+        tailRotor.transform.rotation = simd_quatf(
+            angle: tailRotorAngle,
+            axis: [1, 0, 0]
+        ) // X-axis
     }
     
     func stopRotorRotation() {

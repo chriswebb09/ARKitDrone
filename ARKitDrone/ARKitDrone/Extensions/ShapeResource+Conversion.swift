@@ -22,7 +22,6 @@ extension ShapeResource {
     @MainActor
     static func from(_ scnGeometry: SCNGeometry) throws -> ShapeResource {
         // Try to determine the geometry type and create appropriate shape
-        
         // Check for primitive geometries
         if let box = scnGeometry as? SCNBox {
             let size = SIMD3<Float>(
@@ -32,7 +31,6 @@ extension ShapeResource {
             )
             return .generateBox(size: size)
         }
-        
         if let sphere = scnGeometry as? SCNSphere {
             return .generateSphere(
                 radius: Float(
@@ -40,7 +38,6 @@ extension ShapeResource {
                 )
             )
         }
-        
         if let cylinder = scnGeometry as? SCNCylinder {
             // RealityKit doesn't have generateCylinder, use a box approximation
             let size = SIMD3<Float>(
@@ -50,7 +47,6 @@ extension ShapeResource {
             )
             return .generateBox(size: size)
         }
-        
         if let capsule = scnGeometry as? SCNCapsule {
             // RealityKit doesn't have generateCapsule, use a box approximation
             let size = SIMD3<Float>(
@@ -60,12 +56,10 @@ extension ShapeResource {
             )
             return .generateBox(size: size)
         }
-        
         if let plane = scnGeometry as? SCNPlane {
             let size = SIMD3<Float>(Float(plane.width), 0.01, Float(plane.height)) // Thin box for plane
             return .generateBox(size: size)
         }
-        
         // For complex geometries, create convex hull from mesh
         return try .generateConvex(from: MeshResource.from(scnGeometry))
     }
@@ -126,7 +120,6 @@ extension ShapeResource {
         guard let geometry = node.geometry else {
             throw ConversionError.missingGeometry
         }
-        
         return try from(geometry)
     }
 }

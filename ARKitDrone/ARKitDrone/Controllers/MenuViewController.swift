@@ -27,7 +27,10 @@ class MenuViewController: UIViewController {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         //        label.text = "ARKit Drone"
-        label.font = UIFont.systemFont(ofSize: 36, weight: .bold)
+        label.font = UIFont.systemFont(
+            ofSize: 36,
+            weight: .bold
+        )
         label.textColor = UIColor.darkGray
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -41,11 +44,20 @@ class MenuViewController: UIViewController {
         button.layer.cornerRadius = 20
         // Dark shadow (bottom-right)
         button.layer.shadowColor = UIColor.black.cgColor
-        button.layer.shadowOffset = CGSize(width: 5, height: 5)
+        button.layer.shadowOffset = CGSize(
+            width: 5,
+            height: 5
+        )
         button.layer.shadowOpacity = 0.15
         button.layer.shadowRadius = 10
-        button.setTitleColor(.darkGray, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        button.setTitleColor(
+            .darkGray,
+            for: .normal
+        )
+        button.titleLabel?.font = UIFont.systemFont(
+            ofSize: 18,
+            weight: .semibold
+        )
         button.addTarget(self, action: #selector(newGameButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button

@@ -51,7 +51,9 @@ class ShipManager {
                             y: Float.random(in: -10.0...10.0),
                             z: Float.random(in: -20.0...40.0)
                         )
-                        let anchor = AnchorEntity(world: SIMD3<Float>(0, 0, 0))
+                        let anchor = AnchorEntity(
+                            world: SIMD3<Float>(0, 0, 0)
+                        )
                         anchor.addChild(shipEntity)
                         self.arView.scene.addAnchor(anchor)
                         shipEntity.transform.translation = randomOffset

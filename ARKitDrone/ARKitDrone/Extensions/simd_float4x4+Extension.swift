@@ -12,39 +12,79 @@ import RealityKit
 extension simd_float4x4 {
     /// Extract quaternion rotation from matrix
     public func toQuaternion() -> simd_quatf {
-        let rotationMatrix = float3x3(columns: (
-            SIMD3<Float>(self.columns.0.x, self.columns.0.y, self.columns.0.z),
-            SIMD3<Float>(self.columns.1.x, self.columns.1.y, self.columns.1.z),
-            SIMD3<Float>(self.columns.2.x, self.columns.2.y, self.columns.2.z)
-        ))
+        let rotationMatrix = float3x3(
+            columns: (
+                SIMD3<Float>(
+                    self.columns.0.x,
+                    self.columns.0.y,
+                    self.columns.0.z
+                ),
+                SIMD3<Float>(
+                    self.columns.1.x,
+                    self.columns.1.y,
+                    self.columns.1.z
+                ),
+                SIMD3<Float>(
+                    self.columns.2.x,
+                    self.columns.2.y,
+                    self.columns.2.z
+                )
+            )
+        )
         return simd_quatf(rotationMatrix)
     }
     
     /// Get scale factors from matrix
     var scale: SIMD3<Float> {
         let scaleX = length(
-            SIMD3<Float>(columns.0.x, columns.0.y, columns.0.z)
+            SIMD3<Float>(
+                columns.0.x,
+                columns.0.y,
+                columns.0.z
+            )
         )
         let scaleY = length(
-            SIMD3<Float>(columns.1.x, columns.1.y, columns.1.z)
+            SIMD3<Float>(
+                columns.1.x,
+                columns.1.y,
+                columns.1.z
+            )
         )
         let scaleZ = length(
-            SIMD3<Float>(columns.2.x, columns.2.y, columns.2.z)
+            SIMD3<Float>(
+                columns.2.x,
+                columns.2.y,
+                columns.2.z
+            )
         )
-        return SIMD3<Float>(scaleX, scaleY, scaleZ)
+        return SIMD3<Float>(
+            scaleX,
+            scaleY,
+            scaleZ
+        )
     }
     
     /// Create transform matrix from translation, rotation, and scale
     init(translation: SIMD3<Float>, rotation: simd_quatf, scale: SIMD3<Float>) {
         let rotationMatrix = float4x4(rotation)
         let scaleMatrix = float4x4(
-            diagonal: SIMD4<Float>(scale.x, scale.y, scale.z, 1.0)
+            diagonal: SIMD4<Float>(
+                scale.x,
+                scale.y,
+                scale.z,
+                1.0
+            )
         )
         let translationMatrix = float4x4(
             SIMD4<Float>(1, 0, 0, 0),
             SIMD4<Float>(0, 1, 0, 0),
             SIMD4<Float>(0, 0, 1, 0),
-            SIMD4<Float>(translation.x, translation.y, translation.z, 1)
+            SIMD4<Float>(
+                translation.x,
+                translation.y,
+                translation.z,
+                1
+            )
         )
         self = translationMatrix * rotationMatrix * scaleMatrix
     }
@@ -54,7 +94,11 @@ extension simd_float4x4 {
         self.init(
             translation: translation,
             rotation: rotation,
-            scale: SIMD3<Float>(uniformScale, uniformScale, uniformScale)
+            scale: SIMD3<Float>(
+                uniformScale,
+                uniformScale,
+                uniformScale
+            )
         )
     }
     

@@ -42,13 +42,27 @@ extension MeshResource {
         
         for i in 0..<vertexCount {
             let offset = i * vertexStride
-            let x = vertexData.withUnsafeBytes { $0.load(fromByteOffset: offset, as: Float.self) }
-            let y = vertexData.withUnsafeBytes { $0.load(fromByteOffset: offset + 4, as: Float.self) }
-            let z = vertexData.withUnsafeBytes { $0.load(fromByteOffset: offset + 8, as: Float.self) }
+            let x = vertexData.withUnsafeBytes {
+                $0.load(
+                    fromByteOffset: offset,
+                    as: Float.self
+                )
+            }
+            let y = vertexData.withUnsafeBytes {
+                $0.load(
+                    fromByteOffset: offset + 4,
+                    as: Float.self
+                )
+            }
+            let z = vertexData.withUnsafeBytes {
+                $0.load(
+                    fromByteOffset: offset + 8,
+                    as: Float.self
+                )
+            }
             positions.append(SIMD3<Float>(x, y, z))
         }
         meshDescriptor.positions = MeshBuffers.Positions(positions)
-        
         // Set up normals
         var normals: [SIMD3<Float>] = []
         normals.reserveCapacity(vertexCount)
@@ -56,13 +70,27 @@ extension MeshResource {
         let normalStride = normalSource.dataStride
         for i in 0..<vertexCount {
             let offset = i * normalStride
-            let x = normalData.withUnsafeBytes { $0.load(fromByteOffset: offset, as: Float.self) }
-            let y = normalData.withUnsafeBytes { $0.load(fromByteOffset: offset + 4, as: Float.self) }
-            let z = normalData.withUnsafeBytes { $0.load(fromByteOffset: offset + 8, as: Float.self) }
+            let x = normalData.withUnsafeBytes {
+                $0.load(
+                    fromByteOffset: offset,
+                    as: Float.self
+                )
+            }
+            let y = normalData.withUnsafeBytes {
+                $0.load(
+                    fromByteOffset: offset + 4,
+                    as: Float.self
+                )
+            }
+            let z = normalData.withUnsafeBytes {
+                $0.load(
+                    fromByteOffset: offset + 8,
+                    as: Float.self
+                )
+            }
             normals.append(SIMD3<Float>(x, y, z))
         }
         meshDescriptor.normals = MeshBuffers.Normals(normals)
-        
         // Set up indices
         var indices: [UInt32] = []
         let indexCount = element.primitiveCount * 3 // Assuming triangles
@@ -72,16 +100,24 @@ extension MeshResource {
         for i in 0..<indexCount {
             let offset = i * bytesPerIndex
             if bytesPerIndex == 2 {
-                let index = indexData.withUnsafeBytes { $0.load(fromByteOffset: offset, as: UInt16.self) }
+                let index = indexData.withUnsafeBytes {
+                    $0.load(
+                        fromByteOffset: offset,
+                        as: UInt16.self
+                    )
+                }
                 indices.append(UInt32(index))
             } else {
-                let index = indexData.withUnsafeBytes { $0.load(fromByteOffset: offset, as: UInt32.self) }
+                let index = indexData.withUnsafeBytes {
+                    $0.load(
+                        fromByteOffset: offset,
+                        as: UInt32.self
+                    )
+                }
                 indices.append(index)
             }
         }
-        
         meshDescriptor.primitives = .triangles(indices)
-        
         return try MeshResource.generate(from: [meshDescriptor])
     }
     
@@ -92,14 +128,26 @@ extension MeshResource {
         positions.reserveCapacity(arGeometry.vertices.count)
         for i in 0..<arGeometry.vertices.count {
             let vertex = arGeometry.vertex(at: UInt32(i))
-            positions.append(SIMD3<Float>(vertex.0, vertex.1, vertex.2))
+            positions.append(
+                SIMD3<Float>(
+                    vertex.0,
+                    vertex.1,
+                    vertex.2
+                )
+            )
         }
         // Extract normals
         var normals: [SIMD3<Float>] = []
         normals.reserveCapacity(arGeometry.normals.count)
         for i in 0..<arGeometry.normals.count {
             let normal = arGeometry.normal(at: UInt32(i))
-            normals.append(SIMD3<Float>(normal.0, normal.1, normal.2))
+            normals.append(
+                SIMD3<Float>(
+                    normal.0,
+                    normal.1,
+                    normal.2
+                )
+            )
         }
         // Extract indices
         var indices: [UInt32] = []
@@ -131,18 +179,23 @@ extension MeshResource {
         // Extract classified vertices and normals
         let positions = usedVertexIndices.map { vertexIndex in
             let vertex = arGeometry.vertex(at: vertexIndex)
-            return SIMD3<Float>(vertex.0, vertex.1, vertex.2)
+            return SIMD3<Float>(
+                vertex.0,
+                vertex.1,
+                vertex.2
+            )
         }
-        
         let normals = usedVertexIndices.map { vertexIndex in
             let normal = arGeometry.normal(at: vertexIndex)
-            return SIMD3<Float>(normal.0, normal.1, normal.2)
+            return SIMD3<Float>(
+                normal.0,
+                normal.1,
+                normal.2
+            )
         }
-        
         // Create vertex index mapping
         let vertexIndexMap = Dictionary(uniqueKeysWithValues: usedVertexIndices.enumerated().map { ($1, UInt32($0)) })
         let remappedIndices = usedIndices.compactMap { vertexIndexMap[$0] }
-        
         // Generate texture coordinates
         let bounds = positions.reduce((SIMD3<Float>(repeating: Float.greatestFiniteMagnitude),
                                        SIMD3<Float>(repeating: -Float.greatestFiniteMagnitude))) { (bbox, vertex) in
@@ -158,10 +211,8 @@ extension MeshResource {
         meshDescriptor.normals = MeshBuffers.Normals(normals)
         meshDescriptor.textureCoordinates = MeshBuffers.TextureCoordinates(texCoords)
         meshDescriptor.primitives = .triangles(remappedIndices)
-        
         return try MeshResource.generate(from: [meshDescriptor])
     }
-    
     // Note: Use RealityKit's built-in MeshResource.generateBox, generateSphere, etc. methods directly
     // No need to wrap them since they're already available
 }

@@ -20,7 +20,12 @@ class GameStartViewController: UIViewController {
     
     let hostButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = UIColor(red: 78/255, green: 142/255, blue: 240/255, alpha: 1.0)
+        button.backgroundColor = UIColor(
+            red: 78/255,
+            green: 142/255,
+            blue: 240/255,
+            alpha: 1.0
+        )
         button.setTitle("Host", for: .normal)
         button.tintColor = .white
         button.layer.cornerRadius = 12
@@ -30,7 +35,12 @@ class GameStartViewController: UIViewController {
     
     let joinButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = UIColor(red: 78/255, green: 142/255, blue: 240/255, alpha: 1.0)
+        button.backgroundColor = UIColor(
+            red: 78/255,
+            green: 142/255,
+            blue: 240/255,
+            alpha: 1.0
+        )
         button.setTitle("Join", for: .normal)
         button.tintColor = .white
         button.layer.cornerRadius = 12
@@ -40,7 +50,12 @@ class GameStartViewController: UIViewController {
     
     let soloButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = UIColor(red: 78/255, green: 142/255, blue: 240/255, alpha: 1.0)
+        button.backgroundColor = UIColor(
+            red: 78/255,
+            green: 142/255,
+            blue: 240/255,
+            alpha: 1.0
+        )
         button.setTitle("Solo Game", for: .normal)
         button.setTitleColor(.white, for: .normal) // Explicitly set title color
         button.tintColor = .white

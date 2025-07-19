@@ -138,10 +138,16 @@ class NetworkSession: NSObject {
             let data = bits.packData()
             if data.count > 10_000 {
                 let playPeerID = MCPeerID(displayName: player.username)
-                try sendLarge(data: data, to: playPeerID)
+                try sendLarge(
+                    data: data,
+                    to: playPeerID
+                )
             } else {
                 let playPeerID = MCPeerID(displayName: player.username)
-                try sendSmall(data: data, to: playPeerID)
+                try sendSmall(
+                    data: data,
+                    to: playPeerID
+                )
             }
             if action.description != "physics" {
                 os_signpost(
@@ -169,7 +175,11 @@ class NetworkSession: NSObject {
     }
     
     func sendSmall(data: Data, to peer: MCPeerID) throws {
-        try session.send(data, toPeers: [peer], with: .reliable)
+        try session.send(
+            data,
+            toPeers: [peer],
+            with: .reliable
+        )
     }
     
     func sendLarge(data: Data, to peer: MCPeerID) throws {
@@ -215,7 +225,10 @@ class NetworkSession: NSObject {
             os_log(.info, "received from %@", peerID)
             var bits = ReadableBitStream(data: data)
             let action = try Action(from: &bits)
-            let command = GameCommand(player: player, action: action)
+            let command = GameCommand(
+                player: player,
+                action: action
+            )
             delegate?.networkSession(
                 self,
                 received: command

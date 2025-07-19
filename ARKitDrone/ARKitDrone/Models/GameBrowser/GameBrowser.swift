@@ -64,7 +64,11 @@ extension GameBrowser: MCNearbyServiceBrowserDelegate {
         os_log(.info, "found peer %@", peerID)
         guard let appIdentifier = info?[MultiuserAttribute.appIdentifier],
               appIdentifier == Bundle.main.appIdentifier else {
-            os_log(.info, "peer appIdentifier %s doesn't match, ignoring", info?[MultiuserAttribute.appIdentifier] ?? "(nil)")
+            os_log(
+                .info,
+                "peer appIdentifier %s doesn't match, ignoring",
+                info?[MultiuserAttribute.appIdentifier] ?? "(nil)"
+            )
             return
         }
         guard peerID != MCPeerID(displayName: myself.username) else {
@@ -82,7 +86,10 @@ extension GameBrowser: MCNearbyServiceBrowserDelegate {
                 name: gameName
             )
             self.games.insert(game)
-            self.delegate?.gameBrowser(self, sawGames: Array(self.games))
+            self.delegate?.gameBrowser(
+                self,
+                sawGames: Array(self.games)
+            )
         }
     }
     

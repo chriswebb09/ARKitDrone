@@ -26,7 +26,10 @@ extension UIView {
         darkShadow.cornerRadius = 15
         darkShadow.backgroundColor = UIColor.offWhite.cgColor
         darkShadow.shadowColor = UIColor.black.withAlphaComponent(0.2).cgColor
-        darkShadow.shadowOffset = CGSize(width: 10, height: 10)
+        darkShadow.shadowOffset = CGSize(
+            width: 10,
+            height: 10
+        )
         darkShadow.shadowOpacity = 1
         darkShadow.shadowRadius = 15
         layer.insertSublayer(darkShadow, at: 0)

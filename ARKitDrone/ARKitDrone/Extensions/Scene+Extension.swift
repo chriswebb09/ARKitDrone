@@ -90,7 +90,12 @@ extension ARView {
             zFar: 1000
         )
         // Transform world position to screen coordinates
-        let worldPos4 = SIMD4<Float>(point.x, point.y, point.z, 1.0)
+        let worldPos4 = SIMD4<Float>(
+            point.x,
+            point.y,
+            point.z,
+            1.0
+        )
         let cameraPos = viewMatrix * worldPos4
         let clipPos = projectionMatrix * cameraPos
         guard clipPos.w != 0 else {
@@ -105,7 +110,10 @@ extension ARView {
     
     /// Convert 2D screen point to 3D world ray (inverse of projection)
     func unprojectPoint(_ screenPoint: SIMD2<Float>) -> (origin: SIMD3<Float>, direction: SIMD3<Float>) {
-        let cgPoint = CGPoint(x: CGFloat(screenPoint.x), y: CGFloat(screenPoint.y))
+        let cgPoint = CGPoint(
+            x: CGFloat(screenPoint.x),
+            y: CGFloat(screenPoint.y)
+        )
         return ray(from: cgPoint)
     }
     
@@ -118,7 +126,11 @@ extension ARView {
     ///
    func getRaycastQuery(for alignment: ARRaycastQuery.TargetAlignment = .any) -> ARRaycastQuery? {
         guard let frame = session.currentFrame else { return nil }
-        return frame.raycastQuery(from: screenCenter, allowing: .estimatedPlane, alignment: alignment)
+       return frame.raycastQuery(
+        from: screenCenter,
+        allowing: .estimatedPlane,
+        alignment: alignment
+       )
     }
     
     /// Get the center point of the screen

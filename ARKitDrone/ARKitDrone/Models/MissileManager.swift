@@ -264,7 +264,9 @@ class MissileManager {
         DispatchQueue.main.async {
             ship.isDestroyed = true
             ship.removeShip()
-            self.sceneView.addExplosion(at: shipEntity.transform.translation)
+            self.sceneView.addExplosion(
+                at: shipEntity.transform.translation
+            )
         }
         missile.particleEntity?.isEnabled = false
         missileEntity.removeFromParent()

@@ -83,14 +83,12 @@ class FocusSquare: Entity {
     private func createSimpleSquareOutline() {
         let halfSize = Self.size * 0.5
         let thickness = Self.thickness
-        
         let segments = [
             (SIMD3<Float>(0, 0, -halfSize), SIMD3<Float>(Self.size, thickness, thickness)),
             (SIMD3<Float>(0, 0, halfSize), SIMD3<Float>(Self.size, thickness, thickness)),
             (SIMD3<Float>(-halfSize, 0, 0), SIMD3<Float>(thickness, thickness, Self.size)),
             (SIMD3<Float>(halfSize, 0, 0), SIMD3<Float>(thickness, thickness, Self.size))
         ]
-        
         for (position, size) in segments {
             let segmentEntity = Entity()
             segmentEntity.transform.translation = position
@@ -160,7 +158,6 @@ class FocusSquare: Entity {
             )
             self.transform.translation = newPosition
         }
-        
         self.isEnabled = true
     }
     
@@ -171,7 +168,6 @@ class FocusSquare: Entity {
                                        anchor.transform.columns.1.z)
         let up = SIMD3<Float>(0, 1, 0)
         let normal = simd_normalize(planeNormal)
-        
         if simd_length(simd_cross(up, normal)) > 0.001 {
             let rotationAxis = simd_normalize(simd_cross(up, normal))
             let angle = acos(simd_clamp(simd_dot(up, normal), -1.0, 1.0))
@@ -216,7 +212,10 @@ class FocusSquare: Entity {
     
     func update(with raycastResult: ARRaycastResult?, camera: ARCamera?) {
         if let result = raycastResult {
-            state = .detecting(raycastResult: result, camera: camera)
+            state = .detecting(
+                raycastResult: result,
+                camera: camera
+            )
         } else {
             state = .initializing
         }
@@ -224,7 +223,11 @@ class FocusSquare: Entity {
     
     func updateWithLightweight(result lightweightResult: LightweightRaycastResult?, camera: ARCamera?) {
         if let result = lightweightResult {
-            updatePositionDirectly(worldTransform: result.worldTransform, anchor: result.anchor, camera: camera)
+            updatePositionDirectly(
+                worldTransform: result.worldTransform,
+                anchor: result.anchor,
+                camera: camera
+            )
             self.isEnabled = true
         } else {
             state = .initializing
@@ -255,7 +258,11 @@ class FocusSquare: Entity {
     
     func updateFocusSquare(for arView: ARView, camera: ARCamera?) {
         let center = CGPoint(x: arView.bounds.midX, y: arView.bounds.midY)
-        let results = arView.raycast(from: center, allowing: .estimatedPlane, alignment: .horizontal)
+        let results = arView.raycast(
+            from: center,
+            allowing: .estimatedPlane,
+            alignment: .horizontal
+        )
         if let result = results.first {
             update(with: result, camera: camera)
         } else {

@@ -20,11 +20,9 @@ class Joystick: SKNode {
     }
     
     private let backdropNode, thumbNode: SKSpriteNode
-    
     private var isTracking: Bool = false
     
     var angularVelocity: CGFloat = 0.0
-    
     var velocity: CGPoint = .zero
     
     weak var delegate: JoystickDelegate?
@@ -66,10 +64,8 @@ class Joystick: SKNode {
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let touchPoint = touch.location(in: self)
-        
         // Check if movement is significant enough to consider it movement vs tap
         let distanceFromStart = sqrt(pow(touchPoint.x - touchStartLocation.x, 2) + pow(touchPoint.y - touchStartLocation.y, 2))
-        
         // Only update joystick position if movement is significant enough
         if distanceFromStart > 30 { // 30 points threshold - prevent accidental movement on taps
             hasMovedSignificantly = true
@@ -80,19 +76,15 @@ class Joystick: SKNode {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        
         guard let touch = touches.first else { return }
         let touchDuration = touch.timestamp - touchStartTime
-        
         // If no significant movement was detected, it's a tap
         let wasTap = !hasMovedSignificantly && touchDuration < 0.6
-        
         if wasTap {
             DispatchQueue.main.async {
                 self.delegate?.tapped()
             }
         }
-        
         DispatchQueue.main.async {
             self.resetVelocity()
         }
@@ -100,7 +92,6 @@ class Joystick: SKNode {
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
         print("🎮 Touch CANCELLED")
-        
         // If touch was cancelled but no significant movement occurred, treat as tap
         if !hasMovedSignificantly {
             print("🎯 Treating as TAP!")
@@ -110,7 +101,6 @@ class Joystick: SKNode {
         } else {
             print("🎮 Had movement - not firing")
         }
-        
         DispatchQueue.main.async {
             self.resetVelocity()
         }
@@ -127,7 +117,10 @@ class Joystick: SKNode {
         }
         self.isTracking = false
         self.velocity = .zero
-        let easeOut = SKAction.move(to: .zero, duration: LocalConstants.kThumbSpringBack)
+        let easeOut = SKAction.move(
+            to: .zero,
+            duration: LocalConstants.kThumbSpringBack
+        )
         easeOut.timingMode = .easeOut
         thumbNode.removeAllActions()
         self.thumbNode.run(easeOut)
@@ -139,12 +132,10 @@ class Joystick: SKNode {
         // This approach gives a more direct control feel
         //  let thumbWidth = thumbNode.size.width / 2
         let maxDistance = backdropNode.size.width / 2 - 10
-        
         let dx = touchPoint.x
         let dy = touchPoint.y
         let distance = sqrt(dx * dx + dy * dy)
         let angle = atan2(dy, dx)
-        
         // Position the thumb
         if distance < maxDistance {
             thumbNode.position = touchPoint
@@ -152,7 +143,6 @@ class Joystick: SKNode {
             let newX = cos(angle) * maxDistance
             let newY = sin(angle) * maxDistance
             thumbNode.position = CGPoint(x: newX, y: newY)
-            
         }
         // Set velocity directly based on thumb position
         // This preserves the original behavior while adding the multiplier
@@ -160,7 +150,6 @@ class Joystick: SKNode {
             x: thumbNode.position.x * LocalConstants.velocityMultiplier,
             y: thumbNode.position.y * LocalConstants.velocityMultiplier
         )
-        
         // Only update velocity if movement is significant enough to prevent tiny movements
         let velocityMagnitude = sqrt(newVelocity.x * newVelocity.x + newVelocity.y * newVelocity.y)
         if velocityMagnitude > 10.0 { // Minimum velocity threshold - much higher to prevent tap movement
@@ -174,7 +163,7 @@ class Joystick: SKNode {
 }
 
 private extension CGPoint {
-
+    
     static func - (lhs: CGPoint, rhs: CGPoint) -> CGPoint {
         return CGPoint(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
     }

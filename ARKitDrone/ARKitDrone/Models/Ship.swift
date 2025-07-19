@@ -118,9 +118,18 @@ class Ship: @unchecked Sendable {
     
     @MainActor
     func updateShipPosition(perceivedCenter: SIMD3<Float>, perceivedVelocity: SIMD3<Float>, otherShips: [Ship], obstacles: [Entity]) {
-        var v1 = flyCenterOfMass(otherShips.count, perceivedCenter)
-        var v2 = keepASmallDistance(self, ships: otherShips)
-        var v3 = matchSpeedWithOtherShips(otherShips.count, perceivedVelocity)
+        var v1 = flyCenterOfMass(
+            otherShips.count,
+            perceivedCenter
+        )
+        var v2 = keepASmallDistance(
+            self,
+            ships: otherShips
+        )
+        var v3 = matchSpeedWithOtherShips(
+            otherShips.count,
+            perceivedVelocity
+        )
         var v4 = boundPositions(self)
         
         v1 *= 0.1
@@ -135,7 +144,11 @@ class Ship: @unchecked Sendable {
         // Update rotation to face movement direction
         if simd_length(velocity) > 0.001 {
             let direction = simd_normalize(velocity)
-            entity.look(at: entity.transform.translation + direction, from: entity.transform.translation, relativeTo: nil)
+            entity.look(
+                at: entity.transform.translation + direction,
+                from: entity.transform.translation,
+                relativeTo: nil
+            )
         }
         // Update target square if present
         if targetAdded, let square = square {
@@ -192,16 +205,26 @@ extension Ship {
     
     @MainActor
     func attack(target: Entity) {
-        let distanceToTarget = simd_distance(entity.transform.translation, target.transform.translation)
+        let distanceToTarget = simd_distance(
+            entity.transform.translation,
+            target.transform.translation
+        )
         let attackRange: Float = 50.0
         // Look at target
-        entity.look(at: target.transform.translation, from: entity.transform.translation, relativeTo: nil)
+        entity.look(
+            at: target.transform.translation,
+            from: entity.transform.translation,
+            relativeTo: nil
+        )
         if distanceToTarget <= attackRange {
             if !isDestroyed {
                 if !fired {
                     fired = true
                     self.fireAt(target)
-                    _ = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { [weak self] timer in
+                    _ = Timer.scheduledTimer(
+                        withTimeInterval: 0.5,
+                        repeats: false
+                    ) { [weak self] timer in
                         guard let self = self else { return }
                         Task { @MainActor in
                             self.fired = false
@@ -218,16 +241,12 @@ extension Ship {
             // Create missile entity
             let missile = createMissile()
             missile.transform.translation = self.entity.transform.translation
-            
             let targetPos = target.transform.translation
             let currentPos = missile.transform.translation
             let direction = simd_normalize(targetPos - currentPos)
-            
             missile.look(at: targetPos, from: currentPos, relativeTo: nil)
-            
             // Add physics force simulation
             _ = direction * 1000
-            
             // Add to scene (you'll need to pass the scene reference)
             // scene.addAnchor(AnchorEntity(world: missile.transform.translation))
         }
@@ -237,10 +256,18 @@ extension Ship {
         let missile = Entity()
         missile.name = "Missile"
         // Create missile geometry
-        let geometry = MeshResource.generateCylinder(height: 0.4, radius: 0.06)
+        let geometry = MeshResource.generateCylinder(
+            height: 0.4,
+            radius: 0.06
+        )
         var material = UnlitMaterial()
         material.color = .init(tint: .red)
-        missile.components.set(ModelComponent(mesh: geometry, materials: [material]))
+        missile.components.set(
+            ModelComponent(
+                mesh: geometry,
+                materials: [material]
+            )
+        )
         // Add physics
         let physicsComponent = PhysicsBodyComponent(
             massProperties: PhysicsMassProperties(mass: 0.1),
@@ -249,7 +276,10 @@ extension Ship {
         )
         missile.components.set(physicsComponent)
         let collisionComponent = CollisionComponent(
-            shapes: [ShapeResource.generateCapsule(height: 0.4, radius: 0.06)]
+            shapes: [ShapeResource.generateCapsule(
+                height: 0.4,
+                radius: 0.06
+            )]
         )
         missile.components.set(collisionComponent)
         

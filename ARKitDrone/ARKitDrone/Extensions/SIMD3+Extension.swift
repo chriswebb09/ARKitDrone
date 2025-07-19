@@ -46,7 +46,11 @@ extension SIMD3<Float> {
     
     /// Create position from transform matrix
     static func positionFromTransform(_ transform: simd_float4x4) -> SIMD3<Float> {
-        return SIMD3<Float>(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
+        return SIMD3<Float>(
+            transform.columns.3.x,
+            transform.columns.3.y,
+            transform.columns.3.z
+        )
     }
     
     /// Negate vector

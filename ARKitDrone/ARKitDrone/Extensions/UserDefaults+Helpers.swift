@@ -80,18 +80,29 @@ extension UserDefaults {
     var myself: Player {
         get {
             if let data = data(forKey: UserDefaultsKeys.peerID),
-               let unarchived = try? NSKeyedUnarchiver.unarchivedObject(ofClass: MCPeerID.self, from: data) {
+               let unarchived = try? NSKeyedUnarchiver.unarchivedObject(
+                ofClass: MCPeerID.self,
+                from: data
+               ) {
                 let peerID = unarchived
                 return Player(peerID: peerID)
             }
             // if no playerID was previously selected, create and cache a new one.
             let player = Player(username: UIDevice.current.name)
-            let newData = try? NSKeyedArchiver.archivedData(withRootObject: MCPeerID(displayName: player.username), requiringSecureCoding: true)
+            let newData = try? NSKeyedArchiver.archivedData(
+                withRootObject: MCPeerID(
+                    displayName: player.username
+                ),
+                requiringSecureCoding: true
+            )
             set(newData, forKey: UserDefaultsKeys.peerID)
             return player
         }
         set {
-            let data = try? NSKeyedArchiver.archivedData(withRootObject: MCPeerID(displayName: newValue.username), requiringSecureCoding: true)
+            let data = try? NSKeyedArchiver.archivedData(
+                withRootObject: MCPeerID(displayName: newValue.username),
+                requiringSecureCoding: true
+            )
             set(data, forKey: UserDefaultsKeys.peerID)
         }
     }
