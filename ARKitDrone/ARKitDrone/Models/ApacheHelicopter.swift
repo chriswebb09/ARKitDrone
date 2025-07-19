@@ -69,15 +69,11 @@ class ApacheHelicopter {
     }
     
     private func loadHelicopterModel() async {
-        
         do {
-            let entity = try await Entity(named:"heli")
+            // Use AsyncModelLoader with async Entity(named:) for Reality files
+            let entity = try await AsyncModelLoader.shared.loadRealityModel(named: "heli")
             let model = entity.findEntity(named: "Model")
-//            let temp2 = await temp!.findEntity(named: "Untitled")
-//            for child in await temp!.children {
-//                await print(child.name)
-//            }
-            self.helicopter = model!.findEntity(named: "Apache")
+            self.helicopter = model?.findEntity(named: "Apache")
             
             // Apply helicopter orientation correction
             let originalRotation = simd_quatf(real: 0.7071069, imag: SIMD3<Float>(-0.70710665, 0.0, 0.0))
@@ -85,10 +81,8 @@ class ApacheHelicopter {
             let levelNose = simd_quatf(angle: .pi / 2, axis: [1, 0, 0])
             let correctionRotation = originalRotation * faceUserRotation * levelNose
             
-            await MainActor.run {
-                self.helicopter?.scale = SIMD3<Float>(repeating: 0.4)
-                self.helicopter?.transform.rotation = correctionRotation
-            }
+            self.helicopter?.scale = SIMD3<Float>(repeating: 0.4)
+            self.helicopter?.transform.rotation = correctionRotation
             
             await self.setupHelicopterComponents()
             self.setupMissiles()
@@ -102,9 +96,8 @@ class ApacheHelicopter {
             }
             
         } catch {
-            return
+            print("❌ Failed to load helicopter: \(error)")
         }
-        
     }
     
     private func setupHelicopterComponents() async {
@@ -126,13 +119,6 @@ class ApacheHelicopter {
         if let frontIRSteering = self.frontIRSteering {
             self.frontIR = frontIRSteering.findEntity(named: "FrontIR")
         }
-        
-        
-        
-//        // Debug: Print the hierarchy of the helicopter entity
-//        if let helicopter = helicopter {
-//
-//        }
     }
     
     private func debugPrintEntityHierarchy(_ entity: Entity, indent: Int) {
@@ -178,8 +164,8 @@ class ApacheHelicopter {
     }
     
     func startRotorRotation() {
-        guard rotor != nil, tailRotor != nil else { 
-            return 
+        guard rotor != nil, tailRotor != nil else {
+            return
         }
         
         // Stop any existing timer
@@ -188,9 +174,9 @@ class ApacheHelicopter {
         // Create a timer to manually rotate the rotors - ensure it runs on main thread
         DispatchQueue.main.async { [weak self] in
             self?.rotorTimer = Timer.scheduledTimer(withTimeInterval: 1.0/30.0, repeats: true) { [weak self] timer in
-                guard let self = self else { 
+                guard let self = self else {
                     timer.invalidate()
-                    return 
+                    return
                 }
                 Task { @MainActor in
                     self.updateRotorRotation()
@@ -209,8 +195,8 @@ class ApacheHelicopter {
     private func updateRotorRotation() {
         updateCounter += 1
         
-        guard let rotor = rotor, let tailRotor = tailRotor else { 
-            return 
+        guard let rotor = rotor, let tailRotor = tailRotor else {
+            return
         }
         
         // Increment rotation angles
@@ -406,7 +392,7 @@ class ApacheHelicopter {
     
     // MARK: - RealityKitMissile System
     
-//    var missilesArmed: Bool = false
+    //    var missilesArmed: Bool = false
     
     func toggleArmMissile() {
         missilesArmed = !missilesArmed

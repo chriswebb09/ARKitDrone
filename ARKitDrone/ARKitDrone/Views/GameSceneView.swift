@@ -28,64 +28,62 @@ class GameSceneView: ARView {
     var attack: Bool = false
     var competitor: ApacheHelicopter!
     
+    // REPLACE setup() method:
     func setup() async {
-        // Configure ARView settings immediately for camera
         automaticallyConfigureSession = false
         
-        // Load models asynchronously in background to prevent camera freeze
-        Task.detached { [weak self] in
-            guard let self else { return }
-            
-            let heli = await ApacheHelicopter()
-            await heli.setup()
-            
-            // Now hop to the main actor and assign
-            await MainActor.run {
-                self.helicopter = heli
+        // Start preloading models immediately
+        Task.detached {
+            await AsyncModelLoader.shared.preloadModels([
+                "F-35B_Lightning_II",  // USDZ files
+                "m1tankmodel"
+            ])
+            // Preload Reality files separately
+            do {
+                _ = try await AsyncModelLoader.shared.loadRealityModel(named: "heli")
+                print("✅ Preloaded: heli.reality")
+            } catch {
+                print("❌ Failed to preload heli: \(error)")
             }
         }
         
-        // Load tank model asynchronously
-        Task.detached { [weak self] in
-            guard let self else { return }
-            
+        // Load helicopter async
+        Task { @MainActor in
+            let heli = await ApacheHelicopter()
+            await heli.setup()
+            self.helicopter = heli
+        }
+        
+        // Load tank async
+        Task { @MainActor in
             do {
-                let entity = try await Entity.loadUSDZ(named: LocalConstants.tankAssetName)
+                let entity = try await AsyncModelLoader.shared.loadModel(named: "m1tankmodel")
                 
-                // Find the root entity which contains all tank parts
                 let tankRootEntity: Entity
-                if let rootEntity = await entity.findEntity(named: "root") {
+                if let rootEntity = entity.findEntity(named: "root") {
                     tankRootEntity = rootEntity
                 } else {
                     tankRootEntity = entity
                 }
                 
-                // Configure the tank model on the main actor
-                await MainActor.run {
-                    tankRootEntity.name = "Tank"
-                    tankRootEntity.scale = SIMD3<Float>(repeating: 0.1)
-                    tankRootEntity.isEnabled = true
-                    
-                    // Fix orientation - rotate to make turret face up
-                    tankRootEntity.transform.rotation = simd_quatf(angle: -Float.pi / 2, axis: SIMD3<Float>(1, 0, 0))
-                    
-                    // Set up collision and physics on the body part
-                    if let bodyEntity = tankRootEntity.findEntity(named: "body") {
-                        let bounds = bodyEntity.visualBounds(relativeTo: nil).extents
-                        bodyEntity.components.set(CollisionComponent(shapes: [.generateBox(size: bounds)]))
-                        bodyEntity.components.set(PhysicsBodyComponent(massProperties: .default, material: .default, mode: .static))
-                    }
-                    
-                    // Store the root entity, but we need it as ModelEntity for the interface
-                    if let modelEntity = tankRootEntity as? ModelEntity {
-                        self.tankEntity = modelEntity
-                    } else {
-                        // Create a ModelEntity wrapper if needed
-                        let wrapperEntity = ModelEntity()
-                        wrapperEntity.name = "TankWrapper"
-                        wrapperEntity.addChild(tankRootEntity)
-                        self.tankEntity = wrapperEntity
-                    }
+                tankRootEntity.name = "Tank"
+                tankRootEntity.scale = SIMD3<Float>(repeating: 0.1)
+                tankRootEntity.isEnabled = true
+                tankRootEntity.transform.rotation = simd_quatf(angle: -Float.pi / 2, axis: SIMD3<Float>(1, 0, 0))
+                
+                if let bodyEntity = tankRootEntity.findEntity(named: "body") {
+                    let bounds = bodyEntity.visualBounds(relativeTo: nil).extents
+                    bodyEntity.components.set(CollisionComponent(shapes: [.generateBox(size: bounds)]))
+                    bodyEntity.components.set(PhysicsBodyComponent(massProperties: .default, material: .default, mode: .static))
+                }
+                
+                if let modelEntity = tankRootEntity as? ModelEntity {
+                    self.tankEntity = modelEntity
+                } else {
+                    let wrapperEntity = ModelEntity()
+                    wrapperEntity.name = "TankWrapper"
+                    wrapperEntity.addChild(tankRootEntity)
+                    self.tankEntity = wrapperEntity
                 }
                 
             } catch {
@@ -94,13 +92,12 @@ class GameSceneView: ARView {
         }
     }
     
+    // UPDATE positionHelicopter method:
     func positionHelicopter(at position: SIMD3<Float>) async -> ApacheHelicopter? {
-        // Ensure helicopter is initialized
         if helicopter == nil {
             helicopter = await ApacheHelicopter()
         }
         
-        // Ensure helicopter entity is loaded (load if not already)
         if helicopter?.helicopter == nil {
             await helicopter?.setup()
         }
@@ -110,23 +107,18 @@ class GameSceneView: ARView {
             return nil
         }
         
-        // Remove existing anchor
         helicopterAnchor?.removeFromParent()
         
-        // Adjust position to lift and offset from tank slightly
         let helicopterPosition = SIMD3<Float>(x: position.x, y: position.y + 0.5, z: position.z - 0.2)
         
-        // Create new anchor and attach helicopter
         helicopterAnchor = AnchorEntity(world: helicopterPosition)
-        heliEntity.position = .zero  // Attach at origin relative to anchor
+        heliEntity.position = .zero
         helicopterAnchor?.addChild(heliEntity)
         if let anchor = helicopterAnchor {
             scene.anchors.append(anchor)
         }
         
-        // Initialize helicopter HUD
         helicopter.setupHUD()
-        
         return helicopter
     }
     

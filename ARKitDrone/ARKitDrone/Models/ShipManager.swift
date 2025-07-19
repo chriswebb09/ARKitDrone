@@ -9,6 +9,11 @@
 import RealityKit
 import ARKit
 
+enum ModelLoadError: Error {
+    case fileNotFound(String)
+    case loadingFailed(String)
+}
+
 @MainActor
 class ShipManager {
     
@@ -30,20 +35,21 @@ class ShipManager {
         self.arView = arView
     }
     
-    func setupShips() {
-        // Prevent duplicate ship creation
+    // REPLACE setupShips() method:
+    func setupShips() async {
         guard !shipsSetup else {
             print("⚠️ Ships already setup, skipping")
             return
         }
         
-        Task {
-            do {
-                let f35Entity = try await Entity.loadUSDZ(named: LocalConstants.f35Scene, in: .main)
-                
-                // Create all ships at once on main actor
-                await MainActor.run {
-                    for i in 1...3 {
+        do {
+            // Use AsyncModelLoader
+            let f35Entity = try await AsyncModelLoader.shared.loadModel(named: "F-35B_Lightning_II")
+            
+            // Create ships in parallel
+            await withTaskGroup(of: Ship?.self) { group in
+                for i in 1...3 {
+                    group.addTask { @MainActor in
                         let shipEntity = f35Entity.clone(recursive: true)
                         shipEntity.name = "F_35B \(i)"
                         
@@ -53,45 +59,47 @@ class ShipManager {
                             z: Float.random(in: -20.0...40.0)
                         )
                         
-                        // Create anchor at world origin and position ship directly
                         let anchor = AnchorEntity(world: SIMD3<Float>(0, 0, 0))
                         anchor.addChild(shipEntity)
-                        arView.scene.addAnchor(anchor)
+                        self.arView.scene.addAnchor(anchor)
                         
-                        // Position ship at the random offset in world space
                         shipEntity.transform.translation = randomOffset
                         shipEntity.transform.scale = SIMD3<Float>(x: 0.005, y: 0.005, z: 0.005)
                         
                         let ship = Ship(entity: shipEntity)
                         ship.num = i
-                        
-                        self.ships.append(ship)
-                        print("🚢 Ship \(i) created: destroyed = \(ship.isDestroyed), position = \(shipEntity.transform.translation)")
-                        
-                        if i == 1 {
-                            self.targetIndex = 0
-                            // Only create target if one doesn't already exist
-                            if ship.square == nil && !ship.targetAdded {
-                                let square = TargetNode()
-                                ship.square = square
-                                anchor.addChild(square)
-                                ship.targetAdded = true
-                            }
-                        }
-                    }
-                    self.shipsSetup = true
-                    print("✅ All 3 ships created successfully")
-                    
-                    // Sync ships to arView for MissileManager access
-                    if let gameRealityView = self.arView as? GameSceneView {
-                        gameRealityView.ships = self.ships
-                        print("🔄 Ships synced to GameRealityView: \(gameRealityView.ships.count)")
+                        return ship
                     }
                 }
-            } catch {
-                print("❌ Failed to load ship model: \(error)")
-                return
+                
+                // Collect results
+                for await ship in group {
+                    if let ship = ship {
+                        self.ships.append(ship)
+                        print("🚢 Ship \(ship.num ?? 0) created")
+                    }
+                }
             }
+            
+            // Setup first target
+            if !ships.isEmpty {
+                let square = TargetNode()
+                ships[0].square = square
+                if let parent = ships[0].entity.parent {
+                    parent.addChild(square)
+                }
+                ships[0].targetAdded = true
+            }
+            
+            self.shipsSetup = true
+            
+            // Sync to GameSceneView
+            if let gameRealityView = self.arView as? GameSceneView {
+                gameRealityView.ships = self.ships
+            }
+            
+        } catch {
+            print("❌ Failed to load ship model: \(error)")
         }
     }
     
@@ -130,9 +138,9 @@ class ShipManager {
     
     func moveShips(placed: Bool) {
         // Skip distance culling for now - update all ships
-        guard !ships.isEmpty else { 
+        guard !ships.isEmpty else {
             print("❌ No ships to move")
-            return 
+            return
         }
         
         print("🚢 Moving \(ships.count) ships, placed: \(placed)")
@@ -145,11 +153,11 @@ class ShipManager {
             perceivedVelocity = perceivedVelocity + otherShip.velocity
         }
         
-//        // Get helicopter position for orbiting behavior
-//        let helicopterPos = helicopterEntity?.transform.translation ?? SIMD3<Float>(0, 0, 0)
-//        let cameraTransform = arView.session.currentFrame?.camera.transform ?? matrix_identity_float4x4
-//        let cameraPos = SIMD3<Float>(cameraTransform.columns.3.x, cameraTransform.columns.3.y, cameraTransform.columns.3.z)
-//        
+        //        // Get helicopter position for orbiting behavior
+        //        let helicopterPos = helicopterEntity?.transform.translation ?? SIMD3<Float>(0, 0, 0)
+        //        let cameraTransform = arView.session.currentFrame?.camera.transform ?? matrix_identity_float4x4
+        //        let cameraPos = SIMD3<Float>(cameraTransform.columns.3.x, cameraTransform.columns.3.y, cameraTransform.columns.3.z)
+        //
         // Update all ships
         ships.forEach { ship in
             ship.updateShipPosition(
@@ -180,6 +188,85 @@ class ShipManager {
                             self.attack = false
                         }
                         timer.invalidate()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@MainActor
+class AsyncModelLoader {
+    static let shared = AsyncModelLoader()
+    private var loadingCache: [String: Task<Entity, Error>] = [:]
+    
+    private init() {} // Singleton
+    
+    func loadModel(named: String, withExtension ext: String = "usdz") async throws -> Entity {
+        let fullName = "\(named).\(ext)"
+        
+        // Check if already loading
+        if let existingTask = loadingCache[fullName] {
+            return try await existingTask.value
+        }
+        
+        // Create new loading task
+        let task = Task<Entity, Error> {
+            guard let url = Bundle.main.url(forResource: named, withExtension: ext) else {
+                throw ModelLoadError.fileNotFound(fullName)
+            }
+            
+            // Use async Entity initializer (NOT Entity.load)
+            return try await Entity(contentsOf: url)
+        }
+        
+        loadingCache[fullName] = task
+        
+        do {
+            let entity = try await task.value
+            loadingCache.removeValue(forKey: fullName)
+            return entity
+        } catch {
+            loadingCache.removeValue(forKey: fullName)
+            throw error
+        }
+    }
+    
+    // Alternative method using Entity(named:) async for Reality files
+    func loadRealityModel(named: String) async throws -> Entity {
+        let fullName = "\(named).reality"
+        
+        if let existingTask = loadingCache[fullName] {
+            return try await existingTask.value
+        }
+        
+        let task = Task<Entity, Error> {
+            // Use async Entity(named:) for Reality files
+            return try await Entity(named: named)
+        }
+        
+        loadingCache[fullName] = task
+        
+        do {
+            let entity = try await task.value
+            loadingCache.removeValue(forKey: fullName)
+            return entity
+        } catch {
+            loadingCache.removeValue(forKey: fullName)
+            throw error
+        }
+    }
+    
+    // Preload models during app startup
+    func preloadModels(_ modelNames: [String]) async {
+        await withTaskGroup(of: Void.self) { group in
+            for modelName in modelNames {
+                group.addTask {
+                    do {
+                        _ = try await self.loadModel(named: modelName)
+                        print("✅ Preloaded: \(modelName)")
+                    } catch {
+                        print("❌ Failed to preload: \(modelName) - \(error)")
                     }
                 }
             }

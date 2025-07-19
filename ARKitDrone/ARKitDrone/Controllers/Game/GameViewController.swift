@@ -183,31 +183,21 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         return realityKitView.session
     }
     
-    
     // MARK: - ViewController Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         DeviceOrientation.shared.set(orientation: .landscapeRight)
-        setupRealityKit()
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(missileCanHit),
-            name: .missileCanHit,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(advanceToNextTarget),
-            name: .advanceTarget,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(updateScoreUI),
-            name: .updateScore,
-            object: nil
-        )
+        
+        // Start async setup immediately
+        Task {
+            await setupRealityKitAsync()
+        }
+        
+        // Setup notifications
+        NotificationCenter.default.addObserver(self, selector: #selector(missileCanHit), name: .missileCanHit, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(advanceToNextTarget), name: .advanceTarget, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateScoreUI), name: .updateScore, object: nil)
         
         overlayView = gameStartViewContoller.view
         gameStartViewContoller.delegate = self
@@ -215,6 +205,55 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         view.bringSubviewToFront(overlayView!)
     }
     
+    private func setupRealityKitAsync() async {
+        guard realityKitView.superview == nil else { return }
+        
+        await MainActor.run {
+            view.insertSubview(realityKitView, at: 0)
+            
+            realityKitView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                realityKitView.topAnchor.constraint(equalTo: view.topAnchor),
+                realityKitView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                realityKitView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                realityKitView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            ])
+        }
+        
+        // Configure AR session
+        let config = ARWorldTrackingConfiguration()
+        config.planeDetection = [.horizontal]
+        if addsMesh {
+            if ARWorldTrackingConfiguration.supportsSceneReconstruction(.meshWithClassification) {
+                config.sceneReconstruction = .meshWithClassification
+                config.frameSemantics = .sceneDepth
+            }
+        }
+        realityKitView.session.run(config, options: [.resetTracking, .removeExistingAnchors])
+        realityKitView.session.delegate = self
+        
+        // Setup RealityKit view async
+        await realityKitView.setup()
+        
+        await MainActor.run {
+            // Setup managers
+            missileManager = MissileManager(game: game, sceneView: realityKitView)
+            missileManager?.delegate = self
+            shipManager = ShipManager(game: game, arView: realityKitView)
+            
+            // Add UI elements
+            realityKitView.addSubview(padView1)
+            realityKitView.addSubview(padView2)
+            realityKitView.addSubview(destoryedText)
+            realityKitView.addSubview(armMissilesButton)
+            realityKitView.addSubview(scoreText)
+            
+            focusSquareAnchor = AnchorEntity(world: SIMD3<Float>(0, 0, -1))
+            focusSquareAnchor!.addChild(focusSquare)
+            realityKitView.scene.addAnchor(focusSquareAnchor!)
+            focusSquare.unhide()
+        }
+    }
     
     private func setupRealityKit() {
         guard realityKitView.superview == nil else { return }
@@ -343,17 +382,6 @@ class GameViewController: UIViewController, MissileManagerDelegate {
     
     // MARK: - Private Methods
     
-    func startMinimapUpdate() {
-        let updateAction = SKAction.run { [weak self] in
-            guard let self = self else { return }
-            updateMinimap()
-        }
-        let delay = SKAction.wait(forDuration: 0.1)
-        let updateLoop = SKAction.sequence([updateAction, delay])
-        minimapScene.run(
-            SKAction.repeatForever(updateLoop)
-        )
-    }
     
     @objc func startGame() {
         let gameSession = NetworkSession(
@@ -534,7 +562,9 @@ class GameViewController: UIViewController, MissileManagerDelegate {
                 shipManager?.helicopterEntity = helicopterEntity
                 
                 // Setup ships immediately on main thread for responsiveness
-                shipManager?.setupShips()
+                Task {
+                    await shipManager?.setupShips()
+                }
             }
         }
         
