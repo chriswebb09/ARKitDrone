@@ -7,7 +7,6 @@
 
 import Foundation
 import simd
-import SceneKit
 import os.log
 
 class MovementSyncSceneData {
@@ -38,6 +37,7 @@ class MovementSyncSceneData {
     // Put up a packet number to make sure that packets are in order
     private var lastPacketNumberRead = 0
     
+    @MainActor
     func addObject(_ object: GameObject) {
         guard let data = object.generateMovementData() else { return }
         lock.lock() ; defer { lock.unlock() }
@@ -45,6 +45,7 @@ class MovementSyncSceneData {
         nodeDataList.append(data)
     }
     
+    @MainActor
     func generateData() -> MovementSyncData {
         lock.lock() ; defer { lock.unlock() }
         // Update Data of normal nodes
@@ -63,6 +64,7 @@ class MovementSyncSceneData {
         return packet
     }
     
+    @MainActor
     func updateFromReceivedData() {
         lock.lock() ; defer { lock.unlock() }
         discardOutOfOrderData()
@@ -122,6 +124,7 @@ class MovementSyncSceneData {
         packetReceived += 1
     }
     
+    @MainActor
     private func apply(packet: MovementSyncData) {
         lastPacketNumberRead = packet.packetNumber
         nodeDataList = packet.nodeData
@@ -129,6 +132,7 @@ class MovementSyncSceneData {
         updateObjectsFromData(isHalfway: false)
     }
     
+    @MainActor
     private func updateObjectsFromData(isHalfway: Bool) {
         // Update Nodes
         let objectCount = min(objectList.count, nodeDataList.count)

@@ -9,27 +9,11 @@
 import ARKit
 import os
 
-extension GameViewController: ARSCNViewDelegate {
+// DEPRECATED: This ARSCNViewDelegate is no longer used in RealityKit-only mode
+// Game loop and ship movement logic has been moved to ARSessionDelegate for RealityKit compatibility
+extension GameViewController {
     
-    // MARK: - ARSCNViewDelegate
-    
-    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        DispatchQueue.main.async {
-            if self.game.placed {
-                self.shipManager.moveShips(placed: self.game.placed)
-            }
-            self.updateFocusSquare(isObjectVisible: self.game.placed)
-        }
-        os_signpost(.begin, log: .render_loop, name: .render_loop, signpostID: .render_loop, "Render loop started")
-        os_signpost(.begin, log: .render_loop, name: .logic_update, signpostID: .render_loop, "Game logic update started")
-        if let gameManager = self.gameManager, gameManager.isInitialized {
-            GameTime.updateAtTime(time: time)
-            self.gameManager?.update(timeDelta: GameTime.deltaTime)
-        }
-        os_signpost(.end, log: .render_loop, name: .logic_update, signpostID: .render_loop, "Game logic update finished")
-    }
-    
-    func sessionShouldAttemptRelocalization(_ session: ARSession) -> Bool {
+    nonisolated func sessionShouldAttemptRelocalization(_ session: ARSession) -> Bool {
         return true
     }
     

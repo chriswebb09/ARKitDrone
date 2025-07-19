@@ -8,7 +8,6 @@
 
 import Foundation
 import simd
-import SceneKit
 
 struct FloatCompressor {
     var minValue: Float

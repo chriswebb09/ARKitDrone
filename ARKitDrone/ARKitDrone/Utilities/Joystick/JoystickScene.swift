@@ -31,10 +31,11 @@ class JoystickScene: SKScene {
     
     override func update(_ currentTime: CFTimeInterval) {
         super.update(currentTime)
-       
+        
         let joystickVelocity = self.joystick.velocity
         
-        if joystickVelocity != .zero {
+        let velocityMagnitude = sqrt(joystickVelocity.x * joystickVelocity.x + joystickVelocity.y * joystickVelocity.y)
+        if velocityMagnitude > 15.0 { // Only send movement if velocity is significant - higher threshold
             let isVertical = abs(joystickVelocity.y) > abs(joystickVelocity.x)
             if isVertical {
                 let test = SIMD3<Float>(x: 0, y: Float(joystickVelocity.y), z: Float(joystickVelocity.y))

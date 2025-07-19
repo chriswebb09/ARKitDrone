@@ -6,7 +6,6 @@
 //  Copyright © 2025 Christopher Webb-Orenstein. All rights reserved.
 //
 
-import SceneKit
 import ARKit
 
 extension ARWorldMap {

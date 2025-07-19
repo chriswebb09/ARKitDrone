@@ -8,7 +8,6 @@
 
 import Foundation
 import simd
-import SceneKit
 
 struct WritableBitStream {
     var bytes = [UInt8]()

@@ -1,12 +1,14 @@
 /*
-See LICENSE folder for this sample’s licensing information.
-
-Abstract:
-Central static class to keep track of game time.
-*/
+ See LICENSE folder for this sample’s licensing information.
+ 
+ Abstract:
+ Central static class to keep track of game time.
+ */
 
 import Foundation
+import RealityKit
 
+@MainActor
 class GameTime {
     
     //! The start time of the app.

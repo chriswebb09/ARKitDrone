@@ -8,7 +8,7 @@
 
 import Foundation
 import simd
-import SceneKit
+import RealityKit
 
 private let positionCompressor = FloatCompressor(minValue: -80.0, maxValue: 80.0, bits: 16)
 private let eulerAnglesCompressor = FloatCompressor(minValue: -1.0, maxValue: 1.0, bits: 12)
@@ -30,13 +30,17 @@ struct MovementData: CustomStringConvertible {
 }
 
 extension MovementData {
-    init(node: SCNNode, alive: Bool) {
-        let newPosition = node.presentation.simdWorldPosition
-        let newEulerAngles = node.presentation.simdEulerAngles
+    @MainActor init(entity: Entity, alive: Bool) {
+        let newPosition = entity.transform.translation
+        // Convert quaternion to euler angles for RealityKit
+        let quaternion = entity.transform.rotation
+        let newEulerAngles = quaternion.eulerAngles
         
         position = newPosition
         eulerAngles = newEulerAngles
+        isAlive = alive
     }
+    
 }
 
 extension MovementData: BitStreamCodable {

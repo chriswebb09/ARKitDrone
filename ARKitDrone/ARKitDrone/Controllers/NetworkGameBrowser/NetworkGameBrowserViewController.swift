@@ -64,9 +64,11 @@ class NetworkGameBrowserViewController: UIViewController {
 // MARK: - GameBrowserDelegate
 extension NetworkGameBrowserViewController: GameBrowserDelegate {
     
-    func gameBrowser(_ browser: GameBrowser, sawGames games: [NetworkGame]) {
-        self.games = games
-        tableView.reloadData()
+    nonisolated func gameBrowser(_ browser: GameBrowser, sawGames games: [NetworkGame]) {
+        Task { @MainActor in
+            self.games = games
+            self.tableView.reloadData()
+        }
     }
 }
 

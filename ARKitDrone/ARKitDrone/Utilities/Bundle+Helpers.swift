@@ -1,9 +1,9 @@
 /*
-See LICENSE folder for this sample’s licensing information.
-
-Abstract:
-Helpers for Bundle
-*/
+ See LICENSE folder for this sample’s licensing information.
+ 
+ Abstract:
+ Helpers for Bundle
+ */
 
 import Foundation
 

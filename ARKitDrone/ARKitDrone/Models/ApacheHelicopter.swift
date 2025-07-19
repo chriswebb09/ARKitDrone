@@ -1,140 +1,412 @@
-//
-//  Helicopter.swift
-//  ARKitDrone
-//
-//  Created by Christopher Webb on 1/14/23.
-//  Copyright © 2023 Christopher Webb-Orenstein. All rights reserved.
+////
+////  Helicopter.swift
+////  ARKitDrone
+////
+////  Created by Christopher Webb on 1/14/23.
+////  Copyright © 2023 Christopher Webb-Orenstein. All rights reserved.
+////
 //
 
-import Foundation
-import SceneKit
+import RealityKit
 import ARKit
-import simd
+import Combine
 
+extension Entity {
+    func findFirstModelEntity() -> ModelEntity? {
+        if let model = self as? ModelEntity {
+            return model
+        }
+        for child in children {
+            if let found = child.findFirstModelEntity() {
+                return found
+            }
+        }
+        return nil
+    }
+}
+
+@MainActor
 class ApacheHelicopter {
+    static var speed: Float = 50 // Static speed property for missile tracking
     
-    struct LocalConstants {
-        static let sceneName = "art.scnassets/Apache.scn"
-        static let parentModelName = "grpApache"
-        static let bodyName = "Body"
-        static let wingLName = "Wing_L"
-        static let wingRName = "Wing_R"
-        static let frontRotorName = "FrontRotor"
-        static let tailRotorName = "TailRotor"
-        static let hudNodeName = "hud"
-        static let frontIRSteering = "FrontIRSteering"
-        static let missile1 = "Missile1"
-        static let missile2 = "Missile2"
-        static let missile3 = "Missile3"
-        static let missile4 = "Missile4"
-        static let missile5 = "Missile5"
-        static let missile6 = "Missile6"
-        static let missile7 = "Missile7"
-        static let missile8 = "Missile8"
-        static let frontIR = "FrontIR"
-        static let audioFileName = "audio.m4a"
-        static let upperGun = "UpperGun"
-        static let helicopterSceneName = "art.scnassets/Helicopter.scn"
-        static let targetScene = "art.scnassets/Target.scn"
-        static let helicopterParentModelName = "Apache"
-        static let helicopterBodyName = "Body"
-        static let activeEmitterRate: CGFloat = 1000
-        static let angleConversion = SCNQuaternion.angleConversion(x: 0, y: 0.002 * Float.pi, z: 0 , w: 0)
-        static let negativeAngleConversion = SCNQuaternion.angleConversion(x: 0, y: -0.002 * Float.pi, z: 0 , w: 0)
-        static let altitudeAngleConversion = SCNQuaternion.angleConversion(x: 0.001 * Float.pi, y:0, z: 0 , w: 0)
-        static let negativeAltitudeAngleConversion = SCNQuaternion.angleConversion(x: -0.001 * Float.pi, y:0, z: 0 , w: 0)
-    }
-
-    var helicopterNode: SCNNode!
-    var parentModelNode: SCNNode!
-    var firing:Bool = false
+    var helicopter: Entity?
+    var rotor: Entity?
+    var tailRotor: Entity?
+    var missiles: [Missile] = []  // Changed to match SceneKit
+    var missileEntities: [Entity] = []  // Keep reference to raw entities
+    var hudEntity: Entity?
     
-    var missile1: Missile = Missile()
-    var missile2: Missile = Missile()
-    var missile3: Missile = Missile()
-    var missile4: Missile = Missile()
-    var missile5: Missile = Missile()
-    var missile6: Missile = Missile()
-    var missile7: Missile = Missile()
-    var missile8: Missile = Missile()
-    var missiles: [Missile] = []
-    
-    var autoLock = true
-    
-    var rotor: SCNNode!
-    var rotor2: SCNNode!
-    var wingL: SCNNode!
-    var wingR: SCNNode!
-    var hud: SCNNode!
-    var front: SCNNode!
-    var frontIR: SCNNode!
+    // Additional helicopter components matching SceneKit version
+    var wingL: Entity?
+    var wingR: Entity?
+    var bodyEntity: Entity?
+    var frontIRSteering: Entity?
+    var frontIR: Entity?
+    var upperGun: Entity?
     var missilesArmed: Bool = false
-    var missileLockDirection = SCNVector3(0, 0, 1)
-    var upperGun: SCNNode!
-    var targetPosition: SCNVector3!
     
-    static var speed: Float = 50
-    var speed: Float = 2000 // Base speed
-    let maxSpeed: Float = 10000.0 // Max missile speed
+    // Manual rotor rotation
+    private var rotorAngle: Float = 0
+    private var tailRotorAngle: Float = 0
+    private var rotorTimer: Timer?
+    private var updateCounter: Int = 0 // Debug counter - used in updateRotorRotation()
     
-    // Define smooth factors for rotation
-    let rotationSmoothFactor: Float = 0.005 // Lower = smoother turns
+    private var cancellables = Set<AnyCancellable>()
     
-    init() {
-        parentModelNode = setupHelicopterModel()
-        helicopterNode = setupHelicopterNode(helicopterModel: parentModelNode)
-        setupAdditionalHelicopterComponents()
-        setup(with: helicopterNode)
-        setupMissiles()
+    // Movement smoothing properties
+    private var targetTranslation = SIMD3<Float>(0, 0, 0)
+    private var targetRotation = simd_quatf()
+    private var smoothingFactor: Float = 0.15 // How fast to interpolate towards target
+    
+    init() async {
+        await loadHelicopterModel()
     }
     
-    func spinBlades() {
-        DispatchQueue.global(qos: .userInteractive).async {
-            let rotate = SCNAction.rotateBy(x: 20, y: 0, z: 0, duration: 0.5)
-            let moveSequence = SCNAction.sequence([rotate])
-            let moveLoop = SCNAction.repeatForever(moveSequence)
-            let rotate2 = SCNAction.rotateBy(x: 0, y: 20, z: 0, duration: 0.25)
-            let moveSequence2 = SCNAction.sequence([rotate2])
-            let moveLoop2 = SCNAction.repeatForever(moveSequence2)
-            DispatchQueue.main.async {
-                self.rotor2.runAction(moveLoop)
-                self.rotor.runAction(moveLoop2)
+    deinit {
+        Task { @MainActor [weak self] in
+            self?.stopRotorRotation()
+        }
+    }
+    
+    private func loadHelicopterModel() async {
+        
+        do {
+            let entity = try await Entity(named:"heli")
+            let model = entity.findEntity(named: "Model")
+//            let temp2 = await temp!.findEntity(named: "Untitled")
+//            for child in await temp!.children {
+//                await print(child.name)
+//            }
+            self.helicopter = model!.findEntity(named: "Apache")
+            
+            // Apply helicopter orientation correction
+            let originalRotation = simd_quatf(real: 0.7071069, imag: SIMD3<Float>(-0.70710665, 0.0, 0.0))
+            let faceUserRotation = simd_quatf(angle: .pi, axis: [0, 1, 0])
+            let levelNose = simd_quatf(angle: .pi / 2, axis: [1, 0, 0])
+            let correctionRotation = originalRotation * faceUserRotation * levelNose
+            
+            await MainActor.run {
+                self.helicopter?.scale = SIMD3<Float>(repeating: 0.4)
+                self.helicopter?.transform.rotation = correctionRotation
+            }
+            
+            await self.setupHelicopterComponents()
+            self.setupMissiles()
+            self.adjustRotorPositions()
+            self.startRotorRotation()
+            
+            // Initialize target transform values
+            if let helicopter = self.helicopter {
+                self.targetTranslation = helicopter.transform.translation
+                self.targetRotation = helicopter.transform.rotation
+            }
+            
+        } catch {
+            return
+        }
+        
+    }
+    
+    private func setupHelicopterComponents() async {
+        guard let helicopter = helicopter else {
+            return
+        }
+        
+        // Find all helicopter components matching SceneKit version
+        self.hudEntity = helicopter.findEntity(named: "hud")
+        self.rotor = helicopter.findEntity(named: "FrontRotor")
+        self.tailRotor = helicopter.findEntity(named: "TailRotor")
+        self.wingL = helicopter.findEntity(named: "Wing_L")
+        self.wingR = helicopter.findEntity(named: "Wing_R")
+        self.bodyEntity = helicopter.findEntity(named: "Body")
+        self.frontIRSteering = helicopter.findEntity(named: "FrontIRSteering")
+        self.upperGun = helicopter.findEntity(named: "UpperGun")
+        
+        // Setup frontIR if frontIRSteering exists
+        if let frontIRSteering = self.frontIRSteering {
+            self.frontIR = frontIRSteering.findEntity(named: "FrontIR")
+        }
+        
+        
+        
+//        // Debug: Print the hierarchy of the helicopter entity
+//        if let helicopter = helicopter {
+//
+//        }
+    }
+    
+    private func debugPrintEntityHierarchy(_ entity: Entity, indent: Int) {
+        let indentString = String(repeating: "  ", count: indent)
+        print("\(indentString)- \(entity.name)")
+        
+        for child in entity.children {
+            debugPrintEntityHierarchy(child, indent: indent + 1)
+        }
+    }
+    
+    private func adjustRotorPositions() {
+        // The rotors are children of the Body entity in the hierarchy
+        // We should keep them in their relative positions but just adjust scale
+        // Since they're children of Body, they'll move with the helicopter automatically
+        
+        if let rotor = rotor {
+            rotor.transform.scale = SIMD3<Float>(repeating: 0.8)
+        }
+        
+        if let tailRotor = tailRotor {
+            tailRotor.transform.scale = SIMD3<Float>(repeating: 0.6)
+        }
+        
+    }
+    
+    private func setupMissiles() {
+        for i in 1...8 {
+            if let missileEntity = helicopter?.findEntity(named: "Missile\(i)") {
+                missileEntity.components.set(PhysicsBodyComponent(
+                    massProperties: .default,
+                    material: .default,
+                    mode: .kinematic
+                ))
+                missileEntities.append(missileEntity)
+                
+                // Create Missile wrapper like SceneKit
+                let missile = Missile()
+                missile.setupEntity(entity: missileEntity, number: i)
+                missiles.append(missile)
             }
         }
     }
     
-    func setup(with helicopterNode: SCNNode) {
-        helicopterNode.simdScale = SIMD3<Float>(0.001, 0.001, 0.001)
-        hud.simdScale = SIMD3<Float>(0.1, 0.1, 0.1)
-        hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
-        spinBlades()
-    }
-
-    func setupMissiles() {
-        missile1.setupNode(scnNode: wingR!.childNode(withName: ApacheHelicopter.LocalConstants.missile1, recursively: true), number: 1)
-        missile2.setupNode(scnNode: wingR.childNode(withName: ApacheHelicopter.LocalConstants.missile2, recursively: true), number: 2)
-        missile3.setupNode(scnNode: wingR!.childNode(withName: ApacheHelicopter.LocalConstants.missile3, recursively: true), number: 3)
-        missile4.setupNode(scnNode: wingR.childNode(withName: ApacheHelicopter.LocalConstants.missile4, recursively: true), number: 4)
-        missile5.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile5, recursively: true), number: 5)
-        missile6.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile6, recursively: true), number: 6)
-        missile7.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile7, recursively: true), number: 7)
-        missile8.setupNode(scnNode: wingL.childNode(withName: ApacheHelicopter.LocalConstants.missile8, recursively: true), number: 8)
-        missiles =  [missile1, missile2, missile3, missile4, missile5, missile6, missile7, missile8]
-    }
-    
-    func setupAdditionalHelicopterComponents() {
-        hud = parentModelNode!.childNode(withName: LocalConstants.hudNodeName, recursively: false)!
-        front = helicopterNode.childNode(withName: LocalConstants.frontIRSteering, recursively: true)
-        rotor = helicopterNode.childNode(withName: LocalConstants.frontRotorName, recursively: true)
-        rotor2 = helicopterNode.childNode(withName: LocalConstants.tailRotorName, recursively: true)
-        wingL = helicopterNode.childNode(withName: LocalConstants.wingLName, recursively: true)
-        wingR = helicopterNode.childNode(withName: LocalConstants.wingRName, recursively: true)
-        front = helicopterNode.childNode(withName: LocalConstants.frontIRSteering, recursively: true)
-        frontIR = front.childNode(withName:LocalConstants.frontIR, recursively: false)
-        upperGun = helicopterNode.childNode(withName: LocalConstants.upperGun, recursively: true)!
+    func startRotorRotation() {
+        guard rotor != nil, tailRotor != nil else { 
+            return 
+        }
+        
+        // Stop any existing timer
+        rotorTimer?.invalidate()
+        
+        // Create a timer to manually rotate the rotors - ensure it runs on main thread
+        DispatchQueue.main.async { [weak self] in
+            self?.rotorTimer = Timer.scheduledTimer(withTimeInterval: 1.0/30.0, repeats: true) { [weak self] timer in
+                guard let self = self else { 
+                    timer.invalidate()
+                    return 
+                }
+                Task { @MainActor in
+                    self.updateRotorRotation()
+                }
+            }
+            
+            // Add timer to current run loop to ensure it runs
+            if let timer = self?.rotorTimer {
+                RunLoop.current.add(timer, forMode: .common)
+            }
+        }
+        
     }
     
+    @MainActor
+    private func updateRotorRotation() {
+        updateCounter += 1
+        
+        guard let rotor = rotor, let tailRotor = tailRotor else { 
+            return 
+        }
+        
+        // Increment rotation angles
+        rotorAngle += 0.3 // Main rotor speed
+        tailRotorAngle += 0.5 // Tail rotor speed (faster)
+        
+        // Keep angles in reasonable range
+        if rotorAngle > .pi * 2 { rotorAngle -= .pi * 2 }
+        if tailRotorAngle > .pi * 2 { tailRotorAngle -= .pi * 2 }
+        
+        // Apply rotations
+        rotor.transform.rotation = simd_quatf(angle: rotorAngle, axis: [0, 1, 0]) // Y-axis
+        tailRotor.transform.rotation = simd_quatf(angle: tailRotorAngle, axis: [1, 0, 0]) // X-axis
+        
+    }
+    
+    func stopRotorRotation() {
+        rotorTimer?.invalidate()
+        rotorTimer = nil
+    }
+    
+    static func createRotorAnimation(axis: SIMD3<Float>, duration: TimeInterval) -> AnimationResource? {
+        let anim = FromToByAnimation<Transform>(
+            name: "rotorSpin",
+            from: Transform(
+                rotation: simd_quatf(
+                    angle: 0,
+                    axis: axis
+                )
+            ),
+            to: Transform(
+                rotation: simd_quatf(
+                    angle: .pi * 2, // Full rotation
+                    axis: axis
+                )
+            ),
+            duration: duration,
+            timing: .linear,
+            bindTarget: .transform
+        )
+        
+        // Create repeating animation using correct RealityKit API
+        let animationResource = try? AnimationResource.generate(with: anim)
+        return animationResource
+    }
+    
+    func moveForward(value: Float) {
+        guard let helicopter = helicopter else { return }
+        let forward = helicopter.transform.matrix.columns.2
+        let movementVector = SIMD3<Float>(
+            forward.x,
+            forward.y,
+            forward.z
+        ) * value
+        targetTranslation -= movementVector
+        
+        // Apply smooth interpolation
+        let currentTranslation = helicopter.transform.translation
+        let newTranslation = simd_mix(
+            currentTranslation,
+            targetTranslation,
+            SIMD3<Float>(repeating: smoothingFactor)
+        )
+        
+        var transform = helicopter.transform
+        transform.translation = newTranslation
+        helicopter.transform = transform
+        
+        // Update target to current position for next frame
+        targetTranslation = newTranslation
+    }
+    
+    func rotate(yaw: Float) {
+        guard let helicopter = helicopter else { return }
+        let rotationDelta = simd_quatf(
+            angle: yaw,
+            axis: [0, 1, 0]
+        )
+        targetRotation = targetRotation * rotationDelta
+        
+        // Apply smooth interpolation
+        let currentRotation = helicopter.transform.rotation
+        let newRotation = simd_slerp(
+            currentRotation,
+            targetRotation,
+            smoothingFactor
+        )
+        
+        var transform = helicopter.transform
+        transform.rotation = newRotation
+        helicopter.transform = transform
+        
+        // Update target to current rotation for next frame
+        targetRotation = newRotation
+    }
+    
+    func changeAltitude(value: Float) {
+        guard let helicopter = helicopter else { return }
+        targetTranslation.y += value
+        
+        // Apply smooth interpolation
+        let currentTranslation = helicopter.transform.translation
+        let newTranslation = simd_mix(
+            currentTranslation,
+            targetTranslation,
+            SIMD3<Float>(repeating: smoothingFactor)
+        )
+        
+        var transform = helicopter.transform
+        transform.translation = newTranslation
+        helicopter.transform = transform
+        
+        // Update target to current position for next frame
+        targetTranslation = newTranslation
+    }
+    
+    func moveSides(value: Float) {
+        guard let helicopter = helicopter else { return }
+        let right = helicopter.transform.matrix.columns.0
+        let movementVector = SIMD3<Float>(
+            right.x,
+            right.y,
+            right.z
+        ) * value
+        targetTranslation += movementVector
+        
+        // Apply smooth interpolation
+        let currentTranslation = helicopter.transform.translation
+        let newTranslation = simd_mix(
+            currentTranslation,
+            targetTranslation,
+            SIMD3<Float>(repeating: smoothingFactor)
+        )
+        
+        var transform = helicopter.transform
+        transform.translation = newTranslation
+        helicopter.transform = transform
+        
+        // Update target to current position for next frame
+        targetTranslation = newTranslation
+    }
+    
+    // MARK: - Setup Methods
+    
+    /// Call this when helicopter position is changed externally (e.g., when placed by tap)
+    func resetTargetTransform() {
+        guard let helicopter = helicopter else { return }
+        targetTranslation = helicopter.transform.translation
+        targetRotation = helicopter.transform.rotation
+    }
+    
+    func setup() async {
+        // Initialize helicopter if not already loaded
+        if helicopter == nil {
+            await loadHelicopterModel()
+        }
+    }
+    
+    func setupHUD() {
+        guard let hud = hudEntity else {
+            return
+        }
+        
+        // Position and scale HUD
+        if let helicopter = helicopter {
+            hud.transform.translation = helicopter.transform.translation
+            // Offset HUD slightly forward
+            let forward = helicopter.transform.matrix.columns.2
+            hud.transform.translation -= SIMD3<Float>(
+                forward.x,
+                forward.y,
+                forward.z
+            ) * 0.44
+        }
+        
+    }
+    
+    func updateHUD() {
+        guard let hud = hudEntity, let helicopter = helicopter else { return }
+        
+        // Update HUD position and orientation to match helicopter
+        hud.transform.rotation = helicopter.transform.rotation
+        hud.transform.translation = helicopter.transform.translation
+        
+        // Maintain forward offset
+        let forward = helicopter.transform.matrix.columns.2
+        hud.transform.translation -= SIMD3<Float>(
+            forward.x,
+            forward.y,
+            forward.z
+        ) * 0.44
+    }
+    
+    // MARK: - RealityKitMissile System
+    
+//    var missilesArmed: Bool = false
     
     func toggleArmMissile() {
         missilesArmed = !missilesArmed
@@ -144,152 +416,95 @@ class ApacheHelicopter {
         return missilesArmed
     }
     
-    func rotate(value: Float) {
-        guard helicopterNode != nil else { return }
-        SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.1
-        let localAngleConversion = SCNQuaternion.angleConversion(x: 0, y:  (-(0.001 * value) * Float(Double.pi)) * 0.5, z: 0, w: 0)
-        let locationRotation = SCNQuaternion.getQuaternion(from: localAngleConversion)
-        helicopterNode.localRotate(by: locationRotation)
-        updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
-        SCNTransaction.commit()
-    }
-    
-    func moveForward(value: Float) {
-        guard helicopterNode != nil else { return }
-        let val = value / 2000
-        SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.05
-        helicopterNode.localTranslate(by: SCNVector3(x: 0, y: 0, z: -val))
-        updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
-        SCNTransaction.commit()
-    }
-    
-    func changeAltitude(value: Float) {
-        guard helicopterNode != nil else { return }
-        let val = (value / 2000)
-        SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.1
-        helicopterNode.localTranslate(by: SCNVector3(x: 0, y:val, z:0))
-        updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
-        SCNTransaction.commit()
-    }
-    
-    func updateHUD() {
-        hud.orientation = helicopterNode.orientation
-        hud.position = SCNVector3(x: helicopterNode.position.x, y: helicopterNode.position.y , z: helicopterNode.position.z)
-    }
-    
-    func moveSides(value: Float) {
-        guard helicopterNode != nil else { return }
-        let val = -(value / 1000)
-        SCNTransaction.begin()
-        SCNTransaction.animationDuration = 0.1
-        helicopterNode.localTranslate(by: SCNVector3(x: val, y: 0, z: 0))
-        updateHUD()
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z:-0.44))
-        SCNTransaction.commit()
-    }
-    
-    func lockOn(ship: Ship) {
-        guard helicopterNode != nil else { return }
-        let target = ship.node
-        targetPosition = target.position
-        let helicopterNodePosition = helicopterNode.position
-        hud.position = SCNVector3(x: helicopterNodePosition.x, y: helicopterNodePosition.y , z: helicopterNodePosition.z)
-        hud.orientation = target.orientation
-        hud.look(at: target.position)
-        let distance = helicopterNode.position.distance(target.position) - 4
-        hud.localTranslate(by: SCNVector3(x: 0, y:0, z: -distance))
-    }
-    
-    func update(missile: Missile, ship: Ship, offset: Int = 1, previousTime: CFAbsoluteTime) -> CFAbsoluteTime {
-        let currentTime = CFAbsoluteTimeGetCurrent()
-        let deltaTime = max(Float(currentTime - previousTime), 1.0 / 120.0)
-        let nextTime = currentTime
-        let missilePosition = missile.node.presentation.simdPosition
-        let shipPosition = ship.node.simdPosition
-        let targetDirection = simd_normalize(shipPosition - missilePosition)
-        let currentDirection = missile.node.simdOrientation.act(simd_float3(0, 0, -1))
-        let distanceToTarget = simd_length(shipPosition - missilePosition)
-        let maxSpeed: Float = 10000.0
-        let speedSmoothFactor: Float = 1
-        let acceleration: Float = 20
-        ApacheHelicopter.speed = min(ApacheHelicopter.speed + acceleration * deltaTime * speedSmoothFactor, maxSpeed)
-        let rotationStartDistance: Float = 3000
-        let rotationSmoothFactor: Float = 1000
-        if distanceToTarget < rotationStartDistance {
-            let targetRotation = simd_quaternion(currentDirection, targetDirection)
-            let smoothRotation = simd_slerp(missile.node.simdOrientation, targetRotation, rotationSmoothFactor)
-            missile.node.simdOrientation = smoothRotation
-            missile.particle?.orientationDirection = SCNVector3(-smoothRotation.axis.x, -smoothRotation.axis.y, -smoothRotation.axis.z)
-        }
-        let forwardDirection = missile.node.simdOrientation.act(simd_float3(0, 0, -1))
-        let scnForwardDirection = SCNVector3(forwardDirection.x, forwardDirection.y, forwardDirection.z)
-        let impulse = scnForwardDirection * speed * deltaTime * speedSmoothFactor
-        missile.node.physicsBody?.applyForce(impulse, asImpulse: true)
-        return nextTime
-    }
-    
-    func normalize(vector: SCNVector3) -> SCNVector3 {
-        let length = sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z)
-        return length == 0 ? vector : SCNVector3(vector.x / length, vector.y / length, vector.z / length)
-    }
-    
-    func shootUpperGun() {
-        let bullet = SCNNode(geometry: SCNSphere(radius: 0.002))
-        bullet.geometry?.firstMaterial?.diffuse.contents = UIColor.yellow
-        print("Gun position: \(upperGun.presentation.worldPosition)")
-        bullet.position = SCNVector3(upperGun.presentation.worldPosition.x + 0.009, upperGun.presentation.worldPosition.y + 0.07, upperGun.presentation.worldPosition.z + 0.3)
-        let physicsShape = SCNPhysicsShape(geometry: bullet.geometry!, options: nil)
-        let physicsBody = SCNPhysicsBody(type: .dynamic, shape: physicsShape)
-        physicsBody.isAffectedByGravity = false
-        bullet.physicsBody = physicsBody
-        let forwardDirection = SCNVector3(
-            -helicopterNode.presentation.transform.m31,
-             -helicopterNode.presentation.transform.m32,
-             -helicopterNode.presentation.transform.m33
+    func lockOn(target: Entity) {
+        guard let helicopter = helicopter, let hud = hudEntity else { return }
+        
+        let targetPosition = target.transform.translation
+        let helicopterPosition = helicopter.transform.translation
+        
+        // Point HUD at target
+        hud.transform.translation = helicopterPosition
+        hud.look(
+            at: targetPosition,
+            from: helicopterPosition,
+            relativeTo: nil
         )
-        if forwardDirection.length() > 0.01 {
-            let impulse = forwardDirection * 200
-            bullet.physicsBody?.applyForce(impulse, asImpulse: true)
+        
+        // Calculate distance and adjust HUD position
+        let distance = simd_distance(
+            helicopterPosition,
+            targetPosition
+        ) - 4
+        let forward = hud.transform.matrix.columns.2
+        hud.transform.translation -= SIMD3<Float>(
+            forward.x,
+            forward.y,
+            forward.z
+        ) * distance
+        
+    }
+    
+    // MARK: - Weapon Systems
+    
+    func shootUpperGun() -> Entity? {
+        guard let helicopter = helicopter else {
+            return nil
+        }
+        
+        // Create bullet entity
+        let bullet = Entity()
+        
+        // Create sphere mesh for bullet
+        let geometry = MeshResource.generateSphere(radius: 0.002)
+        var material = UnlitMaterial()
+        material.color = .init(tint: .yellow)
+        bullet.components.set(
+            ModelComponent(
+                mesh: geometry,
+                materials: [material]
+            )
+        )
+        
+        // Position bullet at helicopter's gun position
+        let helicopterTransform = helicopter.transform
+        
+        // Use actual upperGun position if available, otherwise use default offset
+        if let upperGun = upperGun {
+            bullet.transform.translation = upperGun.transform.translation
+            bullet.transform.rotation = upperGun.transform.rotation
         } else {
-            print("Warning: Forward direction is too small, helicopter rotation might be incorrect.")
+            // Fallback to hardcoded offset
+            let gunOffset = SIMD3<Float>(
+                0.009,
+                0.07,
+                0.3
+            )
+            bullet.transform.translation = helicopterTransform.translation + gunOffset
+            bullet.transform.rotation = helicopterTransform.rotation
         }
-        self.helicopterNode.getRootNode().addChildNode(bullet)
-        let impulse = forwardDirection * 200
-        bullet.physicsBody?.applyForce(impulse, asImpulse: true)
-        print("Bullet position after force application: \(bullet.position)")
+        
+        // Add physics for movement
+        let physicsComponent = PhysicsBodyComponent(
+            massProperties: PhysicsMassProperties(mass: 0.01),
+            material: PhysicsMaterialResource.default,
+            mode: .dynamic
+        )
+        bullet.components.set(physicsComponent)
+        
+        // Add collision detection
+        let collisionComponent = CollisionComponent(
+            shapes: [ShapeResource.generateSphere(radius: 0.002)]
+        )
+        bullet.components.set(collisionComponent)
+        
+        // Note: Bullet physics handled by dynamic body component
+        
+        // Auto-remove bullet after 5 seconds
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            bullet.removeFromParentNode()
+            bullet.removeFromParent()
         }
+        
+        return bullet
     }
-    
-    func setupHelicopterModel() -> SCNNode {
-        let tempScene = SCNScene.nodeWithModelName(LocalConstants.helicopterSceneName).clone()
-        guard let model = tempScene.childNode(withName: LocalConstants.helicopterParentModelName, recursively: true) else {
-            fatalError("Failed to find helicopter parent model: \(LocalConstants.helicopterParentModelName)")
-        }
-        let helicopterModel = model
-        let modelScale: Float = 0.001
-        helicopterModel.scale = SCNVector3(modelScale, modelScale, modelScale)
-        helicopterModel.simdScale = SIMD3<Float>(modelScale, modelScale, modelScale)
-        return helicopterModel
-    }
-    
-    func setupHelicopterNode(helicopterModel: SCNNode) -> SCNNode {
-        guard let bodyNode = helicopterModel.childNode(withName: LocalConstants.helicopterBodyName, recursively: true) else {
-            fatalError("Failed to find helicopter body node: \(LocalConstants.helicopterBodyName)")
-        }
-        let helicopterNode = bodyNode
-        helicopterNode.simdEulerAngles = SIMD3<Float>(-3.0, 0, 0)
-        let bodyScale = SCNVector3(0.001, 0.00001, 0.00001)
-        helicopterNode.scale = bodyScale
-        helicopterNode.simdScale = SIMD3<Float>(bodyScale.x, bodyScale.y, bodyScale.z)
-        return helicopterNode
-    }
-    
 }
+

@@ -7,11 +7,11 @@ Representations for game events, related data, and their encoding.
 
 import Foundation
 import simd
-import SceneKit
+import RealityKit
 import ARKit
 
 /// - Tag: GameCommand
-struct GameCommand {
+struct GameCommand: Sendable {
     var player: Player?
     var action: Action
 }

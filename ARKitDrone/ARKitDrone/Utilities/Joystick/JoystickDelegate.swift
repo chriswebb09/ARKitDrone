@@ -8,6 +8,7 @@
 
 import Foundation
 
+@MainActor
 protocol JoystickDelegate: AnyObject {
     func tapped()
 }

@@ -7,6 +7,7 @@
 //
 import UIKit
 
+@MainActor
 protocol GameBrowserDelegate: AnyObject {
     func gameBrowser(_ browser: GameBrowser, sawGames: [NetworkGame])
 }

@@ -5,14 +5,9 @@
 //  Created by Christopher Webb on 3/7/25.
 //  Copyright © 2025 Christopher Webb-Orenstein. All rights reserved.
 //
+import UIKit
 
-import SceneKit
-
-extension GameViewController: SCNPhysicsContactDelegate {
-    
-    func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
-        missileManager.handleContact(contact)
-    }
+extension GameViewController {
     
     @objc func updateGameStateText() {
         destoryedText.text = game.destoryedTextString

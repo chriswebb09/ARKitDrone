@@ -29,6 +29,11 @@ class Joystick: SKNode {
     
     weak var delegate: JoystickDelegate?
     
+    // Tap detection properties
+    private var touchStartTime: TimeInterval = 0
+    private var touchStartLocation: CGPoint = .zero
+    private var hasMovedSignificantly: Bool = false
+    
     init(thumbNode: SKSpriteNode = SKSpriteNode(imageNamed: LocalConstants.imageJoystickName), backdropNode: SKSpriteNode = SKSpriteNode(imageNamed: LocalConstants.imageDpadName)) {
         self.thumbNode = thumbNode
         self.backdropNode = backdropNode
@@ -45,38 +50,67 @@ class Joystick: SKNode {
     // MARK: - Touches Lifecycle
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        //        super.touchesBegan(touches, with: event)
         guard let touch = touches.first else { return }
         let touchPoint = touch.location(in: self)
         if !self.isTracking,
            self.backdropNode.frame.contains(touchPoint) {
             self.isTracking = true
-            updateJoystick(touchPoint: touchPoint)
+            self.touchStartTime = touch.timestamp
+            self.touchStartLocation = touchPoint
+            self.hasMovedSignificantly = false
+            self.velocity = .zero // Ensure velocity starts at zero
+            // DON'T update joystick on initial touch - wait for movement
         }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        //        super.touchesMoved(touches, with: event)
         guard let touch = touches.first else { return }
         let touchPoint = touch.location(in: self)
-        self.updateJoystick(touchPoint: touchPoint)
+        
+        // Check if movement is significant enough to consider it movement vs tap
+        let distanceFromStart = sqrt(pow(touchPoint.x - touchStartLocation.x, 2) + pow(touchPoint.y - touchStartLocation.y, 2))
+        
+        // Only update joystick position if movement is significant enough
+        if distanceFromStart > 30 { // 30 points threshold - prevent accidental movement on taps
+            hasMovedSignificantly = true
+            self.updateJoystick(touchPoint: touchPoint)
+        }
+        // If movement is too small, don't update joystick at all
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        print("touches ended")
-        DispatchQueue.main.async {
-            self.delegate?.tapped()
-            if self.velocity == .zero {
-                
+        
+        guard let touch = touches.first else { return }
+        let touchDuration = touch.timestamp - touchStartTime
+        
+        // If no significant movement was detected, it's a tap
+        let wasTap = !hasMovedSignificantly && touchDuration < 0.6
+        
+        if wasTap {
+            DispatchQueue.main.async {
+                self.delegate?.tapped()
             }
+        }
+        
+        DispatchQueue.main.async {
             self.resetVelocity()
         }
-//        self.resetVelocity()
-        
     }
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
+        print("🎮 Touch CANCELLED")
+        
+        // If touch was cancelled but no significant movement occurred, treat as tap
+        if !hasMovedSignificantly {
+            print("🎯 Treating as TAP!")
+            DispatchQueue.main.async {
+                self.delegate?.tapped()
+            }
+        } else {
+            print("🎮 Had movement - not firing")
+        }
+        
         DispatchQueue.main.async {
             self.resetVelocity()
         }
@@ -122,19 +156,25 @@ class Joystick: SKNode {
         }
         // Set velocity directly based on thumb position
         // This preserves the original behavior while adding the multiplier
-        velocity = CGPoint(
+        let newVelocity = CGPoint(
             x: thumbNode.position.x * LocalConstants.velocityMultiplier,
             y: thumbNode.position.y * LocalConstants.velocityMultiplier
         )
-        angularVelocity = atan2(velocity.y, velocity.x)
+        
+        // Only update velocity if movement is significant enough to prevent tiny movements
+        let velocityMagnitude = sqrt(newVelocity.x * newVelocity.x + newVelocity.y * newVelocity.y)
+        if velocityMagnitude > 10.0 { // Minimum velocity threshold - much higher to prevent tap movement
+            velocity = newVelocity
+            angularVelocity = atan2(velocity.y, velocity.x)
+        } else {
+            velocity = .zero
+            angularVelocity = 0
+        }
     }
 }
 
 private extension CGPoint {
-    func distance(to point: CGPoint) -> CGFloat {
-        return sqrt(pow(x - point.x, 2) + pow(y - point.y, 2))
-    }
-    
+
     static func - (lhs: CGPoint, rhs: CGPoint) -> CGPoint {
         return CGPoint(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
     }

@@ -1,9 +1,9 @@
 /*
-See LICENSE folder for this sample’s licensing information.
-
-Abstract:
-Convenience extension for using LZFSE compression on arbitrary Data.
-*/
+ See LICENSE folder for this sample’s licensing information.
+ 
+ Abstract:
+ Convenience extension for using LZFSE compression on arbitrary Data.
+ */
 
 import Foundation
 import Compression
@@ -28,11 +28,11 @@ extension Data {
             return result.prefix(resultCount)
         }
     }
-
+    
     private func compress(into dest: inout Data) -> Int {
         let destSize = dest.count
         let srcSize = count
-
+        
         let resultSize = withUnsafeBytes { source in
             return dest.withUnsafeMutableBytes { (destPointer: UnsafeMutableRawBufferPointer) in
                 // Safely unwrap the baseAddress of both source and dest
@@ -46,7 +46,7 @@ extension Data {
         }
         return resultSize
     }
-
+    
     func decompressed() throws -> Data {
         guard !isEmpty else { return self }
         var targetBufferSize = count * 8
@@ -61,12 +61,12 @@ extension Data {
             return result.prefix(resultCount)
         }
     }
-
+    
     private func decompress(into dest: inout Data) -> Int {
-
+        
         let destSize = dest.count
         let srcSize = count
-
+        
         let result = withUnsafeBytes { source in
             return dest.withUnsafeMutableBytes { (destPointer: UnsafeMutableRawBufferPointer) -> Int in
                 // Safely unwrap the baseAddress of both source and dest
@@ -78,7 +78,7 @@ extension Data {
                 return compression_decode_buffer(destBaseAddress, destSize, sourceBaseAddress, srcSize, nil, COMPRESSION_LZFSE)
             }
         }
-
+        
         return result
     }
 }

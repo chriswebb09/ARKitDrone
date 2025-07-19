@@ -9,7 +9,7 @@
 import UIKit
 
 // https://stackoverflow.com/questions/73124396/is-force-view-controller-orientation-working-in-ios-16-beta
-
+@MainActor
 final class DeviceOrientation {
     
     static let shared: DeviceOrientation = DeviceOrientation()

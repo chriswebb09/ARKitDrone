@@ -10,6 +10,7 @@ import UIKit
 import Foundation
 import os.log
 
+@MainActor
 protocol GameStartViewControllerDelegate: AnyObject {
     func gameStartViewController(_ gameStartViewController: UIViewController, didPressStartSoloGameButton: UIButton)
     func gameStartViewController(_ gameStartViewController: UIViewController, didStart game: NetworkSession)

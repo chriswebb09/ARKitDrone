@@ -58,7 +58,7 @@ extension UserDefaults {
         case manual = 2
     }
 
-    static let applicationDefaults: [String: Any] = [
+    nonisolated(unsafe) static let applicationDefaults: [String: Any] = [
         UserDefaultsKeys.spectator: false,
         UserDefaultsKeys.musicVolume: 0.0,
         UserDefaultsKeys.effectsVolume: 1.0,
@@ -75,7 +75,8 @@ extension UserDefaults {
         UserDefaultsKeys.showProjectileTrail: true,
         UserDefaultsKeys.trailShouldNarrow: true
         ]
-
+    
+    @MainActor
     var myself: Player {
         get {
             if let data = data(forKey: UserDefaultsKeys.peerID),
@@ -85,15 +86,20 @@ extension UserDefaults {
             }
             // if no playerID was previously selected, create and cache a new one.
             let player = Player(username: UIDevice.current.name)
-            let newData = try? NSKeyedArchiver.archivedData(withRootObject: player.peerID, requiringSecureCoding: true)
+            let newData = try? NSKeyedArchiver.archivedData(withRootObject: MCPeerID(displayName: player.username), requiringSecureCoding: true)
             set(newData, forKey: UserDefaultsKeys.peerID)
             return player
         }
         set {
-            let data = try? NSKeyedArchiver.archivedData(withRootObject: newValue.peerID, requiringSecureCoding: true)
+            let data = try? NSKeyedArchiver.archivedData(withRootObject: MCPeerID(displayName: newValue.username), requiringSecureCoding: true)
             set(data, forKey: UserDefaultsKeys.peerID)
         }
     }
+//    
+//    @MainActor
+//    func createPlayer() -> Player {
+//        return )
+//    }
 
     var musicVolume: Float {
         get { return float(forKey: UserDefaultsKeys.musicVolume) }

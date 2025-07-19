@@ -7,7 +7,6 @@
 //
 import Foundation
 import simd
-import SceneKit
 import ARKit
 
 class BoardAnchor: ARAnchor, @unchecked Sendable {

@@ -23,9 +23,10 @@ class MinimapScene: SKScene {
         minimap = SKShapeNode(circleOfRadius: minimapRadius)
         minimap.position = CGPoint(x: size.width / 2, y: size.height / 2)
         minimap.strokeColor = .white
-        minimap.fillColor = UIColor(white: 0.2, alpha: 0.7)
-        minimap.lineWidth = 2
+        minimap.fillColor = UIColor(white: 0.1, alpha: 0.9) // Darker background
+        minimap.lineWidth = 3
         addChild(minimap)
+        
         cropNode = SKCropNode()
         cropNode.position = CGPoint(x: size.width / 2, y: size.height / 2)
         let mask = SKShapeNode(circleOfRadius: minimapRadius)
@@ -33,27 +34,32 @@ class MinimapScene: SKScene {
         mask.strokeColor = .clear
         cropNode.maskNode = mask
         addChild(cropNode)
-        playerDot = SKShapeNode(circleOfRadius: 5)
-        playerDot.fillColor = .blue
+        
+        playerDot = SKShapeNode(circleOfRadius: 4)
+        playerDot.fillColor = .cyan  // Bright cyan for player visibility
+        playerDot.strokeColor = .white
+        playerDot.lineWidth = 2
         playerDot.position = .zero
         cropNode.addChild(playerDot)
     }
     
     func updateMinimap(playerPosition: simd_float4, helicopterPosition: simd_float4, ships: [simd_float4], missiles: [simd_float4], cameraRotation: simd_float4x4, placed: Bool) {
-        let minimapRadius: CGFloat = 180
-        let worldRange: Float = 90
+        let minimapRadius: CGFloat = 60  // Match the visual minimap radius
+        let worldRange: Float = 10  // Smaller world range for better visibility
         let scale = minimapRadius / CGFloat(worldRange)
         let playerX = CGFloat(playerPosition.x) * scale
         let playerZ = CGFloat(playerPosition.z) * scale
         playerDot.position = CGPoint(x: playerX, y: playerZ)
         if placed {
             if helicopterDot == nil {
-                helicopterDot = SKShapeNode(circleOfRadius: 3)
-                helicopterDot?.fillColor = .purple
+                helicopterDot = SKShapeNode(circleOfRadius: 5)
+                helicopterDot?.fillColor = .yellow  // Bright yellow for helicopter
+                helicopterDot?.strokeColor = .black
+                helicopterDot?.lineWidth = 1
                 cropNode.addChild(helicopterDot!)
             }
             let transformedHelicopterPosition = applyCameraRotation(position: helicopterPosition, cameraRotation: cameraRotation)
-            let invertedHelicopterYPosition = -CGFloat(transformedHelicopterPosition.z * 5)
+            let invertedHelicopterYPosition = -CGFloat(transformedHelicopterPosition.z)
             helicopterDot?.position = CGPoint(x: CGFloat(transformedHelicopterPosition.x) * scale, y: invertedHelicopterYPosition * scale)
         }
         
@@ -65,19 +71,23 @@ class MinimapScene: SKScene {
         
         for shipPosition in ships {
             let transformedShipPosition = applyCameraRotation(position: shipPosition, cameraRotation: cameraRotation)
-            let invertedYPosition = -CGFloat(transformedShipPosition.z * 0.45)
+            let invertedYPosition = -CGFloat(transformedShipPosition.z)
             let shipDot = SKShapeNode(circleOfRadius: 3)
             shipDot.fillColor = .red
-            shipDot.position = CGPoint(x: CGFloat(-transformedShipPosition.x) * scale, y: invertedYPosition * scale)
+            shipDot.strokeColor = .white
+            shipDot.lineWidth = 1
+            shipDot.position = CGPoint(x: CGFloat(transformedShipPosition.x) * scale, y: invertedYPosition * scale)
             cropNode.addChild(shipDot)
             shipDots.append(shipDot)
         }
         for missilePosition in missiles {
             let transformedMissilePosition = applyCameraRotation(position: missilePosition, cameraRotation: cameraRotation)
-            let invertedYPosition = -CGFloat(transformedMissilePosition.z * 0.55)
-            let missileDot = SKShapeNode(circleOfRadius: 1)
+            let invertedYPosition = -CGFloat(transformedMissilePosition.z)
+            let missileDot = SKShapeNode(circleOfRadius: 2)
             missileDot.fillColor = .orange
-            missileDot.position = CGPoint(x: -CGFloat(transformedMissilePosition.x) * scale, y: invertedYPosition * scale)
+            missileDot.strokeColor = .white
+            missileDot.lineWidth = 1
+            missileDot.position = CGPoint(x: CGFloat(transformedMissilePosition.x) * scale, y: invertedYPosition * scale)
             cropNode.addChild(missileDot)
             missileDots.append(missileDot)
         }

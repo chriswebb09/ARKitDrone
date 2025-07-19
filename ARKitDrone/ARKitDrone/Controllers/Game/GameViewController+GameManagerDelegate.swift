@@ -8,7 +8,8 @@
 
 import Foundation
 import os.log
-import SceneKit
+import RealityKit
+import ARKit
 
 extension GameViewController: GameManagerDelegate {
     
@@ -16,27 +17,27 @@ extension GameViewController: GameManagerDelegate {
     
     func manager(_ manager: GameManager, moveNode: MoveData) {
         os_log(.info, "move forward from joytick %s", String.init(describing: moveNode))
-        DispatchQueue.main.async {
-            if let dir = moveNode.direction {
-                switch dir {
-                case .forward:
-                    self.sceneView.competitor.moveForward(value: (moveNode.velocity.vector.y))
-                case .altitude:
-                    self.sceneView.competitor.changeAltitude(value: moveNode.velocity.vector.y)
-                case .rotation:
-                    self.sceneView.competitor.rotate(value: moveNode.velocity.vector.x)
-                case .side:
-                    self.sceneView.competitor.moveSides(value: moveNode.velocity.vector.x)
-                }
-            } else {
-                self.sceneView.competitor.moveForward(value: moveNode.velocity.vector.y)
-            }
-        }
+        //        DispatchQueue.main.async {
+        //            if let dir = moveNode.direction {
+        //                switch dir {
+        //                case .forward:
+        //                    self.sceneView.competitor.moveForward(value: (moveNode.velocity.vector.y))
+        //                case .altitude:
+        //                    self.sceneView.competitor.changeAltitude(value: moveNode.velocity.vector.y)
+        //                case .rotation:
+        //                    self.sceneView.competitor.rotate(value: moveNode.velocity.vector.x)
+        //                case .side:
+        //                    self.sceneView.competitor.moveSides(value: moveNode.velocity.vector.x)
+        //                }
+        //            } else {
+        //                self.sceneView.competitor.moveForward(value: moveNode.velocity.vector.y)
+        //            }
+        //        }
     }
     
     func manager(_ manager: GameManager, completed: CompletedAction) {
         print("completed")
-        sessionState = .gameInProgress
+        self.sessionState = .gameInProgress
     }
     
     private func process(boardAction: BoardSetupAction, from peer: Player) {
@@ -47,43 +48,63 @@ extension GameViewController: GameManagerDelegate {
             switch location {
             case .worldMapData(let data):
                 os_log(.info, "Received WorldMap data. Size: %d", data.count)
-                loadWorldMap(from: data)
-                sessionState = .lookingForSurface
+                self.loadWorldMap(from: data)
+                self.sessionState = .lookingForSurface
             case .manual:
                 os_log(.info, "Received a manual board placement")
-                sessionState = .lookingForSurface
+                self.sessionState = .lookingForSurface
             }
         case .requestBoardLocation:
             os_log(.info, "sending world to peer")
-            sendWorldTo(peer: peer)
+            self.sendWorldTo(peer: peer)
         }
     }
     
     func manager(_ manager: GameManager, addNode: AddNodeAction) {
         os_log(.info, "adding node")
-        let tappedPosition = SCNVector3.positionFromTransform(addNode.simdWorldTransform)
-        DispatchQueue.main.async {
-            let apache: ApacheHelicopter = self.sceneView.positionHelicopter(position: tappedPosition)
-            let square = TargetNode()
-            self.sceneView.scene.rootNode.addChildNode(square)
-            self.sceneView.competitor = apache
-            square.simdScale = [1.0, 1.0, 1.0]
-            square.unhide()
-            square.displayNodeHierarchyOnTop(true)
-            square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
-            SCNTransaction.begin()
-            SCNTransaction.animationDuration = 0.01
-            square.position = SCNVector3(x: apache.helicopterNode.position.x, y: apache.helicopterNode.position.y + 1, z: apache.helicopterNode.position.z)
-            SCNTransaction.commit()
-            let endPos = SIMD3<Float>(x: tappedPosition.x, y: tappedPosition.y, z: tappedPosition.z)
-            self.gameManager?.send(completed:CompletedAction.init(position: endPos))
+        // Extract position from transform matrix
+        let tappedPosition = SIMD3<Float>(
+            addNode.simdWorldTransform.columns.3.x,
+            addNode.simdWorldTransform.columns.3.y,
+            addNode.simdWorldTransform.columns.3.z
+        )
+        
+        Task { [weak self] in
+            guard let self = self else { return }
+            if let apache = await self.realityKitView.positionHelicopter(at: tappedPosition) {
+                await MainActor.run {
+                     self.realityKitView.competitor = apache // Commented out - competitor property removed
+                    
+                    // Create RealityKit target entity instead of SCN TargetNode
+                    let targetEntity = TargetNode()
+                    targetEntity.transform.translation = SIMD3<Float>(
+                        tappedPosition.x,
+                        tappedPosition.y + 1,
+                        tappedPosition.z
+                    )
+                    
+                    let anchor = AnchorEntity(world: targetEntity.transform.translation)
+                    anchor.addChild(targetEntity)
+                    self.realityKitView.scene.addAnchor(anchor)
+                    
+                    let endPos = SIMD3<Float>(
+                        x: tappedPosition.x,
+                        y: tappedPosition.y,
+                        z: tappedPosition.z
+                    )
+                    self.gameManager?.send(
+                        completed: CompletedAction.init(position: endPos)
+                    )
+                }
+            }
         }
     }
     
-    func manager(_ manager: GameManager, received boardAction: BoardSetupAction, from player: Player) {
-        os_log(.info, "received action to process %s", String(describing: boardAction))
-        DispatchQueue.main.async {
-            self.process(boardAction: boardAction, from: player)
+    func manager(_ manager: GameManager, received: BoardSetupAction, from: Player) {
+        os_log(.info, "received action to process %s", String(describing: received))
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.process(boardAction: received, from: from)
         }
     }
     
@@ -94,7 +115,8 @@ extension GameViewController: GameManagerDelegate {
     func manager(_ manager: GameManager, joiningHost host: Player) {
         os_log(.info, "GameManagerDelegate joining host")
         // MARK: request worldmap when joining the host
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             if self.sessionState == .waitingForBoard {
                 manager.send(boardAction: .requestBoardLocation)
             }

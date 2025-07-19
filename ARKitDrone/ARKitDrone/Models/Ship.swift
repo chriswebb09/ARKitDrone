@@ -6,300 +6,289 @@
 //  Copyright © 2025 Christopher Webb-Orenstein. All rights reserved.
 //
 
-import SceneKit
-import QuartzCore
+import RealityKit
+import simd
+import UIKit
 
-class Ship {
+@MainActor
+class Ship: @unchecked Sendable {
     
-    var node: SCNNode
+    var entity: Entity
     var targeted: Bool = false
-    var velocity: SCNVector3 = SCNVector3(x: 1, y: 1, z: 1)
-    var prevDir: SCNVector3 = SCNVector3(x: 0, y: 1, z: 0)
+    var velocity: SIMD3<Float> = SIMD3<Float>(0.01, 0.01, 0.01)
+    var prevDir: SIMD3<Float> = SIMD3<Float>(0, 1, 0)
     
-    private static var shipRegistry: [SCNNode: Ship] = [:]
+    private static var shipRegistry: [Entity: Ship] = [:]
     
     var isDestroyed: Bool = false
-    var targetNode: SCNNode!
-    var square: TargetNode!
+    var square: TargetNode?
     var targetAdded = false
     var fired = false
-    var id: String!
-    var num: Int!
+    var id: String
+    var num: Int?
     
-    init(newNode: SCNNode) {
-        node = newNode
-        id = UUID.init().uuidString
-        Ship.shipRegistry[newNode] = self
-        let physicsBody =  SCNPhysicsBody(type: .kinematic, shape: nil)
-        node.physicsBody = physicsBody
-        node.physicsBody!.categoryBitMask = CollisionTypes.missile.rawValue
-        node.physicsBody!.contactTestBitMask = CollisionTypes.base.rawValue
-        node.physicsBody!.collisionBitMask = 2
+    init(entity: Entity) {
+        self.entity = entity
+        self.id = UUID().uuidString
+        Ship.shipRegistry[entity] = self
+        setupPhysics()
     }
     
     deinit {
-        Ship.shipRegistry.removeValue(forKey: node)
+        let entityToRemove = entity
+        Task { @MainActor in
+            Ship.shipRegistry.removeValue(forKey: entityToRemove)
+        }
     }
     
-    func flyCenterOfMass(_ shipCount: Int, _ percievedCenter: SCNVector3) -> SCNVector3 {
-        let averagePercievedCenter = percievedCenter / Float(shipCount - 1);
-        return (averagePercievedCenter - node.position) / 100
+    private func setupPhysics() {
+        let physicsComponent = PhysicsBodyComponent(
+            massProperties: PhysicsMassProperties(mass: 1.0),
+            material: PhysicsMaterialResource.default,
+            mode: .kinematic
+        )
+        entity.components.set(physicsComponent)
+        
+        let collisionComponent = CollisionComponent(
+            shapes: [ShapeResource.generateBox(size: SIMD3<Float>(1, 1, 1))]
+        )
+        entity.components.set(collisionComponent)
     }
     
-    func matchSpeedWithOtherShips(_ shipCount: Int,  _ percievedVelocity: SCNVector3) -> SCNVector3 {
-        let averagePercievedVelocity = percievedVelocity / Float(shipCount - 1)
-        return (averagePercievedVelocity - velocity)
+    @MainActor
+    func flyCenterOfMass(_ shipCount: Int, _ perceivedCenter: SIMD3<Float>) -> SIMD3<Float> {
+        let averagePerceivedCenter = perceivedCenter / Float(shipCount - 1)
+        return (averagePerceivedCenter - entity.transform.translation) / 100
     }
     
-    func boundPositions(_ ship: Ship) -> SCNVector3 {
-        var rebound = SCNVector3(x: Float(0), y: Float(0), z:Float(0))
-        let Xmin = -30
-        let Ymin = -30
-        let Zmin = -100
-        let Xmax = 50
-        let Ymax = 50
-        let Zmax = 50
+    func matchSpeedWithOtherShips(_ shipCount: Int, _ perceivedVelocity: SIMD3<Float>) -> SIMD3<Float> {
+        let averagePerceivedVelocity = perceivedVelocity / Float(shipCount - 1)
+        return (averagePerceivedVelocity - velocity)
+    }
+    
+    @MainActor
+    func boundPositions(_ ship: Ship) -> SIMD3<Float> {
+        var rebound = SIMD3<Float>(0, 0, 0)
+        let minBounds = SIMD3<Float>(-30, -30, -100)
+        let maxBounds = SIMD3<Float>(50, 50, 50)
         
-        if ship.node.position.x < Float(Xmin) {
-            rebound.x = 1;
-        }
+        let pos = ship.entity.transform.translation
         
-        if ship.node.position.x > Float(Xmax) {
-            rebound.x = -1;
-        }
+        if pos.x < minBounds.x { rebound.x = 1 }
+        if pos.x > maxBounds.x { rebound.x = -1 }
+        if pos.y < minBounds.y { rebound.y = 1 }
+        if pos.y > maxBounds.y { rebound.y = -1 }
+        if pos.z < minBounds.z { rebound.z = 1 }
+        if pos.z > maxBounds.z { rebound.z = -1 }
         
-        if ship.node.position.y < Float(Ymin) {
-            rebound.y = 1;
-        }
-        
-        if ship.node.position.y > Float(Ymax) {
-            rebound.y = -1;
-        }
-        
-        if ship.node.position.z < Float(Zmin) {
-            rebound.z = 1;
-        }
-        
-        if ship.node.position.z > Float(Zmax) {
-            rebound.z = -1;
-        }
-        return rebound;
-        
+        return rebound
     }
     
     func limitVelocity(_ ship: Ship) {
-        let mag = Float(ship.velocity.length())
+        let mag = simd_length(ship.velocity)
         let limit: Float = 0.8
         if mag > limit {
-            ship.velocity = (ship.velocity/mag) * limit
+            ship.velocity = (ship.velocity / mag) * limit
         }
     }
     
-    static func getShip(from node: SCNNode) -> Ship? {
-        return shipRegistry[node]
+    @MainActor
+    static func getShip(from entity: Entity) -> Ship? {
+        return shipRegistry[entity]
     }
     
-    func smoothForces(forces: SCNVector3, factor: Float) -> SCNVector3 {
+    func smoothForces(forces: SIMD3<Float>, factor: Float) -> SIMD3<Float> {
         return velocity + forces * factor
     }
     
-    func keepASmallDistance(_ ship: Ship, ships: [Ship]) -> SCNVector3 {
-        var forceAway = SCNVector3(x: Float(0), y: Float(0), z: Float(0))
+    @MainActor
+    func keepASmallDistance(_ ship: Ship, ships: [Ship]) -> SIMD3<Float> {
+        var forceAway = SIMD3<Float>(0, 0, 0)
         for otherShip in ships {
-            if ship.node != otherShip.node {
-                if abs(otherShip.node.position.distance(ship.node.position)) < 40 {
-                    forceAway = (forceAway - (otherShip.node.position - ship.node.position))
+            if ship.entity != otherShip.entity {
+                let distance = simd_distance(otherShip.entity.transform.translation, ship.entity.transform.translation)
+                if distance < 40 {
+                    forceAway = forceAway - (otherShip.entity.transform.translation - ship.entity.transform.translation)
                 }
             }
         }
         return forceAway
     }
     
-    func updateShipPosition(percievedCenter: SCNVector3, percievedVelocity: SCNVector3, otherShips: [Ship], obstacles: [SCNNode]) {
-        var v1 = flyCenterOfMass(otherShips.count, percievedCenter)
+    @MainActor
+    func updateShipPosition(perceivedCenter: SIMD3<Float>, perceivedVelocity: SIMD3<Float>, otherShips: [Ship], obstacles: [Entity]) {
+        var v1 = flyCenterOfMass(otherShips.count, perceivedCenter)
         var v2 = keepASmallDistance(self, ships: otherShips)
-        var v3 = matchSpeedWithOtherShips(otherShips.count, percievedVelocity)
+        var v3 = matchSpeedWithOtherShips(otherShips.count, perceivedVelocity)
         var v4 = boundPositions(self)
-        v1 *= (0.1)
-        v2 *= (0.1)
-        v3 *= (0.1)
-        v4 *= (1.0)
-        let forward = SCNVector3(x: Float(0), y: Float(0), z: Float(1))
-        let velocityNormal = velocity.normalized()
-        velocity = velocity + v1 + v2 + v3 + v4;
+        
+        v1 *= 0.1
+        v2 *= 0.1
+        v3 *= 0.1
+        v4 *= 1.0
+        
+        velocity = velocity + v1 + v2 + v3 + v4
         limitVelocity(self)
-        let nor = forward.cross(velocityNormal)
-        let angle = CGFloat(forward.dot(velocityNormal))
-        node.rotation = SCNVector4(x: nor.x, y: nor.y, z: nor.z, w: Float(acos(angle)))
-        node.position = node.position + (velocity)
-        if targetAdded {
-            square.unhide()
-            square.displayNodeHierarchyOnTop(true)
-            square.recentFocusSquarePositions = Array(square.recentFocusSquarePositions.suffix(10))
-            let position = node.simdWorldTransform.translation
-            square.recentFocusSquarePositions.append(position)
-            let average = square.recentFocusSquarePositions.reduce([0, 0, 0], { $0 + $1 }) / Float(square.recentFocusSquarePositions.count)
-            square.simdPosition = average
-            square.simdScale = [20.0, 20.0, 20.0]
-            SCNTransaction.begin()
-            SCNTransaction.animationDuration = 0.1
-            square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
-            square.position = SCNVector3(x: node.position.x, y: node.position.y, z: node.position.z)
-            SCNTransaction.commit()
-            square.performOpenAnimation()
+        
+        // Update position
+        entity.transform.translation = entity.transform.translation + velocity
+        
+        // Update rotation to face movement direction
+        if simd_length(velocity) > 0.001 {
+            let direction = simd_normalize(velocity)
+            entity.look(at: entity.transform.translation + direction, from: entity.transform.translation, relativeTo: nil)
         }
-    }
-    
-    func setTargetAboveSelected() {
-        if targetAdded {
-            SCNTransaction.begin()
-            SCNTransaction.animationDuration = 0.01
-            targetNode.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
-            targetNode.position = SCNVector3(x: node.position.x, y: node.position.y + 1, z: node.position.z - 10)
-            SCNTransaction.commit()
-        }
-    }
-    
-    func updateShipPosition(target: SCNVector3, otherShips: [Ship]) {
-        let nodes = otherShips.map { $0.node }
-        let perceivedCenter: SCNVector3
-        if otherShips.isEmpty {
-            perceivedCenter = node.position
-        } else {
-            let sumPositions = otherShips.reduce(SCNVector3Zero) { (accumulated, ship) -> SCNVector3 in
-                return SCNVector3(accumulated.x + ship.node.position.x,
-                                  accumulated.y + ship.node.position.y,
-                                  accumulated.z + ship.node.position.z)
-            }
-            perceivedCenter = SCNVector3(
-                x: sumPositions.x / Float(otherShips.count),
-                y: sumPositions.y / Float(otherShips.count),
-                z: sumPositions.z / Float(otherShips.count)
+        
+        // Update target square if present
+        if targetAdded, let square = square {
+            square.transform.translation = SIMD3<Float>(
+                entity.transform.translation.x,
+                entity.transform.translation.y,
+                entity.transform.translation.z
             )
         }
-        let directionToTarget = (target - node.position).normalized()
+    }
+    
+    @MainActor
+    func updateShipPosition(target: SIMD3<Float>, otherShips: [Ship]) {
+        let entities = otherShips.map { $0.entity }
+        let perceivedCenter: SIMD3<Float>
         
-        let avoidCollisions = nodes.reduce(SCNVector3Zero) { (force, shipNode) in
-            let distance = node.position.distance(shipNode.position)
-            if distance < 14 { // Avoid collisions if too close
-                return force - (shipNode.position - node.position).normalized() * (1 / distance) // apply more force as ships are closer
+        if otherShips.isEmpty {
+            perceivedCenter = entity.transform.translation
+        } else {
+            let sumPositions = otherShips.reduce(SIMD3<Float>(0, 0, 0)) { (accumulated, ship) -> SIMD3<Float> in
+                return accumulated + ship.entity.transform.translation
+            }
+            perceivedCenter = sumPositions / Float(otherShips.count)
+        }
+        
+        let directionToTarget = simd_normalize(target - entity.transform.translation)
+        
+        let avoidCollisions = entities.reduce(SIMD3<Float>(0, 0, 0)) { (force, shipEntity) in
+            let distance = simd_distance(entity.transform.translation, shipEntity.transform.translation)
+            if distance < 14 {
+                return force - simd_normalize(shipEntity.transform.translation - entity.transform.translation) * (1 / distance)
             }
             return force
         }
         
-        let boundary = SCNVector3(
-            x: max(-10, min(10, node.position.x)),
-            y: max(-10, min(10, node.position.y)),
-            z: max(-10, min(10, node.position.z))
-        ) - node.position
+        let currentPos = entity.transform.translation
+        let boundary = SIMD3<Float>(
+            x: max(-10, min(10, currentPos.x)),
+            y: max(-10, min(10, currentPos.y)),
+            z: max(-10, min(10, currentPos.z))
+        ) - currentPos
         
-        let newVelocity = (perceivedCenter - node.position) * 0.1 +
-        avoidCollisions * 0.1 +
-        directionToTarget * 0.2 +
-        boundary
+        let cohesion = (perceivedCenter - entity.transform.translation) * 0.1
+        let separation = avoidCollisions * 0.1
+        let alignment = directionToTarget * 0.2
+        let newVelocity = cohesion + separation + alignment + boundary
+        
         let speedLimit: Float = 0.4
-        let speed = newVelocity.length()
-        velocity = (speed > speedLimit) ? (newVelocity / speed) * speedLimit : newVelocity
-        node.position += velocity
-        if targetAdded {
-            square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
-            SCNTransaction.begin()
-            square.simdScale = [1.0, 1.0, 1.0]
-            SCNTransaction.animationDuration = 0.4
-            square.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
-            square.simdWorldPosition = node.simdWorldPosition
-            square.simdWorldOrientation = node.simdWorldOrientation
-            square.simdWorldTransform = node.simdWorldTransform
-            SCNTransaction.commit()
+        let speed = simd_length(newVelocity)
+        velocity = (speed > speedLimit) ? simd_normalize(newVelocity) * speedLimit : newVelocity
+        
+        entity.transform.translation += velocity
+        
+        // Update target square
+        if targetAdded, let square = square {
+            square.transform.translation = entity.transform.translation
         }
     }
 }
 
-
 extension Ship {
     
-    func attack(target: SCNNode) {
-        let distanceToTarget = node.position.distance(target.position)
+    @MainActor
+    func attack(target: Entity) {
+        let distanceToTarget = simd_distance(entity.transform.translation, target.transform.translation)
         let attackRange: Float = 50.0
-        node.simdWorldOrientation = target.simdWorldOrientation
-        node.look(at: target.position)
+        
+        // Look at target
+        entity.look(at: target.transform.translation, from: entity.transform.translation, relativeTo: nil)
+        
         if distanceToTarget <= attackRange {
             if !isDestroyed {
                 if !fired {
                     fired = true
                     self.fireAt(target)
-                    _ = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { [weak self] timer in
+                    _ = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { [weak self] timer in
                         guard let self = self else { return }
-                        fired = false
+                        Task { @MainActor in
+                            self.fired = false
+                        }
                         timer.invalidate()
-                    })
+                    }
                 }
             }
         }
     }
     
-    private func fireAt(_ target: SCNNode) {
-//        let missile = createMissile()
-//        missile.position = self.node.position
-//        let targetPos = target.presentation.simdWorldPosition
-//        let currentPos = missile.presentation.simdWorldPosition
-//        let targetDirection = simd_normalize(currentPos - targetPos)
-//        let direction = SCNVector3(x: -Float(targetDirection.x), y: -Float(targetDirection.y), z: -Float(targetDirection.z))
-//        missile.simdWorldOrientation = target.simdWorldOrientation
-//        missile.look(at: target.position)
-//        missile.physicsBody?.applyForce(direction * 1000, at: target.presentation.position, asImpulse: true)
-//        missile.simdWorldOrientation = target.simdWorldOrientation
-//        missile.look(at: target.position)
+    private func fireAt(_ target: Entity) {
+        Task { @MainActor in
+            // Create missile entity
+            let missile = createMissile()
+            missile.transform.translation = self.entity.transform.translation
+            
+            let targetPos = target.transform.translation
+            let currentPos = missile.transform.translation
+            let direction = simd_normalize(targetPos - currentPos)
+            
+            missile.look(at: targetPos, from: currentPos, relativeTo: nil)
+            
+            // Add physics force simulation
+            _ = direction * 1000
+            
+            // Add to scene (you'll need to pass the scene reference)
+            // scene.addAnchor(AnchorEntity(world: missile.transform.translation))
+        }
     }
     
-    private func createMissile() -> SCNNode {
-        let missileGeometry = SCNCapsule(capRadius: 0.6, height: 4)
-        let material = missileGeometry.firstMaterial!
-        material.diffuse.contents = TargetNode.fillColor
-        material.isDoubleSided = true
-        material.ambient.contents = UIColor.black
-        material.lightingModel = .constant
-        material.emission.contents = TargetNode.fillColor
-        let missileNode = SCNNode(geometry: missileGeometry)
-        missileNode.name = "Missile"
-        let missilePhysicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
-        missileNode.physicsBody = missilePhysicsBody
-        missileNode.physicsBody?.isAffectedByGravity = false
-        missileNode.physicsBody?.categoryBitMask = CollisionTypes.missile.rawValue
-        missileNode.physicsBody?.collisionBitMask = CollisionTypes.base.rawValue
-        missileNode.physicsBody?.contactTestBitMask = CollisionTypes.base.rawValue
-        node.getRootNode().addChildNode(missileNode)
-        missileNode.eulerAngles = SCNVector3(-Float.pi / 2, 0, 0)
-        return missileNode
+    private func createMissile() -> Entity {
+        let missile = Entity()
+        missile.name = "Missile"
+        
+        // Create missile geometry
+        let geometry = MeshResource.generateCylinder(height: 0.4, radius: 0.06)
+        var material = UnlitMaterial()
+        material.color = .init(tint: .red)
+        
+        missile.components.set(ModelComponent(mesh: geometry, materials: [material]))
+        
+        // Add physics
+        let physicsComponent = PhysicsBodyComponent(
+            massProperties: PhysicsMassProperties(mass: 0.1),
+            material: PhysicsMaterialResource.default,
+            mode: .dynamic
+        )
+        missile.components.set(physicsComponent)
+        
+        let collisionComponent = CollisionComponent(
+            shapes: [ShapeResource.generateCapsule(height: 0.4, radius: 0.06)]
+        )
+        missile.components.set(collisionComponent)
+        
+        return missile
     }
     
-    private func flyTowards(_ targetPosition: SCNVector3, orientation: simd_quatf, currentPos: simd_float3, targetPos: simd_float3) {
-        let targetDirection = simd_normalize(targetPos - currentPos)
-        let direction = SCNVector3(x: Float(targetDirection.x),
-                                 y: Float(targetDirection.y),
-                                 z: Float(targetDirection.z))
-        node.simdWorldOrientation = orientation
-        node.look(at: targetPosition)
-        velocity = direction * 5 // Adjust the speed multiplier
-        // Update the position based on the velocity
-        node.position += velocity
+    @MainActor
+    static func removeShip(conditionalShipEntity: Entity) {
+        if let ship = Ship.getShip(from: conditionalShipEntity) {
+            ship.isDestroyed = true
+            ship.square?.isEnabled = false
+            ship.square?.removeFromParent()
+            ship.entity.isEnabled = false
+            ship.entity.removeFromParent()
+        }
     }
     
-    static func removeShip(conditionalShipNode: SCNNode) {
-        let ship = Ship.getShip(from: conditionalShipNode)!
-        ship.isDestroyed = true
-        ship.square.isHidden = true
-        ship.square.removeFromParentNode()
-        ship.node.isHidden = true
-        ship.node.removeFromParentNode()
-    }
-    
+    @MainActor
     func removeShip() {
         isDestroyed = true
-        square?.isHidden = true
-        square?.removeFromParentNode()
-        node.isHidden = true
-        node.removeFromParentNode()
+        square?.isEnabled = false
+        square?.removeFromParent()
+        entity.isEnabled = false
+        entity.removeFromParent()
     }
 }
-

@@ -6,14 +6,14 @@
 //  Copyright © 2025 Christopher Webb-Orenstein. All rights reserved.
 //
 
-import SceneKit
+import RealityKit
 import ARKit
 
-class TargetNode: SCNNode {
+class TargetNode: Entity {
     
-    let positioningNode = SCNNode()
+    let positioningEntity = Entity()
     
-    var segments: [FocusSquare.Segment] = []
+    var segments: [FocusSquareSegment] = []
     
     var isOpen = false
     
@@ -33,185 +33,258 @@ class TargetNode: SCNNode {
     
     /// The focus square's most recent positions.
     var recentFocusSquarePositions: [SIMD3<Float>] = []
-    lazy var fillPlane: SCNNode = {
-        let correctionFactor = FocusSquare.thickness / 2 // correction to align lines perfectly
-        let length = CGFloat(1.0 - FocusSquare.thickness * 2 + correctionFactor)
-        let plane = SCNPlane(width: length, height: length)
-        let node = SCNNode(geometry: plane)
-        node.name = "fillPlane"
-        node.opacity = 0
-        let material = plane.firstMaterial!
-        material.diffuse.contents = TargetNode.fillColor
-        material.isDoubleSided = true
-        material.ambient.contents = UIColor.black
-        material.lightingModel = .constant
-        material.emission.contents = TargetNode.fillColor
-        return node
-    }()
     
-    override init() {
+    private var fillPlane: Entity!
+    
+    required init() {
         super.init()
-        let s1 = FocusSquare.Segment(name: "s1", corner: .topLeft, alignment: .horizontal, color: TargetNode.fillColor, thickness: 0.04)
-        let s2 = FocusSquare.Segment(name: "s2", corner: .topRight, alignment: .horizontal, color: TargetNode.fillColor, thickness: 0.04)
-        let s3 = FocusSquare.Segment(name: "s3", corner: .topLeft, alignment: .vertical, color: TargetNode.fillColor, thickness: 0.04)
-        let s4 = FocusSquare.Segment(name: "s4", corner: .topRight, alignment: .vertical, color: TargetNode.fillColor, thickness: 0.04)
-        let s5 = FocusSquare.Segment(name: "s5", corner: .bottomLeft, alignment: .vertical, color: TargetNode.fillColor, thickness: 0.04)
-        let s6 = FocusSquare.Segment(name: "s6", corner: .bottomRight, alignment: .vertical, color: TargetNode.fillColor, thickness: 0.04)
-        let s7 = FocusSquare.Segment(name: "s7", corner: .bottomLeft, alignment: .horizontal, color: TargetNode.fillColor, thickness: 0.04)
-        let s8 = FocusSquare.Segment(name: "s8", corner: .bottomRight, alignment: .horizontal, color: TargetNode.fillColor, thickness: 0.04)
-        segments = [s1, s2, s3, s4, s5, s6, s7, s8]
         
-        let sl: Float = 0.5  // segment length
-        let c: Float = FocusSquare.thickness / 2 // correction to align lines perfectly
-        s1.simdPosition += [-(sl / 2 - c), -(sl - c), 0]
-        s2.simdPosition += [sl / 2 - c, -(sl - c), 0]
-        s3.simdPosition += [-sl, -sl / 2, 0]
-        s4.simdPosition += [sl, -sl / 2, 0]
-        s5.simdPosition += [-sl, sl / 2, 0]
-        s6.simdPosition += [sl, sl / 2, 0]
-        s7.simdPosition += [-(sl / 2 - c), sl - c, 0]
-        s8.simdPosition += [sl / 2 - c, sl - c, 0]
-        positioningNode.eulerAngles.x = .pi / 2 // Horizontal
-        positioningNode.simdScale = [1.0, 1.0, 1.0] * (FocusSquare.size * FocusSquare.scaleForClosedSquare)
-        for segment in segments {
-            positioningNode.addChildNode(segment)
-        }
-        positioningNode.addChildNode(fillPlane)
-        // Always render focus square on top of other content.
-        displayNodeHierarchyOnTop(true)
-        addChildNode(positioningNode)
-        // Start the focus square as a billboard.
+        // Create simple green corner brackets for targeting
+        createCornerBrackets()
+        
+        addChild(positioningEntity)
+        
+        // Start the target as visible
         displayAsBillboard()
-        positioningNode.opacity = 1.0
         isOpen = true
         isPointingDownwards = true
     }
     
+    private func createCornerBrackets() {
+        // Create 8 simple corner bracket entities
+        let thickness: Float = 0.02
+        let bracketLength: Float = 0.15
+        let squareSize: Float = 0.6
+        
+        // Create material
+        var material = UnlitMaterial()
+        material.color = .init(tint: TargetNode.primaryColor)
+        
+        // Top-left corner (L-shape)
+        let tlHoriz = Entity()
+        tlHoriz.components.set(ModelComponent(
+            mesh: MeshResource.generateBox(size: SIMD3<Float>(bracketLength, thickness, thickness)),
+            materials: [material]
+        ))
+        tlHoriz.transform.translation = SIMD3<Float>(-squareSize/2 + bracketLength/2, -squareSize/2, 0)
+        
+        let tlVert = Entity()
+        tlVert.components.set(ModelComponent(
+            mesh: MeshResource.generateBox(size: SIMD3<Float>(thickness, bracketLength, thickness)),
+            materials: [material]
+        ))
+        tlVert.transform.translation = SIMD3<Float>(-squareSize/2, -squareSize/2 + bracketLength/2, 0)
+        
+        // Top-right corner (L-shape)
+        let trHoriz = Entity()
+        trHoriz.components.set(ModelComponent(
+            mesh: MeshResource.generateBox(size: SIMD3<Float>(bracketLength, thickness, thickness)),
+            materials: [material]
+        ))
+        trHoriz.transform.translation = SIMD3<Float>(squareSize/2 - bracketLength/2, -squareSize/2, 0)
+        
+        let trVert = Entity()
+        trVert.components.set(ModelComponent(
+            mesh: MeshResource.generateBox(size: SIMD3<Float>(thickness, bracketLength, thickness)),
+            materials: [material]
+        ))
+        trVert.transform.translation = SIMD3<Float>(squareSize/2, -squareSize/2 + bracketLength/2, 0)
+        
+        // Bottom-left corner (L-shape)
+        let blHoriz = Entity()
+        blHoriz.components.set(ModelComponent(
+            mesh: MeshResource.generateBox(size: SIMD3<Float>(bracketLength, thickness, thickness)),
+            materials: [material]
+        ))
+        blHoriz.transform.translation = SIMD3<Float>(-squareSize/2 + bracketLength/2, squareSize/2, 0)
+        
+        let blVert = Entity()
+        blVert.components.set(ModelComponent(
+            mesh: MeshResource.generateBox(size: SIMD3<Float>(thickness, bracketLength, thickness)),
+            materials: [material]
+        ))
+        blVert.transform.translation = SIMD3<Float>(-squareSize/2, squareSize/2 - bracketLength/2, 0)
+        
+        // Bottom-right corner (L-shape)
+        let brHoriz = Entity()
+        brHoriz.components.set(ModelComponent(
+            mesh: MeshResource.generateBox(size: SIMD3<Float>(bracketLength, thickness, thickness)),
+            materials: [material]
+        ))
+        brHoriz.transform.translation = SIMD3<Float>(squareSize/2 - bracketLength/2, squareSize/2, 0)
+        
+        let brVert = Entity()
+        brVert.components.set(ModelComponent(
+            mesh: MeshResource.generateBox(size: SIMD3<Float>(thickness, bracketLength, thickness)),
+            materials: [material]
+        ))
+        brVert.transform.translation = SIMD3<Float>(squareSize/2, squareSize/2 - bracketLength/2, 0)
+        
+        // Add all brackets to positioning entity
+        positioningEntity.addChild(tlHoriz)
+        positioningEntity.addChild(tlVert)
+        positioningEntity.addChild(trHoriz)
+        positioningEntity.addChild(trVert)
+        positioningEntity.addChild(blHoriz)
+        positioningEntity.addChild(blVert)
+        positioningEntity.addChild(brHoriz)
+        positioningEntity.addChild(brVert)
+        
+        // Set basic transform - make it vertical (no rotation) with small base scale
+        positioningEntity.transform.rotation = simd_quatf(angle: 0, axis: [1, 0, 0])
+        positioningEntity.transform.scale = SIMD3<Float>(repeating: 0.2)  // Small base scale
+    }
+    
+    private func createFillPlane() {
+        let correctionFactor: Float = 0.009 // thickness / 2 correction to align lines perfectly
+        let length = 1.0 - 0.018 * 2 + correctionFactor
+        
+        let mesh = MeshResource.generatePlane(width: length, depth: length)
+        fillPlane = Entity()
+        fillPlane.name = "fillPlane"
+        
+        var material = UnlitMaterial()
+        material.color = .init(tint: TargetNode.fillColor.withAlphaComponent(0.0))
+        
+        fillPlane.components.set(ModelComponent(mesh: mesh, materials: [material]))
+    }
+    
     private func displayAsBillboard() {
-        simdTransform = matrix_identity_float4x4
-        eulerAngles.x = .pi / 2
-        simdPosition = [0, 0, -0.8]
+        transform = Transform.identity
+        transform.rotation = simd_quatf(angle: 0, axis: [1, 0, 0])  // Keep vertical
+        transform.translation = [0, 0, 0]  // Don't offset
         unhide()
         performOpenAnimation()
     }
     
     func unhide() {
-        guard action(forKey: "unhide") == nil else { return }
-        displayNodeHierarchyOnTop(true)
-        runAction(.fadeIn(duration: 0.5), forKey: "unhide")
+        isEnabled = true
     }
     
     func performOpenAnimation() {
         guard !isOpen, !isAnimating else { return }
         isOpen = true
         isAnimating = true
-        SCNTransaction.begin()
-        SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: .easeOut)
-        SCNTransaction.animationDuration = FocusSquare.animationDuration / 4
-        positioningNode.opacity = 1.0
-        for segment in segments {
-            segment.open()
+        
+        // Simple scale animation for green targeting brackets
+        let scaleAnimation = FromToByAnimation<Transform>(
+            name: "openScale",
+            from: Transform(scale: SIMD3<Float>(repeating: 0.8)),
+            to: Transform(scale: SIMD3<Float>(repeating: 1.0)),
+            duration: 0.175,
+            timing: .easeOut,
+            bindTarget: .transform
+        )
+        
+        if let animationResource = try? AnimationResource.generate(with: scaleAnimation) {
+            positioningEntity.playAnimation(animationResource)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.175) {
+                self.isAnimating = false
+            }
         }
-        SCNTransaction.completionBlock = {
-            //            self.positioningNode.runAction(pulseAction(), forKey: "pulse")
-            // This is a safe operation because `SCNTransaction`'s completion block is called back on the main thread.
-            self.isAnimating = false
-        }
-        SCNTransaction.commit()
-        // Add a scale/bounce animation.
-        SCNTransaction.begin()
-        SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: .easeOut)
-        SCNTransaction.animationDuration = FocusSquare.animationDuration / 4
-        positioningNode.simdScale = [1.0, 1.0, 1.0] * FocusSquare.size
-        SCNTransaction.commit()
     }
     
     func performCloseAnimation(flash: Bool = false) {
         guard isOpen, !isAnimating else { return }
         isOpen = false
         isAnimating = true
-        positioningNode.removeAction(forKey: "pulse")
-        positioningNode.opacity = 1.0
-        SCNTransaction.begin()
-        SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: .easeOut)
-        SCNTransaction.animationDuration = FocusSquare.animationDuration / 2
-        positioningNode.opacity = 0.99
-        SCNTransaction.completionBlock = {
-            SCNTransaction.begin()
-            SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: .easeOut)
-            SCNTransaction.animationDuration = FocusSquare.animationDuration / 4
-            for segment in self.segments {
-                segment.close()
-            }
-            SCNTransaction.completionBlock = { self.isAnimating = false }
-            SCNTransaction.commit()
-        }
-        SCNTransaction.commit()
-        positioningNode.opacity = 1
-        // Scale/bounce animation
-        positioningNode.addAnimation(scaleAnimation(for: "transform.scale.x"), forKey: "transform.scale.x")
-        positioningNode.addAnimation(scaleAnimation(for: "transform.scale.y"), forKey: "transform.scale.y")
-        positioningNode.addAnimation(scaleAnimation(for: "transform.scale.z"), forKey: "transform.scale.z")
         
-        if flash {
-            let waitAction = SCNAction.wait(duration: FocusSquare.animationDuration * 0.75)
-            let fadeInAction = SCNAction.fadeOpacity(to: 0.25, duration: FocusSquare.animationDuration * 0.125)
-            let fadeOutAction = SCNAction.fadeOpacity(to: 0.0, duration: FocusSquare.animationDuration * 0.125)
-            fillPlane.runAction(SCNAction.sequence([waitAction, fadeInAction, fadeOutAction]))
-            let flashSquareAction = flashAnimation(duration: FocusSquare.animationDuration * 0.25)
-            for segment in segments {
-                segment.runAction(.sequence([waitAction, flashSquareAction]))
+        // Simple scale down animation for the green square
+        let scaleAnimation = FromToByAnimation<Transform>(
+            name: "closeScale",
+            from: Transform(scale: SIMD3<Float>(repeating: 1.0)),
+            to: Transform(scale: SIMD3<Float>(repeating: 0.5)),
+            duration: 0.35,
+            timing: .easeOut,
+            bindTarget: .transform
+        )
+        
+        if let animationResource = try? AnimationResource.generate(with: scaleAnimation) {
+            positioningEntity.playAnimation(animationResource)
+            
+            if flash {
+                performFlashEffect()
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                self.isAnimating = false
             }
         }
     }
     
-    func scaleAnimation(for keyPath: String) -> CAKeyframeAnimation {
-        let scaleAnimation = CAKeyframeAnimation(keyPath: keyPath)
-        let easeOut = CAMediaTimingFunction(name: .easeOut)
-        let easeInOut = CAMediaTimingFunction(name: .easeInEaseOut)
-        let linear = CAMediaTimingFunction(name: .linear)
-        let size = FocusSquare.size
-        let ts = FocusSquare.size * FocusSquare.scaleForClosedSquare
-        let values = [size, size * 1.15, size * 1.15, ts * 0.97, ts]
-        let keyTimes: [NSNumber] = [0.00, 0.25, 0.50, 0.75, 1.00]
-        let timingFunctions = [easeOut, linear, easeOut, easeInOut]
-        scaleAnimation.values = values
-        scaleAnimation.keyTimes = keyTimes
-        scaleAnimation.timingFunctions = timingFunctions
-        scaleAnimation.duration = FocusSquare.animationDuration
-        return scaleAnimation
-    }
-    
-    func displayNodeHierarchyOnTop(_ isOnTop: Bool) {
-        // Recursivley traverses the node's children to update the rendering order depending on the `isOnTop` parameter.
-        func updateRenderOrder(for node: SCNNode) {
-            node.renderingOrder = isOnTop ? 2 : 0
-            for material in node.geometry?.materials ?? [] {
-                material.readsFromDepthBuffer = !isOnTop
-            }
-            for child in node.childNodes {
-                updateRenderOrder(for: child)
+    private func performFlashEffect() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.525) {
+            if var model = self.fillPlane.components[ModelComponent.self] {
+                var material = UnlitMaterial()
+                material.color = .init(tint: TargetNode.fillColor.withAlphaComponent(0.25))
+                model.materials = [material]
+                self.fillPlane.components.set(model)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.0875) {
+                    var material = UnlitMaterial()
+                    material.color = .init(tint: TargetNode.fillColor.withAlphaComponent(0.0))
+                    model.materials = [material]
+                    self.fillPlane.components.set(model)
+                }
             }
         }
-        updateRenderOrder(for: positioningNode)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }
 
+// MARK: - FocusSquareSegment for RealityKit
 
-private func flashAnimation(duration: TimeInterval) -> SCNAction {
+class FocusSquareSegment: Entity {
     
-    let action = SCNAction.customAction(duration: duration) { (node, elapsedTime) -> Void in
-//        let elapsedTimePercentage = elapsedTime / CGFloat(duration)
-//        let saturation = 2.8 * (elapsedTimePercentage - 0.5) * (elapsedTimePercentage - 0.5) + 0.3
-        if let material = node.geometry?.firstMaterial {
-            material.diffuse.contents = TargetNode.fillColor.withAlphaComponent(1.0)
-        }
+    enum Corner {
+        case topLeft
+        case topRight
+        case bottomLeft
+        case bottomRight
     }
-    return action
     
+    enum Alignment {
+        case horizontal
+        case vertical
+    }
+    
+    var corner: Corner
+    var alignment: Alignment
+    var isOpen = false
+    
+    init(name: String, corner: Corner, alignment: Alignment, color: UIColor, thickness: Float) {
+        self.corner = corner
+        self.alignment = alignment
+        super.init()
+        
+        self.name = name
+        
+        // Create short corner bracket segments for proper focus square look
+        let bracketLength: Float = 0.2  // Short segments for corner brackets
+        let segmentSize = alignment == .horizontal ? 
+            SIMD3<Float>(bracketLength, thickness, thickness) :
+            SIMD3<Float>(thickness, bracketLength, thickness)
+        
+        let mesh = MeshResource.generateBox(size: segmentSize)
+        var material = UnlitMaterial()
+        material.color = .init(tint: color)
+        
+        components.set(ModelComponent(mesh: mesh, materials: [material]))
+    }
+    
+    required init() {
+        self.corner = .topLeft
+        self.alignment = .horizontal
+        super.init()
+    }
+    
+    func open() {
+        isOpen = true
+        // Segments start in open position
+    }
+    
+    func close() {
+        isOpen = false
+        // Segments close animation
+    }
 }
-

@@ -7,7 +7,6 @@ Utilities for compact serialization of data structures for network transmission.
 
 import Foundation
 import simd
-import SceneKit
 
 enum BitStreamError: Error {
     case tooShort

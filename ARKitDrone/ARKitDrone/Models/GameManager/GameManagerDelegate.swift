@@ -8,6 +8,7 @@
 
 import UIKit
 
+@MainActor
 protocol GameManagerDelegate: AnyObject {
     func manager(_ manager: GameManager, received: BoardSetupAction, from: Player)
     func manager(_ manager: GameManager, joiningPlayer player: Player)

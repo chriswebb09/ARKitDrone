@@ -7,12 +7,16 @@
 //
 
 import UIKit
-import SceneKit
-import ARKit
+import RealityKit
+@preconcurrency import ARKit
 import SpriteKit
 import os.log
 
-class GameViewController: UIViewController {
+extension NSNotification.Name {
+    static let advanceTarget = NSNotification.Name("advanceTarget")
+}
+
+class GameViewController: UIViewController, MissileManagerDelegate {
     
     enum SessionState {
         case setup
@@ -80,37 +84,38 @@ class GameViewController: UIViewController {
         return view
     }()
     
-    lazy var minimapView: SKView = {
-        let size: CGFloat = 140
-        let view = SKView(frame: CGRect(
-            x: UIScreen.main.bounds.width - size - 20,
-            y: 20,
-            width: size,
-            height: size
-        ))
-        view.isMultipleTouchEnabled = false
-        view.backgroundColor = .clear
-        return view
-    }()
     
     lazy var armMissilesButton: UIButton = {
         let button = UIButton()
         button.setTitle(LocalConstants.buttonTitle, for: .normal)
         button.setTitleColor(UIColor.white, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: UIFont.Weight.black)
-        button.frame = CGRect(origin: CGPoint(x:600, y: UIScreen.main.bounds.height - 320), size: CGSize(width: 180, height: 50))
+        button.frame = CGRect(origin: CGPoint(x: UIScreen.main.bounds.width - 200, y: 100), size: CGSize(width: 180, height: 60))
         button.layer.borderColor = UIColor(red: 1.00, green: 0.03, blue: 0.00, alpha: 1.00).cgColor
         //UIColor(red: 0.95, green: 0.15, blue: 0.07, alpha: 1.00).cgColor
-        button.backgroundColor = UIColor(red: 1.00, green: 0.03, blue: 0.00, alpha: 1.00)
+        button.backgroundColor = UIColor(
+            red: 1.00,
+            green: 0.03,
+            blue: 0.00,
+            alpha: 1.00
+        )
         button.layer.borderWidth = 3
+        button.isEnabled = true
         return button
     }()
+    
+    var focusSquareAnchor: AnchorEntity? = nil
     
     lazy var destoryedText: UILabel = {
         let label = UILabel()
         label.text = ""
         label.textAlignment = .center
-        label.textColor = UIColor(red: 1.00, green: 0.03, blue: 0.00, alpha: 1.00)
+        label.textColor = UIColor(
+            red: 1.00,
+            green: 0.03,
+            blue: 0.00,
+            alpha: 1.00
+        )
         label.backgroundColor = .clear
         label.font = UIFont(
             name: "AvenirNext-Bold",
@@ -136,11 +141,15 @@ class GameViewController: UIViewController {
         label.textColor = UIColor(red: 0.00, green: 1.00, blue: 0.01, alpha: 1.00)
         label.text = "Score: 0"
         label.backgroundColor = .black
-        label.frame = CGRect(origin: CGPoint(x: 40 , y:  UIScreen.main.bounds.origin.y + 50), size: CGSize(width: 130, height: 50))
+        label.frame = CGRect(
+            origin: CGPoint(
+                x: 40 ,
+                y:  UIScreen.main.bounds.origin.y + 50
+            ),
+            size: CGSize(width: 130, height: 50)
+        )
         return label
     }()
-    
-    
     
     let coachingOverlay = ARCoachingOverlayView()
     
@@ -150,51 +159,127 @@ class GameViewController: UIViewController {
     
     var focusSquare: FocusSquare! = FocusSquare()
     
-    var minimapScene: MinimapScene!
-    
-    var minimap: SKShapeNode!
-    
-    var playerNode: SCNNode!
-    
-    var score: [Int] = []
-    
-    let updateQueue = DispatchQueue(label: "com.arkitdrone.Queue", qos: .userInteractive)
     
     // used when state is localizingToWorldMap or localizingToSavedMap
     var targetWorldMap: ARWorldMap?
     let gameStartViewContoller = GameStartViewController()
     var overlayView: UIView?
-    var squareSet = false
-    var showPhysicsShapes = false
-    var missileManager: MissileManager!
-    var shipManager: ShipManager!
+    
+    
+    // MARK: - RealityKit Properties
+    lazy var realityKitView: GameSceneView = {
+        let arView = GameSceneView(frame: view.bounds)
+        return arView
+    }()
+    
+    var missileManager: MissileManager?
+    var shipManager: ShipManager?
+    
+    // MARK: - Common Properties
     var addsMesh = false
     var isLoaded = false
     let myself = UserDefaults.standard.myself
     var session: ARSession {
-        return sceneView.session
+        return realityKitView.session
     }
     
-    @IBOutlet weak var sceneView: GameSceneView!
     
     // MARK: - ViewController Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         DeviceOrientation.shared.set(orientation: .landscapeRight)
-        sceneView.delegate = self
-        sceneView.autoenablesDefaultLighting = true
-        NotificationCenter.default.addObserver(self, selector: #selector(missileCanHit), name: .missileCanHit, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(updateGameStateText), name: .updateScore, object: nil)
-        missileManager = MissileManager(game: game, sceneView: sceneView)
-        shipManager = ShipManager(game: game, sceneView: sceneView)
-        if showPhysicsShapes {
-            sceneView.debugOptions = .showPhysicsShapes
-        }
+        setupRealityKit()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(missileCanHit),
+            name: .missileCanHit,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(advanceToNextTarget),
+            name: .advanceTarget,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateScoreUI),
+            name: .updateScore,
+            object: nil
+        )
+        
         overlayView = gameStartViewContoller.view
         gameStartViewContoller.delegate = self
         view.addSubview(overlayView!)
         view.bringSubviewToFront(overlayView!)
+    }
+    
+    
+    private func setupRealityKit() {
+        guard realityKitView.superview == nil else { return }
+        view.insertSubview(realityKitView, at: 0)
+        
+        realityKitView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            realityKitView.topAnchor.constraint(equalTo: view.topAnchor),
+            realityKitView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            realityKitView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            realityKitView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
+        // ✅ Run AR session here - detect both horizontal and vertical planes
+        let config = ARWorldTrackingConfiguration()
+        config.planeDetection = [.horizontal]
+        if addsMesh {
+            if ARWorldTrackingConfiguration.supportsSceneReconstruction(.meshWithClassification) {
+                config.sceneReconstruction = .meshWithClassification
+                config.frameSemantics = .sceneDepth
+            }
+        }
+        realityKitView.session.run(config, options: [.resetTracking, .removeExistingAnchors])
+        realityKitView.session.delegate = self
+        
+        // Setup the RealityKit view
+        Task {
+            await realityKitView.setup()
+        }
+        
+        // Setup RealityKit managers
+        missileManager = MissileManager(
+            game: game,
+            sceneView: realityKitView
+        )
+        missileManager?.delegate = self
+        shipManager = ShipManager(
+            game: game,
+            arView: realityKitView
+        )
+        
+        realityKitView.addSubview(padView1)
+        realityKitView.addSubview(padView2)
+        realityKitView.addSubview(destoryedText)
+        realityKitView.addSubview(armMissilesButton)
+        realityKitView.addSubview(scoreText)
+        
+        // Setup coaching overlay
+        //        setupCoachingOverlay()
+        
+    }
+    
+    // MARK: - Game Setup
+    
+    func setupGameSession() {
+        setupRealityKit()
+        
+        // Reset game state for new session
+        game.scoreUpdated = false
+        game.valueReached = false
+        
+        // Sync ship managers
+        if let shipManager = shipManager {
+            realityKitView.ships = shipManager.ships
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -205,44 +290,56 @@ class GameViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+        setupViews()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        sceneView.session.pause()
+        realityKitView.session.pause()
     }
     
     func setupViews() {
         UIApplication.shared.isIdleTimerDisabled = true
-        resetTracking()
-        //        setupPlayerNode()
-        sceneView.scene.physicsWorld.contactDelegate = self
-        sceneView.addSubview(padView1)
-        sceneView.addSubview(padView2)
-        setupPadScene(padView1: padView1, padView2: padView2)
-        setupCoachingOverlay()
-        sceneView.addSubview(destoryedText)
-        sceneView.addSubview(armMissilesButton)
-        sceneView.addSubview(scoreText)
-        armMissilesButton.addTarget(self, action: #selector(didTapUIButton), for: .touchUpInside)
+        //        resetTrackingForRealityKit()
+        
+        // Add joystick pads
+        realityKitView.addSubview(padView1)
+        realityKitView.addSubview(padView2)
+        setupPadScene(
+            padView1: padView1,
+            padView2: padView2
+        )
+        
+        // Add UI elements
+        realityKitView.addSubview(destoryedText)
+        realityKitView.addSubview(armMissilesButton)
+        realityKitView.addSubview(scoreText)
+        
+        
+        armMissilesButton.addTarget(
+            self,
+            action: #selector(didTapUIButton),
+            for: .touchUpInside
+        )
         self.isLoaded = true
+        
         if UIDevice.current.userInterfaceIdiom == .phone {
             DeviceOrientation.shared.set(orientation: .landscapeRight)
         } else {
             DeviceOrientation.shared.set(orientation: .portrait)
         }
-        focusSquare.hide()
-        sceneView.scene.rootNode.addChildNode(focusSquare)
+        
+        focusSquareAnchor = AnchorEntity(world: SIMD3<Float>(0, 0, -1))  // <-- Assign to class property!
+        focusSquareAnchor!.addChild(focusSquare)
+        realityKitView.scene.addAnchor(focusSquareAnchor!)
+        focusSquare.unhide()
     }
     
     func setupPlayerNode() {
-        playerNode = SCNNode(geometry: SCNSphere(radius: 0.01))
-        playerNode.name = "Player"
-        playerNode.position = SCNVector3(0, 0, 0)
-        playerNode.geometry?.firstMaterial?.transparency = 0.0
-        sceneView.scene.rootNode.addChildNode(playerNode)
+        // Player node setup not needed in RealityKit mode
+        // RealityKit uses camera tracking directly
     }
+    
     
     // MARK: - Private Methods
     
@@ -253,62 +350,46 @@ class GameViewController: UIViewController {
         }
         let delay = SKAction.wait(forDuration: 0.1)
         let updateLoop = SKAction.sequence([updateAction, delay])
-        minimapScene.run(SKAction.repeatForever(updateLoop))
+        minimapScene.run(
+            SKAction.repeatForever(updateLoop)
+        )
     }
     
     @objc func startGame() {
-        let gameSession = NetworkSession(myself: myself, asServer: true, host: myself)
-        gameManager = GameManager(sceneView: sceneView, session: gameSession)
+        let gameSession = NetworkSession(
+            myself: myself,
+            asServer: true,
+            host: myself
+        )
+        gameManager = GameManager(
+            arView: realityKitView,
+            session: gameSession
+        )
+        gameManager?.start()
     }
     
     func updateMinimap() {
-        guard let camTransform = sceneView.session.currentFrame?.camera.transform else { return }
-        let camColumn = camTransform.columns
-        let cameraRotation = simd_float4x4(camColumn.0, camColumn.1, camColumn.2, camColumn.3)
-        let playerPosition = simd_float4(playerNode.worldPosition.x, playerNode.worldPosition.y, playerNode.worldPosition.z, 1.0)
-        let shipPositions = sceneView.ships.filter { !$0.isDestroyed }.map {
-            simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0)
-        }
-        let missilePositions = sceneView.helicopter.missiles.filter { $0.fired && !$0.hit }.map {
-            simd_float4($0.node.worldPosition.x, $0.node.worldPosition.y, $0.node.worldPosition.z, 1.0)
-        }
-        let heliWorldPos = sceneView.helicopterNode.worldPosition
-        let heliPos: simd_float4 = game.placed ? simd_float4(heliWorldPos.x, heliWorldPos.y, heliWorldPos.z, 1.0) : simd_float4.zero
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            minimapScene.updateMinimap(
-                playerPosition: playerPosition,
-                helicopterPosition: heliPos,
-                ships: shipPositions,
-                missiles: missilePositions,
-                cameraRotation: cameraRotation,
-                placed: game.placed
-            )
-        }
+        // TODO: Implement minimap updates when needed
     }
     
-    func resetTracking() {
+    
+    func resetTrackingForRealityKit() {
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = [.horizontal]
+        
         if addsMesh {
-            let sceneReconstruction: ARWorldTrackingConfiguration.SceneReconstruction = .meshWithClassification
-            if ARWorldTrackingConfiguration.supportsSceneReconstruction(sceneReconstruction) {
-                configuration.sceneReconstruction = sceneReconstruction
+            let reconstruction: ARWorldTrackingConfiguration.SceneReconstruction = .meshWithClassification
+            if ARWorldTrackingConfiguration.supportsSceneReconstruction(reconstruction) {
+                configuration.sceneReconstruction = reconstruction
+                configuration.frameSemantics = .sceneDepth
             }
-            configuration.frameSemantics = .sceneDepth
         }
-        sceneView.automaticallyUpdatesLighting = false
-        if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
-            sceneView.scene.lightingEnvironment.contents = environmentMap
-        }
-        guard let camera = sceneView.pointOfView?.camera else {
-            fatalError("Expected a valid `pointOfView` from the scene.")
-        }
-        camera.wantsHDR = true
-        camera.exposureOffset = -1
-        camera.minimumExposure = -1
-        camera.maximumExposure = 3
-        session.run(
+        
+        // Run session on the RealityKit ARView
+        realityKitView.automaticallyConfigureSession = false // ✅ You configure manually
+        realityKitView.environment.sceneUnderstanding.options = []
+        
+        realityKitView.session.run(
             configuration,
             options: [
                 .resetTracking,
@@ -318,7 +399,6 @@ class GameViewController: UIViewController {
             ]
         )
     }
-    
     private func setupPadScene(padView1: SKView, padView2: SKView) {
         let scene = JoystickScene()
         scene.point = LocalConstants.joystickPoint
@@ -326,7 +406,7 @@ class GameViewController: UIViewController {
         scene.joystickDelegate = self
         scene.stickNum = 2
         scene.scaleMode = .resizeFill
-        padView1.preferredFramesPerSecond = 30
+        padView1.preferredFramesPerSecond = 60
         padView1.presentScene(scene)
         padView1.ignoresSiblingOrder = true
         let scene2 = JoystickScene()
@@ -335,7 +415,7 @@ class GameViewController: UIViewController {
         scene2.joystickDelegate = self
         scene2.stickNum = 1
         scene2.scaleMode = .resizeFill
-        padView2.preferredFramesPerSecond = 30
+        padView2.preferredFramesPerSecond = 60
         padView2.presentScene(scene2)
         padView2.ignoresSiblingOrder = true
     }
@@ -364,34 +444,113 @@ class GameViewController: UIViewController {
     }
     
     func updateFiredButton() {
-        sceneView.helicopter.missilesArmed = !sceneView.helicopter.missilesArmed
-        let title = sceneView.helicopter.missilesAreArmed() ? LocalConstants.disarmTitle : LocalConstants.buttonTitle
-        armMissilesButton.setTitle(title, for: .normal)
+        let currentTitle = armMissilesButton.title(for: .normal)
+        let newTitle = currentTitle == LocalConstants.buttonTitle ? LocalConstants.disarmTitle : LocalConstants.buttonTitle
+        armMissilesButton.setTitle(newTitle, for: .normal)
+        
+        // Toggle helicopter missiles state
+        realityKitView.helicopter?.toggleArmMissile()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard !game.placed, let touch = touches.first else { return }
-        let tapLocation: CGPoint = touch.location(in: sceneView)
-        guard let result = sceneView.raycastQuery(
+        guard let touch = touches.first else { return }
+        
+        // Don't place helicopter if it's already placed
+        
+        let tapLocation: CGPoint = touch.location(in: realityKitView)
+        
+        if game.placed {
+            
+            return
+        }
+        
+        
+        // Perform raycast from tap location - only allow horizontal planes
+        let raycastQuery = realityKitView.makeRaycastQuery(
             from: tapLocation,
             allowing: .estimatedPlane,
             alignment: .horizontal
-        ) else { return }
-        
-        let castRay = session.raycast(result)
-        guard let firstCast = castRay.first else { return }
-        let tappedPosition = SCNVector3.positionFromTransform(firstCast.worldTransform)
-        sceneView.helicopter = sceneView.positionHelicopter(position: tappedPosition)
-        let angles =  SIMD3<Float>(0, focusSquare.eulerAngles.y + 180.0 * .pi / 180, 0)
-        let addNode = AddNodeAction(
-            simdWorldTransform: firstCast.worldTransform,
-            eulerAngles: angles
         )
-        os_log(.info, "sending add node")
-        gameManager?.send(addNode: addNode)
-        focusSquare.cleanup()
-        game.placed = true
-        shipManager.setupShips()
+        
+        guard let query = raycastQuery else {
+            return
+        }
+        let results = realityKitView.session.raycast(query)
+        guard let firstResult = results.first else {
+            return
+        }
+        
+        // Verify this is a horizontal plane if it has an anchor
+        if let planeAnchor = firstResult.anchor as? ARPlaneAnchor {
+            guard planeAnchor.alignment == .horizontal else {
+                return
+            }
+        }
+        
+        let tappedPosition = SIMD3<Float>(
+            firstResult.worldTransform.columns.3.x,
+            firstResult.worldTransform.columns.3.y,
+            firstResult.worldTransform.columns.3.z
+        )
+        
+        // Position helicopter at tapped location
+        Task {
+            guard let helicopter = await realityKitView.positionHelicopter(at: tappedPosition) else {
+                return
+            }
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                realityKitView.helicopter = helicopter
+                
+                // Reset target transform for smooth movement from new position
+                helicopter.resetTargetTransform()
+                
+                // Use default rotation angles (if you want different rotation, update here)
+                let angles = SIMD3<Float>(0, 0, 0)
+                
+                // Make sure firstResult.worldTransform is available
+                let worldTransform = firstResult.worldTransform
+                
+                let addNode = AddNodeAction(
+                    simdWorldTransform: worldTransform,
+                    eulerAngles: angles
+                )
+                
+                os_log(.info, "Sending add node action for multiplayer")
+                
+                gameManager?.send(addNode: addNode)
+                
+                // Hide focus square and mark game as placed
+                focusSquare.hide()
+                game.placed = true
+                
+                // Ensure focus square stays hidden by disabling it completely
+                focusSquare.isEnabled = false
+                realityKitView.placeTankOnSurface(at: tapLocation)
+                
+                // Set helicopter entity for managers
+                let helicopterEntity = realityKitView.helicopter.helicopter
+                shipManager?.helicopterEntity = helicopterEntity
+                
+                // Setup ships immediately on main thread for responsiveness
+                shipManager?.setupShips()
+            }
+        }
+        
+    }
+    
+    private func startShipMovementLoop() {
+        Timer.scheduledTimer(withTimeInterval: 1.0/30.0, repeats: true) { [weak self] timer in // 30fps for smooth movement
+            guard let self = self else {
+                timer.invalidate()
+                return
+            }
+            
+            Task { @MainActor in
+                self.shipManager?.moveShips(placed: self.game.placed)
+            }
+        }
     }
     
     func sendWorldTo(peer: Player) {
@@ -403,7 +562,9 @@ class GameViewController: UIViewController {
         switch UserDefaults.standard.boardLocatingMode {
         case .worldMap:
             os_log(.info, "generating worldmap for %s", "\(peer)")
-            getCurrentWorldMapData { data, error in
+            getCurrentWorldMapData {
+                data,
+                error in
                 if let error = error {
                     os_log(.error, "didn't work! %s", "\(error)")
                     return
@@ -416,20 +577,35 @@ class GameViewController: UIViewController {
                 let location = GameBoardLocation.worldMapData(data)
                 DispatchQueue.main.async {
                     os_log(.info, "sending worldmap to %s", "\(peer)")
-                    gameManager.send(boardAction: .boardLocation(location), to: peer)
+                    gameManager.send(
+                        boardAction: .boardLocation(location),
+                        to: peer
+                    )
                 }
             }
         case .manual:
             os_log(.info, "manual board location")
-            gameManager.send(boardAction: .boardLocation(.manual), to: peer)
+            gameManager.send(
+                boardAction: .boardLocation(.manual),
+                to: peer
+            )
         }
     }
     
+    
+    
     func loadWorldMap(from archivedData: Data) {
         do {
-            os_log(.info, "loading world map")
+            os_log(.info, "Loading world map")
+            
+            // Decompress the data if compressed
             let uncompressedData = try archivedData.decompressed()
-            guard let worldMap = try NSKeyedUnarchiver.unarchivedObject(ofClass: ARWorldMap.self, from: uncompressedData) else {
+            
+            // Unarchive the ARWorldMap from the data
+            guard let worldMap = try NSKeyedUnarchiver.unarchivedObject(
+                ofClass: ARWorldMap.self,
+                from: uncompressedData
+            ) else {
                 os_log(.error, "The WorldMap received couldn't be read")
                 DispatchQueue.main.async {
                     self.sessionState = .setup
@@ -439,22 +615,22 @@ class GameViewController: UIViewController {
             
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                targetWorldMap = worldMap
+                
+                self.targetWorldMap = worldMap
+                // Setup ARWorldTrackingConfiguration with loaded world map
                 let configuration = ARWorldTrackingConfiguration()
                 configuration.initialWorldMap = worldMap
-                configuration.planeDetection = [.horizontal, .vertical]
-                sceneView.automaticallyUpdatesLighting = false
-                if let environmentMap = UIImage(named: LocalConstants.environmentalMap) {
-                    sceneView.scene.lightingEnvironment.contents = environmentMap
+                configuration.planeDetection = [.horizontal]
+                if self.addsMesh {
+                    if ARWorldTrackingConfiguration.supportsSceneReconstruction(.meshWithClassification) {
+                        configuration.sceneReconstruction = .meshWithClassification
+                        configuration.frameSemantics = .sceneDepth
+                    }
                 }
-                guard let camera = self.sceneView.pointOfView?.camera else {
-                    fatalError("Expected a valid `pointOfView` from the scene.")
-                }
-                camera.wantsHDR = true
-                camera.exposureOffset = -1
-                camera.minimumExposure = -1
-                camera.maximumExposure = 3
-                sceneView.session.run(
+                // Since you manually configure the session
+                self.realityKitView.automaticallyConfigureSession = false
+                // Run the AR session with options to reset tracking and anchors
+                self.realityKitView.session.run(
                     configuration,
                     options: [
                         .resetTracking,
@@ -463,10 +639,21 @@ class GameViewController: UIViewController {
                         .stopTrackedRaycasts
                     ]
                 )
-                sceneView.debugOptions = []
-                os_log(.info, "running session completed board setup")
-                sceneView.scene.rootNode.addChildNode(focusSquare)
-                updateFocusSquare(isObjectVisible: false)
+                os_log(.info, "RealityKit session started with world map")
+                Task {
+                    do {
+                        let environmentResource = try await EnvironmentResource(named: LocalConstants.environmentalMap)
+                        self.realityKitView.environment.lighting.resource = environmentResource
+                    } catch {
+                        os_log(.error, "Failed to load environment resource: %{public}@", error.localizedDescription)
+                    }
+                }
+                
+                if let focusSquareAnchor = self.focusSquareAnchor, !self.realityKitView.scene.anchors.contains(where: { $0 == focusSquareAnchor }) {
+                    self.realityKitView.scene.addAnchor(focusSquareAnchor)
+                }
+                // Update focus square state if needed
+                self.updateFocusSquare(isObjectVisible: false)
             }
         } catch {
             os_log(.error, "The WorldMap received couldn't be decompressed")
@@ -476,7 +663,8 @@ class GameViewController: UIViewController {
         }
     }
     
-    func getCurrentWorldMapData(_ closure: @escaping (Data?, Error?) -> Void) {
+    
+    func getCurrentWorldMapData(_ closure: @Sendable @escaping (Data?, Error?) -> Void) {
         os_log(.info, "in getCurrentWordMapData")
         // When loading a map, send the loaded map and not the current extended map
         if let targetWorldMap = targetWorldMap {
@@ -485,7 +673,7 @@ class GameViewController: UIViewController {
             return
         } else {
             os_log(.info, "asking ARSession for the world map")
-            sceneView.session.getCurrentWorldMap { map, error in
+            realityKitView.session.getCurrentWorldMap { map, error in
                 os_log(.info, "ARSession getCurrentWorldMap returned")
                 if let error = error {
                     os_log(.error, "didn't work! %s", "\(error)")
@@ -501,7 +689,7 @@ class GameViewController: UIViewController {
         }
     }
     
-    private func compressMap(map: ARWorldMap, _ closure: @escaping (Data?, Error?) -> Void) {
+    private func compressMap(map: ARWorldMap, _ closure: @Sendable @escaping (Data?, Error?) -> Void) {
         DispatchQueue.global().async {
             do {
                 let data = try NSKeyedArchiver.archivedData(withRootObject: map, requiringSecureCoding: true)
@@ -514,5 +702,39 @@ class GameViewController: UIViewController {
                 closure(nil, error)
             }
         }
+    }
+    
+    @objc func advanceToNextTarget() {
+        DispatchQueue.main.async {
+            self.shipManager?.addTargetToShip()
+        }
+    }
+    
+    @objc func updateScoreUI() {
+        print("🎯 Updating score UI")
+        DispatchQueue.main.async {
+            self.scoreText.text = self.game.scoreTextString
+        }
+    }
+    
+    // MARK: - MissileManagerDelegate
+    
+    func missileManager(_ manager: MissileManager, didUpdateScore score: Int) {
+        print("🎯 Score updated to: \(score)")
+        updateScoreUI()
+    }
+    
+    // MARK: - Orientation Control
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .landscapeRight
+    }
+    
+    override var shouldAutorotate: Bool {
+        return false
+    }
+    
+    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+        return .landscapeRight
     }
 }

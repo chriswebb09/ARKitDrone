@@ -14,5 +14,5 @@ extension Notification.Name {
 }
 
 
-var joystickNotificationName = NSNotification.Name("joystickNotificationName")
+nonisolated(unsafe) var joystickNotificationName = NSNotification.Name("joystickNotificationName")
 let joystickVelocityMultiplier: CGFloat = 0.00006

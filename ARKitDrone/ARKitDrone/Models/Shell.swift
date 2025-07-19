@@ -7,32 +7,74 @@
 //
 
 import Foundation
-import SceneKit
+import RealityKit
 import ARKit
 import simd
+import UIKit
 
+@MainActor
 class Shell {
     
-    var node: SCNNode
-    
-    init(_ node: SCNNode) {
-        self.node = node
+    var entity: Entity
+
+    init(_ entity: Entity) {
+        self.entity = entity
     }
-    
-    static func createShell() -> Shell {
-        let geometry = SCNSphere(radius: 0.005)
-        geometry.materials.first?.diffuse.contents = UIColor.red
-        let geometryNode = SCNNode(geometry: geometry)
-        geometryNode.physicsBody = SCNPhysicsBody.dynamic()
-        return Shell(geometryNode)
+
+    static func createShell() async -> Shell {
+        // Create sphere mesh
+        let geometry = MeshResource.generateSphere(radius: 0.005)
+
+        // Create red material
+        let material = SimpleMaterial.create(color: .red)
+
+        // Create entity with model component
+        let shellEntity = Entity()
+        shellEntity.components.set(ModelComponent(mesh: geometry, materials: [material]))
+
+        // Add physics body
+        let physicsComponent = PhysicsBodyComponent(
+            massProperties: PhysicsMassProperties(mass: 0.1),
+            material: .default,
+            mode: .dynamic
+        )
+        shellEntity.components.set(physicsComponent)
+
+        // Add collision component for sphere
+        let collisionComponent = CollisionComponent(
+            shapes: [ShapeResource.generateSphere(radius: 0.005)]
+        )
+        shellEntity.components.set(collisionComponent)
+
+        return Shell(shellEntity)
     }
-    
-    func launchProjectile(position: SCNVector3, x: Float, y: Float, z: Float, name: String) {
-        let force = SCNVector3(x: Float(x), y: Float(y) , z: z)
-        node.name = name
-        node.physicsBody?.applyForce(force, at: position, asImpulse: true)
-//        node.categoryBitMask = GameViewController.ColliderCategory.shell
-//        node.physicsBody?.contactTestBitMask = GameViewController.ColliderCategory.tank
+
+    func launchProjectile(position: SIMD3<Float>, force: SIMD3<Float>, name: String) {
+        entity.name = name
+
+        // Set initial position
+        entity.transform.translation = position
+
+        // Apply force using RealityKit physics
+        if let physicsBody = entity.components[PhysicsBodyComponent.self] {
+            let mass = physicsBody.massProperties.mass
+            _ = force / mass
+
+            var updatedPhysics = physicsBody
+            updatedPhysics.massProperties = PhysicsMassProperties(
+                mass: mass,
+                inertia: physicsBody.massProperties.inertia,
+                centerOfMass: physicsBody.massProperties.centerOfMass
+            )
+            entity.components.set(updatedPhysics)
+
+            // TODO: Apply velocity via custom motion system if needed
+        }
+    }
+
+    // Convenience method with individual force components
+    func launchProjectile(position: SIMD3<Float>, x: Float, y: Float, z: Float, name: String) {
+        let force = SIMD3<Float>(x, y, z)
+        launchProjectile(position: position, force: force, name: name)
     }
 }
-

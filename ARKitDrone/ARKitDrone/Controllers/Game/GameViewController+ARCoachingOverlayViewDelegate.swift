@@ -7,26 +7,31 @@
 //
 
 import ARKit
+import RealityKit
+import UIKit
+
 
 extension GameViewController: ARCoachingOverlayViewDelegate {
     
-    func coachingOverlayViewWillActivate(_ coachingOverlayView: ARCoachingOverlayView) { }
+    nonisolated func coachingOverlayViewWillActivate(_ coachingOverlayView: ARCoachingOverlayView) { }
     
-    func coachingOverlayViewDidDeactivate(_ coachingOverlayView: ARCoachingOverlayView) { }
+    nonisolated func coachingOverlayViewDidDeactivate(_ coachingOverlayView: ARCoachingOverlayView) { }
     
-    func coachingOverlayViewDidRequestSessionReset(_ coachingOverlayView: ARCoachingOverlayView) { }
+    nonisolated func coachingOverlayViewDidRequestSessionReset(_ coachingOverlayView: ARCoachingOverlayView) { }
     
     func setupCoachingOverlay() {
-        coachingOverlay.session = sceneView.session
+        coachingOverlay.session = realityKitView.session
         coachingOverlay.delegate = self
         coachingOverlay.translatesAutoresizingMaskIntoConstraints = false
-        sceneView.addSubview(coachingOverlay)
+        realityKitView.addSubview(coachingOverlay)
+        
         NSLayoutConstraint.activate([
-            coachingOverlay.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            coachingOverlay.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            coachingOverlay.widthAnchor.constraint(equalTo: view.widthAnchor),
-            coachingOverlay.heightAnchor.constraint(equalTo: view.heightAnchor)
+            coachingOverlay.centerXAnchor.constraint(equalTo: realityKitView.centerXAnchor),
+            coachingOverlay.centerYAnchor.constraint(equalTo: realityKitView.centerYAnchor),
+            coachingOverlay.widthAnchor.constraint(equalTo: realityKitView.widthAnchor),
+            coachingOverlay.heightAnchor.constraint(equalTo: realityKitView.heightAnchor)
         ])
+        
         setActivatesAutomatically()
         setGoal()
     }
@@ -38,30 +43,44 @@ extension GameViewController: ARCoachingOverlayViewDelegate {
     func setGoal() {
         coachingOverlay.goal = .horizontalPlane
     }
-    
-    // MARK: - Focus Square
-    
     func updateFocusSquare(isObjectVisible: Bool) {
+        // If game is placed, always hide and don't update
+        if game.placed {
+            focusSquare.hide()
+            print("🎯 Focus square hidden - game is placed")
+            return
+        }
+        
+        print("🎯 Focus square update - game.placed: \(game.placed), isObjectVisible: \(isObjectVisible)")
+        
         if isObjectVisible || coachingOverlay.isActive {
             focusSquare.hide()
+            return
         } else {
             focusSquare.unhide()
         }
-        if let camera = session.currentFrame?.camera,
-           case .normal = camera.trackingState,
-           let query = sceneView.getRaycastQuery(),
-           let result = sceneView.castRay(for: query).first {
-            updateQueue.async {
-                self.sceneView.scene.rootNode.addChildNode(self.focusSquare)
-                self.focusSquare.state = .detecting(raycastResult: result, camera: camera)
-            }
-        } else {
-            updateQueue.async {
-                self.focusSquare.state = .initializing
-                self.sceneView.pointOfView?.addChildNode(self.focusSquare)
-            }
+
+        guard let currentFrame = session.currentFrame else { return }
+        let camera = currentFrame.camera
+
+        guard case .normal = camera.trackingState else { return }
+
+        guard let query = realityKitView.makeRaycastQuery(
+            from: realityKitView.center,
+            allowing: .estimatedPlane,
+            alignment: .horizontal
+        ),
+        let result = realityKitView.session.raycast(query).first else {
+            return
         }
+
+        guard let anchor = focusSquareAnchor else { return }
+        anchor.transform = Transform(matrix: result.worldTransform)
+
+        let lightweightResult = LightweightRaycastResult(
+            worldTransform: result.worldTransform,
+            anchor: result.anchor
+        )
+        focusSquare.updateWithLightweight(result: lightweightResult, camera: camera)
     }
 }
-
-
