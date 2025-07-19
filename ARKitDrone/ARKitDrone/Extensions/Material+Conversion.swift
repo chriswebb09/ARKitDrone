@@ -29,7 +29,9 @@ extension SimpleMaterial {
               let texture = try? TextureResource(
                 image: cgImage,
                 withName: nil,
-                options: TextureResource.CreateOptions(semantic: .color)
+                options: TextureResource.CreateOptions(
+                    semantic: .color
+                )
               ) else {
             return nil
         }
@@ -71,7 +73,9 @@ extension UnlitMaterial {
               let texture = try? TextureResource(
                 image: cgImage,
                 withName: nil,
-                options: TextureResource.CreateOptions(semantic: .color)
+                options: TextureResource.CreateOptions(
+                    semantic: .color
+                )
               ) else {
             return nil
         }
@@ -86,7 +90,6 @@ extension UnlitMaterial {
         guard let texture = try? TextureResource.load(named: textureName) else {
             return nil
         }
-        
         var material = UnlitMaterial()
         material.color = .init(texture: .init(texture))
         return material
@@ -117,7 +120,6 @@ extension PhysicallyBasedMaterial {
               ) else {
             return nil
         }
-        
         var material = PhysicallyBasedMaterial()
         material.baseColor = .init(texture: .init(texture))
         material.metallic = .init(floatLiteral: metallic)
@@ -150,12 +152,20 @@ extension Material {
     
     /// Create a metallic material
     static func metallic(_ color: UIColor, roughness: Float = 0.1) -> SimpleMaterial {
-        return SimpleMaterial.create(color: color, metallic: 1.0, roughness: roughness)
+        return SimpleMaterial.create(
+            color: color,
+            metallic: 1.0,
+            roughness: roughness
+        )
     }
     
     /// Create a matte material
     static func matte(_ color: UIColor) -> SimpleMaterial {
-        return SimpleMaterial.create(color: color, metallic: 0.0, roughness: 1.0)
+        return SimpleMaterial.create(
+            color: color,
+            metallic: 0.0,
+            roughness: 1.0
+        )
     }
     
     /// Create an emissive material (using UnlitMaterial for glow effect)

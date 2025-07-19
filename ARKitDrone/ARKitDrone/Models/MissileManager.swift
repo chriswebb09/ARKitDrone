@@ -60,13 +60,11 @@ class MissileManager {
             print("❌ No helicopter entity found")
             return
         }
-        
         // Get helicopter's world position (through its anchor)
         let helicopterWorldPos: SIMD3<Float>
         if let parent = helicopterEntity.parent {
             print("🚁 Parent transform: \(parent.transform.translation)")
         }
-        
         // Try to get world position from the helicopter anchor
         if let helicopterAnchor = sceneView.helicopterAnchor {
             helicopterWorldPos = helicopterAnchor.transform.translation
@@ -78,27 +76,21 @@ class MissileManager {
             helicopterWorldPos = helicopterEntity.transform.translation
             print("🚁 Using entity position: \(helicopterWorldPos)")
         }
-        
         // Start missile from helicopter's gun position
         let gunOffset = SIMD3<Float>(0.0, 0.0, 0.2) // Slightly forward of helicopter
         let initialMissilePos = helicopterWorldPos + gunOffset
-        
         // Move missile to world space and set position
         // Remove missile from helicopter parent hierarchy
         missile.entity.removeFromParent()
-        
         // Make missile visible and appropriately sized
         missile.entity.isEnabled = true
         missile.entity.scale = SIMD3<Float>(repeating: 2.0) // Make missile bigger for visibility
-        
         // Create world anchor for missile
         let missileAnchor = AnchorEntity(world: initialMissilePos)
         missileAnchor.addChild(missile.entity)
         sceneView.scene.addAnchor(missileAnchor)
-        
         // Set missile local position to origin since it's now anchored at the correct world position
         missile.entity.transform.translation = SIMD3<Float>(0, 0, 0)
-        
         // Point missile at target
         let targetPos = ship.entity.transform.translation
         missile.entity.look(
@@ -111,7 +103,10 @@ class MissileManager {
         print("🎯 Helicopter world position: \(helicopterWorldPos)")
         ApacheHelicopter.speed = 0
         missile.particleEntity?.isEnabled = true
-        let displayLink = CADisplayLink(target: self, selector: #selector(updateMissilePosition))
+        let displayLink = CADisplayLink(
+            target: self,
+            selector: #selector(updateMissilePosition)
+        )
         displayLink.preferredFramesPerSecond = 60
         activeMissileTrackers[missile.id] = MissileTrackingInfo(
             missile: missile,
@@ -127,7 +122,10 @@ class MissileManager {
     @MainActor
     @objc private func updateMissilePosition(displayLink: CADisplayLink) {
         print("updateMissilePosition")
-        guard let trackingInfo = activeMissileTrackers.first(where: { $0.value.displayLink === displayLink })?.value else {
+        guard let trackingInfo = activeMissileTrackers.first(
+            where: {
+                $0.value.displayLink === displayLink
+            })?.value else {
             displayLink.invalidate()
             return
         }
@@ -174,7 +172,10 @@ class MissileManager {
             DispatchQueue.main.async {
                 self.game.playerScore += 1
                 self.game.updateScoreText()
-                self.delegate?.missileManager(self, didUpdateScore: self.game.playerScore)
+                self.delegate?.missileManager(
+                    self,
+                    didUpdateScore: self.game.playerScore
+                )
             }
             // Stop tracking this missile
             displayLink.invalidate()
@@ -244,8 +245,12 @@ class MissileManager {
         let missileEntity = nameA.contains("Missile") ? entityA : entityB
         let shipEntity = nameA.contains("Missile") ? entityB : entityA
         guard
-            let missile = Missile.getMissile(from: missileEntity),
-            let ship = Ship.getShip(from: shipEntity)
+            let missile = Missile.getMissile(
+                from: missileEntity
+            ),
+            let ship = Ship.getShip(
+                from: shipEntity
+            )
         else { return }
         let shouldUpdateScore = !missile.hit
         missile.hit = true

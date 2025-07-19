@@ -188,7 +188,10 @@ class GameManager: NSObject, @unchecked Sendable {
             )
             if command.player != nil {
                 Task { @MainActor in
-                    self.delegate?.manager(self, addNode: addNode)
+                    self.delegate?.manager(
+                        self,
+                        addNode: addNode
+                    )
                 }
             }
         case .completed(_):
@@ -246,7 +249,10 @@ extension GameManager: NetworkSessionDelegate {
         Task { @MainActor in
             // Create new instances with safe data inside the main actor context
             let safePlayer = Player(username: playerUsername)
-            let newCommand = GameCommand(player: safePlayer, action: actionCopy)
+            let newCommand = GameCommand(
+                player: safePlayer,
+                action: actionCopy
+            )
             if case .gameAction(.joyStickMoved) = actionCopy {
                 self.commandsLock.withLock {
                     self.gameCommands.append(newCommand)
@@ -286,7 +292,10 @@ extension GameManager: NetworkSessionDelegate {
 extension GameManager: MovementSyncSceneDataDelegate {
     nonisolated func hasNetworkDelayStatusChanged(hasNetworkDelay: Bool) {
         Task { @MainActor in
-            self.delegate?.manager(self, hasNetworkDelay: hasNetworkDelay)
+            self.delegate?.manager(
+                self,
+                hasNetworkDelay: hasNetworkDelay
+            )
         }
     }
 }

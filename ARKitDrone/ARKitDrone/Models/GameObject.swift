@@ -83,7 +83,10 @@ class GameObject: NSObject {
     
     @MainActor
     func generateMovementData() -> MovementData? {
-        return MovementData(entity: objectRootEntity, alive: isAlive)
+        return MovementData(
+            entity: objectRootEntity,
+            alive: isAlive
+        )
     }
 }
 

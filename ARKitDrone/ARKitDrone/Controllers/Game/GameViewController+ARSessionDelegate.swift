@@ -32,7 +32,6 @@ extension GameViewController: ARSessionDelegate {
                 }
             }
         }
-        
         // Game logic updates
         os_signpost(
             .begin,
@@ -68,7 +67,11 @@ extension GameViewController: ARSessionDelegate {
     nonisolated func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
         // Handle anchor additions if needed
         for anchor in anchors {
-            os_log(.info, "Added anchor: %@", anchor.description)
+            os_log(
+                .info,
+                "Added anchor: %@",
+                anchor.description
+            )
         }
     }
     
@@ -79,7 +82,11 @@ extension GameViewController: ARSessionDelegate {
     nonisolated func session(_ session: ARSession, didRemove anchors: [ARAnchor]) {
         // Handle anchor removals if needed
         for anchor in anchors {
-            os_log(.info, "Removed anchor: %@", anchor.description)
+            os_log(
+                .info,
+                "Removed anchor: %@",
+                anchor.description
+            )
         }
     }
 }

@@ -6,7 +6,6 @@
 //  Copyright © 2024 Christopher Webb-Orenstein. All rights reserved.
 //
 
-import Foundation
 import RealityKit
 import ARKit
 import simd
@@ -28,7 +27,12 @@ class Shell {
         let material = SimpleMaterial.create(color: .red)
         // Create entity with model component
         let shellEntity = Entity()
-        shellEntity.components.set(ModelComponent(mesh: geometry, materials: [material]))
+        shellEntity.components.set(
+            ModelComponent(
+                mesh: geometry,
+                materials: [material]
+            )
+        )
         // Add physics body
         let physicsComponent = PhysicsBodyComponent(
             massProperties: PhysicsMassProperties(mass: 0.1),
@@ -66,6 +70,10 @@ class Shell {
     // Convenience method with individual force components
     func launchProjectile(position: SIMD3<Float>, x: Float, y: Float, z: Float, name: String) {
         let force = SIMD3<Float>(x, y, z)
-        launchProjectile(position: position, force: force, name: name)
+        launchProjectile(
+            position: position,
+            force: force,
+            name: name
+        )
     }
 }

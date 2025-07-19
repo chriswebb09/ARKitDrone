@@ -11,17 +11,13 @@ import simd
 
 struct Player: @unchecked Sendable {
     
-//    let peerID: MCPeerID
     var username: String
-//    var username: String { return peerID.displayName }
     
     init(peerID: MCPeerID) {
-//        self.peerID = peerID
         self.username = peerID.displayName
     }
     
     init(username: String) {
-//        self.peerID = MCPeerID(displayName: username)
         self.username = username
     }
 }

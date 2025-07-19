@@ -28,7 +28,7 @@ class GameSceneView: ARView {
     var attack: Bool = false
     var competitor: ApacheHelicopter!
     
-    func setup() async {
+    private func preloadModelsAsnyc() {
         automaticallyConfigureSession = false
         // Start preloading models immediately
         Task.detached {
@@ -38,55 +38,74 @@ class GameSceneView: ARView {
             ])
             // Preload Reality files separately
             do {
-                _ = try await AsyncModelLoader.shared.loadRealityModel(named: "heli")
-                print("✅ Preloaded: heli.reality")
+                try await AsyncModelLoader.shared.loadRealityModel(named: "heli")
+                print("Preloaded: heli.reality")
             } catch {
-                print("❌ Failed to preload heli: \(error)")
-            }
-        }
-        // Load helicopter async
-        Task { @MainActor in
-            let heli = await ApacheHelicopter()
-            await heli.setup()
-            self.helicopter = heli
-        }
-        // Load tank async
-        Task { @MainActor in
-            do {
-                let entity = try await AsyncModelLoader.shared.loadModel(named: "m1tankmodel")
-                let tankRootEntity: Entity
-                if let rootEntity = entity.findEntity(named: "root") {
-                    tankRootEntity = rootEntity
-                } else {
-                    tankRootEntity = entity
-                }
-                tankRootEntity.name = "Tank"
-                tankRootEntity.scale = SIMD3<Float>(repeating: 0.1)
-                tankRootEntity.isEnabled = true
-                tankRootEntity.transform.rotation = simd_quatf(
-                    angle: -Float.pi / 2,
-                    axis: SIMD3<Float>(1, 0, 0)
-                )
-                if let bodyEntity = tankRootEntity.findEntity(named: "body") {
-                    let bounds = bodyEntity.visualBounds(relativeTo: nil).extents
-                    bodyEntity.components.set(CollisionComponent(shapes: [.generateBox(size: bounds)]))
-                    bodyEntity.components.set(PhysicsBodyComponent(massProperties: .default, material: .default, mode: .static))
-                }
-                if let modelEntity = tankRootEntity as? ModelEntity {
-                    self.tankEntity = modelEntity
-                } else {
-                    let wrapperEntity = ModelEntity()
-                    wrapperEntity.name = "TankWrapper"
-                    wrapperEntity.addChild(tankRootEntity)
-                    self.tankEntity = wrapperEntity
-                }
-            } catch {
-                print("❌ Failed to load tank model: \(error)")
+                print("Failed to preload heli: \(error)")
             }
         }
     }
     
-    // UPDATE positionHelicopter method:
+    @MainActor
+    private func loadHelicopter() async {
+        // Load helicopter async
+        let heli = await ApacheHelicopter()
+        await heli.setup()
+        self.helicopter = heli
+    }
+    
+    func setup() async {
+        preloadModelsAsnyc()
+        await loadHelicopter()
+        await setupTank()
+    }
+    
+    @MainActor
+    private func setupTank() async {
+        // Load tank async
+        do {
+            let entity = try await AsyncModelLoader.shared.loadModel(named: "m1tankmodel")
+            let tankRootEntity: Entity
+            if let rootEntity = entity.findEntity(named: "root") {
+                tankRootEntity = rootEntity
+            } else {
+                tankRootEntity = entity
+            }
+            tankRootEntity.name = "Tank"
+            tankRootEntity.scale = SIMD3<Float>(repeating: 0.1)
+            tankRootEntity.isEnabled = true
+            tankRootEntity.transform.rotation = simd_quatf(
+                angle: -Float.pi / 2,
+                axis: SIMD3<Float>(1, 0, 0)
+            )
+            if let bodyEntity = tankRootEntity.findEntity(named: "body") {
+                let bounds = bodyEntity.visualBounds(relativeTo: nil).extents
+                bodyEntity.components.set(
+                    CollisionComponent(
+                        shapes: [.generateBox(size: bounds)]
+                    )
+                )
+                bodyEntity.components.set(
+                    PhysicsBodyComponent(
+                        massProperties: .default,
+                        material: .default,
+                        mode: .static
+                    )
+                )
+            }
+            if let modelEntity = tankRootEntity as? ModelEntity {
+                self.tankEntity = modelEntity
+            } else {
+                let wrapperEntity = ModelEntity()
+                wrapperEntity.name = "TankWrapper"
+                wrapperEntity.addChild(tankRootEntity)
+                self.tankEntity = wrapperEntity
+            }
+        } catch {
+            print("Failed to load tank model: \(error)")
+        }
+    }
+    
     func positionHelicopter(at position: SIMD3<Float>) async -> ApacheHelicopter? {
         if helicopter == nil {
             helicopter = await ApacheHelicopter()
@@ -114,13 +133,15 @@ class GameSceneView: ARView {
         return helicopter
     }
     
-    
     func addExplosion(at position: SIMD3<Float>) {
         // RealityKit doesn't support SceneKit-style particle systems
         // You need to use a custom 3D animation, sound, or a visual trick instead.
         let sphere = ModelEntity(
             mesh: .generateSphere(radius: 0.02),
-            materials: [SimpleMaterial(color: .orange, isMetallic: false)]
+            materials: [SimpleMaterial(
+                color: .orange,
+                isMetallic: false
+            )]
         )
         let explosionAnchor = AnchorEntity(world: position)
         explosionAnchor.addChild(sphere)
@@ -134,16 +155,16 @@ class GameSceneView: ARView {
     func placeTankOnSurface(at screenPoint: CGPoint) {
         // Force load tank if not ready
         if tankEntity == nil {
-            print("🚛 Loading tank synchronously...")
+            print("Loading tank synchronously...")
             return
         }
         guard let tankEntity = tankEntity else {
-            print("❌ No tank entity available to place")
+            print("No tank entity available to place")
             return
         }
         // Don't place if already placed
         if tankAnchor != nil {
-            print("⚠️ Tank already placed")
+            print("Tank already placed")
             return
         }
         // Use raycast to find surface

@@ -103,7 +103,6 @@ class ShipManager {
                     if let parent = ships[targetIndex].entity.parent {
                         parent.addChild(square)
                     }
-                    
                     ships[targetIndex].targetAdded = true
                 }
             }

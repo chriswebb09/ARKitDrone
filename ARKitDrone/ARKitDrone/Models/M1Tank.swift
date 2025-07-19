@@ -101,7 +101,9 @@ extension M1AbramsTank {
         guard let turretEntity = turretEntity else { return }
         let turretRotation = FromToByAnimation<Transform>(
             name: "turretRotation",
-            from: Transform(rotation: turretEntity.transform.rotation),
+            from: Transform(
+                rotation: turretEntity.transform.rotation
+            ),
             to: Transform(
                 rotation: turretEntity.transform.rotation * simd_quatf(
                     angle: rotation * Float.pi,
@@ -152,7 +154,9 @@ extension M1AbramsTank {
         let targetPosition = entity.transform.translation + direction * 100
         let projectileAnimation = FromToByAnimation<Transform>(
             name: "shellFlight",
-            from: Transform(translation: entity.transform.translation),
+            from: Transform(
+                translation: entity.transform.translation
+            ),
             to: Transform(translation: targetPosition),
             duration: 3.0,
             timing: .linear,

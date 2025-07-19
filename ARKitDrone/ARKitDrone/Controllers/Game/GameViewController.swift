@@ -63,7 +63,12 @@ class GameViewController: UIViewController, MissileManagerDelegate {
             offset = 220
             sizeOffset = 220
         }
-        let frame = CGRect(x:60, y: UIScreen.main.bounds.height - offset, width: sizeOffset, height: sizeOffset)
+        let frame = CGRect(
+            x:60,
+            y: UIScreen.main.bounds.height - offset,
+            width: sizeOffset,
+            height: sizeOffset
+        )
         let view = SKView(frame:frame)
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
@@ -77,7 +82,12 @@ class GameViewController: UIViewController, MissileManagerDelegate {
             offset = 220
             sizeOffset = 220
         }
-        let frame = CGRect(x:600, y: UIScreen.main.bounds.height - offset, width: sizeOffset, height: sizeOffset)
+        let frame = CGRect(
+            x:600,
+            y: UIScreen.main.bounds.height - offset,
+            width: sizeOffset,
+            height: sizeOffset
+        )
         let view = SKView(frame: frame)
         view.isMultipleTouchEnabled = true
         view.backgroundColor = .clear
@@ -87,11 +97,28 @@ class GameViewController: UIViewController, MissileManagerDelegate {
     
     lazy var armMissilesButton: UIButton = {
         let button = UIButton()
-        button.setTitle(LocalConstants.buttonTitle, for: .normal)
+        button.setTitle(
+            LocalConstants.buttonTitle,
+            for: .normal
+        )
         button.setTitleColor(UIColor.white, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: UIFont.Weight.black)
-        button.frame = CGRect(origin: CGPoint(x: UIScreen.main.bounds.width - 200, y: 100), size: CGSize(width: 180, height: 60))
-        button.layer.borderColor = UIColor(red: 1.00, green: 0.03, blue: 0.00, alpha: 1.00).cgColor
+        button.titleLabel?.font = UIFont.systemFont(
+            ofSize: 14,
+            weight: UIFont.Weight.black
+        )
+        button.frame = CGRect(
+            origin: CGPoint(
+                x: UIScreen.main.bounds.width - 200,
+                y: 100
+            ),
+            size: CGSize(width: 180, height: 60)
+        )
+        button.layer.borderColor = UIColor(
+            red: 1.00,
+            green: 0.03,
+            blue: 0.00,
+            alpha: 1.00
+        ).cgColor
         //UIColor(red: 0.95, green: 0.15, blue: 0.07, alpha: 1.00).cgColor
         button.backgroundColor = UIColor(
             red: 1.00,
@@ -137,8 +164,16 @@ class GameViewController: UIViewController, MissileManagerDelegate {
     lazy var scoreText: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.font = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.black)
-        label.textColor = UIColor(red: 0.00, green: 1.00, blue: 0.01, alpha: 1.00)
+        label.font = UIFont.systemFont(
+            ofSize: 22,
+            weight: UIFont.Weight.black
+        )
+        label.textColor = UIColor(
+            red: 0.00,
+            green: 1.00,
+            blue: 0.01,
+            alpha: 1.00
+        )
         label.text = "Score: 0"
         label.backgroundColor = .black
         label.frame = CGRect(
@@ -158,7 +193,6 @@ class GameViewController: UIViewController, MissileManagerDelegate {
     let game = Game()
     
     var focusSquare: FocusSquare! = FocusSquare()
-    
     
     // used when state is localizingToWorldMap or localizingToSavedMap
     var targetWorldMap: ARWorldMap?
@@ -195,9 +229,24 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         }
         
         // Setup notifications
-        NotificationCenter.default.addObserver(self, selector: #selector(missileCanHit), name: .missileCanHit, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(advanceToNextTarget), name: .advanceTarget, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(updateScoreUI), name: .updateScore, object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(missileCanHit),
+            name: .missileCanHit,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(advanceToNextTarget),
+            name: .advanceTarget,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateScoreUI),
+            name: .updateScore,
+            object: nil
+        )
         
         overlayView = gameStartViewContoller.view
         gameStartViewContoller.delegate = self
@@ -210,7 +259,6 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         
         await MainActor.run {
             view.insertSubview(realityKitView, at: 0)
-            
             realityKitView.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
                 realityKitView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -348,20 +396,16 @@ class GameViewController: UIViewController, MissileManagerDelegate {
             padView1: padView1,
             padView2: padView2
         )
-        
         // Add UI elements
         realityKitView.addSubview(destoryedText)
         realityKitView.addSubview(armMissilesButton)
         realityKitView.addSubview(scoreText)
-        
-        
         armMissilesButton.addTarget(
             self,
             action: #selector(didTapUIButton),
             for: .touchUpInside
         )
         self.isLoaded = true
-        
         if UIDevice.current.userInterfaceIdiom == .phone {
             DeviceOrientation.shared.set(orientation: .landscapeRight)
         } else {
@@ -414,7 +458,7 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         }
         
         // Run session on the RealityKit ARView
-        realityKitView.automaticallyConfigureSession = false // ✅ You configure manually
+        realityKitView.automaticallyConfigureSession = false
         realityKitView.environment.sceneUnderstanding.options = []
         
         realityKitView.session.run(
@@ -482,24 +526,17 @@ class GameViewController: UIViewController, MissileManagerDelegate {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
-        
         // Don't place helicopter if it's already placed
-        
         let tapLocation: CGPoint = touch.location(in: realityKitView)
-        
         if game.placed {
-            
             return
         }
-        
-        
         // Perform raycast from tap location - only allow horizontal planes
         let raycastQuery = realityKitView.makeRaycastQuery(
             from: tapLocation,
             allowing: .estimatedPlane,
             alignment: .horizontal
         )
-        
         guard let query = raycastQuery else {
             return
         }
@@ -507,20 +544,17 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         guard let firstResult = results.first else {
             return
         }
-        
         // Verify this is a horizontal plane if it has an anchor
         if let planeAnchor = firstResult.anchor as? ARPlaneAnchor {
             guard planeAnchor.alignment == .horizontal else {
                 return
             }
         }
-        
         let tappedPosition = SIMD3<Float>(
             firstResult.worldTransform.columns.3.x,
             firstResult.worldTransform.columns.3.y,
             firstResult.worldTransform.columns.3.z
         )
-        
         // Position helicopter at tapped location
         Task {
             guard let helicopter = await realityKitView.positionHelicopter(at: tappedPosition) else {
@@ -530,44 +564,33 @@ class GameViewController: UIViewController, MissileManagerDelegate {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 realityKitView.helicopter = helicopter
-                
                 // Reset target transform for smooth movement from new position
                 helicopter.resetTargetTransform()
-                
                 // Use default rotation angles (if you want different rotation, update here)
                 let angles = SIMD3<Float>(0, 0, 0)
-                
                 // Make sure firstResult.worldTransform is available
                 let worldTransform = firstResult.worldTransform
-                
                 let addNode = AddNodeAction(
                     simdWorldTransform: worldTransform,
                     eulerAngles: angles
                 )
-                
                 os_log(.info, "Sending add node action for multiplayer")
-                
                 gameManager?.send(addNode: addNode)
-                
                 // Hide focus square and mark game as placed
                 focusSquare.hide()
                 game.placed = true
-                
                 // Ensure focus square stays hidden by disabling it completely
                 focusSquare.isEnabled = false
                 realityKitView.placeTankOnSurface(at: tapLocation)
-                
                 // Set helicopter entity for managers
                 let helicopterEntity = realityKitView.helicopter.helicopter
                 shipManager?.helicopterEntity = helicopterEntity
-                
                 // Setup ships immediately on main thread for responsiveness
                 Task {
                     await shipManager?.setupShips()
                 }
             }
         }
-        
     }
     
     private func startShipMovementLoop() {
@@ -576,7 +599,6 @@ class GameViewController: UIViewController, MissileManagerDelegate {
                 timer.invalidate()
                 return
             }
-            
             Task { @MainActor in
                 self.shipManager?.moveShips(placed: self.game.placed)
             }
@@ -588,7 +610,6 @@ class GameViewController: UIViewController, MissileManagerDelegate {
             os_log(.error, "i'm not the server")
             return
         }
-        
         switch UserDefaults.standard.boardLocatingMode {
         case .worldMap:
             os_log(.info, "generating worldmap for %s", "\(peer)")
@@ -622,15 +643,11 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         }
     }
     
-    
-    
     func loadWorldMap(from archivedData: Data) {
         do {
             os_log(.info, "Loading world map")
-            
             // Decompress the data if compressed
             let uncompressedData = try archivedData.decompressed()
-            
             // Unarchive the ARWorldMap from the data
             guard let worldMap = try NSKeyedUnarchiver.unarchivedObject(
                 ofClass: ARWorldMap.self,
@@ -642,10 +659,8 @@ class GameViewController: UIViewController, MissileManagerDelegate {
                 }
                 return
             }
-            
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                
                 self.targetWorldMap = worldMap
                 // Setup ARWorldTrackingConfiguration with loaded world map
                 let configuration = ARWorldTrackingConfiguration()
@@ -741,7 +756,6 @@ class GameViewController: UIViewController, MissileManagerDelegate {
     }
     
     @objc func updateScoreUI() {
-        print("🎯 Updating score UI")
         DispatchQueue.main.async {
             self.scoreText.text = self.game.scoreTextString
         }
@@ -750,7 +764,6 @@ class GameViewController: UIViewController, MissileManagerDelegate {
     // MARK: - MissileManagerDelegate
     
     func missileManager(_ manager: MissileManager, didUpdateScore score: Int) {
-        print("🎯 Score updated to: \(score)")
         updateScoreUI()
     }
     

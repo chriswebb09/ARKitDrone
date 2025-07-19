@@ -122,7 +122,5 @@ extension GameViewController: GameManagerDelegate {
     
     func manager(_ manager: GameManager, leavingHost host: Player) { }
     
-    func managerDidStartGame(_ manager: GameManager) {
-        
-    }
+    func managerDidStartGame(_ manager: GameManager) { }
 }

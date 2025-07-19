@@ -72,7 +72,10 @@ extension GameBrowser: MCNearbyServiceBrowserDelegate {
             return
         }
         guard peerID != MCPeerID(displayName: myself.username) else {
-            os_log(.info, "found myself, ignoring")
+            os_log(
+                .info,
+                "found myself, ignoring"
+            )
             return
         }
         let peerIDName = peerID.displayName
@@ -94,21 +97,19 @@ extension GameBrowser: MCNearbyServiceBrowserDelegate {
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
-        os_log(.info, "lost peer id %@", peerID)
+        os_log(
+            .info,
+            "lost peer id %@",
+            peerID
+        )
         let peerIDName = peerID.displayName
-
         Task { @MainActor in
             self.games = self.games.filter { $0.host.username != peerIDName }
-            self.delegate?.gameBrowser(self, sawGames: Array(self.games))
+            self.delegate?.gameBrowser(
+                self,
+                sawGames: Array(self.games)
+            )
         }
-//        let capturedPeerID = peerID
-//        Task { @MainActor in
-//            self.games = self.games.filter { $0.host.username != capturedPeerID.displayName }
-//            self.delegate?.gameBrowser(
-//                self,
-//                sawGames: Array(self.games)
-//            )
-//        }
     }
     
     func refresh() {

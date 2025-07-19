@@ -109,7 +109,6 @@ class GameStartViewController: UIViewController {
             soloButton.heightAnchor.constraint(equalToConstant: 50)
         ])
         soloButton.addTarget(self, action: #selector(soloButtonPressed), for: .touchUpInside)
-        print("🟦 Solo button target added successfully")
     }
     
     func setupBrowserView() {
@@ -132,14 +131,18 @@ class GameStartViewController: UIViewController {
     }
     
     func showViews(forSetup: Bool) {
-        UIView.transition(with: view, duration: 1.0, options: [.transitionCrossDissolve], animations: {
-            self.joinButton.isHidden = !forSetup
-            self.hostButton.isHidden = !forSetup
-        }, completion: nil)
+        UIView.transition(
+            with: view,
+            duration: 1.0,
+            options: [.transitionCrossDissolve],
+            animations: {
+                self.joinButton.isHidden = !forSetup
+                self.hostButton.isHidden = !forSetup
+            },
+            completion: nil)
     }
     
     @objc func soloButtonPressed() {
-        print("🎮 Solo button tapped!")
         print("🔗 Delegate is: \(delegate != nil ? "set" : "nil")")
         delegate?.gameStartViewController(self, didPressStartSoloGameButton: soloButton)
     }
@@ -156,7 +159,11 @@ class GameStartViewController: UIViewController {
     }
     
     func startGame(with player: Player) {
-        let gameSession = NetworkSession(myself: player, asServer: true, host: myself)
+        let gameSession = NetworkSession(
+            myself: player,
+            asServer: true,
+            host: myself
+        )
         delegate?.gameStartViewController(self, didStart: gameSession)
         setupOverlayVC()
     }

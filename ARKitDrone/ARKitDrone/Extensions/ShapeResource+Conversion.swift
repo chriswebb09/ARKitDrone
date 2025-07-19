@@ -57,7 +57,11 @@ extension ShapeResource {
             return .generateBox(size: size)
         }
         if let plane = scnGeometry as? SCNPlane {
-            let size = SIMD3<Float>(Float(plane.width), 0.01, Float(plane.height)) // Thin box for plane
+            let size = SIMD3<Float>(
+                Float(plane.width),
+                0.01,
+                Float(plane.height)
+            ) // Thin box for plane
             return .generateBox(size: size)
         }
         // For complex geometries, create convex hull from mesh
@@ -87,20 +91,32 @@ extension ShapeResource {
     @MainActor
     static func cylinder(height: Float, radius: Float) -> ShapeResource {
         // RealityKit doesn't have generateCylinder, use box approximation
-        let size = SIMD3<Float>(radius * 2, height, radius * 2)
+        let size = SIMD3<Float>(
+            radius * 2,
+            height,
+            radius * 2
+        )
         return .generateBox(size: size)
     }
     
     @MainActor
     static func capsule(height: Float, radius: Float) -> ShapeResource {
         // RealityKit doesn't have generateCapsule, use box approximation  
-        let size = SIMD3<Float>(radius * 2, height, radius * 2)
+        let size = SIMD3<Float>(
+            radius * 2,
+            height,
+            radius * 2
+        )
         return .generateBox(size: size)
     }
     
     @MainActor
     static func plane(size: SIMD2<Float>) -> ShapeResource {
-        let boxSize = SIMD3<Float>(size.x, 0.01, size.y) // Thin box
+        let boxSize = SIMD3<Float>(
+            size.x,
+            0.01,
+            size.y
+        ) // Thin box
         return .generateBox(size: boxSize)
     }
     
@@ -206,11 +222,9 @@ extension CollisionComponent {
         // SCNPhysicsShape doesn't expose geometry, so use default collision shape
         let shape = ShapeResource.generateSphere(radius: 0.01)
         let component = CollisionComponent(shapes: [shape])
-        
         // Note: RealityKit uses a different collision system than SceneKit
         // Category and contact test bit masks need to be handled differently
         // This would require a separate collision group management system
-        
         return component
     }
 }

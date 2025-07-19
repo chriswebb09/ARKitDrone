@@ -12,11 +12,15 @@ extension UIView {
     
     func fadeTransition(_ duration:CFTimeInterval) {
         let animation = CATransition()
-        animation.timingFunction = CAMediaTimingFunction(name:
-            CAMediaTimingFunctionName.easeInEaseOut)
+        animation.timingFunction = CAMediaTimingFunction(
+            name: CAMediaTimingFunctionName.easeInEaseOut
+        )
         animation.type = CATransitionType.fade
         animation.duration = duration
-        layer.add(animation, forKey: CATransitionType.fade.rawValue)
+        layer.add(
+            animation,
+            forKey: CATransitionType.fade.rawValue
+        )
     }
     
     func setshadow() {
@@ -37,10 +41,16 @@ extension UIView {
         lightShadow.cornerRadius = 15
         lightShadow.backgroundColor = UIColor.offWhite.cgColor
         lightShadow.shadowColor = UIColor.white.withAlphaComponent(0.9).cgColor
-        lightShadow.shadowOffset = CGSize(width: -5, height: -5)
+        lightShadow.shadowOffset = CGSize(
+            width: -5,
+            height: -5
+        )
         lightShadow.shadowOpacity = 1
         lightShadow.shadowRadius = 15
-        layer.insertSublayer(lightShadow, at: 0)
+        layer.insertSublayer(
+            lightShadow,
+            at: 0
+        )
     }
 }
 

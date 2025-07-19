@@ -244,7 +244,11 @@ extension Ship {
             let targetPos = target.transform.translation
             let currentPos = missile.transform.translation
             let direction = simd_normalize(targetPos - currentPos)
-            missile.look(at: targetPos, from: currentPos, relativeTo: nil)
+            missile.look(
+                at: targetPos,
+                from: currentPos,
+                relativeTo: nil
+            )
             // Add physics force simulation
             _ = direction * 1000
             // Add to scene (you'll need to pass the scene reference)
@@ -282,13 +286,14 @@ extension Ship {
             )]
         )
         missile.components.set(collisionComponent)
-        
         return missile
     }
     
     @MainActor
     static func removeShip(conditionalShipEntity: Entity) {
-        if let ship = Ship.getShip(from: conditionalShipEntity) {
+        if let ship = Ship.getShip(
+            from: conditionalShipEntity
+        ) {
             ship.isDestroyed = true
             ship.square?.isEnabled = false
             ship.square?.removeFromParent()

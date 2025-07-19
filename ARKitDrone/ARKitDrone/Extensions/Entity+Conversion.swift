@@ -399,7 +399,10 @@ extension Entity {
             self.transform.translation = (nodeData.position + currentPos) * 0.5
             // Convert euler angles to quaternion for RealityKit
             let newEuler = (nodeData.eulerAngles + currentRot) * 0.5
-            self.transform.rotation = simd_quatf(angle: newEuler.y, axis: SIMD3(0, 1, 0)) *
+            self.transform.rotation = simd_quatf(
+                angle: newEuler.y,
+                axis: SIMD3(0, 1, 0)
+            ) *
             simd_quatf(
                 angle: newEuler.x,
                 axis: SIMD3(1, 0, 0)

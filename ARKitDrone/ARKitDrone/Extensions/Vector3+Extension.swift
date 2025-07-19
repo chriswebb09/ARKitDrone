@@ -15,18 +15,42 @@ extension SCNVector3 {
     }
     
     static func -(left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-        return SCNVector3(left.x - right.x, left.y - right.y, left.z - right.z)
+        return SCNVector3(
+            left.x - right.x,
+            left.y - right.y,
+            left.z - right.z
+        )
     }
     
     func rotate(by quaternion: SCNQuaternion) -> SCNVector3 {
         // Convert the vector to a quaternion (w = 0)
-        let vectorQuat = SCNQuaternion(self.x, self.y, self.z, 0)
+        let vectorQuat = SCNQuaternion(
+            self.x,
+            self.y,
+            self.z,
+            0
+        )
         // Conjugate of the quaternion (invert its vector part)
-        let conjugateQuat = SCNQuaternion(-quaternion.x, -quaternion.y, -quaternion.z, quaternion.w)
+        let conjugateQuat = SCNQuaternion(
+            -quaternion.x,
+             -quaternion.y,
+             -quaternion.z,
+             quaternion.w
+        )
         // Apply the rotation: q * v * q^-1
-        let resultQuat = quaternionMultiply(quaternionMultiply(quaternion, vectorQuat), conjugateQuat)
+        let resultQuat = quaternionMultiply(
+            quaternionMultiply(
+                quaternion,
+                vectorQuat
+            ),
+            conjugateQuat
+        )
         // Return the rotated vector (x, y, z)
-        return SCNVector3(resultQuat.x, resultQuat.y, resultQuat.z)
+        return SCNVector3(
+            resultQuat.x,
+            resultQuat.y,
+            resultQuat.z
+        )
     }
     
     private func quaternionMultiply(_ q1: SCNQuaternion, _ q2: SCNQuaternion) -> SCNQuaternion {
@@ -52,7 +76,11 @@ extension SCNVector3 {
     
     func normalized() -> SCNVector3 {
         let magnitude = ((self.x * self.x) + (self.y * self.y) + (self.z * self.z)).squareRoot()
-        return SCNVector3(self.x / magnitude, self.y / magnitude, self.z / magnitude)
+        return SCNVector3(
+            self.x / magnitude,
+            self.y / magnitude,
+            self.z / magnitude
+        )
     }
     
     /// Returns a position in SCNVector3
@@ -64,7 +92,11 @@ extension SCNVector3 {
     /// - Returns: the positon in SCNVector3 from `transform`.
     
     static func positionFromTransform(_ transform: matrix_float4x4) -> SCNVector3 {
-        return SCNVector3(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
+        return SCNVector3(
+            transform.columns.3.x,
+            transform.columns.3.y,
+            transform.columns.3.z
+        )
     }
     
     /**
@@ -118,12 +150,20 @@ extension SCNVector3 {
      * Calculates the cross product between two SCNVector3.
      */
     func cross(_ vector: SCNVector3) -> SCNVector3 {
-        return SCNVector3(x:((y * vector.z) - (z * vector.y)), y: ((z * vector.x) - (x * vector.z)), z: ((x * vector.y) - (y * vector.x)))
+        return SCNVector3(
+            x:((y * vector.z) - (z * vector.y)),
+            y: ((z * vector.x) - (x * vector.z)),
+            z: ((x * vector.y) - (y * vector.x))
+        )
     }
 }
 
 func +(left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-    return SCNVector3(left.x + right.x, left.y + right.y, left.z + right.z)
+    return SCNVector3(
+        left.x + right.x,
+        left.y + right.y,
+        left.z + right.z
+    )
 }
 
 func +=( left: inout SCNVector3, right: SCNVector3) {
@@ -134,7 +174,11 @@ func +=( left: inout SCNVector3, right: SCNVector3) {
  * Multiplies a SCNVector3 with another.
  */
 func *= (left: inout SCNVector3, right: SCNVector3) {
-    left = SCNVector3(left.x * right.x, left.y * right.y, left.z * right.z)
+    left = SCNVector3(
+        left.x * right.x,
+        left.y * right.y,
+        left.z * right.z
+    )
 }
 
 /**
@@ -143,7 +187,11 @@ func *= (left: inout SCNVector3, right: SCNVector3) {
  */
 
 func * (vector: SCNVector3, scalar: Float) -> SCNVector3 {
-    return SCNVector3(x: vector.x * scalar, y: vector.y * scalar, z: vector.z * scalar)
+    return SCNVector3(
+        x: vector.x * scalar,
+        y: vector.y * scalar,
+        z: vector.z * scalar
+    )
 }
 
 /**
@@ -158,7 +206,11 @@ func *= (vector: inout SCNVector3, scalar: Float) {
  */
 infix operator /
 func / (left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-    return SCNVector3(x: left.x / right.x, y: left.y / right.y, z: left.z / right.z)
+    return SCNVector3(
+        x: left.x / right.x,
+        y: left.y / right.y,
+        z: left.z / right.z
+    )
 }
 
 /**
@@ -173,7 +225,11 @@ func /= (left: inout SCNVector3, right: SCNVector3) {
  * returns the result as a new SCNVector3.
  */
 func / (vector: SCNVector3, scalar: Float) -> SCNVector3 {
-    return SCNVector3(x: vector.x / Float(scalar), y: vector.y / Float(scalar), z: vector.z / Float(scalar))
+    return SCNVector3(
+        x: vector.x / Float(scalar),
+        y: vector.y / Float(scalar),
+        z: vector.z / Float(scalar)
+    )
 }
 
 /**
@@ -222,7 +278,11 @@ func SCNVector3DotProduct(_ left: SCNVector3, right: SCNVector3) -> Float {
  * Calculates the cross product between two SCNVector3 vectors
  */
 func SCNVector3CrossProduct(_ left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-    return SCNVector3(x: ((left.y * right.z) - (left.z * right.y)), y: ((left.z * right.x) - (left.x * right.z)), z: ((left.x * right.y) - (left.y * right.x)))
+    return SCNVector3(
+        x: ((left.y * right.z) - (left.z * right.y)),
+        y: ((left.z * right.x) - (left.x * right.z)),
+        z: ((left.x * right.y) - (left.y * right.x))
+    )
 }
 
 
@@ -230,12 +290,22 @@ func SCNVector3CrossProduct(_ left: SCNVector3, right: SCNVector3) -> SCNVector3
  * Project the vector, vectorToProject, onto the vector, projectionVector.
  */
 func SCNVector3Project(_ vectorToProject: SCNVector3, projectionVector: SCNVector3) -> SCNVector3 {
-    let scale: Float = SCNVector3DotProduct(projectionVector, right: vectorToProject) / SCNVector3DotProduct(projectionVector, right: projectionVector)
+    let scale: Float = SCNVector3DotProduct(
+        projectionVector,
+        right: vectorToProject
+    ) / SCNVector3DotProduct(
+        projectionVector,
+        right: projectionVector
+    )
     let v: SCNVector3 = projectionVector * scale
     return v
 }
 
 
 func / (left: SCNVector3, right: Int) -> SCNVector3 {
-    return SCNVector3(x: left.x / Float(right), y: left.y / Float(right), z: left.z / Float(right))
+    return SCNVector3(
+        x: left.x / Float(right),
+        y: left.y / Float(right),
+        z: left.z / Float(right)
+    )
 }

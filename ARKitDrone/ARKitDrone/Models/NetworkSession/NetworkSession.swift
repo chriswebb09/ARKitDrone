@@ -47,7 +47,10 @@ class NetworkSession: NSObject {
         // if the appIdentifier is missing from the main bundle, that's
         // a significant build error and we should crash.
         self.appIdentifier = Bundle.main.appIdentifier!
-        os_log("my appIdentifier is %s", self.appIdentifier)
+        os_log(
+            "my appIdentifier is %s",
+            self.appIdentifier
+        )
         super.init()
         self.session.delegate = self
     }
@@ -55,9 +58,15 @@ class NetworkSession: NSObject {
     // for use when acting as game server
     func startAdvertising() {
         guard serviceAdvertiser == nil else { return } // already advertising
-        os_log(.info, "ADVERTISING %@", myself.username)
+        os_log(
+            .info,
+            "ADVERTISING %@",
+            myself.username
+        )
         let discoveryInfo: [String: String] = [MultiuserAttribute.appIdentifier: appIdentifier]
-        let myId = MCPeerID(displayName: myself.username)
+        let myId = MCPeerID(
+            displayName: myself.username
+        )
         let advertiser = MCNearbyServiceAdvertiser(
             peer: myId,
             discoveryInfo: discoveryInfo,
@@ -79,17 +88,13 @@ class NetworkSession: NSObject {
         os_log(
             .info,
             "sending action: %s",
-            String(
-                describing: action
-            )
+            String(describing: action)
         )
         guard !peers.isEmpty else {
             os_log(
                 .error,
                 "no peers ",
-                String(
-                    describing: action
-                )
+                String(describing: action)
             )
             return
         }
@@ -98,8 +103,11 @@ class NetworkSession: NSObject {
             try action.encode(to: &bits)
             let data = bits.packData()
             let peerIds = peers.map { MCPeerID(displayName: $0.username) }
-            
-            try session.send(data, toPeers: peerIds, with: .reliable)
+            try session.send(
+                data,
+                toPeers: peerIds,
+                with: .reliable
+            )
             if action.description != "physics" {
                 os_signpost(
                     .event,
@@ -121,7 +129,11 @@ class NetworkSession: NSObject {
                 )
             }
         } catch {
-            os_log(.error, "sending failed: %s", "\(error)")
+            os_log(
+                .error,
+                "sending failed: %s",
+                "\(error)"
+            )
         }
     }
     
@@ -170,7 +182,11 @@ class NetworkSession: NSObject {
                 )
             }
         } catch {
-            os_log(.error, "sending failed: %s", "\(error)")
+            os_log(
+                .error,
+                "sending failed: %s",
+                "\(error)"
+            )
         }
     }
     
@@ -258,7 +274,11 @@ class NetworkSession: NSObject {
                 )
             }
         } catch {
-            os_log(.error, "deserialization error: %s", "\(error)")
+            os_log(
+                .error,
+                "deserialization error: %s",
+                "\(error)"
+            )
         }
     }
     
@@ -276,12 +296,18 @@ extension NetworkSession: MCSessionDelegate {
         switch state {
         case .connected:
             peers.insert(player)
-            delegate?.networkSession(self, joining: player)
+            delegate?.networkSession(
+                self,
+                joining: player
+            )
         case .connecting:
             break
         case.notConnected:
             peers.remove(player)
-            delegate?.networkSession(self, leaving: player)
+            delegate?.networkSession(
+                self,
+                leaving: player
+            )
         @unknown default:
             fatalError()
         }
@@ -295,16 +321,30 @@ extension NetworkSession: MCSessionDelegate {
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        os_log(.info, "did receive data from peer %@", peerID)
+        os_log(
+            .info,
+            "did receive data from peer %@",
+            peerID
+        )
         receive(data: data, from: peerID)
     }
     
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
-        os_log(.info, "peer %@ sent a stream named %s", peerID, streamName)
+        os_log(
+            .info,
+            "peer %@ sent a stream named %s",
+            peerID,
+            streamName
+        )
     }
     
     func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
-        os_log(.info, "peer %@ started sending a resource named %s", peerID, resourceName)
+        os_log(
+            .info,
+            "peer %@ started sending a resource named %s",
+            peerID,
+            resourceName
+        )
     }
     
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
@@ -318,7 +358,12 @@ extension NetworkSession: MCSessionDelegate {
             os_log(.error, "failed to receive resource: %s", "\(error)")
             return
         }
-        guard let url = localURL else { os_log(.error, "what what no url?"); return }
+        guard let url = localURL else {
+            os_log(
+                .error,
+                "what what no url?"
+            ); return
+        }
         do {
             // .mappedIfSafe makes the initializer attempt to map the file directly into memory
             // using mmap(2), rather than serially copying the bytes into memory.
@@ -328,7 +373,11 @@ extension NetworkSession: MCSessionDelegate {
             // removing the file is done by the session, so long as we're done with it before the
             // delegate method returns.
         } catch {
-            os_log(.error, "dealing with resource failed: %s", "\(error)")
+            os_log(
+                .error,
+                "dealing with resource failed: %s",
+                "\(error)"
+            )
         }
     }
 }
@@ -338,7 +387,11 @@ extension NetworkSession: MCNearbyServiceBrowserDelegate {
     /// - Tag: FoundPeer
     
     public func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
-        os_log(.info, "found peer named %@", peerID)
+        os_log(
+            .info,
+            "found peer named %@",
+            peerID
+        )
         // Invite the new peer to the session.
         browser.invitePeer(
             peerID,
@@ -349,7 +402,11 @@ extension NetworkSession: MCNearbyServiceBrowserDelegate {
     }
     
     public func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
-        os_log(.info, "lost peer named %@", peerID)
+        os_log(
+            .info,
+            "lost peer named %@",
+            peerID
+        )
         //        print("  public func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) ")
         // This app doesn't do anything with non-invited peers, so there's nothing to do here.
     }

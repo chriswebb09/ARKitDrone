@@ -25,7 +25,12 @@ extension simd_quatf {
         let yF = c1 * s2 * c3 - s1 * c2 * s3
         let zF = c1 * c2 * s3 + s1 * s2 * c3
         let wF = c1 * c2 * c3 - s1 * s2 * s3
-        return simd_quatf(ix: xF, iy: yF, iz: zF, r: wF)
+        return simd_quatf(
+            ix: xF,
+            iy: yF,
+            iz: zF,
+            r: wF
+        )
     }
     
     /// Create quaternion from tuple (for compatibility)
@@ -72,13 +77,21 @@ extension simd_quatf {
             let yaw = 2 * atan2(self.imag.x, self.real)
             let pitch = Float.pi / 2
             let roll: Float = 0
-            return SIMD3<Float>(roll, pitch, yaw)
+            return SIMD3<Float>(
+                roll,
+                pitch,
+                yaw
+            )
         }
         if test < -0.499 { // singularity at south pole
             let yaw = -2 * atan2(self.imag.x, self.real)
             let pitch = -Float.pi / 2
             let roll: Float = 0
-            return SIMD3<Float>(roll, pitch, yaw)
+            return SIMD3<Float>(
+                roll,
+                pitch,
+                yaw
+            )
         }
         let sqx = self.imag.x * self.imag.x
         let sqy = self.imag.y * self.imag.y
@@ -86,7 +99,12 @@ extension simd_quatf {
         let yaw = atan2(2 * self.imag.y * self.real - 2 * self.imag.x * self.imag.z, 1 - 2 * sqy - 2 * sqz)
         let pitch = asin(2 * test)
         let roll = atan2(2 * self.imag.x * self.real - 2 * self.imag.y * self.imag.z, 1 - 2 * sqx - 2 * sqz)
-        return SIMD3<Float>(roll, pitch, yaw)
+    
+        return SIMD3<Float>(
+            roll,
+            pitch,
+            yaw
+        )
     }
     
     /// Spherical linear interpolation
@@ -96,6 +114,11 @@ extension simd_quatf {
     
     /// Get the conjugate (inverse rotation)
     var conjugate: simd_quatf {
-        return simd_quatf(ix: -self.imag.x, iy: -self.imag.y, iz: -self.imag.z, r: self.real)
+        return simd_quatf(
+            ix: -self.imag.x,
+            iy: -self.imag.y,
+            iz: -self.imag.z,
+            r: self.real
+        )
     }
 }

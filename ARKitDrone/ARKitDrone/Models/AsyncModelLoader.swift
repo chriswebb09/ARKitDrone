@@ -45,6 +45,7 @@ class AsyncModelLoader {
     }
     
     // Alternative method using Entity(named:) async for Reality files
+    @discardableResult
     func loadRealityModel(named: String) async throws -> Entity {
         let fullName = "\(named).reality"
         if let existingTask = loadingCache[fullName] {

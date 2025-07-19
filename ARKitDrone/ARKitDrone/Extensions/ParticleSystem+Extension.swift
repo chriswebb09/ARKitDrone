@@ -24,8 +24,18 @@ extension SCNParticleSystem {
         explosion.particleSizeVariation = 0.05
         explosion.particleAngularVelocity = 5.0
         explosion.particleAngularVelocityVariation = 5.5
-        explosion.particleColor = UIColor(red: 1, green: 0.6, blue: 0.2, alpha: 1.0)
-        explosion.particleColorVariation = SCNVector4(0.2, 0.2, 0.2, 0.5)
+        explosion.particleColor = UIColor(
+            red: 1,
+            green: 0.6,
+            blue: 0.2,
+            alpha: 1.0
+        )
+        explosion.particleColorVariation = SCNVector4(
+            0.2,
+            0.2,
+            0.2,
+            0.5
+        )
         let fadeAnimation = CAKeyframeAnimation(keyPath: "opacity")
         fadeAnimation.values = [1.0, 0.0]
         fadeAnimation.keyTimes = [0.0, 0.5] as [NSNumber]

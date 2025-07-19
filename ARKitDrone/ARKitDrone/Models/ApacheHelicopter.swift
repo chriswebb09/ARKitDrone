@@ -141,7 +141,10 @@ class ApacheHelicopter {
                 missileEntities.append(missileEntity)
                 // Create Missile wrapper like SceneKit
                 let missile = Missile()
-                missile.setupEntity(entity: missileEntity, number: i)
+                missile.setupEntity(
+                    entity: missileEntity,
+                    number: i
+                )
                 missiles.append(missile)
             }
         }
@@ -169,7 +172,10 @@ class ApacheHelicopter {
             }
             // Add timer to current run loop to ensure it runs
             if let timer = self?.rotorTimer {
-                RunLoop.current.add(timer, forMode: .common)
+                RunLoop.current.add(
+                    timer,
+                    forMode: .common
+                )
             }
         }
     }

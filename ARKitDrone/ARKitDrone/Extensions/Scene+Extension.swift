@@ -19,12 +19,18 @@ extension Entity {
         // Try common RealityKit file extensions
         let extensions = ["usdz", "reality", "rcproject"]
         for ext in extensions {
-            if let url = bundle.url(forResource: modelName, withExtension: ext) {
+            if let url = bundle.url(
+                forResource: modelName,
+                withExtension: ext
+            ) {
                 return try await Entity(contentsOf: url)
             }
         }
         // If no file found with extensions, try without extension
-        if let url = bundle.url(forResource: modelName, withExtension: nil) {
+        if let url = bundle.url(
+            forResource: modelName,
+            withExtension: nil
+        ) {
             return try await Entity(contentsOf: url)
         }
         throw EntityLoadingError.fileNotFound(modelName)
@@ -34,7 +40,10 @@ extension Entity {
     static func entityWithModelNameSync(_ modelName: String, in bundle: Bundle = .main) -> Entity? {
         let extensions = ["usdz", "reality", "rcproject"]
         for ext in extensions {
-            if let url = bundle.url(forResource: modelName, withExtension: ext) {
+            if let url = bundle.url(
+                forResource: modelName,
+                withExtension: ext
+            ) {
                 do {
                     return try Entity.load(contentsOf: url)
                 } catch {
@@ -52,10 +61,17 @@ extension simd_float4x4 {
     
     /// Create translation matrix
     init(translation vector: SIMD3<Float>) {
-        self.init(SIMD4(1, 0, 0, 0),
-                  SIMD4(0, 1, 0, 0),
-                  SIMD4(0, 0, 1, 0),
-                  SIMD4(vector.x, vector.y, vector.z, 1))
+        self.init(
+            SIMD4(1, 0, 0, 0),
+            SIMD4(0, 1, 0, 0),
+            SIMD4(0, 0, 1, 0),
+            SIMD4(
+                vector.x,
+                vector.y,
+                vector.z,
+                1
+            )
+        )
     }
     
     

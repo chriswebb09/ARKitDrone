@@ -52,12 +52,18 @@ extension CGPoint {
             self.init(x: 0, y: 0)
             return
         }
-        let ndc = SIMD2<Float>(clipPos.x / clipPos.w, clipPos.y / clipPos.w)
+        let ndc = SIMD2<Float>(
+            clipPos.x / clipPos.w,
+            clipPos.y / clipPos.w
+        )
         let screenSize = arView.bounds.size
         let screenX = (ndc.x + 1.0) * 0.5 * Float(screenSize.width)
         let screenY = (1.0 - ndc.y) * 0.5 * Float(screenSize.height)
         
-        self.init(x: CGFloat(screenX), y: CGFloat(screenY))
+        self.init(
+            x: CGFloat(screenX),
+            y: CGFloat(screenY)
+        )
     }
     
     /// Returns the length of a point when considered as a vector. (Used with gesture recognizers.)
@@ -67,7 +73,10 @@ extension CGPoint {
     
     /// Convert CGPoint to SIMD2<Float> for RealityKit calculations
     var simd2: SIMD2<Float> {
-        return SIMD2<Float>(Float(x), Float(y))
+        return SIMD2<Float>(
+            Float(x),
+            Float(y)
+        )
     }
     
     /// Calculate distance to another point
@@ -81,7 +90,10 @@ extension CGPoint {
     var normalized: CGPoint {
         let len = length
         guard len > 0 else { return CGPoint.zero }
-        return CGPoint(x: x / len, y: y / len)
+        return CGPoint(
+            x: x / len,
+            y: y / len
+        )
     }
     
     /// Create a point by interpolating between two points

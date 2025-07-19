@@ -58,7 +58,11 @@ class MenuViewController: UIViewController {
             ofSize: 18,
             weight: .semibold
         )
-        button.addTarget(self, action: #selector(newGameButtonTapped), for: .touchUpInside)
+        button.addTarget(
+            self,
+            action: #selector(newGameButtonTapped),
+            for: .touchUpInside
+        )
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -117,25 +121,39 @@ class MenuViewController: UIViewController {
         newGameButton.isEnabled = false
         // Set initial countdown display
         newGameButton.setTitle("\(countdown)", for: .normal)
-        newGameButton.titleLabel?.font = UIFont.systemFont(ofSize: 24, weight: .heavy)
+        newGameButton.titleLabel?.font = UIFont.systemFont(
+            ofSize: 24,
+            weight: .heavy
+        )
         Task {
             for _ in 1...count {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
                 countdown -= 1
                 await MainActor.run {
-                    UIView.transition(with: self.newGameButton, duration: 0.3, options: .transitionCrossDissolve, animations: {
-                        let title = countdown > 0 ? "\(countdown)" : "GO!"
-                        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-                        impactFeedback.impactOccurred()
-                        self.newGameButton.setTitle(title, for: .normal)
-                        self.newGameButton.titleLabel?.font = UIFont.systemFont(ofSize: 24, weight: .heavy)
-                        
-                    }, completion: { _ in
+                    UIView.transition(
+                        with: self.newGameButton,
+                        duration: 0.3,
+                        options: .transitionCrossDissolve,
+                        animations: {
+                            let title = countdown > 0 ? "\(countdown)" : "GO!"
+                            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                            impactFeedback.impactOccurred()
+                            self.newGameButton.setTitle(title, for: .normal)
+                            self.newGameButton.titleLabel?.font = UIFont.systemFont(
+                                ofSize: 24,
+                                weight: .heavy
+                            )
+                            
+                        },
+                        completion: { _ in
                         if countdown == 0 {
                             // Reset button after countdown
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 self.newGameButton.setTitle("New Game", for: .normal)
-                                self.newGameButton.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+                                self.newGameButton.titleLabel?.font = UIFont.systemFont(
+                                    ofSize: 18,
+                                    weight: .semibold
+                                )
                                 self.newGameButton.isEnabled = true
                             }
                         }

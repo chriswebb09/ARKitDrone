@@ -28,7 +28,6 @@ extension GameViewController: GameStartViewControllerDelegate {
     
     func gameStartViewController(_ _: UIViewController, didPressStartSoloGameButton: UIButton) {
         os_log(.info, "🎮 Starting solo game")
-        print("🎮 GameViewController received solo game request")
         // Create a solo session (no networking)
         let soloSession = NetworkSession(
             myself: UserDefaults.standard.myself,
