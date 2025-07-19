@@ -178,7 +178,6 @@ class TargetNode: Entity {
         
         if let animationResource = try? AnimationResource.generate(with: scaleAnimation) {
             positioningEntity.playAnimation(animationResource)
-            
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.175) {
                 self.isAnimating = false
             }
@@ -189,7 +188,6 @@ class TargetNode: Entity {
         guard isOpen, !isAnimating else { return }
         isOpen = false
         isAnimating = true
-        
         // Simple scale down animation for the green square
         let scaleAnimation = FromToByAnimation<Transform>(
             name: "closeScale",
@@ -202,11 +200,9 @@ class TargetNode: Entity {
         
         if let animationResource = try? AnimationResource.generate(with: scaleAnimation) {
             positioningEntity.playAnimation(animationResource)
-            
             if flash {
                 performFlashEffect()
             }
-            
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                 self.isAnimating = false
             }
@@ -256,19 +252,15 @@ class FocusSquareSegment: Entity {
         self.corner = corner
         self.alignment = alignment
         super.init()
-        
         self.name = name
-        
         // Create short corner bracket segments for proper focus square look
         let bracketLength: Float = 0.2  // Short segments for corner brackets
-        let segmentSize = alignment == .horizontal ? 
-            SIMD3<Float>(bracketLength, thickness, thickness) :
-            SIMD3<Float>(thickness, bracketLength, thickness)
-        
+        let segmentSize = alignment == .horizontal ?
+        SIMD3<Float>(bracketLength, thickness, thickness) :
+        SIMD3<Float>(thickness, bracketLength, thickness)
         let mesh = MeshResource.generateBox(size: segmentSize)
         var material = UnlitMaterial()
         material.color = .init(tint: color)
-        
         components.set(ModelComponent(mesh: mesh, materials: [material]))
     }
     

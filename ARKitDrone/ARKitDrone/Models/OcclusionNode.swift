@@ -67,10 +67,8 @@ class OcclusionEntity: Entity {
     
     func updateOcclusionEntity(with meshAnchor: ARMeshAnchor, visible: Bool) {
         self.visible = visible
-        
         // Remove existing mesh entity
         meshEntity?.removeFromParent()
-        
         // Create new mesh entity with updated geometry
         do {
             let meshResource = try MeshResource.from(meshAnchor.geometry)
@@ -91,16 +89,12 @@ class OcclusionEntity: Entity {
     
     private func createMeshEntity(with meshResource: MeshResource) {
         let entity = Entity()
-        
         // Create appropriate material based on visibility
         let material = visible ? createVisibleMeshMaterial() : createOccluderMaterial()
-        
         // Set up model component
         entity.components.set(ModelComponent(mesh: meshResource, materials: [material]))
-        
         // Set rendering order (RealityKit doesn't have direct renderingOrder, but we can use other approaches)
         entity.name = visible ? "visibleMesh" : "occluder"
-        
         meshEntity = entity
         addChild(entity)
     }

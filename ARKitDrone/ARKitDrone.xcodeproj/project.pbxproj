@@ -58,6 +58,10 @@
 		9467A30F2BB93A840023EA62 /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9467A30E2BB93A840023EA62 /* Shell.swift */; };
 		9470AE472974001A00A55134 /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9470AE462974001A00A55134 /* MenuViewController.swift */; };
 		947691C42E2B5ED300F22DE4 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947691C32E2B5ECD00F22DE4 /* SceneDelegate.swift */; };
+		947691C62E2B801300F22DE4 /* ModelLoadError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947691C52E2B801100F22DE4 /* ModelLoadError.swift */; };
+		947691C82E2B804700F22DE4 /* AsyncModelLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947691C72E2B804400F22DE4 /* AsyncModelLoader.swift */; };
+		947691CA2E2B80BF00F22DE4 /* MissileTrackingInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947691C92E2B80BC00F22DE4 /* MissileTrackingInfo.swift */; };
+		947691CC2E2B80E600F22DE4 /* MissileManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947691CB2E2B80E200F22DE4 /* MissileManagerDelegate.swift */; };
 		94874EB02E258A3900453E04 /* Missile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94874EAF2E258A3900453E04 /* Missile.swift */; };
 		94874EB42E25C95700453E04 /* heli.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 94874EB32E25C95700453E04 /* heli.usdz */; };
 		9488F2032D657BA6001C08D9 /* TargetNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9488F2022D657BA2001C08D9 /* TargetNode.swift */; };
@@ -160,6 +164,10 @@
 		9467A30E2BB93A840023EA62 /* Shell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
 		9470AE462974001A00A55134 /* MenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
 		947691C32E2B5ECD00F22DE4 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		947691C52E2B801100F22DE4 /* ModelLoadError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelLoadError.swift; sourceTree = "<group>"; };
+		947691C72E2B804400F22DE4 /* AsyncModelLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncModelLoader.swift; sourceTree = "<group>"; };
+		947691C92E2B80BC00F22DE4 /* MissileTrackingInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissileTrackingInfo.swift; sourceTree = "<group>"; };
+		947691CB2E2B80E200F22DE4 /* MissileManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissileManagerDelegate.swift; sourceTree = "<group>"; };
 		94874EAF2E258A3900453E04 /* Missile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Missile.swift; sourceTree = "<group>"; };
 		94874EB32E25C95700453E04 /* heli.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = heli.usdz; sourceTree = "<group>"; };
 		9488F2022D657BA2001C08D9 /* TargetNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetNode.swift; sourceTree = "<group>"; };
@@ -377,8 +385,12 @@
 				94B173ED2DAA31DB0015DC0D /* GameBrowser */,
 				94B173F12DAA33590015DC0D /* NetworkSession */,
 				9455B7522D60C73B0019FE10 /* MissileManager.swift */,
+				947691CB2E2B80E200F22DE4 /* MissileManagerDelegate.swift */,
+				947691C92E2B80BC00F22DE4 /* MissileTrackingInfo.swift */,
 				946690B12D9E3DA900343B1B /* NetworkGame.swift */,
 				9455B7542D60C7460019FE10 /* ShipManager.swift */,
+				947691C72E2B804400F22DE4 /* AsyncModelLoader.swift */,
+				947691C52E2B801100F22DE4 /* ModelLoadError.swift */,
 				9412F0752D5B4BE500D9F1BD /* Ship.swift */,
 				941706D82972A5F400CB0308 /* ApacheHelicopter.swift */,
 				94316FAE2DAB56BE0002BAF8 /* Missiles */,
@@ -567,18 +579,22 @@
 				946690C92D9E3FF400343B1B /* GameStartViewController.swift in Sources */,
 				94B173E72DAA30540015DC0D /* GameStartViewControllerDelegate.swift in Sources */,
 				94423DED2DAB45C7007B5945 /* WritableBitStream.swift in Sources */,
+				947691CA2E2B80BF00F22DE4 /* MissileTrackingInfo.swift in Sources */,
 				94C881AE2D5D07450050119D /* ParticleSystem+Extension.swift in Sources */,
 				94F968A82AD7337F00D7B418 /* OcclusionNode.swift in Sources */,
 				941706D92972A5F400CB0308 /* ApacheHelicopter.swift in Sources */,
+				947691CC2E2B80E600F22DE4 /* MissileManagerDelegate.swift in Sources */,
 				946690BB2D9E3DFA00343B1B /* Action+Signposts.swift in Sources */,
 				946690BC2D9E3DFA00343B1B /* SignpostData.swift in Sources */,
 				A7AE72C21F888EF500B015D3 /* GameViewController.swift in Sources */,
 				94423DE02DAB4360007B5945 /* MoveData.swift in Sources */,
+				947691C62E2B801300F22DE4 /* ModelLoadError.swift in Sources */,
 				946690C12D9E3E9000343B1B /* GameManager.swift in Sources */,
 				946690AC2D9E3D7A00343B1B /* GameObject.swift in Sources */,
 				94CCC8F02972D97700F7D17F /* JoystickDelegate.swift in Sources */,
 				94B173E32DA9CC420015DC0D /* GameViewController+GameManagerDelegate.swift in Sources */,
 				9455B7552D60C74A0019FE10 /* ShipManager.swift in Sources */,
+				947691C82E2B804700F22DE4 /* AsyncModelLoader.swift in Sources */,
 				94396BDA2D7B474900A83CF4 /* GameViewController+SCNPhysicsContactDelegate.swift in Sources */,
 				94D630322976077000096104 /* UIFont+Extension.swift in Sources */,
 				94423DDE2DAB433E007B5945 /* CompletedAction.swift in Sources */,

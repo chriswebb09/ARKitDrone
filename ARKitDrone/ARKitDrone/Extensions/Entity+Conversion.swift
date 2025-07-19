@@ -10,11 +10,9 @@ import RealityKit
 import UIKit
 
 extension Entity {
-    
     /// Create Entity with specific mesh and materials
     @MainActor
-    static func createWithMesh(_ meshResource: MeshResource,
-                               materials: [Material] = [SimpleMaterial.create(color: .white)]) -> Entity {
+    static func createWithMesh(_ meshResource: MeshResource, materials: [Material] = [SimpleMaterial.create(color: .white)]) -> Entity {
         let entity = Entity()
         entity.components.set(ModelComponent(mesh: meshResource, materials: materials))
         return entity
@@ -22,12 +20,8 @@ extension Entity {
     
     /// Create Entity with physics
     @MainActor
-    static func createWithPhysics(mesh: MeshResource,
-                                  materials: [Material],
-                                  physicsMode: PhysicsBodyMode = .dynamic,
-                                  mass: Float = 1.0) -> Entity {
+    static func createWithPhysics(mesh: MeshResource, materials: [Material], physicsMode: PhysicsBodyMode = .dynamic, mass: Float = 1.0) -> Entity {
         let entity = Entity.createWithMesh(mesh, materials: materials)
-        
         let shape = ShapeResource.generateConvex(from: mesh)
         let physicsComponent = PhysicsBodyComponent(
             massProperties: PhysicsMassProperties(mass: mass),
@@ -35,22 +29,16 @@ extension Entity {
             mode: physicsMode
         )
         entity.components.set(physicsComponent)
-        
         let collisionComponent = CollisionComponent(shapes: [shape])
         entity.components.set(collisionComponent)
-        
         return entity
     }
     
     /// Create a simple box entity
     @MainActor
-    static func createBox(size: SIMD3<Float>, 
-                          color: UIColor = .white,
-                          withPhysics: Bool = false,
-                          physicsMode: PhysicsBodyMode = .dynamic) -> Entity {
+    static func createBox(size: SIMD3<Float>, color: UIColor = .white, withPhysics: Bool = false, physicsMode: PhysicsBodyMode = .dynamic) -> Entity {
         let mesh = MeshResource.generateBox(size: size)
         let material = SimpleMaterial.create(color: color)
-        
         if withPhysics {
             return Entity.createWithPhysics(mesh: mesh, materials: [material], physicsMode: physicsMode)
         } else {
@@ -60,13 +48,9 @@ extension Entity {
     
     /// Create a simple sphere entity
     @MainActor
-    static func createSphere(radius: Float,
-                             color: UIColor = .white,
-                             withPhysics: Bool = false,
-                             physicsMode: PhysicsBodyMode = .dynamic) -> Entity {
+    static func createSphere(radius: Float, color: UIColor = .white, withPhysics: Bool = false, physicsMode: PhysicsBodyMode = .dynamic) -> Entity {
         let mesh = MeshResource.generateSphere(radius: radius)
         let material = SimpleMaterial.create(color: color)
-        
         if withPhysics {
             return Entity.createWithPhysics(mesh: mesh, materials: [material], physicsMode: physicsMode)
         } else {
@@ -76,17 +60,12 @@ extension Entity {
     
     /// Create a simple cylinder entity (using box as approximation since RealityKit has limited primitive shapes)
     @MainActor
-    static func createCylinder(height: Float,
-                               radius: Float,
-                               color: UIColor = .white,
-                               withPhysics: Bool = false,
-                               physicsMode: PhysicsBodyMode = .dynamic) -> Entity {
+    static func createCylinder(height: Float, radius: Float, color: UIColor = .white, withPhysics: Bool = false, physicsMode: PhysicsBodyMode = .dynamic) -> Entity {
         // Note: RealityKit only has generateBox, generateSphere, and generatePlane
         // Using a tall box as cylinder approximation, or load a USDZ cylinder model instead
         let size = SIMD3<Float>(radius * 2, height, radius * 2)
         let mesh = MeshResource.generateBox(size: size)
         let material = SimpleMaterial.create(color: color)
-        
         if withPhysics {
             return Entity.createWithPhysics(mesh: mesh, materials: [material], physicsMode: physicsMode)
         } else {
@@ -96,14 +75,9 @@ extension Entity {
     
     /// Create a simple plane entity
     @MainActor
-    static func createPlane(width: Float,
-                            height: Float,
-                            color: UIColor = .white,
-                            withPhysics: Bool = false,
-                            physicsMode: PhysicsBodyMode = .static) -> Entity {
+    static func createPlane(width: Float, height: Float, color: UIColor = .white, withPhysics: Bool = false, physicsMode: PhysicsBodyMode = .static) -> Entity {
         let mesh = MeshResource.generatePlane(width: width, height: height)
         let material = SimpleMaterial.create(color: color)
-        
         if withPhysics {
             return Entity.createWithPhysics(mesh: mesh, materials: [material], physicsMode: physicsMode)
         } else {
@@ -116,7 +90,6 @@ extension Entity {
         guard let url = bundle.url(forResource: filename, withExtension: "usdz") else {
             throw EntityError.missingFile(filename)
         }
-        
         return try await Entity(contentsOf: url)
     }
     
@@ -125,18 +98,14 @@ extension Entity {
         guard let url = bundle.url(forResource: filename, withExtension: "reality") else {
             throw EntityError.missingFile(filename)
         }
-        
         return try await Entity(contentsOf: url)
     }
     
     /// Load Entity from common file types
-    static func load(named filename: String, 
-                     withExtension ext: String = "usdz", 
-                     in bundle: Bundle = .main) async throws -> Entity {
+    static func load(named filename: String, withExtension ext: String = "usdz", in bundle: Bundle = .main) async throws -> Entity {
         guard let url = bundle.url(forResource: filename, withExtension: ext) else {
             throw EntityError.missingFile("\(filename).\(ext)")
         }
-        
         return try await Entity(contentsOf: url)
     }
     
@@ -307,7 +276,6 @@ extension Entity {
             let bounds = modelComponent.mesh.bounds
             let extents = bounds.extents
             let offset = SIMD3<Float>(extents.x / 2, extents.y / 2, extents.z / 2) + bounds.min
-            
             // Adjust the entity's transform to center align
             self.transform.translation = self.transform.translation - offset
         }
@@ -344,7 +312,6 @@ extension Entity {
     static func addFlash(contactPoint: SIMD3<Float>) -> Entity {
         let flashEntity = Entity()
         flashEntity.transform.translation = contactPoint
-        
         // Create a bright light component
         let light = DirectionalLightComponent(
             color: .white,
@@ -369,27 +336,37 @@ extension Entity {
     
     func apply(movementData nodeData: MovementData, isHalfway: Bool) {
         guard nodeData.isAlive else { return }
-        
         if isHalfway {
             // Smooth interpolation for halfway positioning
             let currentPos = self.transform.translation
             let currentRot = self.transform.rotation.eulerAngles
-            
             self.transform.translation = (nodeData.position + currentPos) * 0.5
-            
             // Convert euler angles to quaternion for RealityKit
             let newEuler = (nodeData.eulerAngles + currentRot) * 0.5
             self.transform.rotation = simd_quatf(angle: newEuler.y, axis: SIMD3(0, 1, 0)) *
-                                     simd_quatf(angle: newEuler.x, axis: SIMD3(1, 0, 0)) *
-                                     simd_quatf(angle: newEuler.z, axis: SIMD3(0, 0, 1))
+            simd_quatf(angle: newEuler.x, axis: SIMD3(1, 0, 0)) *
+            simd_quatf(angle: newEuler.z, axis: SIMD3(0, 0, 1))
         } else {
             // Direct positioning using SIMD types
             self.transform.translation = nodeData.position
-            
             // Convert euler angles to quaternion for RealityKit
             self.transform.rotation = simd_quatf(angle: nodeData.eulerAngles.y, axis: SIMD3(0, 1, 0)) *
-                                     simd_quatf(angle: nodeData.eulerAngles.x, axis: SIMD3(1, 0, 0)) *
-                                     simd_quatf(angle: nodeData.eulerAngles.z, axis: SIMD3(0, 0, 1))
+            simd_quatf(angle: nodeData.eulerAngles.x, axis: SIMD3(1, 0, 0)) *
+            simd_quatf(angle: nodeData.eulerAngles.z, axis: SIMD3(0, 0, 1))
         }
+    }
+}
+
+extension Entity {
+    func findFirstModelEntity() -> ModelEntity? {
+        if let model = self as? ModelEntity {
+            return model
+        }
+        for child in children {
+            if let found = child.findFirstModelEntity() {
+                return found
+            }
+        }
+        return nil
     }
 }

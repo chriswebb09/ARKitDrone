@@ -10,13 +10,6 @@ import RealityKit
 import simd
 import UIKit
 
-// MARK: - MissileManagerDelegate
-
-@MainActor
-protocol MissileManagerDelegate: AnyObject {
-    func missileManager(_ manager: MissileManager, didUpdateScore score: Int)
-}
-
 // MARK: - MissileManager
 
 class MissileManager {
@@ -40,35 +33,28 @@ class MissileManager {
     
     @MainActor
     func fire(game: Game) {
-        print("🚀 Missile fire() called")
-        print("🚀 Helicopter missiles: \(sceneView.helicopter.missiles.count)")
-        print("🚀 Ships count: \(sceneView.ships.count), target index: \(sceneView.targetIndex)")
-        print("🚀 Score updated: \(game.scoreUpdated)")
-        
-        guard !sceneView.helicopter.missiles.isEmpty, !game.scoreUpdated else { 
+        guard !sceneView.helicopter.missiles.isEmpty, !game.scoreUpdated else {
             print("❌ Fire failed: no missiles or score updated")
-            return 
+            return
         }
         // Get ships from the sceneView
         let ships = sceneView.ships
-        guard ships.count > sceneView.targetIndex else { 
+        guard ships.count > sceneView.targetIndex else {
             print("❌ Fire failed: no ships or invalid target index")
-            return 
+            return
         }
-        guard !ships[sceneView.targetIndex].isDestroyed else { 
+        guard !ships[sceneView.targetIndex].isDestroyed else {
             print("❌ Fire failed: target ship is destroyed")
-            return 
+            return
         }
         let ship = ships[sceneView.targetIndex]
         ship.targeted = true
-        guard let missile = sceneView.helicopter.missiles.first(where: { !$0.fired }) else { 
+        guard let missile = sceneView.helicopter.missiles.first(where: { !$0.fired }) else {
             print("❌ No available missiles to fire")
-            return 
+            return
         }
         missile.fired = true
-        print("✅ Missile fired successfully: \(missile.id)")
         missile.addCollision()
-        
         // Initialize missile position at helicopter's gun position
         guard let helicopterEntity = sceneView.helicopter.helicopter else {
             print("❌ No helicopter entity found")
@@ -77,11 +63,6 @@ class MissileManager {
         
         // Get helicopter's world position (through its anchor)
         let helicopterWorldPos: SIMD3<Float>
-        
-        // Debug helicopter hierarchy
-        print("🚁 Helicopter entity: \(helicopterEntity.name)")
-        print("🚁 Helicopter parent: \(helicopterEntity.parent?.name ?? "nil")")
-        print("🚁 Helicopter transform: \(helicopterEntity.transform.translation)")
         if let parent = helicopterEntity.parent {
             print("🚁 Parent transform: \(parent.transform.translation)")
         }
@@ -120,7 +101,11 @@ class MissileManager {
         
         // Point missile at target
         let targetPos = ship.entity.transform.translation
-        missile.entity.look(at: targetPos, from: initialMissilePos, relativeTo: nil)
+        missile.entity.look(
+            at: targetPos,
+            from: initialMissilePos,
+            relativeTo: nil
+        )
         
         print("🎯 Missile initial position: \(initialMissilePos)")
         print("🎯 Target position: \(targetPos)")
@@ -167,11 +152,11 @@ class MissileManager {
         }
         
         // Check for invalid positions - including infinity
-        if targetPos.x.isNaN || targetPos.y.isNaN || targetPos.z.isNaN || 
-           currentPos.x.isNaN || currentPos.y.isNaN || currentPos.z.isNaN ||
-           targetPos.x.isInfinite || targetPos.y.isInfinite || targetPos.z.isInfinite ||
-           currentPos.x.isInfinite || currentPos.y.isInfinite || currentPos.z.isInfinite ||
-           abs(currentPos.x) > 1000 || abs(currentPos.y) > 1000 || abs(currentPos.z) > 1000 {
+        if targetPos.x.isNaN || targetPos.y.isNaN || targetPos.z.isNaN ||
+            currentPos.x.isNaN || currentPos.y.isNaN || currentPos.z.isNaN ||
+            targetPos.x.isInfinite || targetPos.y.isInfinite || targetPos.z.isInfinite ||
+            currentPos.x.isInfinite || currentPos.y.isInfinite || currentPos.z.isInfinite ||
+            abs(currentPos.x) > 1000 || abs(currentPos.y) > 1000 || abs(currentPos.z) > 1000 {
             print("❌ Invalid positions detected - stopping missile tracking")
             print("❌ Current: \(currentPos), Target: \(targetPos)")
             displayLink.invalidate()
@@ -190,17 +175,14 @@ class MissileManager {
             missile.hit = true
             ship.isDestroyed = true
             ship.removeShip()
-            
             // Add explosion effect
             sceneView.addExplosion(at: targetPos)
-            
             // Update score
             DispatchQueue.main.async {
                 self.game.playerScore += 1
                 self.game.updateScoreText()
                 self.delegate?.missileManager(self, didUpdateScore: self.game.playerScore)
             }
-            
             // Stop tracking this missile
             displayLink.invalidate()
             activeMissileTrackers[missile.id] = nil
@@ -255,29 +237,22 @@ class MissileManager {
     func handleContact(_ contact: CollisionEvents.Began) {
         let entityA = contact.entityA
         let entityB = contact.entityB
-        
         let nameA = entityA.name
         let nameB = entityB.name
-        
         let isMissileHit = (nameA.contains("Missile") && !nameB.contains("Missile")) ||
         (nameB.contains("Missile") && !nameA.contains("Missile"))
-        
-        guard isMissileHit else { 
+        guard isMissileHit else {
             print("❌ Not a missile hit: \(nameA) vs \(nameB)")
-            return 
+            return
         }
-        
         let missileEntity = nameA.contains("Missile") ? entityA : entityB
         let shipEntity = nameA.contains("Missile") ? entityB : entityA
-        
         guard
             let missile = Missile.getMissile(from: missileEntity),
             let ship = Ship.getShip(from: shipEntity)
         else { return }
-        
         let shouldUpdateScore = !missile.hit
         missile.hit = true
-        
         if shouldUpdateScore {
             DispatchQueue.main.async {
                 self.game.playerScore += 1
@@ -286,13 +261,11 @@ class MissileManager {
                 NotificationCenter.default.post(name: .updateScore, object: self, userInfo: nil)
             }
         }
-        
         DispatchQueue.main.async {
             ship.isDestroyed = true
             ship.removeShip()
             self.sceneView.addExplosion(at: shipEntity.transform.translation)
         }
-        
         missile.particleEntity?.isEnabled = false
         missileEntity.removeFromParent()
         activeMissileTrackers[missile.id] = nil
@@ -303,22 +276,18 @@ class MissileManager {
     @MainActor
     private func handleMissileHit(missile: Missile, ship: Ship, at position: SIMD3<Float>) {
         print("💥 HIT DETECTED!")
-        
         missile.hit = true
         ship.isDestroyed = true
-        
         DispatchQueue.main.async {
             self.game.playerScore += 1
             ApacheHelicopter.speed = 0
             self.game.updateScoreText()
             NotificationCenter.default.post(name: .updateScore, object: self, userInfo: nil)
         }
-        
         DispatchQueue.main.async {
             ship.removeShip()
             self.sceneView.addExplosion(at: position)
         }
-        
         cleanupMissile(missile)
         print("✅ Missile hit processing complete.")
     }
@@ -329,16 +298,4 @@ class MissileManager {
         missile.entity.removeFromParent()
         activeMissileTrackers[missile.id] = nil
     }
-}
-
-// MARK: - MissileTrackingInfo
-
-struct MissileTrackingInfo {
-    let missile: Missile
-    let target: Ship
-    let startTime: TimeInterval
-    let duration: TimeInterval
-    let displayLink: CADisplayLink
-    var lastUpdateTime: TimeInterval
-    var frameCount: Int = 0
 }

@@ -42,18 +42,18 @@ class M1AbramsTank {
             // Load USDZ tank model
             let tankModel = try await Entity.loadUSDZ(named: LocalConstants.sceneName)
             tankEntity = tankModel
-            
             // Find child entities
             tracksEntity = tankEntity.findEntity(named: LocalConstants.body)
             turretEntity = tankEntity.findEntity(named: LocalConstants.turret)
             mainGunEntity = turretEntity?.findEntity(named: LocalConstants.maingun)
-            
             // Set transform
             await MainActor.run {
                 tankEntity.transform.matrix = transform
-                tankEntity.transform.rotation *= simd_quatf(angle: -1.7, axis: SIMD3<Float>(1, 0, 0))
+                tankEntity.transform.rotation *= simd_quatf(
+                    angle: -1.7,
+                    axis: SIMD3<Float>(1, 0, 0)
+                )
             }
-            
             // Add to scene
             let anchor = AnchorEntity(world: SIMD3<Float>(0, 0, 0))
             anchor.addChild(tankEntity)
@@ -82,12 +82,16 @@ extension M1AbramsTank {
         let rotationAnimation = FromToByAnimation<Transform>(
             name: "tankRotation",
             from: Transform(rotation: tankEntity.transform.rotation),
-            to: Transform(rotation: tankEntity.transform.rotation * simd_quatf(angle: angle * Float.pi, axis: SIMD3<Float>(0, 0, 1))),
+            to: Transform(
+                rotation: tankEntity.transform.rotation * simd_quatf(
+                    angle: angle * Float.pi,
+                    axis: SIMD3<Float>(0, 0, 1)
+                )
+            ),
             duration: 0.25,
             timing: .easeOut,
             bindTarget: .transform
         )
-        
         if let animationResource = try? AnimationResource.generate(with: rotationAnimation) {
             tankEntity.playAnimation(animationResource)
         }
@@ -95,16 +99,19 @@ extension M1AbramsTank {
     
     func rotateTurret(rotation: Float) {
         guard let turretEntity = turretEntity else { return }
-        
         let turretRotation = FromToByAnimation<Transform>(
             name: "turretRotation",
             from: Transform(rotation: turretEntity.transform.rotation),
-            to: Transform(rotation: turretEntity.transform.rotation * simd_quatf(angle: rotation * Float.pi, axis: SIMD3<Float>(0, 0, 1))),
+            to: Transform(
+                rotation: turretEntity.transform.rotation * simd_quatf(
+                    angle: rotation * Float.pi,
+                    axis: SIMD3<Float>(0, 0, 1)
+                )
+            ),
             duration: 0.25,
             timing: .easeOut,
             bindTarget: .transform
         )
-        
         if let animationResource = try? AnimationResource.generate(with: turretRotation) {
             turretEntity.playAnimation(animationResource)
         }
@@ -117,28 +124,32 @@ extension M1AbramsTank {
     
     func fire() async {
         guard let mainGunEntity = mainGunEntity else { return }
-        
         let shell = await Shell.createShell()
-        
         // Position shell at gun muzzle
-        shell.entity.transform.translation = mainGunEntity.convert(position: SIMD3<Float>(1.0, 0, 0), to: tankEntity)
-        
+        shell.entity.transform.translation = mainGunEntity.convert(
+            position: SIMD3<Float>(1.0, 0, 0),
+            to: tankEntity
+        )
         // Add shell to parent
         if let parent = tankEntity.parent {
             parent.addChild(shell.entity)
         }
-        
         // Calculate firing direction based on gun orientation
-        let gunWorldTransform = mainGunEntity.convert(transform: Transform.identity, to: tankEntity)
-        let firingDirection = normalize(gunWorldTransform.rotation.act(SIMD3<Float>(1, 0, 0)))
-        
+        let gunWorldTransform = mainGunEntity.convert(
+            transform: Transform.identity,
+            to: tankEntity
+        )
+        let firingDirection = normalize(
+            gunWorldTransform.rotation.act(
+                SIMD3<Float>(1, 0, 0)
+            )
+        )
         launchProjectile(entity: shell.entity, direction: firingDirection)
     }
     
     private func launchProjectile(entity: Entity, direction: SIMD3<Float>) {
         // Animate shell movement
         let targetPosition = entity.transform.translation + direction * 100
-        
         let projectileAnimation = FromToByAnimation<Transform>(
             name: "shellFlight",
             from: Transform(translation: entity.transform.translation),
@@ -147,10 +158,8 @@ extension M1AbramsTank {
             timing: .linear,
             bindTarget: .transform
         )
-        
         if let animationResource = try? AnimationResource.generate(with: projectileAnimation) {
             entity.playAnimation(animationResource)
-            
             // Remove shell after flight
             DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
                 entity.removeFromParent()
@@ -163,12 +172,13 @@ extension M1AbramsTank {
         let moveAnimation = FromToByAnimation<Transform>(
             name: "tankMovement",
             from: Transform(translation: tankEntity.transform.translation),
-            to: Transform(translation: tankEntity.transform.translation + SIMD3<Float>(0, moveDistance, 0)),
+            to: Transform(
+                translation: tankEntity.transform.translation + SIMD3<Float>(0, moveDistance, 0)
+            ),
             duration: 0.25,
             timing: .easeOut,
             bindTarget: .transform
         )
-        
         if let animationResource = try? AnimationResource.generate(with: moveAnimation) {
             tankEntity.playAnimation(animationResource)
         }
@@ -191,7 +201,6 @@ extension M1AbramsTank {
     func decideToEngage(against opponent: M1AbramsTank) async {
         let distance = distanceToTarget(opponent)
         let angleToOpponent = angleToTarget(opponent)
-        
         if abs(angleToOpponent) <= forwardAngleThreshold {
             print("RealityKit M1 Abrams Tank: Opponent is in front.")
             if distance <= firingRange && hasLineOfSight(to: opponent) {

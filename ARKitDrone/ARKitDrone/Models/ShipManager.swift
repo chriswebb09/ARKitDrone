@@ -9,11 +9,6 @@
 import RealityKit
 import ARKit
 
-enum ModelLoadError: Error {
-    case fileNotFound(String)
-    case loadingFailed(String)
-}
-
 @MainActor
 class ShipManager {
     
@@ -45,7 +40,6 @@ class ShipManager {
         do {
             // Use AsyncModelLoader
             let f35Entity = try await AsyncModelLoader.shared.loadModel(named: "F-35B_Lightning_II")
-            
             // Create ships in parallel
             await withTaskGroup(of: Ship?.self) { group in
                 for i in 1...3 {
@@ -71,7 +65,6 @@ class ShipManager {
                         return ship
                     }
                 }
-                
                 // Collect results
                 for await ship in group {
                     if let ship = ship {
@@ -80,7 +73,6 @@ class ShipManager {
                     }
                 }
             }
-            
             // Setup first target
             if !ships.isEmpty {
                 let square = TargetNode()
@@ -90,9 +82,7 @@ class ShipManager {
                 }
                 ships[0].targetAdded = true
             }
-            
             self.shipsSetup = true
-            
             // Sync to GameSceneView
             if let gameRealityView = self.arView as? GameSceneView {
                 gameRealityView.ships = self.ships
@@ -125,11 +115,16 @@ class ShipManager {
     
     func addExplosion(contactPoint: SIMD3<Float>) {
         // Create simple explosion effect
-        let sphere = ModelEntity(mesh: .generateSphere(radius: 0.02), materials: [SimpleMaterial(color: .orange, isMetallic: false)])
+        let sphere = ModelEntity(
+            mesh: .generateSphere(radius: 0.02),
+            materials: [SimpleMaterial(
+                color: .orange,
+                isMetallic: false
+            )]
+        )
         let explosionAnchor = AnchorEntity(world: contactPoint)
         explosionAnchor.addChild(sphere)
         arView.scene.addAnchor(explosionAnchor)
-        
         // Auto-remove after short delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
             explosionAnchor.removeFromParent()
@@ -152,12 +147,6 @@ class ShipManager {
             perceivedCenter = perceivedCenter + otherShip.entity.transform.translation
             perceivedVelocity = perceivedVelocity + otherShip.velocity
         }
-        
-        //        // Get helicopter position for orbiting behavior
-        //        let helicopterPos = helicopterEntity?.transform.translation ?? SIMD3<Float>(0, 0, 0)
-        //        let cameraTransform = arView.session.currentFrame?.camera.transform ?? matrix_identity_float4x4
-        //        let cameraPos = SIMD3<Float>(cameraTransform.columns.3.x, cameraTransform.columns.3.y, cameraTransform.columns.3.z)
-        //
         // Update all ships
         ships.forEach { ship in
             ship.updateShipPosition(
@@ -169,104 +158,30 @@ class ShipManager {
         }
         
         if placed {
-            _ = Timer.scheduledTimer(withTimeInterval: 0.9, repeats: false) { [weak self] timer in
+            _ = Timer.scheduledTimer(
+                withTimeInterval: 0.9,
+                repeats: false
+            ) { [weak self] timer in
                 guard let self = self else { return }
                 Task { @MainActor in
                     self.attack = true
                 }
                 timer.invalidate()
             }
-            
             for ship in ships {
                 if attack {
                     if let helicopterEntity = helicopterEntity {
                         ship.attack(target: helicopterEntity)
                     }
-                    _ = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { [weak self] timer in
+                    _ = Timer.scheduledTimer(
+                        withTimeInterval: 0.5,
+                        repeats: false
+                    ) { [weak self] timer in
                         guard let self = self else { return }
                         Task { @MainActor in
                             self.attack = false
                         }
                         timer.invalidate()
-                    }
-                }
-            }
-        }
-    }
-}
-
-@MainActor
-class AsyncModelLoader {
-    static let shared = AsyncModelLoader()
-    private var loadingCache: [String: Task<Entity, Error>] = [:]
-    
-    private init() {} // Singleton
-    
-    func loadModel(named: String, withExtension ext: String = "usdz") async throws -> Entity {
-        let fullName = "\(named).\(ext)"
-        
-        // Check if already loading
-        if let existingTask = loadingCache[fullName] {
-            return try await existingTask.value
-        }
-        
-        // Create new loading task
-        let task = Task<Entity, Error> {
-            guard let url = Bundle.main.url(forResource: named, withExtension: ext) else {
-                throw ModelLoadError.fileNotFound(fullName)
-            }
-            
-            // Use async Entity initializer (NOT Entity.load)
-            return try await Entity(contentsOf: url)
-        }
-        
-        loadingCache[fullName] = task
-        
-        do {
-            let entity = try await task.value
-            loadingCache.removeValue(forKey: fullName)
-            return entity
-        } catch {
-            loadingCache.removeValue(forKey: fullName)
-            throw error
-        }
-    }
-    
-    // Alternative method using Entity(named:) async for Reality files
-    func loadRealityModel(named: String) async throws -> Entity {
-        let fullName = "\(named).reality"
-        
-        if let existingTask = loadingCache[fullName] {
-            return try await existingTask.value
-        }
-        
-        let task = Task<Entity, Error> {
-            // Use async Entity(named:) for Reality files
-            return try await Entity(named: named)
-        }
-        
-        loadingCache[fullName] = task
-        
-        do {
-            let entity = try await task.value
-            loadingCache.removeValue(forKey: fullName)
-            return entity
-        } catch {
-            loadingCache.removeValue(forKey: fullName)
-            throw error
-        }
-    }
-    
-    // Preload models during app startup
-    func preloadModels(_ modelNames: [String]) async {
-        await withTaskGroup(of: Void.self) { group in
-            for modelName in modelNames {
-                group.addTask {
-                    do {
-                        _ = try await self.loadModel(named: modelName)
-                        print("✅ Preloaded: \(modelName)")
-                    } catch {
-                        print("❌ Failed to preload: \(modelName) - \(error)")
                     }
                 }
             }

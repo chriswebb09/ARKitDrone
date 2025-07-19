@@ -11,20 +11,6 @@ import RealityKit
 import ARKit
 import Combine
 
-extension Entity {
-    func findFirstModelEntity() -> ModelEntity? {
-        if let model = self as? ModelEntity {
-            return model
-        }
-        for child in children {
-            if let found = child.findFirstModelEntity() {
-                return found
-            }
-        }
-        return nil
-    }
-}
-
 @MainActor
 class ApacheHelicopter {
     static var speed: Float = 50 // Static speed property for missile tracking
@@ -74,27 +60,22 @@ class ApacheHelicopter {
             let entity = try await AsyncModelLoader.shared.loadRealityModel(named: "heli")
             let model = entity.findEntity(named: "Model")
             self.helicopter = model?.findEntity(named: "Apache")
-            
             // Apply helicopter orientation correction
             let originalRotation = simd_quatf(real: 0.7071069, imag: SIMD3<Float>(-0.70710665, 0.0, 0.0))
             let faceUserRotation = simd_quatf(angle: .pi, axis: [0, 1, 0])
             let levelNose = simd_quatf(angle: .pi / 2, axis: [1, 0, 0])
             let correctionRotation = originalRotation * faceUserRotation * levelNose
-            
             self.helicopter?.scale = SIMD3<Float>(repeating: 0.4)
             self.helicopter?.transform.rotation = correctionRotation
-            
             await self.setupHelicopterComponents()
             self.setupMissiles()
             self.adjustRotorPositions()
             self.startRotorRotation()
-            
             // Initialize target transform values
             if let helicopter = self.helicopter {
                 self.targetTranslation = helicopter.transform.translation
                 self.targetRotation = helicopter.transform.rotation
             }
-            
         } catch {
             print("❌ Failed to load helicopter: \(error)")
         }
@@ -104,7 +85,6 @@ class ApacheHelicopter {
         guard let helicopter = helicopter else {
             return
         }
-        
         // Find all helicopter components matching SceneKit version
         self.hudEntity = helicopter.findEntity(named: "hud")
         self.rotor = helicopter.findEntity(named: "FrontRotor")
@@ -114,7 +94,6 @@ class ApacheHelicopter {
         self.bodyEntity = helicopter.findEntity(named: "Body")
         self.frontIRSteering = helicopter.findEntity(named: "FrontIRSteering")
         self.upperGun = helicopter.findEntity(named: "UpperGun")
-        
         // Setup frontIR if frontIRSteering exists
         if let frontIRSteering = self.frontIRSteering {
             self.frontIR = frontIRSteering.findEntity(named: "FrontIR")
@@ -124,7 +103,6 @@ class ApacheHelicopter {
     private func debugPrintEntityHierarchy(_ entity: Entity, indent: Int) {
         let indentString = String(repeating: "  ", count: indent)
         print("\(indentString)- \(entity.name)")
-        
         for child in entity.children {
             debugPrintEntityHierarchy(child, indent: indent + 1)
         }
@@ -134,11 +112,9 @@ class ApacheHelicopter {
         // The rotors are children of the Body entity in the hierarchy
         // We should keep them in their relative positions but just adjust scale
         // Since they're children of Body, they'll move with the helicopter automatically
-        
         if let rotor = rotor {
             rotor.transform.scale = SIMD3<Float>(repeating: 0.8)
         }
-        
         if let tailRotor = tailRotor {
             tailRotor.transform.scale = SIMD3<Float>(repeating: 0.6)
         }
@@ -154,7 +130,6 @@ class ApacheHelicopter {
                     mode: .kinematic
                 ))
                 missileEntities.append(missileEntity)
-                
                 // Create Missile wrapper like SceneKit
                 let missile = Missile()
                 missile.setupEntity(entity: missileEntity, number: i)
@@ -167,10 +142,8 @@ class ApacheHelicopter {
         guard rotor != nil, tailRotor != nil else {
             return
         }
-        
         // Stop any existing timer
         rotorTimer?.invalidate()
-        
         // Create a timer to manually rotate the rotors - ensure it runs on main thread
         DispatchQueue.main.async { [weak self] in
             self?.rotorTimer = Timer.scheduledTimer(withTimeInterval: 1.0/30.0, repeats: true) { [weak self] timer in
@@ -182,35 +155,28 @@ class ApacheHelicopter {
                     self.updateRotorRotation()
                 }
             }
-            
             // Add timer to current run loop to ensure it runs
             if let timer = self?.rotorTimer {
                 RunLoop.current.add(timer, forMode: .common)
             }
         }
-        
     }
     
     @MainActor
     private func updateRotorRotation() {
         updateCounter += 1
-        
         guard let rotor = rotor, let tailRotor = tailRotor else {
             return
         }
-        
         // Increment rotation angles
         rotorAngle += 0.3 // Main rotor speed
         tailRotorAngle += 0.5 // Tail rotor speed (faster)
-        
         // Keep angles in reasonable range
         if rotorAngle > .pi * 2 { rotorAngle -= .pi * 2 }
         if tailRotorAngle > .pi * 2 { tailRotorAngle -= .pi * 2 }
-        
         // Apply rotations
         rotor.transform.rotation = simd_quatf(angle: rotorAngle, axis: [0, 1, 0]) // Y-axis
         tailRotor.transform.rotation = simd_quatf(angle: tailRotorAngle, axis: [1, 0, 0]) // X-axis
-        
     }
     
     func stopRotorRotation() {
@@ -237,7 +203,6 @@ class ApacheHelicopter {
             timing: .linear,
             bindTarget: .transform
         )
-        
         // Create repeating animation using correct RealityKit API
         let animationResource = try? AnimationResource.generate(with: anim)
         return animationResource
@@ -252,7 +217,6 @@ class ApacheHelicopter {
             forward.z
         ) * value
         targetTranslation -= movementVector
-        
         // Apply smooth interpolation
         let currentTranslation = helicopter.transform.translation
         let newTranslation = simd_mix(
@@ -260,11 +224,9 @@ class ApacheHelicopter {
             targetTranslation,
             SIMD3<Float>(repeating: smoothingFactor)
         )
-        
         var transform = helicopter.transform
         transform.translation = newTranslation
         helicopter.transform = transform
-        
         // Update target to current position for next frame
         targetTranslation = newTranslation
     }
@@ -276,7 +238,6 @@ class ApacheHelicopter {
             axis: [0, 1, 0]
         )
         targetRotation = targetRotation * rotationDelta
-        
         // Apply smooth interpolation
         let currentRotation = helicopter.transform.rotation
         let newRotation = simd_slerp(
@@ -284,11 +245,9 @@ class ApacheHelicopter {
             targetRotation,
             smoothingFactor
         )
-        
         var transform = helicopter.transform
         transform.rotation = newRotation
         helicopter.transform = transform
-        
         // Update target to current rotation for next frame
         targetRotation = newRotation
     }
@@ -296,7 +255,6 @@ class ApacheHelicopter {
     func changeAltitude(value: Float) {
         guard let helicopter = helicopter else { return }
         targetTranslation.y += value
-        
         // Apply smooth interpolation
         let currentTranslation = helicopter.transform.translation
         let newTranslation = simd_mix(
@@ -304,11 +262,9 @@ class ApacheHelicopter {
             targetTranslation,
             SIMD3<Float>(repeating: smoothingFactor)
         )
-        
         var transform = helicopter.transform
         transform.translation = newTranslation
         helicopter.transform = transform
-        
         // Update target to current position for next frame
         targetTranslation = newTranslation
     }
@@ -322,7 +278,6 @@ class ApacheHelicopter {
             right.z
         ) * value
         targetTranslation += movementVector
-        
         // Apply smooth interpolation
         let currentTranslation = helicopter.transform.translation
         let newTranslation = simd_mix(
@@ -330,11 +285,9 @@ class ApacheHelicopter {
             targetTranslation,
             SIMD3<Float>(repeating: smoothingFactor)
         )
-        
         var transform = helicopter.transform
         transform.translation = newTranslation
         helicopter.transform = transform
-        
         // Update target to current position for next frame
         targetTranslation = newTranslation
     }
@@ -359,7 +312,6 @@ class ApacheHelicopter {
         guard let hud = hudEntity else {
             return
         }
-        
         // Position and scale HUD
         if let helicopter = helicopter {
             hud.transform.translation = helicopter.transform.translation
@@ -371,16 +323,13 @@ class ApacheHelicopter {
                 forward.z
             ) * 0.44
         }
-        
     }
     
     func updateHUD() {
         guard let hud = hudEntity, let helicopter = helicopter else { return }
-        
         // Update HUD position and orientation to match helicopter
         hud.transform.rotation = helicopter.transform.rotation
         hud.transform.translation = helicopter.transform.translation
-        
         // Maintain forward offset
         let forward = helicopter.transform.matrix.columns.2
         hud.transform.translation -= SIMD3<Float>(
@@ -390,9 +339,7 @@ class ApacheHelicopter {
         ) * 0.44
     }
     
-    // MARK: - RealityKitMissile System
-    
-    //    var missilesArmed: Bool = false
+    // MARK: - Missile System
     
     func toggleArmMissile() {
         missilesArmed = !missilesArmed
@@ -404,10 +351,8 @@ class ApacheHelicopter {
     
     func lockOn(target: Entity) {
         guard let helicopter = helicopter, let hud = hudEntity else { return }
-        
         let targetPosition = target.transform.translation
         let helicopterPosition = helicopter.transform.translation
-        
         // Point HUD at target
         hud.transform.translation = helicopterPosition
         hud.look(
@@ -415,7 +360,6 @@ class ApacheHelicopter {
             from: helicopterPosition,
             relativeTo: nil
         )
-        
         // Calculate distance and adjust HUD position
         let distance = simd_distance(
             helicopterPosition,
@@ -427,7 +371,6 @@ class ApacheHelicopter {
             forward.y,
             forward.z
         ) * distance
-        
     }
     
     // MARK: - Weapon Systems
@@ -436,10 +379,8 @@ class ApacheHelicopter {
         guard let helicopter = helicopter else {
             return nil
         }
-        
         // Create bullet entity
         let bullet = Entity()
-        
         // Create sphere mesh for bullet
         let geometry = MeshResource.generateSphere(radius: 0.002)
         var material = UnlitMaterial()
@@ -450,10 +391,8 @@ class ApacheHelicopter {
                 materials: [material]
             )
         )
-        
         // Position bullet at helicopter's gun position
         let helicopterTransform = helicopter.transform
-        
         // Use actual upperGun position if available, otherwise use default offset
         if let upperGun = upperGun {
             bullet.transform.translation = upperGun.transform.translation
@@ -468,7 +407,6 @@ class ApacheHelicopter {
             bullet.transform.translation = helicopterTransform.translation + gunOffset
             bullet.transform.rotation = helicopterTransform.rotation
         }
-        
         // Add physics for movement
         let physicsComponent = PhysicsBodyComponent(
             massProperties: PhysicsMassProperties(mass: 0.01),
@@ -476,20 +414,16 @@ class ApacheHelicopter {
             mode: .dynamic
         )
         bullet.components.set(physicsComponent)
-        
         // Add collision detection
         let collisionComponent = CollisionComponent(
             shapes: [ShapeResource.generateSphere(radius: 0.002)]
         )
         bullet.components.set(collisionComponent)
-        
         // Note: Bullet physics handled by dynamic body component
-        
         // Auto-remove bullet after 5 seconds
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             bullet.removeFromParent()
         }
-        
         return bullet
     }
 }

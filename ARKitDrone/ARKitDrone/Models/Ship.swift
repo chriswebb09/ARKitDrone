@@ -48,7 +48,6 @@ class Ship: @unchecked Sendable {
             mode: .kinematic
         )
         entity.components.set(physicsComponent)
-        
         let collisionComponent = CollisionComponent(
             shapes: [ShapeResource.generateBox(size: SIMD3<Float>(1, 1, 1))]
         )
@@ -71,16 +70,13 @@ class Ship: @unchecked Sendable {
         var rebound = SIMD3<Float>(0, 0, 0)
         let minBounds = SIMD3<Float>(-30, -30, -100)
         let maxBounds = SIMD3<Float>(50, 50, 50)
-        
         let pos = ship.entity.transform.translation
-        
         if pos.x < minBounds.x { rebound.x = 1 }
         if pos.x > maxBounds.x { rebound.x = -1 }
         if pos.y < minBounds.y { rebound.y = 1 }
         if pos.y > maxBounds.y { rebound.y = -1 }
         if pos.z < minBounds.z { rebound.z = 1 }
         if pos.z > maxBounds.z { rebound.z = -1 }
-        
         return rebound
     }
     
@@ -106,7 +102,10 @@ class Ship: @unchecked Sendable {
         var forceAway = SIMD3<Float>(0, 0, 0)
         for otherShip in ships {
             if ship.entity != otherShip.entity {
-                let distance = simd_distance(otherShip.entity.transform.translation, ship.entity.transform.translation)
+                let distance = simd_distance(
+                    otherShip.entity.transform.translation,
+                    ship.entity.transform.translation
+                )
                 if distance < 40 {
                     forceAway = forceAway - (otherShip.entity.transform.translation - ship.entity.transform.translation)
                 }
@@ -129,16 +128,13 @@ class Ship: @unchecked Sendable {
         
         velocity = velocity + v1 + v2 + v3 + v4
         limitVelocity(self)
-        
         // Update position
         entity.transform.translation = entity.transform.translation + velocity
-        
         // Update rotation to face movement direction
         if simd_length(velocity) > 0.001 {
             let direction = simd_normalize(velocity)
             entity.look(at: entity.transform.translation + direction, from: entity.transform.translation, relativeTo: nil)
         }
-        
         // Update target square if present
         if targetAdded, let square = square {
             square.transform.translation = SIMD3<Float>(
@@ -153,7 +149,6 @@ class Ship: @unchecked Sendable {
     func updateShipPosition(target: SIMD3<Float>, otherShips: [Ship]) {
         let entities = otherShips.map { $0.entity }
         let perceivedCenter: SIMD3<Float>
-        
         if otherShips.isEmpty {
             perceivedCenter = entity.transform.translation
         } else {
@@ -162,9 +157,7 @@ class Ship: @unchecked Sendable {
             }
             perceivedCenter = sumPositions / Float(otherShips.count)
         }
-        
         let directionToTarget = simd_normalize(target - entity.transform.translation)
-        
         let avoidCollisions = entities.reduce(SIMD3<Float>(0, 0, 0)) { (force, shipEntity) in
             let distance = simd_distance(entity.transform.translation, shipEntity.transform.translation)
             if distance < 14 {
@@ -172,25 +165,20 @@ class Ship: @unchecked Sendable {
             }
             return force
         }
-        
         let currentPos = entity.transform.translation
         let boundary = SIMD3<Float>(
             x: max(-10, min(10, currentPos.x)),
             y: max(-10, min(10, currentPos.y)),
             z: max(-10, min(10, currentPos.z))
         ) - currentPos
-        
         let cohesion = (perceivedCenter - entity.transform.translation) * 0.1
         let separation = avoidCollisions * 0.1
         let alignment = directionToTarget * 0.2
         let newVelocity = cohesion + separation + alignment + boundary
-        
         let speedLimit: Float = 0.4
         let speed = simd_length(newVelocity)
         velocity = (speed > speedLimit) ? simd_normalize(newVelocity) * speedLimit : newVelocity
-        
         entity.transform.translation += velocity
-        
         // Update target square
         if targetAdded, let square = square {
             square.transform.translation = entity.transform.translation
@@ -204,10 +192,8 @@ extension Ship {
     func attack(target: Entity) {
         let distanceToTarget = simd_distance(entity.transform.translation, target.transform.translation)
         let attackRange: Float = 50.0
-        
         // Look at target
         entity.look(at: target.transform.translation, from: entity.transform.translation, relativeTo: nil)
-        
         if distanceToTarget <= attackRange {
             if !isDestroyed {
                 if !fired {
@@ -248,14 +234,11 @@ extension Ship {
     private func createMissile() -> Entity {
         let missile = Entity()
         missile.name = "Missile"
-        
         // Create missile geometry
         let geometry = MeshResource.generateCylinder(height: 0.4, radius: 0.06)
         var material = UnlitMaterial()
         material.color = .init(tint: .red)
-        
         missile.components.set(ModelComponent(mesh: geometry, materials: [material]))
-        
         // Add physics
         let physicsComponent = PhysicsBodyComponent(
             massProperties: PhysicsMassProperties(mass: 0.1),
@@ -263,7 +246,6 @@ extension Ship {
             mode: .dynamic
         )
         missile.components.set(physicsComponent)
-        
         let collisionComponent = CollisionComponent(
             shapes: [ShapeResource.generateCapsule(height: 0.4, radius: 0.06)]
         )
