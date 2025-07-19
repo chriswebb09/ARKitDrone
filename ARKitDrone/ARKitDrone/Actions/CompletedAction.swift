@@ -13,6 +13,7 @@ struct CompletedAction {
 }
 
 extension CompletedAction: BitStreamCodable {
+    
     func encode(to bitStream: inout WritableBitStream) throws {
         position.encode(to: &bitStream)
     }

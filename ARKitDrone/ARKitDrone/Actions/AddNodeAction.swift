@@ -15,6 +15,7 @@ struct AddNodeAction {
 }
 
 extension AddNodeAction: BitStreamCodable {
+    
     init(from bitStream: inout ReadableBitStream) throws {
         simdWorldTransform = try float4x4(from: &bitStream)
         eulerAngles = try SIMD3<Float>(from: &bitStream)

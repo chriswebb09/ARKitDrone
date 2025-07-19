@@ -13,8 +13,17 @@ extension SCNGeometryElement {
     convenience init(_ source: ARGeometryElement) {
         let pointer = source.buffer.contents()
         let byteCount = source.count * source.indexCountPerPrimitive * source.bytesPerIndex
-        let data = Data(bytesNoCopy: pointer, count: byteCount, deallocator: .none)
-        self.init(data: data, primitiveType: .of(source.primitiveType), primitiveCount: source.count, bytesPerIndex: source.bytesPerIndex)
+        let data = Data(
+            bytesNoCopy: pointer,
+            count: byteCount,
+            deallocator: .none
+        )
+        self.init(
+            data: data,
+            primitiveType: .of(source.primitiveType),
+            primitiveCount: source.count,
+            bytesPerIndex: source.bytesPerIndex
+        )
     }
 }
 
@@ -74,7 +83,14 @@ extension ARMeshGeometry {
 
 extension SCNGeometrySource {
     convenience init(_ source: ARGeometrySource, semantic: Semantic) {
-        self.init(buffer: source.buffer, vertexFormat: source.format, semantic: semantic, vertexCount: source.count, dataOffset: source.offset, dataStride: source.stride)
+        self.init(
+            buffer: source.buffer,
+            vertexFormat: source.format,
+            semantic: semantic,
+            vertexCount: source.count,
+            dataOffset: source.offset,
+            dataStride: source.stride
+        )
     }
 }
 
@@ -121,7 +137,6 @@ extension SCNGeometry {
         let texcoords = vertices.map { vertex -> CGPoint in
             return CGPoint(x: CGFloat((vertex.x - bounds.0.x) / size.x), y: CGFloat((vertex.z - bounds.0.z) / size.z))
         }
-        
         let verticesSource = SCNGeometrySource(vertices: vertices)
         let normalsSource = SCNGeometrySource(normals: normals)
         let faces = SCNGeometryElement(indices: usedIndicies, primitiveType: .triangles)
@@ -149,7 +164,6 @@ extension SCNGeometry {
         return forest
     }
 }
-
 
 extension SCNGeometry {
     

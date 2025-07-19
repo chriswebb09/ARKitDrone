@@ -24,7 +24,6 @@ extension GameViewController: ARCoachingOverlayViewDelegate {
         coachingOverlay.delegate = self
         coachingOverlay.translatesAutoresizingMaskIntoConstraints = false
         realityKitView.addSubview(coachingOverlay)
-        
         NSLayoutConstraint.activate([
             coachingOverlay.centerXAnchor.constraint(equalTo: realityKitView.centerXAnchor),
             coachingOverlay.centerYAnchor.constraint(equalTo: realityKitView.centerYAnchor),
@@ -43,6 +42,7 @@ extension GameViewController: ARCoachingOverlayViewDelegate {
     func setGoal() {
         coachingOverlay.goal = .horizontalPlane
     }
+    
     func updateFocusSquare(isObjectVisible: Bool) {
         // If game is placed, always hide and don't update
         if game.placed {
@@ -50,9 +50,7 @@ extension GameViewController: ARCoachingOverlayViewDelegate {
             print("🎯 Focus square hidden - game is placed")
             return
         }
-        
         print("🎯 Focus square update - game.placed: \(game.placed), isObjectVisible: \(isObjectVisible)")
-        
         if isObjectVisible || coachingOverlay.isActive {
             focusSquare.hide()
             return
@@ -73,10 +71,8 @@ extension GameViewController: ARCoachingOverlayViewDelegate {
         let result = realityKitView.session.raycast(query).first else {
             return
         }
-
         guard let anchor = focusSquareAnchor else { return }
         anchor.transform = Transform(matrix: result.worldTransform)
-
         let lightweightResult = LightweightRaycastResult(
             worldTransform: result.worldTransform,
             anchor: result.anchor

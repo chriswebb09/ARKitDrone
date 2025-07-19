@@ -17,6 +17,7 @@ struct GameCommand: Sendable {
 }
 
 extension SIMD3<Float>: BitStreamCodable {
+    
     init(from bitStream: inout ReadableBitStream) throws {
         let x = try bitStream.readFloat()
         let y = try bitStream.readFloat()
@@ -32,6 +33,7 @@ extension SIMD3<Float>: BitStreamCodable {
 }
 
 extension SIMD4<Float>: BitStreamCodable {
+    
     init(from bitStream: inout ReadableBitStream) throws {
         let x = try bitStream.readFloat()
         let y = try bitStream.readFloat()
@@ -49,6 +51,7 @@ extension SIMD4<Float>: BitStreamCodable {
 }
 
 extension float4x4: BitStreamCodable {
+    
     init(from bitStream: inout ReadableBitStream) throws {
         self.init()
         self.columns.0 = try SIMD4<Float>(from: &bitStream)

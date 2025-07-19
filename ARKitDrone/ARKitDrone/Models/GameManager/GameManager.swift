@@ -35,17 +35,7 @@ class GameManager: NSObject, @unchecked Sendable {
     
     let isNetworked: Bool
     let isServer: Bool
-//    
-//    init(sceneView: SCNView, session: NetworkSession?) {
-//        //self.scene = sceneView.scene
-//        self.scene = 
-//        self.session = session
-//        self.isNetworked = session != nil
-//        self.isServer = session?.isServer ?? true // Solo game act like a server
-//        super.init()
-//        self.session?.delegate = self
-//    }
-//    
+    
     init(arView: ARView, session: NetworkSession?) {
         self.scene = arView.scene
         self.session = session
@@ -60,7 +50,12 @@ class GameManager: NSObject, @unchecked Sendable {
         defer {
             commandsLock.unlock()
         }
-        gameCommands.append(GameCommand(player: currentPlayer, action: .gameAction(gameAction)))
+        gameCommands.append(
+            GameCommand(
+                player: currentPlayer,
+                action: .gameAction(gameAction)
+            )
+        )
     }
     
     @MainActor
@@ -104,23 +99,34 @@ class GameManager: NSObject, @unchecked Sendable {
     weak var delegate: GameManagerDelegate?
     
     func send(gameAction: GameAction) {
-        session?.send(action: .gameAction(gameAction))
+        session?.send(
+            action: .gameAction(gameAction)
+        )
     }
     
     func send(completed: CompletedAction) {
-        session?.send(action: .completed(completed))
+        session?.send(
+            action: .completed(completed)
+        )
     }
     
     func send(addNode: AddNodeAction) {
-        session?.send(action: .addNode(addNode))
+        session?.send(
+            action: .addNode(addNode)
+        )
     }
     
     func send(boardAction: BoardSetupAction) {
-        session?.send(action: .boardSetup(boardAction))
+        session?.send(
+            action: .boardSetup(boardAction)
+        )
     }
     
     func send(boardAction: BoardSetupAction, to player: Player) {
-        session?.send(action: .boardSetup(boardAction), to: player)
+        session?.send(
+            action: .boardSetup(boardAction),
+            to: player
+        )
     }
     
     // MARK: - inbound from network
@@ -159,9 +165,9 @@ class GameManager: NSObject, @unchecked Sendable {
                 }
             }
             
-//            if case let .movement(movementSyncData) = gameAction {
-//                self.delegate?.manager(self, received: movementSyncData, from: player)
-//            }
+            //            if case let .movement(movementSyncData) = gameAction {
+            //                self.delegate?.manager(self, received: movementSyncData, from: player)
+            //            }
         case .boardSetup(let boardAction):
             os_log(
                 .info,
@@ -195,7 +201,7 @@ class GameManager: NSObject, @unchecked Sendable {
     /// - Tag: GameManager-update
     func update(timeDelta: TimeInterval) {
         processCommandQueue()
-//       / syncMovement()
+        //       / syncMovement()
     }
     
     private func processCommandQueue() {
@@ -214,7 +220,6 @@ class GameManager: NSObject, @unchecked Sendable {
                 return gameCommands.removeFirst()
             }
         }
-        
         while let command = nextCommand() {
             process(command: command)
         }
@@ -242,7 +247,6 @@ extension GameManager: NetworkSessionDelegate {
             // Create new instances with safe data inside the main actor context
             let safePlayer = Player(username: playerUsername)
             let newCommand = GameCommand(player: safePlayer, action: actionCopy)
-            
             if case .gameAction(.joyStickMoved) = actionCopy {
                 self.commandsLock.withLock {
                     self.gameCommands.append(newCommand)
@@ -251,15 +255,6 @@ extension GameManager: NetworkSessionDelegate {
                 self.process(command: newCommand)
             }
         }
-//        Task { @MainActor in
-//            if case .gameAction(.joyStickMoved) = action {
-//                self.commandsLock.lock()
-//                self.gameCommands.append(newCommand)
-//                self.commandsLock.unlock()
-//            } else {
-//                self.process(command: newCommand)
-//            }
-//        }
     }
     
     nonisolated func networkSession(_ session: NetworkSession, joining player: Player) {
@@ -275,17 +270,16 @@ extension GameManager: NetworkSessionDelegate {
     }
     
     nonisolated func networkSession(_ session: NetworkSession, leaving player: Player) {
-           let isHost = player == session.host
-           let safePlayer = Player(username: player.username) // Safe copy
-           Task { @MainActor in
-               if isHost {
-                   self.delegate?.manager(self, leavingHost: safePlayer)
-               } else {
-                   self.delegate?.manager(self, leavingPlayer: safePlayer)
-               }
-           }
-       }
-    
+        let isHost = player == session.host
+        let safePlayer = Player(username: player.username) // Safe copy
+        Task { @MainActor in
+            if isHost {
+                self.delegate?.manager(self, leavingHost: safePlayer)
+            } else {
+                self.delegate?.manager(self, leavingPlayer: safePlayer)
+            }
+        }
+    }
 }
 
 
@@ -295,7 +289,6 @@ extension GameManager: MovementSyncSceneDataDelegate {
             self.delegate?.manager(self, hasNetworkDelay: hasNetworkDelay)
         }
     }
-    
 }
 
 extension NSLock {

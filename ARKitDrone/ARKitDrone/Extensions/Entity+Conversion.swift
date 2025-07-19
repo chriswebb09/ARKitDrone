@@ -40,9 +40,16 @@ extension Entity {
         let mesh = MeshResource.generateBox(size: size)
         let material = SimpleMaterial.create(color: color)
         if withPhysics {
-            return Entity.createWithPhysics(mesh: mesh, materials: [material], physicsMode: physicsMode)
+            return Entity.createWithPhysics(
+                mesh: mesh,
+                materials: [material],
+                physicsMode: physicsMode
+            )
         } else {
-            return Entity.createWithMesh(mesh, materials: [material])
+            return Entity.createWithMesh(
+                mesh,
+                materials: [material]
+            )
         }
     }
     
@@ -52,9 +59,16 @@ extension Entity {
         let mesh = MeshResource.generateSphere(radius: radius)
         let material = SimpleMaterial.create(color: color)
         if withPhysics {
-            return Entity.createWithPhysics(mesh: mesh, materials: [material], physicsMode: physicsMode)
+            return Entity.createWithPhysics(
+                mesh: mesh,
+                materials: [material],
+                physicsMode: physicsMode
+            )
         } else {
-            return Entity.createWithMesh(mesh, materials: [material])
+            return Entity.createWithMesh(
+                mesh,
+                materials: [material]
+            )
         }
     }
     
@@ -67,21 +81,38 @@ extension Entity {
         let mesh = MeshResource.generateBox(size: size)
         let material = SimpleMaterial.create(color: color)
         if withPhysics {
-            return Entity.createWithPhysics(mesh: mesh, materials: [material], physicsMode: physicsMode)
+            return Entity.createWithPhysics(
+                mesh: mesh,
+                materials: [material],
+                physicsMode: physicsMode
+            )
         } else {
-            return Entity.createWithMesh(mesh, materials: [material])
+            return Entity.createWithMesh(
+                mesh,
+                materials: [material]
+            )
         }
     }
     
     /// Create a simple plane entity
     @MainActor
     static func createPlane(width: Float, height: Float, color: UIColor = .white, withPhysics: Bool = false, physicsMode: PhysicsBodyMode = .static) -> Entity {
-        let mesh = MeshResource.generatePlane(width: width, height: height)
+        let mesh = MeshResource.generatePlane(
+            width: width,
+            height: height
+        )
         let material = SimpleMaterial.create(color: color)
         if withPhysics {
-            return Entity.createWithPhysics(mesh: mesh, materials: [material], physicsMode: physicsMode)
+            return Entity.createWithPhysics(
+                mesh: mesh,
+                materials: [material],
+                physicsMode: physicsMode
+            )
         } else {
-            return Entity.createWithMesh(mesh, materials: [material])
+            return Entity.createWithMesh(
+                mesh,
+                materials: [material]
+            )
         }
     }
     
@@ -124,7 +155,10 @@ extension ModelComponent {
     static func box(size: SIMD3<Float>, color: UIColor = .white) -> ModelComponent {
         let mesh = MeshResource.generateBox(size: size)
         let material = SimpleMaterial.create(color: color)
-        return ModelComponent(mesh: mesh, materials: [material])
+        return ModelComponent(
+            mesh: mesh,
+            materials: [material]
+        )
     }
     
     /// Create simple sphere model
@@ -132,7 +166,10 @@ extension ModelComponent {
     static func sphere(radius: Float, color: UIColor = .white) -> ModelComponent {
         let mesh = MeshResource.generateSphere(radius: radius)
         let material = SimpleMaterial.create(color: color)
-        return ModelComponent(mesh: mesh, materials: [material])
+        return ModelComponent(
+            mesh: mesh,
+            materials: [material]
+        )
     }
     
     /// Create simple cylinder model (using box as approximation)
@@ -143,27 +180,42 @@ extension ModelComponent {
         let size = SIMD3<Float>(radius * 2, height, radius * 2)
         let mesh = MeshResource.generateBox(size: size)
         let material = SimpleMaterial.create(color: color)
-        return ModelComponent(mesh: mesh, materials: [material])
+        return ModelComponent(
+            mesh: mesh,
+            materials: [material]
+        )
     }
     
     /// Create simple plane model
     @MainActor
     static func plane(width: Float, height: Float, color: UIColor = .white) -> ModelComponent {
-        let mesh = MeshResource.generatePlane(width: width, height: height)
+        let mesh = MeshResource.generatePlane(
+            width: width,
+            height: height
+        )
         let material = SimpleMaterial.create(color: color)
-        return ModelComponent(mesh: mesh, materials: [material])
+        return ModelComponent(
+            mesh: mesh,
+            materials: [material]
+        )
     }
     
     /// Create model from mesh and single color
     @MainActor
     static func create(mesh: MeshResource, color: UIColor) -> ModelComponent {
         let material = SimpleMaterial.create(color: color)
-        return ModelComponent(mesh: mesh, materials: [material])
+        return ModelComponent(
+            mesh: mesh,
+            materials: [material]
+        )
     }
     
     /// Create model from mesh and materials
     static func create(mesh: MeshResource, materials: [Material]) -> ModelComponent {
-        return ModelComponent(mesh: mesh, materials: materials)
+        return ModelComponent(
+            mesh: mesh,
+            materials: materials
+        )
     }
 }
 
@@ -304,7 +356,11 @@ extension Entity {
     
     func getTargetVector(target: Entity) -> (SIMD3<Float>, SIMD3<Float>) {
         let mat = target.transform.matrix
-        let dir = SIMD3<Float>(-mat.columns.2.x, -mat.columns.2.y, -mat.columns.2.z)
+        let dir = SIMD3<Float>(
+            -mat.columns.2.x,
+             -mat.columns.2.y,
+             -mat.columns.2.z
+        )
         let pos = target.transform.translation
         return (dir, pos)
     }
@@ -344,15 +400,30 @@ extension Entity {
             // Convert euler angles to quaternion for RealityKit
             let newEuler = (nodeData.eulerAngles + currentRot) * 0.5
             self.transform.rotation = simd_quatf(angle: newEuler.y, axis: SIMD3(0, 1, 0)) *
-            simd_quatf(angle: newEuler.x, axis: SIMD3(1, 0, 0)) *
-            simd_quatf(angle: newEuler.z, axis: SIMD3(0, 0, 1))
+            simd_quatf(
+                angle: newEuler.x,
+                axis: SIMD3(1, 0, 0)
+            ) *
+            simd_quatf(
+                angle: newEuler.z,
+                axis: SIMD3(0, 0, 1)
+            )
         } else {
             // Direct positioning using SIMD types
             self.transform.translation = nodeData.position
             // Convert euler angles to quaternion for RealityKit
-            self.transform.rotation = simd_quatf(angle: nodeData.eulerAngles.y, axis: SIMD3(0, 1, 0)) *
-            simd_quatf(angle: nodeData.eulerAngles.x, axis: SIMD3(1, 0, 0)) *
-            simd_quatf(angle: nodeData.eulerAngles.z, axis: SIMD3(0, 0, 1))
+            self.transform.rotation = simd_quatf(
+                angle: nodeData.eulerAngles.y,
+                axis: SIMD3(0, 1, 0)
+            ) *
+            simd_quatf(
+                angle: nodeData.eulerAngles.x,
+                axis: SIMD3(1, 0, 0)
+            ) *
+            simd_quatf(
+                angle: nodeData.eulerAngles.z,
+                axis: SIMD3(0, 0, 1)
+            )
         }
     }
 }

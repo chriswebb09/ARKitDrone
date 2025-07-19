@@ -32,7 +32,6 @@ extension Data {
     private func compress(into dest: inout Data) -> Int {
         let destSize = dest.count
         let srcSize = count
-        
         let resultSize = withUnsafeBytes { source in
             return dest.withUnsafeMutableBytes { (destPointer: UnsafeMutableRawBufferPointer) in
                 // Safely unwrap the baseAddress of both source and dest
@@ -40,8 +39,14 @@ extension Data {
                       let destBaseAddress = destPointer.baseAddress else {
                     return 0 // Handle the error appropriately, e.g., return 0 or throw
                 }
-                
-                return compression_encode_buffer(destBaseAddress, destSize, sourceBaseAddress, srcSize, nil, COMPRESSION_LZFSE)
+                return compression_encode_buffer(
+                    destBaseAddress,
+                    destSize,
+                    sourceBaseAddress,
+                    srcSize,
+                    nil,
+                    COMPRESSION_LZFSE
+                )
             }
         }
         return resultSize
@@ -63,10 +68,8 @@ extension Data {
     }
     
     private func decompress(into dest: inout Data) -> Int {
-        
         let destSize = dest.count
         let srcSize = count
-        
         let result = withUnsafeBytes { source in
             return dest.withUnsafeMutableBytes { (destPointer: UnsafeMutableRawBufferPointer) -> Int in
                 // Safely unwrap the baseAddress of both source and dest
@@ -74,11 +77,16 @@ extension Data {
                       let destBaseAddress = destPointer.baseAddress else {
                     return 0 // Handle the error appropriately, e.g., return 0 or throw
                 }
-                
-                return compression_decode_buffer(destBaseAddress, destSize, sourceBaseAddress, srcSize, nil, COMPRESSION_LZFSE)
+                return compression_decode_buffer(
+                    destBaseAddress,
+                    destSize,
+                    sourceBaseAddress,
+                    srcSize,
+                    nil,
+                    COMPRESSION_LZFSE
+                )
             }
         }
-        
         return result
     }
 }

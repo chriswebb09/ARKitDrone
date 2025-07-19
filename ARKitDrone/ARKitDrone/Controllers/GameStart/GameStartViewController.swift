@@ -78,7 +78,6 @@ class GameStartViewController: UIViewController {
             hostButton.heightAnchor.constraint(equalToConstant: 50)
         ])
         hostButton.addTarget(self, action: #selector(hostButtonPressed), for: .touchUpInside)
-        
         joinButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             joinButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -87,7 +86,6 @@ class GameStartViewController: UIViewController {
             joinButton.heightAnchor.constraint(equalToConstant: 50)
         ])
         joinButton.addTarget(self, action: #selector(joinButtonPressed), for: .touchUpInside)
-        
         soloButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             soloButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -97,7 +95,6 @@ class GameStartViewController: UIViewController {
         ])
         soloButton.addTarget(self, action: #selector(soloButtonPressed), for: .touchUpInside)
         print("🟦 Solo button target added successfully")
-        
     }
     
     func setupBrowserView() {

@@ -106,14 +106,11 @@ class MissileManager {
             from: initialMissilePos,
             relativeTo: nil
         )
-        
         print("🎯 Missile initial position: \(initialMissilePos)")
         print("🎯 Target position: \(targetPos)")
         print("🎯 Helicopter world position: \(helicopterWorldPos)")
-        
         ApacheHelicopter.speed = 0
         missile.particleEntity?.isEnabled = true
-        
         let displayLink = CADisplayLink(target: self, selector: #selector(updateMissilePosition))
         displayLink.preferredFramesPerSecond = 60
         activeMissileTrackers[missile.id] = MissileTrackingInfo(
@@ -145,12 +142,10 @@ class MissileManager {
         let speed: Float = 100
         let targetPos = ship.entity.transform.translation
         let currentPos = missile.entity.transform.translation
-        
         // Debug missile position tracking
         if trackingInfo.frameCount < 3 {
             print("🚀 Frame \(trackingInfo.frameCount): Current pos: \(currentPos), Target pos: \(targetPos)")
         }
-        
         // Check for invalid positions - including infinity
         if targetPos.x.isNaN || targetPos.y.isNaN || targetPos.z.isNaN ||
             currentPos.x.isNaN || currentPos.y.isNaN || currentPos.z.isNaN ||
@@ -163,12 +158,10 @@ class MissileManager {
             activeMissileTrackers[missile.id] = nil
             return
         }
-        
         // Check distance to target
         let distance = simd_distance(currentPos, targetPos)
         print("🎯 Missile \(missile.id) distance to target: \(distance)")
         print("🎯 Current pos: \(currentPos), Target pos: \(targetPos)")
-        
         // If close enough to target, trigger hit
         if distance < 1.0 {
             print("💥 Missile hit target!")
@@ -188,24 +181,24 @@ class MissileManager {
             activeMissileTrackers[missile.id] = nil
             return
         }
-        
         // Calculate direction safely with bounds checking
         let directionVector = targetPos - currentPos
         let directionLength = simd_length(directionVector)
-        
         if directionLength > 0.001 && directionLength < 1000 {
             let direction = simd_normalize(directionVector)
             let movement = direction * speed * Float(deltaTime)
-            
             // Verify movement is reasonable
             let movementLength = simd_length(movement)
             if movementLength > 0 && movementLength < 10.0 {
                 let newPosition = currentPos + movement
-                
                 // Verify new position is reasonable
                 if abs(newPosition.x) < 100 && abs(newPosition.y) < 100 && abs(newPosition.z) < 100 {
                     missile.entity.transform.translation = newPosition
-                    missile.entity.look(at: targetPos, from: newPosition, relativeTo: nil)
+                    missile.entity.look(
+                        at: targetPos,
+                        from: newPosition,
+                        relativeTo: nil
+                    )
                 } else {
                     print("❌ New position would be invalid: \(newPosition)")
                     displayLink.invalidate()
@@ -221,13 +214,16 @@ class MissileManager {
             displayLink.invalidate()
             activeMissileTrackers[missile.id] = nil
         }
-        
         var updatedInfo = trackingInfo
         updatedInfo.frameCount += 1
         updatedInfo.lastUpdateTime = displayLink.timestamp
         activeMissileTrackers[missile.id] = updatedInfo
         if updatedInfo.frameCount > 30 {
-            NotificationCenter.default.post(name: .missileCanHit, object: self, userInfo: nil)
+            NotificationCenter.default.post(
+                name: .missileCanHit,
+                object: self,
+                userInfo: nil
+            )
         }
     }
     
@@ -258,7 +254,11 @@ class MissileManager {
                 self.game.playerScore += 1
                 ApacheHelicopter.speed = 0
                 self.game.updateScoreText()
-                NotificationCenter.default.post(name: .updateScore, object: self, userInfo: nil)
+                NotificationCenter.default.post(
+                    name: .updateScore,
+                    object: self,
+                    userInfo: nil
+                )
             }
         }
         DispatchQueue.main.async {
@@ -282,7 +282,11 @@ class MissileManager {
             self.game.playerScore += 1
             ApacheHelicopter.speed = 0
             self.game.updateScoreText()
-            NotificationCenter.default.post(name: .updateScore, object: self, userInfo: nil)
+            NotificationCenter.default.post(
+                name: .updateScore,
+                object: self,
+                userInfo: nil
+            )
         }
         DispatchQueue.main.async {
             ship.removeShip()

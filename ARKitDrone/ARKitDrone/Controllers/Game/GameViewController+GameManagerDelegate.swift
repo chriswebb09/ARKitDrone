@@ -68,13 +68,11 @@ extension GameViewController: GameManagerDelegate {
             addNode.simdWorldTransform.columns.3.y,
             addNode.simdWorldTransform.columns.3.z
         )
-        
         Task { [weak self] in
             guard let self = self else { return }
             if let apache = await self.realityKitView.positionHelicopter(at: tappedPosition) {
                 await MainActor.run {
                      self.realityKitView.competitor = apache // Commented out - competitor property removed
-                    
                     // Create RealityKit target entity instead of SCN TargetNode
                     let targetEntity = TargetNode()
                     targetEntity.transform.translation = SIMD3<Float>(
@@ -82,11 +80,9 @@ extension GameViewController: GameManagerDelegate {
                         tappedPosition.y + 1,
                         tappedPosition.z
                     )
-                    
                     let anchor = AnchorEntity(world: targetEntity.transform.translation)
                     anchor.addChild(targetEntity)
                     self.realityKitView.scene.addAnchor(anchor)
-                    
                     let endPos = SIMD3<Float>(
                         x: tappedPosition.x,
                         y: tappedPosition.y,

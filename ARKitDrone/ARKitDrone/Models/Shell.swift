@@ -24,14 +24,11 @@ class Shell {
     static func createShell() async -> Shell {
         // Create sphere mesh
         let geometry = MeshResource.generateSphere(radius: 0.005)
-
         // Create red material
         let material = SimpleMaterial.create(color: .red)
-
         // Create entity with model component
         let shellEntity = Entity()
         shellEntity.components.set(ModelComponent(mesh: geometry, materials: [material]))
-
         // Add physics body
         let physicsComponent = PhysicsBodyComponent(
             massProperties: PhysicsMassProperties(mass: 0.1),
@@ -39,27 +36,22 @@ class Shell {
             mode: .dynamic
         )
         shellEntity.components.set(physicsComponent)
-
         // Add collision component for sphere
         let collisionComponent = CollisionComponent(
             shapes: [ShapeResource.generateSphere(radius: 0.005)]
         )
         shellEntity.components.set(collisionComponent)
-
         return Shell(shellEntity)
     }
 
     func launchProjectile(position: SIMD3<Float>, force: SIMD3<Float>, name: String) {
         entity.name = name
-
         // Set initial position
         entity.transform.translation = position
-
         // Apply force using RealityKit physics
         if let physicsBody = entity.components[PhysicsBodyComponent.self] {
             let mass = physicsBody.massProperties.mass
             _ = force / mass
-
             var updatedPhysics = physicsBody
             updatedPhysics.massProperties = PhysicsMassProperties(
                 mass: mass,
@@ -67,7 +59,6 @@ class Shell {
                 centerOfMass: physicsBody.massProperties.centerOfMass
             )
             entity.components.set(updatedPhysics)
-
             // TODO: Apply velocity via custom motion system if needed
         }
     }

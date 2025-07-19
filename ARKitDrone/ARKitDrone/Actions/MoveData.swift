@@ -15,6 +15,7 @@ struct MoveData {
 }
 
 extension MoveData: BitStreamCodable {
+    
     init(from bitStream: inout ReadableBitStream) throws {
         velocity = try GameVelocity(from: &bitStream)
         direction = try Direction(from: &bitStream)

@@ -62,7 +62,6 @@ extension GameBrowser: MCNearbyServiceBrowserDelegate {
     
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
         os_log(.info, "found peer %@", peerID)
-        
         guard let appIdentifier = info?[MultiuserAttribute.appIdentifier],
               appIdentifier == Bundle.main.appIdentifier else {
             os_log(.info, "peer appIdentifier %s doesn't match, ignoring", info?[MultiuserAttribute.appIdentifier] ?? "(nil)")

@@ -62,62 +62,98 @@ class TargetNode: Entity {
         
         // Top-left corner (L-shape)
         let tlHoriz = Entity()
-        tlHoriz.components.set(ModelComponent(
-            mesh: MeshResource.generateBox(size: SIMD3<Float>(bracketLength, thickness, thickness)),
-            materials: [material]
-        ))
+        tlHoriz.components.set(
+            ModelComponent(
+                mesh: MeshResource.generateBox(
+                    size: SIMD3<Float>(bracketLength, thickness, thickness)
+                ),
+                materials: [material]
+            )
+        )
         tlHoriz.transform.translation = SIMD3<Float>(-squareSize/2 + bracketLength/2, -squareSize/2, 0)
         
         let tlVert = Entity()
-        tlVert.components.set(ModelComponent(
-            mesh: MeshResource.generateBox(size: SIMD3<Float>(thickness, bracketLength, thickness)),
-            materials: [material]
-        ))
+        tlVert.components.set(
+            ModelComponent(
+                mesh: MeshResource.generateBox(
+                    size: SIMD3<Float>(thickness, bracketLength, thickness)
+                ),
+                materials: [material]
+            )
+        )
         tlVert.transform.translation = SIMD3<Float>(-squareSize/2, -squareSize/2 + bracketLength/2, 0)
         
         // Top-right corner (L-shape)
         let trHoriz = Entity()
-        trHoriz.components.set(ModelComponent(
-            mesh: MeshResource.generateBox(size: SIMD3<Float>(bracketLength, thickness, thickness)),
-            materials: [material]
-        ))
+        trHoriz.components.set(
+            ModelComponent(
+                mesh: MeshResource.generateBox(
+                    size: SIMD3<Float>(bracketLength, thickness, thickness)
+                ),
+                materials: [material]
+            )
+        )
         trHoriz.transform.translation = SIMD3<Float>(squareSize/2 - bracketLength/2, -squareSize/2, 0)
         
         let trVert = Entity()
-        trVert.components.set(ModelComponent(
-            mesh: MeshResource.generateBox(size: SIMD3<Float>(thickness, bracketLength, thickness)),
-            materials: [material]
-        ))
+        trVert.components.set(
+            ModelComponent(
+                mesh: MeshResource.generateBox(
+                    size: SIMD3<Float>(thickness, bracketLength, thickness)
+                ),
+                materials: [material]
+            )
+        )
         trVert.transform.translation = SIMD3<Float>(squareSize/2, -squareSize/2 + bracketLength/2, 0)
         
         // Bottom-left corner (L-shape)
         let blHoriz = Entity()
-        blHoriz.components.set(ModelComponent(
-            mesh: MeshResource.generateBox(size: SIMD3<Float>(bracketLength, thickness, thickness)),
-            materials: [material]
-        ))
+        blHoriz.components.set(
+            ModelComponent(
+                mesh: MeshResource.generateBox(
+                    size: SIMD3<Float>(bracketLength, thickness, thickness)
+                ),
+                materials: [material]
+            )
+        )
         blHoriz.transform.translation = SIMD3<Float>(-squareSize/2 + bracketLength/2, squareSize/2, 0)
         
         let blVert = Entity()
-        blVert.components.set(ModelComponent(
-            mesh: MeshResource.generateBox(size: SIMD3<Float>(thickness, bracketLength, thickness)),
-            materials: [material]
-        ))
+        blVert.components.set(
+            ModelComponent(
+                mesh: MeshResource.generateBox(
+                    size: SIMD3<Float>(thickness, bracketLength, thickness)
+                ),
+                materials: [material]
+            )
+        )
         blVert.transform.translation = SIMD3<Float>(-squareSize/2, squareSize/2 - bracketLength/2, 0)
         
         // Bottom-right corner (L-shape)
         let brHoriz = Entity()
-        brHoriz.components.set(ModelComponent(
-            mesh: MeshResource.generateBox(size: SIMD3<Float>(bracketLength, thickness, thickness)),
-            materials: [material]
-        ))
+        brHoriz.components.set(
+            ModelComponent(
+                mesh: MeshResource.generateBox(
+                    size: SIMD3<Float>(bracketLength, thickness, thickness)
+                ),
+                materials: [material]
+            )
+        )
         brHoriz.transform.translation = SIMD3<Float>(squareSize/2 - bracketLength/2, squareSize/2, 0)
         
         let brVert = Entity()
-        brVert.components.set(ModelComponent(
-            mesh: MeshResource.generateBox(size: SIMD3<Float>(thickness, bracketLength, thickness)),
-            materials: [material]
-        ))
+        brVert.components.set(
+            ModelComponent(
+                mesh: MeshResource.generateBox(
+                    size: SIMD3<Float>(
+                        thickness,
+                        bracketLength,
+                        thickness
+                    )
+                ),
+                materials: [material]
+            )
+        )
         brVert.transform.translation = SIMD3<Float>(squareSize/2, squareSize/2 - bracketLength/2, 0)
         
         // Add all brackets to positioning entity
@@ -139,14 +175,22 @@ class TargetNode: Entity {
         let correctionFactor: Float = 0.009 // thickness / 2 correction to align lines perfectly
         let length = 1.0 - 0.018 * 2 + correctionFactor
         
-        let mesh = MeshResource.generatePlane(width: length, depth: length)
+        let mesh = MeshResource.generatePlane(
+            width: length,
+            depth: length
+        )
         fillPlane = Entity()
         fillPlane.name = "fillPlane"
         
         var material = UnlitMaterial()
         material.color = .init(tint: TargetNode.fillColor.withAlphaComponent(0.0))
         
-        fillPlane.components.set(ModelComponent(mesh: mesh, materials: [material]))
+        fillPlane.components.set(
+            ModelComponent(
+                mesh: mesh,
+                materials: [material]
+            )
+        )
     }
     
     private func displayAsBillboard() {

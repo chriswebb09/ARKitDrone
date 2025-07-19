@@ -12,17 +12,14 @@ extension GameViewController: GameStartViewControllerDelegate {
     
     private func createGameManager(for session: NetworkSession?) {
         os_log(.info, "creating game manager")
-        
         // First hide the overlay
         hideOverlay()
-        
         // Create the game manager with proper session
         gameManager = GameManager(
             arView: realityKitView,
             session: session
         )
         gameManager?.start()
-        
         // Setup views after manager is created
         DispatchQueue.main.async {
             self.setupViews()
@@ -32,7 +29,6 @@ extension GameViewController: GameStartViewControllerDelegate {
     func gameStartViewController(_ _: UIViewController, didPressStartSoloGameButton: UIButton) {
         os_log(.info, "🎮 Starting solo game")
         print("🎮 GameViewController received solo game request")
-        
         // Create a solo session (no networking)
         let soloSession = NetworkSession(
             myself: UserDefaults.standard.myself,

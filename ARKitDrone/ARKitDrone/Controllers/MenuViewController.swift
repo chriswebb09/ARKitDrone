@@ -39,13 +39,11 @@ class MenuViewController: UIViewController {
         button.setTitle("New Game", for: .normal)
         button.backgroundColor = .offWhite
         button.layer.cornerRadius = 20
-        
         // Dark shadow (bottom-right)
         button.layer.shadowColor = UIColor.black.cgColor
         button.layer.shadowOffset = CGSize(width: 5, height: 5)
         button.layer.shadowOpacity = 0.15
         button.layer.shadowRadius = 10
-        
         button.setTitleColor(.darkGray, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
         button.addTarget(self, action: #selector(newGameButtonTapped), for: .touchUpInside)
@@ -80,10 +78,6 @@ class MenuViewController: UIViewController {
     // MARK: - Button Actions
     
     @objc private func newGameButtonTapped() {
-        
-        //        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-        //        impactFeedback.impactOccurred()
-        //
         DispatchQueue.main.async {
             DeviceOrientation.shared.set(orientation: .landscapeRight)
             self.countdownToStart(count: 3)
@@ -95,7 +89,6 @@ class MenuViewController: UIViewController {
     
     private func navigateToGame() {
         let gameViewController = GameViewController()
-        
         // Present the game view controller first (this becomes the main controller)
         gameViewController.modalPresentationStyle = .fullScreen
         present(gameViewController, animated: true) {
@@ -108,19 +101,15 @@ class MenuViewController: UIViewController {
     
     private func countdownToStart(count: Int) {
         var countdown = count
-        
         // Disable button during countdown
         newGameButton.isEnabled = false
-        
         // Set initial countdown display
         newGameButton.setTitle("\(countdown)", for: .normal)
         newGameButton.titleLabel?.font = UIFont.systemFont(ofSize: 24, weight: .heavy)
-        
         Task {
             for _ in 1...count {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
                 countdown -= 1
-                
                 await MainActor.run {
                     UIView.transition(with: self.newGameButton, duration: 0.3, options: .transitionCrossDissolve, animations: {
                         let title = countdown > 0 ? "\(countdown)" : "GO!"
@@ -144,7 +133,3 @@ class MenuViewController: UIViewController {
         }
     }
 }
-
-//extension UIColor {
-//    static let offWhite = UIColor(red: 225/255, green: 225/255, blue: 235/255, alpha: 1)
-//}

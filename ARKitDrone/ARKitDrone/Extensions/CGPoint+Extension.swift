@@ -32,20 +32,26 @@ extension CGPoint {
             self.init(x: 0, y: 0)
             return
         }
-        
         let viewMatrix = frame.camera.viewMatrix(for: .portrait)
-        let projectionMatrix = frame.camera.projectionMatrix(for: .portrait, viewportSize: frame.camera.imageResolution, zNear: 0.01, zFar: 1000)
-        
+        let projectionMatrix = frame.camera.projectionMatrix(
+            for: .portrait,
+            viewportSize: frame.camera.imageResolution,
+            zNear: 0.01,
+            zFar: 1000
+        )
         // Transform world position to screen coordinates
-        let worldPos4 = SIMD4<Float>(worldPosition.x, worldPosition.y, worldPosition.z, 1.0)
+        let worldPos4 = SIMD4<Float>(
+            worldPosition.x,
+            worldPosition.y,
+            worldPosition.z,
+            1.0
+        )
         let cameraPos = viewMatrix * worldPos4
         let clipPos = projectionMatrix * cameraPos
-        
         guard clipPos.w != 0 else {
             self.init(x: 0, y: 0)
             return
         }
-        
         let ndc = SIMD2<Float>(clipPos.x / clipPos.w, clipPos.y / clipPos.w)
         let screenSize = arView.bounds.size
         let screenX = (ndc.x + 1.0) * 0.5 * Float(screenSize.width)
@@ -98,65 +104,32 @@ extension ARView {
         guard let frame = session.currentFrame else {
             return SIMD2<Float>(0, 0)
         }
-        
         let viewMatrix = frame.camera.viewMatrix(for: .portrait)
-        let projectionMatrix = frame.camera.projectionMatrix(for: .portrait, viewportSize: frame.camera.imageResolution, zNear: 0.01, zFar: 1000)
-        
+        let projectionMatrix = frame.camera.projectionMatrix(
+            for: .portrait,
+            viewportSize: frame.camera.imageResolution,
+            zNear: 0.01,
+            zFar: 1000
+        )
         // Transform world position to camera space
-        let worldPos4 = SIMD4<Float>(worldPosition.x, worldPosition.y, worldPosition.z, 1.0)
+        let worldPos4 = SIMD4<Float>(
+            worldPosition.x,
+            worldPosition.y,
+            worldPosition.z,
+            1.0
+        )
         let cameraPos = viewMatrix * worldPos4
-        
         // Project to screen space
         let clipPos = projectionMatrix * cameraPos
-        
         // Perspective divide
         guard clipPos.w != 0 else {
             return SIMD2<Float>(0, 0)
         }
-        
         let ndc = SIMD2<Float>(clipPos.x / clipPos.w, clipPos.y / clipPos.w)
-        
         // Convert from NDC (-1 to 1) to screen coordinates
         let screenSize = bounds.size
         let screenX = (ndc.x + 1.0) * 0.5 * Float(screenSize.width)
         let screenY = (1.0 - ndc.y) * 0.5 * Float(screenSize.height) // Flip Y axis
-        
         return SIMD2<Float>(screenX, screenY)
     }
-    
-//    /// Convert screen point to world ray for raycasting
-//    func ray(from screenPoint: CGPoint) -> (origin: SIMD3<Float>, direction: SIMD3<Float>) {
-//        guard let frame = session.currentFrame else {
-//            return (SIMD3<Float>(0, 0, 0), SIMD3<Float>(0, 0, -1))
-//        }
-//        
-//        let camera = frame.camera
-//        let viewSize = bounds.size
-//        
-//        // Convert screen coordinates to normalized device coordinates
-//        let x = (2.0 * Float(screenPoint.x) / Float(viewSize.width)) - 1.0
-//        let y = 1.0 - (2.0 * Float(screenPoint.y) / Float(viewSize.height))
-//        
-//        // Get camera matrices
-//        let viewMatrix = camera.viewMatrix(for: .portrait)
-//        let projectionMatrix = camera.projectionMatrix(for: .portrait, viewportSize: camera.imageResolution, zNear: 0.01, zFar: 1000)
-//        
-//        // Create ray in NDC space
-//        let nearPoint = SIMD4<Float>(x, y, -1.0, 1.0)
-//        let farPoint = SIMD4<Float>(x, y, 1.0, 1.0)
-//        
-//        // Transform to world space
-//        let invViewProj = (projectionMatrix * viewMatrix).inverse
-//        
-//        let worldNear = invViewProj * nearPoint
-//        let worldFar = invViewProj * farPoint
-//        
-//        // Perspective divide
-//        let rayOrigin = SIMD3<Float>(worldNear.x / worldNear.w, worldNear.y / worldNear.w, worldNear.z / worldNear.w)
-//        let rayEnd = SIMD3<Float>(worldFar.x / worldFar.w, worldFar.y / worldFar.w, worldFar.z / worldFar.w)
-//        
-//        let rayDirection = normalize(rayEnd - rayOrigin)
-//        
-//        return (rayOrigin, rayDirection)
-//    }
 }

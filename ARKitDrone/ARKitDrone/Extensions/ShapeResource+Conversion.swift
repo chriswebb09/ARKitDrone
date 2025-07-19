@@ -25,23 +25,39 @@ extension ShapeResource {
         
         // Check for primitive geometries
         if let box = scnGeometry as? SCNBox {
-            let size = SIMD3<Float>(Float(box.width), Float(box.height), Float(box.length))
+            let size = SIMD3<Float>(
+                Float(box.width),
+                Float(box.height),
+                Float(box.length)
+            )
             return .generateBox(size: size)
         }
         
         if let sphere = scnGeometry as? SCNSphere {
-            return .generateSphere(radius: Float(sphere.radius))
+            return .generateSphere(
+                radius: Float(
+                    sphere.radius
+                )
+            )
         }
         
         if let cylinder = scnGeometry as? SCNCylinder {
             // RealityKit doesn't have generateCylinder, use a box approximation
-            let size = SIMD3<Float>(Float(cylinder.radius * 2), Float(cylinder.height), Float(cylinder.radius * 2))
+            let size = SIMD3<Float>(
+                Float(cylinder.radius * 2),
+                Float(cylinder.height),
+                Float(cylinder.radius * 2)
+            )
             return .generateBox(size: size)
         }
         
         if let capsule = scnGeometry as? SCNCapsule {
             // RealityKit doesn't have generateCapsule, use a box approximation
-            let size = SIMD3<Float>(Float(capsule.capRadius * 2), Float(capsule.height), Float(capsule.capRadius * 2))
+            let size = SIMD3<Float>(
+                Float(capsule.capRadius * 2),
+                Float(capsule.height),
+                Float(capsule.capRadius * 2)
+            )
             return .generateBox(size: size)
         }
         
@@ -59,7 +75,6 @@ extension ShapeResource {
     static func from(physicsBody: SCNPhysicsBody) throws -> ShapeResource {
         // SCNPhysicsShape doesn't expose its geometry, so we need to create a default shape
         // This is a limitation when converting from SceneKit to RealityKit
-        
         // Create a default sphere shape - in practice, you'd want to pass the original geometry
         return .generateSphere(radius: 0.1)
     }
@@ -138,15 +153,17 @@ extension PhysicsBodyComponent {
         
         // Create shape - SCNPhysicsShape doesn't expose geometry, so use default
         let shape = ShapeResource.generateSphere(radius: 0.01)
-        let component = PhysicsBodyComponent(shapes: [shape], density: 1.0, mode: mode)
-        
+        let component = PhysicsBodyComponent(
+            shapes: [shape],
+            density: 1.0,
+            mode: mode
+        )
         // Note: RealityKit PhysicsBodyComponent doesn't have direct mass or gravity properties
         // Mass is calculated from density and volume automatically
         // Gravity is handled at the physics simulation level
         
         // Note: SCNPhysicsBody material properties are not directly accessible
         // Material properties would need to be set when creating the RealityKit component
-        
         return component
     }
     
@@ -154,20 +171,35 @@ extension PhysicsBodyComponent {
     @MainActor
     static func staticBox(size: SIMD3<Float>) -> PhysicsBodyComponent {
         let shape = ShapeResource.generateBox(size: size)
-        return PhysicsBodyComponent(shapes: [shape], density: 1.0, mode: .static)
+        return PhysicsBodyComponent(
+            shapes: [shape],
+            density: 1.0,
+            mode: .static
+        )
     }
     
     @MainActor
     static func dynamicSphere(radius: Float, density: Float = 1.0) -> PhysicsBodyComponent {
         let shape = ShapeResource.generateSphere(radius: radius)
-        let component = PhysicsBodyComponent(shapes: [shape], density: density, mode: .dynamic)
+        let component = PhysicsBodyComponent(
+            shapes: [shape],
+            density: density,
+            mode: .dynamic
+        )
         return component
     }
     
     @MainActor
     static func kinematicCylinder(height: Float, radius: Float) -> PhysicsBodyComponent {
-        let shape = ShapeResource.cylinder(height: height, radius: radius)
-        return PhysicsBodyComponent(shapes: [shape], density: 1.0, mode: .kinematic)
+        let shape = ShapeResource.cylinder(
+            height: height,
+            radius: radius
+        )
+        return PhysicsBodyComponent(
+            shapes: [shape],
+            density: 1.0,
+            mode: .kinematic
+        )
     }
 }
 
@@ -188,17 +220,6 @@ extension CollisionComponent {
         
         return component
     }
-    
-//    /// Create simple collision components
-//    static func box(size: SIMD3<Float>) -> CollisionComponent {
-//        let shape = ShapeResource.generateBox(size: size)
-//        return CollisionComponent(shapes: [shape])
-//    }
-    
-//    static func sphere(radius: Float) -> CollisionComponent {
-//        let shape = ShapeResource.generateSphere(radius: radius)
-//        return CollisionComponent(shapes: [shape])
-//    }
 }
 
 // MARK: - Conversion Errors

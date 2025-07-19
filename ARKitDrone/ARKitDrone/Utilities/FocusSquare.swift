@@ -26,8 +26,19 @@ class FocusSquare: Entity {
     static let scaleForClosedSquare: Float = 0.97
     static let sideLengthForOpenSegments: Float = 0.2
     
-    static let primaryColor = UIColor(red: 1, green: 0.8, blue: 0, alpha: 1)
-    static let fillColor = UIColor(red: 1, green: 0.9254901961, blue: 0.4117647059, alpha: 1)
+    static let primaryColor = UIColor(
+        red: 1,
+        green: 0.8,
+        blue: 0,
+        alpha: 1
+    )
+    
+    static let fillColor = UIColor(
+        red: 1,
+        green: 0.9254901961,
+        blue: 0.4117647059,
+        alpha: 1
+    )
     
     private var segmentPairs: [Entity] = []
     
@@ -83,14 +94,16 @@ class FocusSquare: Entity {
         for (position, size) in segments {
             let segmentEntity = Entity()
             segmentEntity.transform.translation = position
-            
             let mesh = MeshResource.generateBox(size: size)
             var material = UnlitMaterial()
             material.color = .init(tint: .yellow)
-            
-            segmentEntity.components.set(ModelComponent(mesh: mesh, materials: [material]))
+            segmentEntity.components.set(
+                ModelComponent(
+                    mesh: mesh,
+                    materials: [material]
+                )
+            )
             segmentEntity.isEnabled = true
-            
             self.addChild(segmentEntity)
             segmentPairs.append(segmentEntity)
         }
@@ -103,7 +116,10 @@ class FocusSquare: Entity {
             stopFocusSquareAnimations()
         case .detecting(let raycastResult, let camera):
             self.isEnabled = true
-            updatePositionSmoothly(for: raycastResult, camera: camera)
+            updatePositionSmoothly(
+                for: raycastResult,
+                camera: camera
+            )
             updateFocusSquareAlignment(for: raycastResult)
             performOpenAnimation()
         }
@@ -122,18 +138,26 @@ class FocusSquare: Entity {
         let now = CACurrentMediaTime()
         guard now - lastUpdateTime > updateInterval else { return }
         lastUpdateTime = now
-        
         let position = raycastResult.worldTransform.worldTranslation
-        
         // Move the parent anchor to the raycast position so focus square sits exactly on the detected plane
         if let parentAnchor = self.parent as? AnchorEntity {
-            let transform = Transform(matrix: raycastResult.worldTransform)
-            parentAnchor.reanchor(.world(transform: transform.matrix))
+            let transform = Transform(
+                matrix: raycastResult.worldTransform
+            )
+            parentAnchor.reanchor(
+                .world(
+                    transform: transform.matrix
+                )
+            )
         } else {
             // Smoothly interpolate position to avoid snapping
             let currentPosition = self.transform.translation
             let lerpFactor: Float = 0.3
-            let newPosition = simd_mix(currentPosition, position, SIMD3<Float>(repeating: lerpFactor))
+            let newPosition = simd_mix(
+                currentPosition,
+                position,
+                SIMD3<Float>(repeating: lerpFactor)
+            )
             self.transform.translation = newPosition
         }
         
@@ -151,12 +175,13 @@ class FocusSquare: Entity {
         if simd_length(simd_cross(up, normal)) > 0.001 {
             let rotationAxis = simd_normalize(simd_cross(up, normal))
             let angle = acos(simd_clamp(simd_dot(up, normal), -1.0, 1.0))
-            let rotation = simd_quatf(angle: angle, axis: rotationAxis)
-            
+            let rotation = simd_quatf(
+                angle: angle,
+                axis: rotationAxis
+            )
             if !isChangingAlignment {
                 isChangingAlignment = true
                 let currentRotation = self.transform.rotation
-                
                 let rotationAnimation = FromToByAnimation<Transform>(
                     name: "focusSquareAlign",
                     from: Transform(rotation: currentRotation),
@@ -184,7 +209,6 @@ class FocusSquare: Entity {
         }
         self.isEnabled = true
         self.transform.scale = SIMD3<Float>(repeating: 1.0)
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {  // shorter delay, just enough for effect
             self.isAnimating = false
         }
@@ -209,7 +233,6 @@ class FocusSquare: Entity {
     
     private func updatePositionDirectly(worldTransform: simd_float4x4, anchor: ARAnchor?, camera: ARCamera?) {
         let position = worldTransform.worldTranslation
-        
         if let parentAnchor = self.parent as? AnchorEntity {
             let transform = Transform(matrix: worldTransform)
             parentAnchor.reanchor(.world(transform: transform.matrix))
@@ -233,7 +256,6 @@ class FocusSquare: Entity {
     func updateFocusSquare(for arView: ARView, camera: ARCamera?) {
         let center = CGPoint(x: arView.bounds.midX, y: arView.bounds.midY)
         let results = arView.raycast(from: center, allowing: .estimatedPlane, alignment: .horizontal)
-        
         if let result = results.first {
             update(with: result, camera: camera)
         } else {

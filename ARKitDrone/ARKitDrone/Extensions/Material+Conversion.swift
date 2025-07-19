@@ -14,9 +14,7 @@ import UIKit
 extension SimpleMaterial {
     
     /// Create SimpleMaterial with basic properties
-    static func create(color: UIColor, 
-                       metallic: Float = 0.0, 
-                       roughness: Float = 1.0) -> SimpleMaterial {
+    static func create(color: UIColor, metallic: Float = 0.0, roughness: Float = 1.0) -> SimpleMaterial {
         var material = SimpleMaterial()
         material.color = .init(tint: color)
         material.metallic = .init(floatLiteral: metallic)
@@ -26,14 +24,15 @@ extension SimpleMaterial {
     
     /// Create material from texture image
     @MainActor
-    static func create(from image: UIImage, 
-                       metallic: Float = 0.0, 
-                       roughness: Float = 1.0) -> SimpleMaterial? {
+    static func create(from image: UIImage, metallic: Float = 0.0, roughness: Float = 1.0) -> SimpleMaterial? {
         guard let cgImage = image.cgImage,
-              let texture = try? TextureResource(image: cgImage, withName: nil, options: TextureResource.CreateOptions(semantic: .color)) else {
+              let texture = try? TextureResource(
+                image: cgImage,
+                withName: nil,
+                options: TextureResource.CreateOptions(semantic: .color)
+              ) else {
             return nil
         }
-        
         var material = SimpleMaterial()
         material.color = .init(texture: .init(texture))
         material.metallic = .init(floatLiteral: metallic)
@@ -43,13 +42,10 @@ extension SimpleMaterial {
     
     /// Create material from texture name
     @MainActor
-    static func create(fromTexture textureName: String, 
-                       metallic: Float = 0.0, 
-                       roughness: Float = 1.0) -> SimpleMaterial? {
+    static func create(fromTexture textureName: String, metallic: Float = 0.0,  roughness: Float = 1.0) -> SimpleMaterial? {
         guard let texture = try? TextureResource.load(named: textureName) else {
             return nil
         }
-        
         var material = SimpleMaterial()
         material.color = .init(texture: .init(texture))
         material.metallic = .init(floatLiteral: metallic)
@@ -72,10 +68,13 @@ extension UnlitMaterial {
     @MainActor
     static func create(from image: UIImage) -> UnlitMaterial? {
         guard let cgImage = image.cgImage,
-              let texture = try? TextureResource(image: cgImage, withName: nil, options: TextureResource.CreateOptions(semantic: .color)) else {
+              let texture = try? TextureResource(
+                image: cgImage,
+                withName: nil,
+                options: TextureResource.CreateOptions(semantic: .color)
+              ) else {
             return nil
         }
-        
         var material = UnlitMaterial()
         material.color = .init(texture: .init(texture))
         return material
@@ -98,10 +97,7 @@ extension UnlitMaterial {
 extension PhysicallyBasedMaterial {
     
     /// Create PBR material with full control
-    static func create(baseColor: UIColor = .white,
-                       metallic: Float = 0.0,
-                       roughness: Float = 0.5,
-                       specular: Float = 0.5) -> PhysicallyBasedMaterial {
+    static func create(baseColor: UIColor = .white, metallic: Float = 0.0, roughness: Float = 0.5, specular: Float = 0.5) -> PhysicallyBasedMaterial {
         var material = PhysicallyBasedMaterial()
         material.baseColor = .init(tint: baseColor)
         material.metallic = .init(floatLiteral: metallic)
@@ -112,11 +108,13 @@ extension PhysicallyBasedMaterial {
     
     /// Create PBR material from texture
     @MainActor
-    static func create(baseColorTexture: UIImage,
-                       metallic: Float = 0.0,
-                       roughness: Float = 0.5) -> PhysicallyBasedMaterial? {
+    static func create(baseColorTexture: UIImage, metallic: Float = 0.0, roughness: Float = 0.5) -> PhysicallyBasedMaterial? {
         guard let cgImage = baseColorTexture.cgImage,
-              let texture = try? TextureResource(image: cgImage, withName: nil, options: TextureResource.CreateOptions(semantic: .color)) else {
+              let texture = try? TextureResource(
+                image: cgImage,
+                withName: nil,
+                options: TextureResource.CreateOptions(semantic: .color)
+              ) else {
             return nil
         }
         
@@ -129,13 +127,10 @@ extension PhysicallyBasedMaterial {
     
     /// Create PBR material from texture name
     @MainActor
-    static func create(baseColorTexture textureName: String,
-                       metallic: Float = 0.0,
-                       roughness: Float = 0.5) -> PhysicallyBasedMaterial? {
+    static func create(baseColorTexture textureName: String, metallic: Float = 0.0, roughness: Float = 0.5) -> PhysicallyBasedMaterial? {
         guard let texture = try? TextureResource.load(named: textureName) else {
             return nil
         }
-        
         var material = PhysicallyBasedMaterial()
         material.baseColor = .init(texture: .init(texture))
         material.metallic = .init(floatLiteral: metallic)

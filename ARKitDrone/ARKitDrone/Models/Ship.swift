@@ -49,7 +49,9 @@ class Ship: @unchecked Sendable {
         )
         entity.components.set(physicsComponent)
         let collisionComponent = CollisionComponent(
-            shapes: [ShapeResource.generateBox(size: SIMD3<Float>(1, 1, 1))]
+            shapes: [ShapeResource.generateBox(
+                size: SIMD3<Float>(1, 1, 1)
+            )]
         )
         entity.components.set(collisionComponent)
     }

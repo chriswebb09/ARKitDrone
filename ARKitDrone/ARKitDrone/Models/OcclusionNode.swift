@@ -92,7 +92,12 @@ class OcclusionEntity: Entity {
         // Create appropriate material based on visibility
         let material = visible ? createVisibleMeshMaterial() : createOccluderMaterial()
         // Set up model component
-        entity.components.set(ModelComponent(mesh: meshResource, materials: [material]))
+        entity.components.set(
+            ModelComponent(
+                mesh: meshResource,
+                materials: [material]
+            )
+        )
         // Set rendering order (RealityKit doesn't have direct renderingOrder, but we can use other approaches)
         entity.name = visible ? "visibleMesh" : "occluder"
         meshEntity = entity

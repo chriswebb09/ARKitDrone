@@ -23,10 +23,12 @@ class Missile {
     var num: Int = -1
     
     private static var missileRegistry: [Entity: Missile] = [:]
+    
     private static let registryQueue = DispatchQueue(
         label: "missile.registry",
         attributes: .concurrent
     )
+    
     private static let maxParticleDistance: Float = 50.0  // Max distance for particles
     private static let maxActiveParticles: Int = 5  // Limit active particle systems
     

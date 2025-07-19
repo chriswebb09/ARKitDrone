@@ -58,19 +58,15 @@ extension Entity {
     @MainActor
     func addExplosionEffect(at position: SIMD3<Float>? = nil) {
         let explosionEntity = Entity()
-        
         // Set position if provided
         if let pos = position {
             explosionEntity.transform.translation = pos
         }
-        
         // Add particle emitter component
         let explosion = ParticleEmitterComponent.createExplosion()
         explosionEntity.components.set(explosion)
-        
         // Add to parent
         self.addChild(explosionEntity)
-        
         // Remove after explosion duration (fixed duration since we can't access lifeSpan)
         let duration = 2.0 // Fixed duration for explosion effect
         Task { @MainActor in
@@ -89,7 +85,6 @@ class Explosion {
     static func createExplosionEntity() -> Entity {
         let explosionEntity = Entity()
         explosionEntity.name = "Explosion"
-        
         // Add particle emitter
         let explosion = ParticleEmitterComponent.createExplosion()
         explosionEntity.components.set(explosion)
@@ -102,9 +97,7 @@ class Explosion {
     static func createTemporaryExplosion(in scene: Entity, at position: SIMD3<Float>) {
         let explosion = createExplosionEntity()
         explosion.transform.translation = position
-        
         scene.addChild(explosion)
-        
         // Auto-remove after particles finish
         let duration = 2.0 // Safe duration for cleanup
         Task { @MainActor in

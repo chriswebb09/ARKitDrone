@@ -1,9 +1,9 @@
 /*
-See LICENSE folder for this sample’s licensing information.
-
-Abstract:
-Convenience extension for type safe UserDefaults access.
-*/
+ See LICENSE folder for this sample’s licensing information.
+ 
+ Abstract:
+ Convenience extension for type safe UserDefaults access.
+ */
 
 import Foundation
 import MultipeerConnectivity
@@ -25,7 +25,7 @@ struct UserDefaultsKeys {
     static let trailShouldNarrow = "TrailShouldNarrow"
     static let allowGameBoardAutoSize = "AllowGameBoardAutoSize"
     static let disableInGameUI = "DisableInGameUI"
-
+    
     // settings
     static let antialiasingMode = "AntialiasingMode"
     static let peerID = "PeerIDDefaultsKey"
@@ -35,7 +35,7 @@ struct UserDefaultsKeys {
     static let gameRoomMode = "GameRoomMode"
     static let autoFocus = "AutoFocus"
     static let spectator = "Spectator"
-
+    
     static let showReset = "ShowReset"
     static let showClouds = "ShowClouds"
     static let showFlags = "ShowFlags"
@@ -50,14 +50,14 @@ struct UserDefaultsKeys {
 }
 
 extension UserDefaults {
-
+    
     enum BoardLocatingMode: Int {
         case worldMap = 0 // default
         // slot 1 previously used; leave empty so that on update,
         // worldMap is used insead.
         case manual = 2
     }
-
+    
     nonisolated(unsafe) static let applicationDefaults: [String: Any] = [
         UserDefaultsKeys.spectator: false,
         UserDefaultsKeys.musicVolume: 0.0,
@@ -74,13 +74,13 @@ extension UserDefaults {
         UserDefaultsKeys.showThermalState: true,
         UserDefaultsKeys.showProjectileTrail: true,
         UserDefaultsKeys.trailShouldNarrow: true
-        ]
+    ]
     
     @MainActor
     var myself: Player {
         get {
             if let data = data(forKey: UserDefaultsKeys.peerID),
-                let unarchived = try? NSKeyedUnarchiver.unarchivedObject(ofClass: MCPeerID.self, from: data) {
+               let unarchived = try? NSKeyedUnarchiver.unarchivedObject(ofClass: MCPeerID.self, from: data) {
                 let peerID = unarchived
                 return Player(peerID: peerID)
             }
@@ -95,32 +95,27 @@ extension UserDefaults {
             set(data, forKey: UserDefaultsKeys.peerID)
         }
     }
-//    
-//    @MainActor
-//    func createPlayer() -> Player {
-//        return )
-//    }
-
+    
     var musicVolume: Float {
         get { return float(forKey: UserDefaultsKeys.musicVolume) }
         set { set(newValue, forKey: UserDefaultsKeys.musicVolume) }
     }
-
+    
     var effectsVolume: Float {
         get { return float(forKey: UserDefaultsKeys.effectsVolume) }
         set { set(newValue, forKey: UserDefaultsKeys.effectsVolume) }
     }
-
+    
     var showARDebug: Bool {
         get { return bool(forKey: UserDefaultsKeys.showARDebug) }
         set { set(newValue, forKey: UserDefaultsKeys.showARDebug) }
     }
-
+    
     var showSceneViewStats: Bool {
         get { return bool(forKey: UserDefaultsKeys.showSceneViewStats) }
         set { set(newValue, forKey: UserDefaultsKeys.showSceneViewStats) }
     }
-
+    
     // this is a wireframe overlay for looking at poly-count (f.e. LOD)
     var showWireframe: Bool {
         get { return bool(forKey: UserDefaultsKeys.showWireframe) }
@@ -138,12 +133,12 @@ extension UserDefaults {
         get { return bool(forKey: UserDefaultsKeys.antialiasingMode) }
         set { set(newValue, forKey: UserDefaultsKeys.antialiasingMode) }
     }
-
+    
     var showTrackingState: Bool {
         get { return bool(forKey: UserDefaultsKeys.showTrackingState) }
         set { set(newValue, forKey: UserDefaultsKeys.showTrackingState) }
     }
-
+    
     var showPhysicsDebug: Bool {
         get { return bool(forKey: UserDefaultsKeys.showPhysicsDebug) }
         set { set(newValue, forKey: UserDefaultsKeys.showPhysicsDebug) }
@@ -158,12 +153,12 @@ extension UserDefaults {
         get { return bool(forKey: UserDefaultsKeys.hasOnboarded) }
         set { set(newValue, forKey: UserDefaultsKeys.hasOnboarded) }
     }
-
+    
     var boardLocatingMode: BoardLocatingMode {
         get { return BoardLocatingMode(rawValue: integer(forKey: UserDefaultsKeys.boardLocatingMode)) ?? .worldMap }
         set { set(newValue.rawValue, forKey: UserDefaultsKeys.boardLocatingMode) }
     }
-
+    
     var gameRoomMode: Bool {
         get { return bool(forKey: UserDefaultsKeys.gameRoomMode) }
         set { set(newValue, forKey: UserDefaultsKeys.gameRoomMode) }
@@ -178,7 +173,7 @@ extension UserDefaults {
         get { return bool(forKey: UserDefaultsKeys.showARRelocalizationHelp) }
         set { set(newValue, forKey: UserDefaultsKeys.showARRelocalizationHelp) }
     }
-
+    
     var trailLength: Int? {
         get {
             return object(forKey: UserDefaultsKeys.trailLength) as? Int
@@ -191,7 +186,7 @@ extension UserDefaults {
             }
         }
     }
-
+    
     var trailWidth: Float? {
         get {
             return object(forKey: UserDefaultsKeys.trailWidth) as? Float
@@ -209,7 +204,7 @@ extension UserDefaults {
         get { return bool(forKey: UserDefaultsKeys.showProjectileTrail) }
         set { set(newValue, forKey: UserDefaultsKeys.showProjectileTrail) }
     }
-
+    
     var useCustomTrail: Bool {
         get { return bool(forKey: UserDefaultsKeys.useCustomTrail) }
         set { set(newValue, forKey: UserDefaultsKeys.useCustomTrail) }
@@ -219,7 +214,7 @@ extension UserDefaults {
         get { return bool(forKey: UserDefaultsKeys.trailShouldNarrow) }
         set { set(newValue, forKey: UserDefaultsKeys.trailShouldNarrow) }
     }
-
+    
     var showResetLever: Bool {
         get { return bool(forKey: UserDefaultsKeys.showReset) }
         set { set(newValue, forKey: UserDefaultsKeys.showReset) }
@@ -239,7 +234,7 @@ extension UserDefaults {
         get { return bool(forKey: UserDefaultsKeys.showRopeSimulation) }
         set { set(newValue, forKey: UserDefaultsKeys.showRopeSimulation) }
     }
-
+    
     var autoFocus: Bool {
         get { return bool(forKey: UserDefaultsKeys.autoFocus) }
         set { set(newValue, forKey: UserDefaultsKeys.autoFocus) }
@@ -249,17 +244,17 @@ extension UserDefaults {
         get { return bool(forKey: UserDefaultsKeys.allowGameBoardAutoSize) }
         set { set(newValue, forKey: UserDefaultsKeys.allowGameBoardAutoSize) }
     }
-
+    
     var spectator: Bool {
         get { return bool(forKey: UserDefaultsKeys.spectator) }
         set { set(newValue, forKey: UserDefaultsKeys.spectator) }
     }
-
+    
     var disableInGameUI: Bool {
         get { return bool(forKey: UserDefaultsKeys.disableInGameUI) }
         set { set(newValue, forKey: UserDefaultsKeys.disableInGameUI) }
     }
-
+    
     var synchronizeMusicWithWallClock: Bool {
         get { return bool(forKey: UserDefaultsKeys.synchronizeMusicWithWallClock) }
         set { set(newValue, forKey: UserDefaultsKeys.synchronizeMusicWithWallClock) }

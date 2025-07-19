@@ -20,12 +20,10 @@ extension GameViewController: ARSessionDelegate {
             if !self.game.placed {
                 self.updateFocusSquare(isObjectVisible: false)
             }
-            
             // Throttle ship movement updates to 15 FPS
             let currentTime = CACurrentMediaTime()
             if currentTime - Self.lastShipUpdateTime > Self.shipUpdateInterval {
                 Self.lastShipUpdateTime = currentTime
-                
                 // Update ship movements if game is placed
                 if self.game.placed {
                     Task { @MainActor in

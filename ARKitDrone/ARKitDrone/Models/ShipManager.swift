@@ -46,20 +46,16 @@ class ShipManager {
                     group.addTask { @MainActor in
                         let shipEntity = f35Entity.clone(recursive: true)
                         shipEntity.name = "F_35B \(i)"
-                        
                         let randomOffset = SIMD3<Float>(
                             x: Float.random(in: -20.0...20.0),
                             y: Float.random(in: -10.0...10.0),
                             z: Float.random(in: -20.0...40.0)
                         )
-                        
                         let anchor = AnchorEntity(world: SIMD3<Float>(0, 0, 0))
                         anchor.addChild(shipEntity)
                         self.arView.scene.addAnchor(anchor)
-                        
                         shipEntity.transform.translation = randomOffset
                         shipEntity.transform.scale = SIMD3<Float>(x: 0.005, y: 0.005, z: 0.005)
-                        
                         let ship = Ship(entity: shipEntity)
                         ship.num = i
                         return ship
@@ -101,7 +97,6 @@ class ShipManager {
                     guard targetIndex < ships.count else { return }
                     let square = TargetNode()
                     ships[targetIndex].square = square
-                    
                     // Add to ship's anchor
                     if let parent = ships[targetIndex].entity.parent {
                         parent.addChild(square)
@@ -137,12 +132,9 @@ class ShipManager {
             print("❌ No ships to move")
             return
         }
-        
         print("🚢 Moving \(ships.count) ships, placed: \(placed)")
-        
         var perceivedCenter = SIMD3<Float>(0, 0, 0)
         var perceivedVelocity = SIMD3<Float>(0, 0, 0)
-        
         for otherShip in ships {
             perceivedCenter = perceivedCenter + otherShip.entity.transform.translation
             perceivedVelocity = perceivedVelocity + otherShip.velocity

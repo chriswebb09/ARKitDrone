@@ -24,7 +24,10 @@ class AsyncModelLoader {
         }
         // Create new loading task
         let task = Task<Entity, Error> {
-            guard let url = Bundle.main.url(forResource: named, withExtension: ext) else {
+            guard let url = Bundle.main.url(
+                forResource: named,
+                withExtension: ext
+            ) else {
                 throw ModelLoadError.fileNotFound(fullName)
             }
             // Use async Entity initializer (NOT Entity.load)
