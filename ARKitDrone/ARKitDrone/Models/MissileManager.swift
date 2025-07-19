@@ -30,34 +30,51 @@ class MissileManager {
     }
     
     // MARK: - Fire Missile
+    @MainActor
+    private func canFire(game: Game) -> Bool {
+        if sceneView.helicopter.missiles.isEmpty || game.scoreUpdated {
+            print("❌ Fire failed: no missiles or score updated")
+            return false
+        }
+        guard sceneView.targetIndex < sceneView.ships.count else {
+            print("❌ Fire failed: no ships or invalid target index")
+            return false
+        }
+        if sceneView.ships[sceneView.targetIndex].isDestroyed {
+            print("❌ Fire failed: target ship is destroyed")
+            return false
+        }
+        return true
+    }
+
+    @MainActor
+    private func getHelicopterWorldPosition() -> SIMD3<Float>? {
+        if let anchor = sceneView.helicopterAnchor {
+            return anchor.transform.translation
+        } else if let parent = sceneView.helicopter.helicopter?.parent {
+            return parent.transform.translation
+        } else {
+            return sceneView.helicopter.helicopter?.transform.translation
+        }
+    }
     
     @MainActor
     func fire(game: Game) {
-        guard !sceneView.helicopter.missiles.isEmpty, !game.scoreUpdated else {
-            print("❌ Fire failed: no missiles or score updated")
+        if !canFire(game: game) {
             return
         }
-        // Get ships from the sceneView
         let ships = sceneView.ships
-        guard ships.count > sceneView.targetIndex else {
-            print("❌ Fire failed: no ships or invalid target index")
-            return
-        }
-        guard !ships[sceneView.targetIndex].isDestroyed else {
-            print("❌ Fire failed: target ship is destroyed")
-            return
-        }
         let ship = ships[sceneView.targetIndex]
         ship.targeted = true
         guard let missile = sceneView.helicopter.missiles.first(where: { !$0.fired }) else {
-            print("❌ No available missiles to fire")
+            print("No available missiles to fire")
             return
         }
         missile.fired = true
         missile.addCollision()
         // Initialize missile position at helicopter's gun position
         guard let helicopterEntity = sceneView.helicopter.helicopter else {
-            print("❌ No helicopter entity found")
+            print("No helicopter entity found")
             return
         }
         // Get helicopter's world position (through its anchor)
@@ -65,17 +82,10 @@ class MissileManager {
         if let parent = helicopterEntity.parent {
             print("🚁 Parent transform: \(parent.transform.translation)")
         }
-        // Try to get world position from the helicopter anchor
-        if let helicopterAnchor = sceneView.helicopterAnchor {
-            helicopterWorldPos = helicopterAnchor.transform.translation
-            print("🚁 Using helicopter anchor position: \(helicopterWorldPos)")
-        } else if let parent = helicopterEntity.parent {
-            helicopterWorldPos = parent.transform.translation
-            print("🚁 Using parent position: \(helicopterWorldPos)")
-        } else {
-            helicopterWorldPos = helicopterEntity.transform.translation
-            print("🚁 Using entity position: \(helicopterWorldPos)")
+        guard let helicopterPos = getHelicopterWorldPosition() else {
+           return
         }
+        helicopterWorldPos = helicopterPos
         // Start missile from helicopter's gun position
         let gunOffset = SIMD3<Float>(0.0, 0.0, 0.2) // Slightly forward of helicopter
         let initialMissilePos = helicopterWorldPos + gunOffset

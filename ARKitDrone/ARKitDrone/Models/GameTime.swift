@@ -10,7 +10,6 @@ import RealityKit
 
 @MainActor
 class GameTime {
-    
     //! The start time of the app.
     // Note: Uninitialized time/startTime are set to -1.0 so it can be checked in a lazy initialization
     private static var startTime = TimeInterval(-1.0)
