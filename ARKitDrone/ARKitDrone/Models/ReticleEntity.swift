@@ -42,8 +42,11 @@ class ReticleEntity: Entity {
         createCornerBrackets()
         addChild(positioningEntity)
 
-        // Start the target as visible
-        displayAsBillboard()
+        // Start the target as visible without animations
+        transform = Transform.identity
+        transform.rotation = simd_quatf(angle: 0, axis: [1, 0, 0])  // Keep vertical
+        transform.translation = [0, 0, 0]  // Don't offset
+        isEnabled = true
         isOpen = true
         isPointingDownwards = true
     }
@@ -164,9 +167,9 @@ class ReticleEntity: Entity {
         positioningEntity.addChild(brHoriz)
         positioningEntity.addChild(brVert)
         
-        // Set basic transform - make it vertical (no rotation) with small base scale
+        // Set basic transform - make it vertical (no rotation) with visible scale
         positioningEntity.transform.rotation = simd_quatf(angle: 0, axis: [1, 0, 0])
-        positioningEntity.transform.scale = SIMD3<Float>(repeating: 0.2)  // Small base scale
+        positioningEntity.transform.scale = SIMD3<Float>(repeating: 1.0)  // Larger visible scale
     }
     
     private func createFillPlane() {

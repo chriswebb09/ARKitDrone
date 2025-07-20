@@ -80,6 +80,8 @@ extension GameViewController: JoystickSceneDelegate {
                         guard realityKitView.targetIndex < realityKitView.ships.count else { return }
                         let square = ReticleEntity()
                         realityKitView.ships[realityKitView.targetIndex].square = square
+                        // Position the reticle at the ship's location
+                        square.transform.translation = realityKitView.ships[realityKitView.targetIndex].entity.transform.translation
                         // Add to ship's anchor
                         if let parent = realityKitView.ships[realityKitView.targetIndex].entity.parent {
                             parent.addChild(square)

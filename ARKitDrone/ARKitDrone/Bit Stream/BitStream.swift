@@ -124,3 +124,32 @@ struct ReadableBitStream {
         return (bytes[byteIndex] >> bitShift) & 1
     }
 }
+
+extension ReadableBitStream {
+    
+    mutating func readBytes(count: Int) throws -> [UInt8] {
+        align()
+        let startByte = currentBit / 8
+        let endByte = startByte + count
+        
+        guard endByte <= bytes.count else {
+            throw BitStreamError.tooShort
+        }
+        
+        let slice = bytes[startByte..<endByte]
+        currentBit += count * 8
+        return Array(slice)
+    }
+    
+    mutating func readFloat64() throws -> Double {
+        let bytes = try readBytes(count: 8)
+        return bytes.withUnsafeBytes {
+            Double(bitPattern: UInt64(littleEndian: $0.load(as: UInt64.self)))
+        }
+    }
+    
+    mutating func readFloat32() throws -> Float {
+        let bitPattern = try readUInt32()
+        return Float(bitPattern: bitPattern)
+    }
+}

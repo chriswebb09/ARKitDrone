@@ -132,9 +132,9 @@ class GameManager: NSObject {
     func createHelicopter(addNodeAction: AddNodeAction, owner: Player) async {
         os_log(.info, "Creating helicopter object for player %s", owner.username)
         
-        // Offset the world transform upward by 5 units
+        // Offset the world transform upward slightly above the surface
         var modifiedTransform = addNodeAction.simdWorldTransform
-        modifiedTransform.columns.3.y += 5.0
+        modifiedTransform.columns.3.y += 0.5
         
         // Create HelicopterObject instance with modified transform
         let helicopterObject = await HelicopterObject(
@@ -216,6 +216,87 @@ class GameManager: NSObject {
         return helicopters[player]
     }
     
+    // MARK: - Ship Synchronization
+    
+    /// Synchronize ship positions across all clients (called by host)
+    func synchronizeShips(_ ships: [Ship]) {
+        guard isNetworked && isServer else { return }
+        
+        // Convert Ship objects to sync data
+        let syncData = ships.map { ship in
+            ShipSyncData(
+                shipId: ship.id,
+                position: ship.entity.transform.translation,
+                velocity: ship.velocity,
+                rotation: ship.entity.transform.rotation,
+                isDestroyed: ship.isDestroyed,
+                targeted: ship.targeted
+            )
+        }
+        
+        // Send to all clients
+        send(gameAction: .shipsPositionSync(syncData))
+    }
+    
+    /// Update ship state across network
+    func updateShipState(shipId: String, isDestroyed: Bool) {
+        guard isNetworked else { return }
+        send(gameAction: .shipDestroyed(shipId))
+    }
+    
+    /// Update ship targeting state across network
+    func updateShipTargeting(shipId: String, targeted: Bool) {
+        guard isNetworked else { return }
+        send(gameAction: .shipTargeted(shipId, targeted))
+    }
+    
+    // MARK: - Missile Synchronization
+    
+    /// Fire missile across network
+    func fireMissile(missileId: String, from playerId: String, startPosition: SIMD3<Float>, startRotation: simd_quatf, targetShipId: String) {
+        guard isNetworked else { return }
+        
+        let fireData = MissileFireData(
+            missileId: missileId,
+            playerId: playerId,
+            startPosition: startPosition,
+            startRotation: startRotation,
+            targetShipId: targetShipId,
+            fireTime: CACurrentMediaTime()
+        )
+        
+        send(gameAction: .missileFired(fireData))
+    }
+    
+    /// Update missile position across network
+    func updateMissilePosition(missileId: String, position: SIMD3<Float>, rotation: simd_quatf) {
+        guard isNetworked else { return }
+        
+        let syncData = MissileSyncData(
+            missileId: missileId,
+            position: position,
+            rotation: rotation,
+            timestamp: CACurrentMediaTime()
+        )
+        
+        send(gameAction: .missilePositionUpdate(syncData))
+    }
+    
+    /// Handle missile hit across network
+    func handleMissileHit(missileId: String, shipId: String, hitPosition: SIMD3<Float>, playerId: String) {
+        guard isNetworked else { return }
+        
+        let hitData = MissileHitData(
+            missileId: missileId,
+            shipId: shipId,
+            hitPosition: hitPosition,
+            playerId: playerId,
+            timestamp: CACurrentMediaTime()
+        )
+        
+        send(gameAction: .missileHit(hitData))
+    }
+    
     // MARK: - inbound from network
     private func process(command: GameCommand) {
         os_signpost(
@@ -261,6 +342,44 @@ class GameManager: NSObject {
             if case let .helicopterStopMoving(isMoving) = gameAction {
                 Task { @MainActor in
                     self.switchHelicopterAnimation(player: player, isMoving: !isMoving)
+                }
+            }
+            
+            // Ship synchronization message handling
+            if case let .shipsPositionSync(ships) = gameAction {
+                Task { @MainActor in
+                    self.delegate?.manager(self, shipsUpdated: ships)
+                }
+            }
+            
+            if case let .shipDestroyed(shipId) = gameAction {
+                Task { @MainActor in
+                    self.delegate?.manager(self, shipDestroyed: shipId)
+                }
+            }
+            
+            if case let .shipTargeted(shipId, targeted) = gameAction {
+                Task { @MainActor in
+                    self.delegate?.manager(self, shipTargeted: shipId, targeted: targeted)
+                }
+            }
+            
+            // Missile synchronization message handling
+            if case let .missileFired(data) = gameAction {
+                Task { @MainActor in
+                    self.delegate?.manager(self, missileFired: data)
+                }
+            }
+            
+            if case let .missilePositionUpdate(data) = gameAction {
+                Task { @MainActor in
+                    self.delegate?.manager(self, missilePositionUpdated: data)
+                }
+            }
+            
+            if case let .missileHit(data) = gameAction {
+                Task { @MainActor in
+                    self.delegate?.manager(self, missileHit: data)
                 }
             }
             

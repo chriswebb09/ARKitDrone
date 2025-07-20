@@ -27,4 +27,14 @@ protocol GameManagerDelegate: AnyObject {
     func manager(_ manager: GameManager, createdHelicopter: HelicopterObject, for player: Player)
     func manager(_ manager: GameManager, removedHelicopter: HelicopterObject, for player: Player)
     func manager(_ manager: GameManager, helicopterMovementUpdated: HelicopterObject, for player: Player)
+    
+    // MARK: - Ship Synchronization Delegate Methods
+    func manager(_ manager: GameManager, shipsUpdated ships: [ShipSyncData])
+    func manager(_ manager: GameManager, shipDestroyed shipId: String)
+    func manager(_ manager: GameManager, shipTargeted shipId: String, targeted: Bool)
+    
+    // MARK: - Missile Synchronization Delegate Methods
+    func manager(_ manager: GameManager, missileFired data: MissileFireData)
+    func manager(_ manager: GameManager, missilePositionUpdated data: MissileSyncData)
+    func manager(_ manager: GameManager, missileHit data: MissileHitData)
 }

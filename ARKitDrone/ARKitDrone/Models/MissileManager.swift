@@ -205,7 +205,14 @@ class MissileManager {
         let deltaTime = displayLink.timestamp - trackingInfo.lastUpdateTime
         let speed: Float = 5  // Much slower for 10+ second missile flight
         let targetPos = ship.entity.transform.translation
-        let currentPos = missile.entity.transform.translation
+        // Get missile's world position by combining anchor and entity positions
+        let missileWorldPos: SIMD3<Float>
+        if let parent = missile.entity.parent {
+            missileWorldPos = parent.transform.translation + missile.entity.transform.translation
+        } else {
+            missileWorldPos = missile.entity.transform.translation
+        }
+        let currentPos = missileWorldPos
         
         if trackingInfo.frameCount < 3 {
             print("Frame \(trackingInfo.frameCount): Current pos: \(currentPos), Target pos: \(targetPos)")
@@ -231,6 +238,10 @@ class MissileManager {
         let directionVector = targetPos - currentPos
         let directionLength = simd_length(directionVector)
         
+        if trackingInfo.frameCount < 3 {
+            print("Direction vector: \(directionVector), length: \(directionLength)")
+        }
+        
         guard directionLength > 0.001 && directionLength < 1000 else {
             print("Direction vector invalid - length: \(directionLength)")
             cleanupMissile(displayLink: displayLink, missileID: missile.id)
@@ -239,6 +250,10 @@ class MissileManager {
         
         let direction = simd_normalize(directionVector)
         let movement = direction * speed * Float(deltaTime)
+        
+        if trackingInfo.frameCount < 3 {
+            print("Normalized direction: \(direction), movement: \(movement), deltaTime: \(deltaTime)")
+        }
         let movementLength = simd_length(movement)
         
         guard movementLength > 0 && movementLength < 10.0 else {
@@ -247,16 +262,26 @@ class MissileManager {
             return
         }
         
-        let newPosition = currentPos + movement
+        let newWorldPosition = currentPos + movement
         
-        guard abs(newPosition.x) < 100 && abs(newPosition.y) < 100 && abs(newPosition.z) < 100 else {
-            print("New position would be invalid: \(newPosition)")
+        guard abs(newWorldPosition.x) < 100 && abs(newWorldPosition.y) < 100 && abs(newWorldPosition.z) < 100 else {
+            print("New position would be invalid: \(newWorldPosition)")
             cleanupMissile(displayLink: displayLink, missileID: missile.id)
             return
         }
         
-        missile.entity.transform.translation = newPosition
-        missile.entity.look(at: targetPos, from: newPosition, relativeTo: nil)
+        // Convert world position back to local position relative to anchor
+        if let parent = missile.entity.parent {
+            missile.entity.transform.translation = newWorldPosition - parent.transform.translation
+        } else {
+            missile.entity.transform.translation = newWorldPosition
+        }
+        
+        // Orient missile towards target without using look(at:) which might interfere
+        if simd_length(directionVector) > 0.001 {
+            let targetRotation = simd_quatf(from: SIMD3<Float>(0, 0, 1), to: direction)
+            missile.entity.transform.rotation = targetRotation
+        }
         
         var updatedInfo = trackingInfo
         updatedInfo.frameCount += 1

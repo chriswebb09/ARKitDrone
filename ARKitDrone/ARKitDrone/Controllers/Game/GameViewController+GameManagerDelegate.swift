@@ -12,6 +12,30 @@ import RealityKit
 import ARKit
 
 extension GameViewController: GameManagerDelegate {
+    func manager(_ manager: GameManager, shipsUpdated ships: [ShipSyncData]) {
+        
+    }
+    
+    func manager(_ manager: GameManager, shipDestroyed shipId: String) {
+        
+    }
+    
+    func manager(_ manager: GameManager, shipTargeted shipId: String, targeted: Bool) {
+        
+    }
+    
+    func manager(_ manager: GameManager, missileFired data: MissileFireData) {
+        
+    }
+    
+    func manager(_ manager: GameManager, missilePositionUpdated data: MissileSyncData) {
+        
+    }
+    
+    func manager(_ manager: GameManager, missileHit data: MissileHitData) {
+        
+    }
+    
     
     func manager(_ manager: GameManager, hasNetworkDelay: Bool) { }
     
@@ -73,17 +97,6 @@ extension GameViewController: GameManagerDelegate {
         // Only handle non-helicopter related setup here
         // Helicopter creation is now handled by manager(_:createdHelicopter:for:)
         Task { @MainActor in
-            // Create targeting system (if needed)
-            let targetEntity = ReticleEntity()
-            targetEntity.transform.translation = SIMD3<Float>(
-                tappedPosition.x,
-                tappedPosition.y + 1,
-                tappedPosition.z
-            )
-            let anchor = AnchorEntity(world: targetEntity.transform.translation)
-            anchor.addChild(targetEntity)
-            realityKitView.scene.addAnchor(anchor)
-            
             let endPos = SIMD3<Float>(
                 x: tappedPosition.x,
                 y: tappedPosition.y,

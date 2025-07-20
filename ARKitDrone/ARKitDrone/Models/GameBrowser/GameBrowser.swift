@@ -16,19 +16,24 @@ class GameBrowser: NSObject, @unchecked Sendable {
     
     weak var delegate: GameBrowserDelegate?
     
-    fileprivate var games: Set<NetworkGame> = []
+    var games: Set<NetworkGame> = []
     
-    init(myself: Player) {
+    init(myself: Player, serviceBrowser: MCNearbyServiceBrowser? = nil) {
         self.myself = myself
-        let peer = MCPeerID(displayName: myself.username)
-        self.serviceBrowser = MCNearbyServiceBrowser(
-            peer: peer,
-            serviceType: MultiuserService.playerService
-        )
+        
+        if let injectedBrowser = serviceBrowser {
+            self.serviceBrowser = injectedBrowser
+        } else {
+            let peer = MCPeerID(displayName: myself.username)
+            self.serviceBrowser = MCNearbyServiceBrowser(
+                peer: peer,
+                serviceType: MultiuserService.playerService
+            )
+        }
+        
         super.init()
         self.serviceBrowser.delegate = self
     }
-    
     func start() {
         os_log(.info, "looking for peers")
         serviceBrowser.startBrowsingForPeers()

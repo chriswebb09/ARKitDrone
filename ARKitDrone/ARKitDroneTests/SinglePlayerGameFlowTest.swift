@@ -11,6 +11,7 @@ import RealityKit
 import simd
 import os.log
 
+@testable import ARKitDrone
 /// Test class to verify single player game flow
 @MainActor
 class SinglePlayerGameFlowTest {
@@ -42,60 +43,51 @@ class SinglePlayerGameFlowTest {
     
     static func testSoloGameManagerInit() async -> Bool {
         // Test that GameManager initializes correctly for solo mode
-        do {
-            let gameManager = GameManager(arView: nil, session: nil)
-            
-            // Verify solo mode properties
-            let isSoloMode = !gameManager.isNetworked && gameManager.isServer
-            let hasNoHelicopters = gameManager.getAllHelicopters().isEmpty
-            
-            os_log(.info, "✅ Solo GameManager: isNetworked=%@, isServer=%@", 
-                   String(gameManager.isNetworked), String(gameManager.isServer))
-            
-            return isSoloMode && hasNoHelicopters
-        } catch {
-            os_log(.error, "❌ Solo GameManager init failed: %@", error.localizedDescription)
-            return false
-        }
+        let mockARView = ARView(frame: .zero)
+        let gameManager = GameManager(arView: mockARView, session: nil)
+        
+        // Verify solo mode properties
+        let isSoloMode = !gameManager.isNetworked && gameManager.isServer
+        let hasNoHelicopters = gameManager.getAllHelicopters().isEmpty
+        
+        os_log(.info, "✅ Solo GameManager: isNetworked=%@, isServer=%@", 
+               String(gameManager.isNetworked), String(gameManager.isServer))
+        
+        return isSoloMode && hasNoHelicopters
     }
     
     static func testLocalHelicopterCreation() async -> Bool {
         // Test creating a local player helicopter
-        do {
-            let gameManager = GameManager(arView: nil, session: nil)
-            let localPlayer = Player(username: "TestPlayer")
-            let transform = simd_float4x4(1.0) // Identity matrix
-            
-            let addNodeAction = AddNodeAction(
-                simdWorldTransform: transform,
-                eulerAngles: SIMD3<Float>(0, 0, 0)
-            )
-            
-            // Create helicopter
-            await gameManager.createHelicopter(addNodeAction: addNodeAction, owner: localPlayer)
-            
-            // Verify helicopter was created
-            let helicopters = gameManager.getAllHelicopters()
-            let localHelicopter = gameManager.getHelicopter(for: localPlayer)
-            
-            let hasOneHelicopter = helicopters.count == 1
-            let hasLocalHelicopter = localHelicopter != nil
-            let correctOwner = localHelicopter?.owner?.username == "TestPlayer"
-            
-            os_log(.info, "✅ Helicopter creation: count=%d, hasLocal=%@, correctOwner=%@", 
-                   helicopters.count, String(hasLocalHelicopter), String(correctOwner))
-            
-            return hasOneHelicopter && hasLocalHelicopter && correctOwner
-        } catch {
-            os_log(.error, "❌ Helicopter creation failed: %@", error.localizedDescription)
-            return false
-        }
+        let mockARView = ARView(frame: .zero)
+        let gameManager = GameManager(arView: mockARView, session: nil)
+        let localPlayer = Player(username: "TestPlayer")
+        let transform = simd_float4x4(1.0) // Identity matrix
+        
+        let addNodeAction = AddNodeAction(
+            simdWorldTransform: transform,
+            eulerAngles: SIMD3<Float>(0, 0, 0)
+        )
+        
+        // Create helicopter
+        await gameManager.createHelicopter(addNodeAction: addNodeAction, owner: localPlayer)
+        
+        // Verify helicopter was created
+        let helicopters = gameManager.getAllHelicopters()
+        let localHelicopter = gameManager.getHelicopter(for: localPlayer)
+        
+        let hasOneHelicopter = helicopters.count == 1
+        let hasLocalHelicopter = localHelicopter != nil
+        let correctOwner = localHelicopter?.owner?.username == "TestPlayer"
+        
+        os_log(.info, "✅ Helicopter creation: count=%d, hasLocal=%@, correctOwner=%@", 
+               helicopters.count, String(hasLocalHelicopter), String(correctOwner))
+        
+        return hasOneHelicopter && hasLocalHelicopter && correctOwner
     }
     
     static func testHelicopterMovement() async -> Bool {
         // Test helicopter movement through HelicopterObject system
-        do {
-            let gameManager = GameManager(arView: nil, session: nil)
+        let gameManager = GameManager(arView: ARView(frame: .zero), session: nil)
             let localPlayer = Player(username: "TestPlayer")
             let transform = simd_float4x4(1.0)
             
@@ -125,16 +117,11 @@ class SinglePlayerGameFlowTest {
             os_log(.info, "✅ Helicopter movement: isMoving=%@", String(helicopter.isMoving))
             
             return true // Movement succeeded without crashing
-        } catch {
-            os_log(.error, "❌ Helicopter movement failed: %@", error.localizedDescription)
-            return false
-        }
     }
     
     static func testNoDuplicateHelicopters() async -> Bool {
         // Test that solo mode doesn't create duplicate helicopters
-        do {
-            let gameManager = GameManager(arView: nil, session: nil)
+        let gameManager = GameManager(arView: ARView(frame: .zero), session: nil)
             let localPlayer = Player(username: "TestPlayer")
             let transform = simd_float4x4(1.0)
             
@@ -154,16 +141,11 @@ class SinglePlayerGameFlowTest {
             os_log(.info, "✅ Duplicate prevention: helicopterCount=%d", helicopters.count)
             
             return hasOnlyOne
-        } catch {
-            os_log(.error, "❌ Duplicate prevention test failed: %@", error.localizedDescription)
-            return false
-        }
     }
     
     static func testMissileSystem() async -> Bool {
         // Test missile system integration with HelicopterObject
-        do {
-            let gameManager = GameManager(arView: nil, session: nil)
+        let gameManager = GameManager(arView: ARView(frame: .zero), session: nil)
             let localPlayer = Player(username: "TestPlayer")
             let transform = simd_float4x4(1.0)
             
@@ -191,10 +173,6 @@ class SinglePlayerGameFlowTest {
                    String(initialState), String(toggledState))
             
             return missileToggleWorks
-        } catch {
-            os_log(.error, "❌ Missile system test failed: %@", error.localizedDescription)
-            return false
-        }
     }
     
     // MARK: - Test Runner Helper

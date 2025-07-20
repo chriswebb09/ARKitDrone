@@ -73,6 +73,18 @@ extension Action: CustomStringConvertible {
                 return "helicopter_start_moving"
             case .helicopterStopMoving(_):
                 return "helicopter_stop_moving"
+            case .shipsPositionSync(_):
+                return "ships_position_sync"
+            case .shipDestroyed(_):
+                return "ship_destroyed"
+            case .shipTargeted(_, _):
+                return "ship_targeted"
+            case .missileFired(_):
+                return "missile_fired"
+            case .missilePositionUpdate(_):
+                return "missile_position_update"
+            case .missileHit(_):
+                return "missile_hit"
             }
         case .boardSetup(let boardAction):
             switch boardAction {

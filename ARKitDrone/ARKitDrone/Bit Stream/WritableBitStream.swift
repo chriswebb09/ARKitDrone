@@ -85,4 +85,15 @@ struct WritableBitStream {
         let combinedBytes = endBitIndexBytes + bytes
         return Data(combinedBytes)
     }
+    
+//    mutating func appendBytes(_ bytes: [UInt8]) {
+//        self.bytes.append(contentsOf: bytes)
+//        endBitIndex += bytes.count * 8
+//    }
+//    
+    mutating func appendBytes(_ bytes: [UInt8]) {
+        align() // Ensure we are byte-aligned
+        self.bytes.append(contentsOf: bytes)
+        endBitIndex += bytes.count * 8
+    }
 }

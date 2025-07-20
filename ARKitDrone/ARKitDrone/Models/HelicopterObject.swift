@@ -129,16 +129,16 @@ class HelicopterObject: ObservableObject {
         
         switch moveData.direction {
         case .forward:
-            helicopter.moveForward(value: moveData.velocity.vector.y * 0.02)
+            helicopter.moveForward(value: moveData.velocity.vector.y * 0.008)
         case .side:
-            helicopter.moveSides(value: moveData.velocity.vector.x * 0.02)
+            helicopter.moveSides(value: moveData.velocity.vector.x * 0.008)
         case .altitude:
-            helicopter.changeAltitude(value: moveData.velocity.vector.y * 0.02)
+            helicopter.changeAltitude(value: moveData.velocity.vector.y * 0.008)
         case .rotation:
-            helicopter.rotate(yaw: moveData.velocity.vector.x * 0.02)
+            helicopter.rotate(yaw: moveData.velocity.vector.x * 0.008)
         case .none:
             // No specific direction, apply general movement
-            helicopter.moveForward(value: moveData.velocity.vector.y * 0.02)
+            helicopter.moveForward(value: moveData.velocity.vector.y * 0.008)
         @unknown default:
             os_log(.error, "Unknown movement direction in HelicopterObject.updateMovement")
         }

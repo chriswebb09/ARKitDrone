@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -28,6 +28,7 @@
 		94423DE82DAB4434007B5945 /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DE72DAB4432007B5945 /* Direction.swift */; };
 		94423DEB2DAB4597007B5945 /* FloatCompressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DEA2DAB4594007B5945 /* FloatCompressor.swift */; };
 		94423DED2DAB45C7007B5945 /* WritableBitStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DEC2DAB45C6007B5945 /* WritableBitStream.swift */; };
+		94423DF02DAB44AA007B5945 /* SyncDataStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94423DEF2DAB44A7007B5945 /* SyncDataStructures.swift */; };
 		944254542E2457ED00F025C4 /* F-35B_Lightning_II.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 944254532E2457EC00F025C4 /* F-35B_Lightning_II.usdz */; };
 		9455B7532D60C73F0019FE10 /* MissileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9455B7522D60C73B0019FE10 /* MissileManager.swift */; };
 		9455B7552D60C74A0019FE10 /* ShipManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9455B7542D60C7460019FE10 /* ShipManager.swift */; };
@@ -66,6 +67,7 @@
 		94874EB02E258A3900453E04 /* Missile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94874EAF2E258A3900453E04 /* Missile.swift */; };
 		94874EB42E25C95700453E04 /* heli.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 94874EB32E25C95700453E04 /* heli.usdz */; };
 		9488F2032D657BA6001C08D9 /* ReticleEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9488F2022D657BA2001C08D9 /* ReticleEntity.swift */; };
+		949602D72E2CCAB90021B8E7 /* TestPlan.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 949602D62E2CCAB90021B8E7 /* TestPlan.xctestplan */; };
 		94A68F722C8797070059CD82 /* Matrix4+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F712C8797070059CD82 /* Matrix4+Extension.swift */; };
 		94A68F742C87972E0059CD82 /* Quaternion+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F732C87972E0059CD82 /* Quaternion+Extension.swift */; };
 		94B173E32DA9CC420015DC0D /* GameViewController+GameManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B173E22DA9CC390015DC0D /* GameViewController+GameManagerDelegate.swift */; };
@@ -115,6 +117,16 @@
 		A7AE72C71F888EF500B015D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72C61F888EF500B015D3 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		94E6B9A12E2CCA00008392FF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7AE72B21F888EF500B015D3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A7AE72B91F888EF500B015D3;
+			remoteInfo = ARKitDrone;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		9412F0752D5B4BE500D9F1BD /* Ship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ship.swift; sourceTree = "<group>"; };
 		941706D82972A5F400CB0308 /* ApacheHelicopter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApacheHelicopter.swift; sourceTree = "<group>"; };
@@ -137,6 +149,7 @@
 		94423DE72DAB4432007B5945 /* Direction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Direction.swift; sourceTree = "<group>"; };
 		94423DEA2DAB4594007B5945 /* FloatCompressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatCompressor.swift; sourceTree = "<group>"; };
 		94423DEC2DAB45C6007B5945 /* WritableBitStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritableBitStream.swift; sourceTree = "<group>"; };
+		94423DEF2DAB44A7007B5945 /* SyncDataStructures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncDataStructures.swift; sourceTree = "<group>"; };
 		944254532E2457EC00F025C4 /* F-35B_Lightning_II.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = "F-35B_Lightning_II.usdz"; sourceTree = "<group>"; };
 		9455B7522D60C73B0019FE10 /* MissileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissileManager.swift; sourceTree = "<group>"; };
 		9455B7542D60C7460019FE10 /* ShipManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShipManager.swift; sourceTree = "<group>"; };
@@ -175,6 +188,7 @@
 		94874EAF2E258A3900453E04 /* Missile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Missile.swift; sourceTree = "<group>"; };
 		94874EB32E25C95700453E04 /* heli.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = heli.usdz; sourceTree = "<group>"; };
 		9488F2022D657BA2001C08D9 /* ReticleEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReticleEntity.swift; sourceTree = "<group>"; };
+		949602D62E2CCAB90021B8E7 /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
 		94A68F712C8797070059CD82 /* Matrix4+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Matrix4+Extension.swift"; sourceTree = "<group>"; };
 		94A68F732C87972E0059CD82 /* Quaternion+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Quaternion+Extension.swift"; sourceTree = "<group>"; };
 		94B173E22DA9CC390015DC0D /* GameViewController+GameManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+GameManagerDelegate.swift"; sourceTree = "<group>"; };
@@ -218,6 +232,7 @@
 		94D630312976077000096104 /* UIFont+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
 		94DF3F072975F15F006723FC /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		94E5448E29672EE200158DA2 /* JoystickSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoystickSceneDelegate.swift; sourceTree = "<group>"; };
+		94E6B99D2E2CCA00008392FF /* ARKitDroneTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ARKitDroneTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		94F5D19B2D5CAE9B00019569 /* MinimapScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimapScene.swift; sourceTree = "<group>"; };
 		94F968A72AD7337F00D7B418 /* OcclusionNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OcclusionNode.swift; sourceTree = "<group>"; };
 		A7AE72BA1F888EF500B015D3 /* ARKitDrone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARKitDrone.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -226,7 +241,18 @@
 		A7AE72CB1F888EF500B015D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		94E6B99E2E2CCA00008392FF /* ARKitDroneTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ARKitDroneTests; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
+		94E6B99A2E2CCA00008392FF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A7AE72B71F888EF500B015D3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -252,6 +278,7 @@
 				94423DE72DAB4432007B5945 /* Direction.swift */,
 				94423DE52DAB43EB007B5945 /* Action.swift */,
 				94423DE32DAB43B8007B5945 /* GameAction.swift */,
+				94423DEF2DAB44A7007B5945 /* SyncDataStructures.swift */,
 				94423DE12DAB4388007B5945 /* AddNodeAction.swift */,
 				94423DDF2DAB435F007B5945 /* MoveData.swift */,
 				94423DDD2DAB433C007B5945 /* CompletedAction.swift */,
@@ -460,7 +487,9 @@
 		A7AE72B11F888EF500B015D3 = {
 			isa = PBXGroup;
 			children = (
+				949602D62E2CCAB90021B8E7 /* TestPlan.xctestplan */,
 				A7AE72BC1F888EF500B015D3 /* ARKitDrone */,
+				94E6B99E2E2CCA00008392FF /* ARKitDroneTests */,
 				A7AE72BB1F888EF500B015D3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -469,6 +498,7 @@
 			isa = PBXGroup;
 			children = (
 				A7AE72BA1F888EF500B015D3 /* ARKitDrone.app */,
+				94E6B99D2E2CCA00008392FF /* ARKitDroneTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -506,6 +536,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		94E6B99C2E2CCA00008392FF /* ARKitDroneTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 94E6B9A32E2CCA00008392FF /* Build configuration list for PBXNativeTarget "ARKitDroneTests" */;
+			buildPhases = (
+				94E6B9992E2CCA00008392FF /* Sources */,
+				94E6B99A2E2CCA00008392FF /* Frameworks */,
+				94E6B99B2E2CCA00008392FF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				94E6B9A22E2CCA00008392FF /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				94E6B99E2E2CCA00008392FF /* ARKitDroneTests */,
+			);
+			name = ARKitDroneTests;
+			packageProductDependencies = (
+			);
+			productName = ARKitDroneTests;
+			productReference = 94E6B99D2E2CCA00008392FF /* ARKitDroneTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		A7AE72B91F888EF500B015D3 /* ARKitDrone */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A7AE72CE1F888EF500B015D3 /* Build configuration list for PBXNativeTarget "ARKitDrone" */;
@@ -530,10 +583,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastSwiftUpdateCheck = 0910;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1630;
 				ORGANIZATIONNAME = "Christopher Webb-Orenstein";
 				TargetAttributes = {
+					94E6B99C2E2CCA00008392FF = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = A7AE72B91F888EF500B015D3;
+					};
 					A7AE72B91F888EF500B015D3 = {
 						CreatedOnToolsVersion = 9.1;
 						LastSwiftMigration = "";
@@ -554,11 +611,20 @@
 			projectRoot = "";
 			targets = (
 				A7AE72B91F888EF500B015D3 /* ARKitDrone */,
+				94E6B99C2E2CCA00008392FF /* ARKitDroneTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		94E6B99B2E2CCA00008392FF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				949602D72E2CCAB90021B8E7 /* TestPlan.xctestplan in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A7AE72B81F888EF500B015D3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -580,6 +646,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		94E6B9992E2CCA00008392FF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A7AE72B61F888EF500B015D3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -635,6 +708,7 @@
 				94CF991B2E245F1900E780DE /* FocusSquare.swift in Sources */,
 				94CF991C2E245F1900E780DE /* FocusCircle.swift in Sources */,
 				94423DE42DAB43BB007B5945 /* GameAction.swift in Sources */,
+				94423DF02DAB44AA007B5945 /* SyncDataStructures.swift in Sources */,
 				94CCC90E2972EB2400F7D17F /* GameSceneView.swift in Sources */,
 				946690C72D9E3FE100343B1B /* GameCell.swift in Sources */,
 				94DF3F082975F167006723FC /* UIView+Extension.swift in Sources */,
@@ -684,7 +758,67 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		94E6B9A22E2CCA00008392FF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A7AE72B91F888EF500B015D3 /* ARKitDrone */;
+			targetProxy = 94E6B9A12E2CCA00008392FF /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		94E6B9A42E2CCA00008392FF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9LZ34BLS2W;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.froleeyo.ARKitDroneTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ARKitDrone.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ARKitDrone";
+			};
+			name = Debug;
+		};
+		94E6B9A52E2CCA00008392FF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9LZ34BLS2W;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.froleeyo.ARKitDroneTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ARKitDrone.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ARKitDrone";
+			};
+			name = Release;
+		};
 		A7AE72CC1F888EF500B015D3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -838,7 +972,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 9LZ34BLS2W;
 				INFOPLIST_FILE = ARKitDrone/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -860,6 +994,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		94E6B9A32E2CCA00008392FF /* Build configuration list for PBXNativeTarget "ARKitDroneTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				94E6B9A42E2CCA00008392FF /* Debug */,
+				94E6B9A52E2CCA00008392FF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		A7AE72B51F888EF500B015D3 /* Build configuration list for PBXProject "ARKitDrone" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

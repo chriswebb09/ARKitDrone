@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "E46B8658-4062-4F39-8A4C-662AF19CF0DF",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:ARKitDrone.xcodeproj",
+        "identifier" : "94E6B99C2E2CCA00008392FF",
+        "name" : "ARKitDroneTests"
+      }
+    }
+  ],
+  "version" : 1
+}
