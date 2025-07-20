@@ -18,11 +18,11 @@ class ApacheHelicopter {
     var helicopter: Entity?
     var rotor: Entity?
     var tailRotor: Entity?
-    var missiles: [Missile] = []  // Changed to match SceneKit
+    var missiles: [Missile] = []
     var missileEntities: [Entity] = []  // Keep reference to raw entities
     var hudEntity: Entity?
     
-    // Additional helicopter components matching SceneKit version
+    // Additional helicopter components 
     var wingL: Entity?
     var wingR: Entity?
     var bodyEntity: Entity?

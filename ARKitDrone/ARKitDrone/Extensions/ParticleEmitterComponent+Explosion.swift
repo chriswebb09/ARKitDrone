@@ -14,7 +14,7 @@ extension ParticleEmitterComponent {
     /// Create an explosion particle effect
     static func createExplosion() -> ParticleEmitterComponent {
         // Create particle emitter with simple configuration
-        // Note: ParticleEmitterComponent has limited customization compared to SceneKit
+        // Note: ParticleEmitterComponent has limited customization
         // Create basic particle emitter component
         let particles = ParticleEmitterComponent()
         return particles

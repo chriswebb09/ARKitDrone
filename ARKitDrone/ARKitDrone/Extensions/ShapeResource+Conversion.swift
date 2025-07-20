@@ -7,7 +7,6 @@
 //
 
 import RealityKit
-import SceneKit
 
 extension ShapeResource {
     /// Create primitive shapes for common physics bodies

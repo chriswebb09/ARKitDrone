@@ -12,7 +12,7 @@ extension StaticString {
     static let preload_assets = "PreloadAssets" as StaticString
     static let setup_level = "SetupLevel" as StaticString
 
-    // Signpost names for signposts related to scenekit render loop
+    // Signpost names for signposts related to render loop
     static let render_loop = "RenderLoop" as StaticString
     static let logic_update = "GameLogicUpdate" as StaticString
     static let process_command = "ProcessCommand" as StaticString
@@ -42,7 +42,7 @@ extension OSSignpostID {
     static let preload_assets = OSSignpostID(log: .preload_assets)
     static let setup_level = OSSignpostID(log: .setup_level)
 
-    // Signpost ids for signposts related to scenekit render loop
+    // Signpost ids for signposts related to render loop
     static let render_loop = OSSignpostID(log: .render_loop)
 
     // Signpost ids for signposts related to networking

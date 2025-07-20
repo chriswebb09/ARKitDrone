@@ -118,7 +118,7 @@ class Ship {
     
     func limitVelocity(_ ship: Ship) {
         let mag = simd_length(ship.velocity)
-        let limit: Float = 0.5  // Exact SceneKit limit
+        let limit: Float = 0.5
         if mag > limit {
             ship.velocity = (ship.velocity / mag) * limit
         }
@@ -142,7 +142,7 @@ class Ship {
                     otherShip.entity.transform.translation,
                     ship.entity.transform.translation
                 )
-                if distance < 5 {  // Exact SceneKit distance threshold
+                if distance < 5 {
                     forceAway = forceAway - (otherShip.entity.transform.translation - ship.entity.transform.translation)
                 }
             }
