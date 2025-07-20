@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Foundation
+import RealityKit
 
 @MainActor
 protocol GameManagerDelegate: AnyObject {
@@ -20,4 +22,9 @@ protocol GameManagerDelegate: AnyObject {
     func manager(_ manager: GameManager, completed: CompletedAction)
     func manager(_ manager: GameManager, moveNode: MoveData)
     func manager(_ manager: GameManager, hasNetworkDelay: Bool)
+    
+    // MARK: - Multiplayer Helicopter Delegate Methods
+    func manager(_ manager: GameManager, createdHelicopter: HelicopterObject, for player: Player)
+    func manager(_ manager: GameManager, removedHelicopter: HelicopterObject, for player: Player)
+    func manager(_ manager: GameManager, helicopterMovementUpdated: HelicopterObject, for player: Player)
 }

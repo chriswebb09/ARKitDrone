@@ -285,7 +285,7 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         
         await MainActor.run {
             // Setup managers
-            missileManager = MissileManager(game: game, sceneView: realityKitView)
+            missileManager = MissileManager(game: game, sceneView: realityKitView, gameManager: gameManager, localPlayer: myself)
             missileManager?.delegate = self
             shipManager = ShipManager(game: game, arView: realityKitView)
             
@@ -335,7 +335,9 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         // Setup RealityKit managers
         missileManager = MissileManager(
             game: game,
-            sceneView: realityKitView
+            sceneView: realityKitView,
+            gameManager: gameManager,
+            localPlayer: myself
         )
         missileManager?.delegate = self
         shipManager = ShipManager(
@@ -520,8 +522,10 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         let newTitle = currentTitle == LocalConstants.buttonTitle ? LocalConstants.disarmTitle : LocalConstants.buttonTitle
         armMissilesButton.setTitle(newTitle, for: .normal)
         
-        // Toggle helicopter missiles state
-        realityKitView.helicopter?.toggleArmMissile()
+        // Toggle helicopter missiles state through HelicopterObject system
+        if let localHelicopter = gameManager?.getHelicopter(for: myself) {
+            localHelicopter.toggleMissileArmed()
+        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -555,40 +559,38 @@ class GameViewController: UIViewController, MissileManagerDelegate {
             firstResult.worldTransform.columns.3.y,
             firstResult.worldTransform.columns.3.z
         )
-        // Position helicopter at tapped location
-        Task {
-            guard let helicopter = await realityKitView.positionHelicopter(at: tappedPosition) else {
-                return
+        // Create helicopter through HelicopterObject system (unified single/multiplayer)
+        let angles = SIMD3<Float>(0, 0, 0)
+        let worldTransform = firstResult.worldTransform
+        let addNode = AddNodeAction(
+            simdWorldTransform: worldTransform,
+            eulerAngles: angles
+        )
+        
+        os_log(.info, "Creating local player helicopter through HelicopterObject system")
+        
+        // Create local player helicopter using the new multiplayer architecture
+        Task { @MainActor in
+            await gameManager?.createHelicopter(addNodeAction: addNode, owner: myself)
+            
+            // Hide focus square and mark game as placed
+            focusSquare.hide()
+            game.placed = true
+            focusSquare.isEnabled = false
+            
+            // Setup tank positioning (legacy compatibility)
+            realityKitView.placeTankOnSurface(at: tapLocation)
+            
+            // Setup ships with local helicopter
+            if let localHelicopter = gameManager?.getHelicopter(for: myself),
+               let helicopterEntity = localHelicopter.helicopterEntity?.helicopter {
+                shipManager?.helicopterEntity = helicopterEntity
+                await shipManager?.setupShips()
             }
             
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                realityKitView.helicopter = helicopter
-                // Reset target transform for smooth movement from new position
-                helicopter.resetTargetTransform()
-                // Use default rotation angles (if you want different rotation, update here)
-                let angles = SIMD3<Float>(0, 0, 0)
-                // Make sure firstResult.worldTransform is available
-                let worldTransform = firstResult.worldTransform
-                let addNode = AddNodeAction(
-                    simdWorldTransform: worldTransform,
-                    eulerAngles: angles
-                )
-                os_log(.info, "Sending add node action for multiplayer")
-                gameManager?.send(addNode: addNode)
-                // Hide focus square and mark game as placed
-                focusSquare.hide()
-                game.placed = true
-                // Ensure focus square stays hidden by disabling it completely
-                focusSquare.isEnabled = false
-                realityKitView.placeTankOnSurface(at: tapLocation)
-                // Set helicopter entity for managers
-                let helicopterEntity = realityKitView.helicopter.helicopter
-                shipManager?.helicopterEntity = helicopterEntity
-                // Setup ships immediately on main thread for responsiveness
-                Task {
-                    await shipManager?.setupShips()
-                }
+            // Only send to network if we have a network session (multiplayer mode)
+            if let gameManager = gameManager, gameManager.isNetworked {
+                gameManager.send(addNode: addNode)
             }
         }
     }

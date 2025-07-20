@@ -20,6 +20,10 @@ extension GameViewController: GameStartViewControllerDelegate {
             session: session
         )
         gameManager?.start()
+        
+        // Update MissileManager with the new GameManager reference
+        missileManager?.gameManager = gameManager
+        
         // Setup views after manager is created
         DispatchQueue.main.async {
             self.setupViews()
@@ -28,13 +32,8 @@ extension GameViewController: GameStartViewControllerDelegate {
     
     func gameStartViewController(_ _: UIViewController, didPressStartSoloGameButton: UIButton) {
         os_log(.info, "🎮 Starting solo game")
-        // Create a solo session (no networking)
-        let soloSession = NetworkSession(
-            myself: UserDefaults.standard.myself,
-            asServer: true,
-            host: UserDefaults.standard.myself
-        )
-        createGameManager(for: soloSession)
+        // Solo game has no network session
+        createGameManager(for: nil)
     }
     
     func gameStartViewController(_ _: UIViewController, didStart game: NetworkSession) {

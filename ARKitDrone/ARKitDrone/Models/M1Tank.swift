@@ -16,7 +16,7 @@ import simd
 class M1AbramsTank {
     
     private struct LocalConstants {
-        static let sceneName = "m1.usdz"
+        static let sceneName = "m1tankmodel"
         static let tank = "m1tank"
         static let turret = "turret"
         static let maingun = "gun"
@@ -39,29 +39,58 @@ class M1AbramsTank {
     
     func setup(with arView: ARView, transform: simd_float4x4) async {
         do {
-            // Load USDZ tank model
-            let tankModel = try await Entity.loadUSDZ(named: LocalConstants.sceneName)
-            tankEntity = tankModel
-            // Find child entities
-            tracksEntity = tankEntity.findEntity(named: LocalConstants.body)
-            turretEntity = tankEntity.findEntity(named: LocalConstants.turret)
-            mainGunEntity = turretEntity?.findEntity(named: LocalConstants.maingun)
-            // Set transform
-            await MainActor.run {
-                tankEntity.transform.matrix = transform
-                tankEntity.transform.rotation *= simd_quatf(
-                    angle: -1.7,
-                    axis: SIMD3<Float>(1, 0, 0)
-                )
+            // Load tank model exactly like the original working code
+            let entity = try await AsyncModelLoader.shared.loadModel(named: LocalConstants.sceneName)
+            let tankRootEntity: Entity
+            if let rootEntity = entity.findEntity(named: "root") {
+                tankRootEntity = rootEntity
+            } else {
+                tankRootEntity = entity
             }
-            // Add to scene
-            let anchor = AnchorEntity(world: SIMD3<Float>(0, 0, 0))
-            anchor.addChild(tankEntity)
-            arView.scene.addAnchor(anchor)
+            tankRootEntity.name = "Tank"
+            tankRootEntity.scale = SIMD3<Float>(repeating: 0.1)
+            tankRootEntity.isEnabled = true
+            tankRootEntity.transform.rotation = simd_quatf(
+                angle: -Float.pi / 2,
+                axis: SIMD3<Float>(1, 0, 0)
+            )
+            
+            // Add physics to body entity if found (like original)
+            if let bodyEntity = tankRootEntity.findEntity(named: "body") {
+                let bounds = bodyEntity.visualBounds(relativeTo: nil).extents
+                bodyEntity.components.set(CollisionComponent(shapes: [.generateBox(size: bounds)]))
+                bodyEntity.components.set(PhysicsBodyComponent(massProperties: .default, material: .default, mode: .static))
+            }
+            
+            // Wrap in ModelEntity if needed (like original)
+            if let modelEntity = tankRootEntity as? ModelEntity {
+                self.tankEntity = modelEntity
+            } else {
+                let wrapperEntity = ModelEntity()
+                wrapperEntity.name = "TankWrapper"
+                wrapperEntity.addChild(tankRootEntity)
+                self.tankEntity = wrapperEntity
+            }
+            
+            // Position tank using raycast result (like original)
+            let tankPosition = SIMD3<Float>(
+                transform.columns.3.x,
+                transform.columns.3.y,
+                transform.columns.3.z
+            )
+            let adjustedPosition = SIMD3<Float>(
+                tankPosition.x,
+                tankPosition.y + 0.05,
+                tankPosition.z
+            )
+            
+            // Create anchor for tank (like original)
+            let tankAnchor = AnchorEntity(world: adjustedPosition)
+            tankAnchor.addChild(tankEntity)
+            arView.scene.addAnchor(tankAnchor)
             
         } catch {
-            print("Failed to load tank model: \(error)")
-            // No fallback - require actual model
+            print("❌ Failed to load tank model: \(error)")
             return
         }
     }
@@ -206,16 +235,16 @@ extension M1AbramsTank {
         let distance = distanceToTarget(opponent)
         let angleToOpponent = angleToTarget(opponent)
         if abs(angleToOpponent) <= forwardAngleThreshold {
-            print("RealityKit M1 Abrams Tank: Opponent is in front.")
+            print("M1 Abrams Tank: Opponent is in front.")
             if distance <= firingRange && hasLineOfSight(to: opponent) {
-                print("RealityKit M1 Abrams Tank: Engaging opponent. Target within range and clear line of sight.")
+                print("M1 Abrams Tank: Engaging opponent. Target within range and clear line of sight.")
                 await fire()
             } else {
-                print("RealityKit M1 Abrams Tank: Not in range. Moving toward opponent.")
+                print("M1 Abrams Tank: Not in range. Moving toward opponent.")
                 move(direction: 1.0)
             }
         } else {
-            print("RealityKit M1 Abrams Tank: Opponent is not in front, repositioning.")
+            print("M1 Abrams Tank: Opponent is not in front, repositioning.")
             rotate(angle: angleToOpponent)
             move(direction: 1.0)
         }

@@ -58,5 +58,33 @@ extension Action: BitStreamCodable {
             self = .completed(completedAction)
         }
     }
-    
+}
+
+extension Action: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .gameAction(let gameAction):
+            switch gameAction {
+            case .joyStickMoved(_):
+                return "joystick_movement"
+            case .movement(_):
+                return "physics"
+            case .helicopterStartMoving(_):
+                return "helicopter_start_moving"
+            case .helicopterStopMoving(_):
+                return "helicopter_stop_moving"
+            }
+        case .boardSetup(let boardAction):
+            switch boardAction {
+            case .requestBoardLocation:
+                return "request_board_location"
+            case .boardLocation(_):
+                return "board_location"
+            }
+        case .addNode(_):
+            return "add_helicopter"
+        case .completed(_):
+            return "action_completed"
+        }
+    }
 }

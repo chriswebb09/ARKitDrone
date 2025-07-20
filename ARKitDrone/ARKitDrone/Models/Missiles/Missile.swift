@@ -22,12 +22,7 @@ class Missile {
     var id: String
     var num: Int = -1
     
-    private static var missileRegistry: [Entity: Missile] = [:]
-    
-    private static let registryQueue = DispatchQueue(
-        label: "missile.registry",
-        attributes: .concurrent
-    )
+    @MainActor private static var missileRegistry: [Entity: Missile] = [:]
     
     private static let maxParticleDistance: Float = 50.0  // Max distance for particles
     private static let maxActiveParticles: Int = 5  // Limit active particle systems
@@ -51,11 +46,8 @@ class Missile {
     }
     
     deinit {
-        // Remove async dispatch to prevent retain cycles
-        let entity = self.entity
-        Task { @MainActor in
-            Missile.missileRegistry.removeValue(forKey: entity)
-        }
+        // Registry cleanup will happen through explicit cleanup calls
+        // Avoid async cleanup in deinit to prevent race conditions
     }
     
     private func setupParticleSystem() {
@@ -91,8 +83,8 @@ class Missile {
             to: direction
         )
         let distance = simd_length(targetPosition - start)
-        let speed: Float = 10  // Reduced from 30 to 10 for slower motion
-        let duration = TimeInterval(distance / speed)
+        // Fixed duration of 10+ seconds for dramatic missile flight
+        let duration = TimeInterval(max(10.0, distance / 2.0))  // At least 10 seconds, longer for far targets
         let moveAnimation = FromToByAnimation<Transform>(
             name: "missileFlight",
             from: Transform(
@@ -122,7 +114,6 @@ class Missile {
     
     private func cleanup() {
         particleEntity?.isEnabled = false
-        
         // Remove after brief delay to let particles fade
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.entity.removeFromParent()

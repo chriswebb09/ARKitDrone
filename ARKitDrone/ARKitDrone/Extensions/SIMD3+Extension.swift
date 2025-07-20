@@ -111,3 +111,32 @@ func / (left: SIMD3<Float>, right: Int) -> SIMD3<Float> {
 func /= (left: inout SIMD3<Float>, right: Int) {
     left = left / Float(right)
 }
+
+// MARK: - SIMD4<Float> Extensions
+
+extension SIMD4<Float> {
+    /// Extract xyz components as SIMD3<Float>
+    var xyz: SIMD3<Float> {
+        get {
+            return SIMD3<Float>(x, y, z)
+        }
+        set {
+            x = newValue.x
+            y = newValue.y
+            z = newValue.z
+        }
+    }
+    
+    /// Initialize from SIMD3 + w component
+    init(_ xyz: SIMD3<Float>, _ w: Float) {
+        self.init(xyz.x, xyz.y, xyz.z, w)
+    }
+    
+    /// Check for NaN values
+    var hasNaN: Bool {
+        return x.isNaN || y.isNaN || z.isNaN || w.isNaN
+    }
+    
+    /// Zero vector
+    static let zero = SIMD4<Float>(0.0)
+}

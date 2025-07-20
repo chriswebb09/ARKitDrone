@@ -12,10 +12,14 @@ import simd
 enum GameAction {
     case joyStickMoved(MoveData)
     case movement(MovementSyncData)
+    case helicopterStartMoving(Bool)
+    case helicopterStopMoving(Bool)
     
     private enum CodingKey: UInt32, CaseIterable {
         case move
-        case fire
+        case movement
+        case startMoving
+        case stopMoving
     }
 }
 
@@ -28,8 +32,14 @@ extension GameAction: BitStreamCodable {
             bitStream.appendEnum(CodingKey.move)
             try data.encode(to: &bitStream)
         case .movement(let data):
-            bitStream.appendEnum(CodingKey.move)
+            bitStream.appendEnum(CodingKey.movement)
             try data.encode(to: &bitStream)
+        case .helicopterStartMoving(let isMoving):
+            bitStream.appendEnum(CodingKey.startMoving)
+            bitStream.appendBool(isMoving)
+        case .helicopterStopMoving(let isMoving):
+            bitStream.appendEnum(CodingKey.stopMoving)
+            bitStream.appendBool(isMoving)
         }
     }
     
@@ -39,9 +49,15 @@ extension GameAction: BitStreamCodable {
         case .move:
             let data = try MoveData(from: &bitStream)
             self = .joyStickMoved(data)
-        case .fire:
+        case .movement:
             let movement = try MovementSyncData(from: &bitStream)
             self = .movement(movement)
+        case .startMoving:
+            let isMoving = try bitStream.readBool()
+            self = .helicopterStartMoving(isMoving)
+        case .stopMoving:
+            let isMoving = try bitStream.readBool()
+            self = .helicopterStopMoving(isMoving)
         }
     }
     

@@ -38,12 +38,10 @@ class TargetNode: Entity {
     
     required init() {
         super.init()
-        
         // Create simple green corner brackets for targeting
         createCornerBrackets()
-        
         addChild(positioningEntity)
-        
+
         // Start the target as visible
         displayAsBillboard()
         isOpen = true

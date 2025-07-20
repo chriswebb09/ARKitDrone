@@ -16,14 +16,14 @@ import RealityKit
 
 /// - Tag: GameManager
 @MainActor
-class GameManager: NSObject, @unchecked Sendable {
+class GameManager: NSObject {
     // don't execute any code from SCNView renderer until this is true
     private(set) var isInitialized = false
     
     private let session: NetworkSession?
     private var scene: RealityKit.Scene
     
-    var tanks = Set<GameObject>()
+    var helicopters = [Player: HelicopterObject]()
     
     private let catapultsLock = NSLock()
     private var gameCommands = [GameCommand]()
@@ -129,6 +129,93 @@ class GameManager: NSObject, @unchecked Sendable {
         )
     }
     
+    // MARK: - Helicopter Management (Tom & Jerry Pattern)
+    
+    /// Create a helicopter object for multiplayer synchronization
+    func createHelicopter(addNodeAction: AddNodeAction, owner: Player) async {
+        os_log(.info, "Creating helicopter object for player %s", owner.username)
+        
+        // Create HelicopterObject instance
+        let helicopterObject = await HelicopterObject(
+            owner: owner,
+            worldTransform: addNodeAction.simdWorldTransform
+        )
+        
+        // Store in helicopters collection
+        helicopters[owner] = helicopterObject
+        
+        // Add to scene
+        helicopterObject.addToScene(scene)
+        
+        os_log(.info, "Helicopter created and added to scene for player %s", owner.username)
+        
+        // Notify delegate for any additional setup
+        await MainActor.run {
+            self.delegate?.manager(self, addNode: addNodeAction)
+            self.delegate?.manager(self, createdHelicopter: helicopterObject, for: owner)
+        }
+    }
+    
+    /// Move helicopter based on joystick input (Tom & Jerry pattern)  
+    func moveHelicopter(player: Player, movement: MoveData) {
+        guard let helicopter = helicopters[player] else {
+            os_log(.error, "No helicopter found for player %s", player.username)
+            return
+        }
+        
+        os_log(.info, "Moving helicopter for player %s", player.username)
+        helicopter.updateMovement(moveData: movement)
+        
+        // Notify delegate of movement update
+        Task { @MainActor in
+            self.delegate?.manager(self, helicopterMovementUpdated: helicopter, for: player)
+        }
+    }
+    
+    /// Switch helicopter animation state (rotor speed, etc.)
+    func switchHelicopterAnimation(player: Player, isMoving: Bool) {
+        guard let helicopter = helicopters[player] else {
+            os_log(.error, "No helicopter found for player %s", player.username)
+            return
+        }
+        
+        os_log(.info, "Switching helicopter animation for player %s: %@", player.username, isMoving ? "moving" : "idle")
+        
+        helicopter.updateMovementState(isMoving: isMoving)
+        
+        // Send animation state to all players
+        if isMoving {
+            send(gameAction: .helicopterStartMoving(true))
+        } else {
+            send(gameAction: .helicopterStopMoving(false))
+        }
+    }
+    
+    /// Remove helicopter when player leaves
+    func removeHelicopter(for player: Player) {
+        guard let helicopter = helicopters[player] else { return }
+        
+        os_log(.info, "Removing helicopter for player %s", player.username)
+        
+        helicopter.removeFromScene()
+        helicopters.removeValue(forKey: player)
+        
+        // Notify delegate
+        Task { @MainActor in
+            self.delegate?.manager(self, removedHelicopter: helicopter, for: player)
+        }
+    }
+    
+    /// Get all helicopters for collision detection, targeting, etc.
+    func getAllHelicopters() -> [HelicopterObject] {
+        return Array(helicopters.values)
+    }
+    
+    /// Get helicopter for specific player
+    func getHelicopter(for player: Player) -> HelicopterObject? {
+        return helicopters[player]
+    }
+    
     // MARK: - inbound from network
     private func process(command: GameCommand) {
         os_signpost(
@@ -158,10 +245,23 @@ class GameManager: NSObject, @unchecked Sendable {
                 command.player?.username ?? "unknown",
                 String(describing: gameAction)
             )
-            _ = command.player
+            guard let player = command.player else { return }
             if case let .joyStickMoved(data) = gameAction {
                 Task { @MainActor in
-                    self.delegate?.manager(self, moveNode: data)
+                    self.moveHelicopter(player: player, movement: data)
+                }
+            }
+            
+            // Handle helicopter animation synchronization like Tom & Jerry
+            if case let .helicopterStartMoving(isMoving) = gameAction {
+                Task { @MainActor in
+                    self.switchHelicopterAnimation(player: player, isMoving: isMoving)
+                }
+            }
+            
+            if case let .helicopterStopMoving(isMoving) = gameAction {
+                Task { @MainActor in
+                    self.switchHelicopterAnimation(player: player, isMoving: !isMoving)
                 }
             }
             
@@ -186,12 +286,9 @@ class GameManager: NSObject, @unchecked Sendable {
                 command.player?.username ?? "unknown",
                 String(describing: addNode)
             )
-            if command.player != nil {
+            if let player = command.player {
                 Task { @MainActor in
-                    self.delegate?.manager(
-                        self,
-                        addNode: addNode
-                    )
+                    await self.createHelicopter(addNodeAction: addNode, owner: player)
                 }
             }
         case .completed(_):
@@ -279,6 +376,9 @@ extension GameManager: NetworkSessionDelegate {
         let isHost = player == session.host
         let safePlayer = Player(username: player.username) // Safe copy
         Task { @MainActor in
+            // Remove helicopter when player leaves
+            self.removeHelicopter(for: safePlayer)
+            
             if isHost {
                 self.delegate?.manager(self, leavingHost: safePlayer)
             } else {

@@ -42,7 +42,7 @@ class ShipManager {
             let f35Entity = try await AsyncModelLoader.shared.loadModel(named: "F-35B_Lightning_II")
             // Create ships in parallel
             await withTaskGroup(of: Ship?.self) { group in
-                for i in 1...3 {
+                for i in 1...20 {
                     group.addTask { @MainActor in
                         let shipEntity = f35Entity.clone(recursive: true)
                         shipEntity.name = "F_35B \(i)"
@@ -57,7 +57,7 @@ class ShipManager {
                         anchor.addChild(shipEntity)
                         self.arView.scene.addAnchor(anchor)
                         shipEntity.transform.translation = randomOffset
-                        shipEntity.transform.scale = SIMD3<Float>(x: 0.005, y: 0.005, z: 0.005)
+                        shipEntity.transform.scale = SIMD3<Float>(x: 0.002, y: 0.002, z: 0.002)
                         let ship = Ship(entity: shipEntity)
                         ship.num = i
                         return ship

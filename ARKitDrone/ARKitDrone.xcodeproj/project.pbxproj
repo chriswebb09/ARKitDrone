@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9412F0762D5B4BEB00D9F1BD /* Ship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9412F0752D5B4BE500D9F1BD /* Ship.swift */; };
 		941706D92972A5F400CB0308 /* ApacheHelicopter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941706D82972A5F400CB0308 /* ApacheHelicopter.swift */; };
+		941706DA2972A5F400CB0309 /* HelicopterObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941706DB2972A5F400CB0309 /* HelicopterObject.swift */; };
 		94396BD22D7B36A300A83CF4 /* CGPoint+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BD12D7B369800A83CF4 /* CGPoint+Extension.swift */; };
 		94396BD62D7B469600A83CF4 /* GameViewController+JoystickSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BD52D7B468C00A83CF4 /* GameViewController+JoystickSceneDelegate.swift */; };
 		94396BD82D7B46F000A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94396BD72D7B46E400A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift */; };
@@ -100,6 +101,7 @@
 		94CF991C2E245F1900E780DE /* FocusCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CF99192E245F1900E780DE /* FocusCircle.swift */; };
 		94CF99222E24606D00E780DE /* ParticleEmitterComponent+Explosion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CF99212E24606D00E780DE /* ParticleEmitterComponent+Explosion.swift */; };
 		94CF992A2E24B79300E780DE /* GameViewController+ARSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CF99292E24B79300E780DE /* GameViewController+ARSessionDelegate.swift */; };
+		94D182972E2C8686001201FE /* PhysicsBodyComponent+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D182962E2C8686001201FE /* PhysicsBodyComponent+Extension.swift */; };
 		94D598442BB9037400B31874 /* Geometry+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D598432BB9037400B31874 /* Geometry+Extension.swift */; };
 		94D630322976077000096104 /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D630312976077000096104 /* UIFont+Extension.swift */; };
 		94DF3F082975F167006723FC /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DF3F072975F15F006723FC /* UIView+Extension.swift */; };
@@ -115,6 +117,7 @@
 /* Begin PBXFileReference section */
 		9412F0752D5B4BE500D9F1BD /* Ship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ship.swift; sourceTree = "<group>"; };
 		941706D82972A5F400CB0308 /* ApacheHelicopter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApacheHelicopter.swift; sourceTree = "<group>"; };
+		941706DB2972A5F400CB0309 /* HelicopterObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelicopterObject.swift; sourceTree = "<group>"; };
 		94396BD12D7B369800A83CF4 /* CGPoint+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+Extension.swift"; sourceTree = "<group>"; };
 		94396BD52D7B468C00A83CF4 /* GameViewController+JoystickSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+JoystickSceneDelegate.swift"; sourceTree = "<group>"; };
 		94396BD72D7B46E400A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+ARCoachingOverlayViewDelegate.swift"; sourceTree = "<group>"; };
@@ -206,6 +209,7 @@
 		94CF991A2E245F1900E780DE /* FocusSquare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSquare.swift; sourceTree = "<group>"; };
 		94CF99212E24606D00E780DE /* ParticleEmitterComponent+Explosion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ParticleEmitterComponent+Explosion.swift"; sourceTree = "<group>"; };
 		94CF99292E24B79300E780DE /* GameViewController+ARSessionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+ARSessionDelegate.swift"; sourceTree = "<group>"; };
+		94D182962E2C8686001201FE /* PhysicsBodyComponent+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PhysicsBodyComponent+Extension.swift"; sourceTree = "<group>"; };
 		94D598432BB9037400B31874 /* Geometry+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Geometry+Extension.swift"; sourceTree = "<group>"; };
 		94D630312976077000096104 /* UIFont+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
 		94DF3F072975F15F006723FC /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
@@ -393,6 +397,7 @@
 				947691C52E2B801100F22DE4 /* ModelLoadError.swift */,
 				9412F0752D5B4BE500D9F1BD /* Ship.swift */,
 				941706D82972A5F400CB0308 /* ApacheHelicopter.swift */,
+				941706DB2972A5F400CB0309 /* HelicopterObject.swift */,
 				94316FAE2DAB56BE0002BAF8 /* Missiles */,
 				94F968A72AD7337F00D7B418 /* OcclusionNode.swift */,
 				9488F2022D657BA2001C08D9 /* TargetNode.swift */,
@@ -426,6 +431,7 @@
 		94CCC9082972E4D800F7D17F /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				94D182962E2C8686001201FE /* PhysicsBodyComponent+Extension.swift */,
 				94CF990B2E24596F00E780DE /* Entity+Conversion.swift */,
 				94CF990C2E24596F00E780DE /* Material+Conversion.swift */,
 				94CF990D2E24596F00E780DE /* MeshResource+Conversion.swift */,
@@ -583,6 +589,7 @@
 				94C881AE2D5D07450050119D /* ParticleSystem+Extension.swift in Sources */,
 				94F968A82AD7337F00D7B418 /* OcclusionNode.swift in Sources */,
 				941706D92972A5F400CB0308 /* ApacheHelicopter.swift in Sources */,
+				941706DA2972A5F400CB0309 /* HelicopterObject.swift in Sources */,
 				947691CC2E2B80E600F22DE4 /* MissileManagerDelegate.swift in Sources */,
 				946690BB2D9E3DFA00343B1B /* Action+Signposts.swift in Sources */,
 				946690BC2D9E3DFA00343B1B /* SignpostData.swift in Sources */,
@@ -599,6 +606,7 @@
 				94D630322976077000096104 /* UIFont+Extension.swift in Sources */,
 				94423DDE2DAB433E007B5945 /* CompletedAction.swift in Sources */,
 				94D598442BB9037400B31874 /* Geometry+Extension.swift in Sources */,
+				94D182972E2C8686001201FE /* PhysicsBodyComponent+Extension.swift in Sources */,
 				9467A30F2BB93A840023EA62 /* Shell.swift in Sources */,
 				94B173F72DAA35240015DC0D /* MultiuserAttribute.swift in Sources */,
 				94CCC90A2972E54000F7D17F /* Scene+Extension.swift in Sources */,

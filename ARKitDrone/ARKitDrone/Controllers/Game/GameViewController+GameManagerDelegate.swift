@@ -61,38 +61,37 @@ extension GameViewController: GameManagerDelegate {
     }
     
     func manager(_ manager: GameManager, addNode: AddNodeAction) {
-        os_log(.info, "adding node")
+        os_log(.info, "processing addNode action - helicopter creation now handled by createdHelicopter delegate")
+        
         // Extract position from transform matrix
         let tappedPosition = SIMD3<Float>(
             addNode.simdWorldTransform.columns.3.x,
             addNode.simdWorldTransform.columns.3.y,
             addNode.simdWorldTransform.columns.3.z
         )
-        Task { [weak self] in
-            guard let self = self else { return }
-            if let apache = await self.realityKitView.positionHelicopter(at: tappedPosition) {
-                await MainActor.run {
-                     self.realityKitView.competitor = apache // Commented out - competitor property removed
-                    // Create RealityKit target entity instead of SCN TargetNode
-                    let targetEntity = TargetNode()
-                    targetEntity.transform.translation = SIMD3<Float>(
-                        tappedPosition.x,
-                        tappedPosition.y + 1,
-                        tappedPosition.z
-                    )
-                    let anchor = AnchorEntity(world: targetEntity.transform.translation)
-                    anchor.addChild(targetEntity)
-                    self.realityKitView.scene.addAnchor(anchor)
-                    let endPos = SIMD3<Float>(
-                        x: tappedPosition.x,
-                        y: tappedPosition.y,
-                        z: tappedPosition.z
-                    )
-                    self.gameManager?.send(
-                        completed: CompletedAction.init(position: endPos)
-                    )
-                }
-            }
+        
+        // Only handle non-helicopter related setup here
+        // Helicopter creation is now handled by manager(_:createdHelicopter:for:)
+        Task { @MainActor in
+            // Create targeting system (if needed)
+            let targetEntity = TargetNode()
+            targetEntity.transform.translation = SIMD3<Float>(
+                tappedPosition.x,
+                tappedPosition.y + 1,
+                tappedPosition.z
+            )
+            let anchor = AnchorEntity(world: targetEntity.transform.translation)
+            anchor.addChild(targetEntity)
+            realityKitView.scene.addAnchor(anchor)
+            
+            let endPos = SIMD3<Float>(
+                x: tappedPosition.x,
+                y: tappedPosition.y,
+                z: tappedPosition.z
+            )
+            gameManager?.send(
+                completed: CompletedAction.init(position: endPos)
+            )
         }
     }
     
@@ -123,4 +122,54 @@ extension GameViewController: GameManagerDelegate {
     func manager(_ manager: GameManager, leavingHost host: Player) { }
     
     func managerDidStartGame(_ manager: GameManager) { }
+    
+    // MARK: - Multiplayer Helicopter Delegate Methods
+    
+    func manager(_ manager: GameManager, createdHelicopter: HelicopterObject, for player: Player) {
+        os_log(.info, "Helicopter created for player: %s", player.username)
+        
+        // Handle additional setup for newly created helicopters
+        // For example, you might want to:
+        // - Add UI indicators for remote players
+        // - Set up targeting systems
+        // - Initialize visual effects
+        
+        if player == myself {
+            os_log(.info, "Local player helicopter created")
+        } else {
+            os_log(.info, "Remote player helicopter created: %s", player.username)
+        }
+    }
+    
+    func manager(_ manager: GameManager, removedHelicopter: HelicopterObject, for player: Player) {
+        os_log(.info, "Helicopter removed for player: %s", player.username)
+        
+        // Handle cleanup when helicopters are removed
+        // For example:
+        // - Remove UI indicators
+        // - Clean up targeting systems
+        // - Stop any ongoing effects
+        
+        if player == myself {
+            os_log(.info, "Local player helicopter removed")
+        } else {
+            os_log(.info, "Remote player helicopter removed: %s", player.username)
+        }
+    }
+    
+    func manager(_ manager: GameManager, helicopterMovementUpdated: HelicopterObject, for player: Player) {
+        // Handle helicopter movement updates for UI or effects
+        // This is called whenever any helicopter moves
+        
+        if player != myself {
+            // Only log for remote players to avoid spam from local movement
+            os_log(.debug, "Remote helicopter movement updated for player: %s", player.username)
+            
+            // You might use this for:
+            // - Updating minimap positions
+            // - Triggering sound effects
+            // - Updating targeting systems
+            // - Collision detection with local player
+        }
+    }
 }

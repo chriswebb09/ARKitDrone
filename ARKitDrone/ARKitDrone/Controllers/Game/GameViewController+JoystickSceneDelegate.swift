@@ -6,6 +6,11 @@ import UIKit
 
 extension GameViewController: JoystickSceneDelegate {
     
+    /// Get local player's helicopter from GameManager
+    private var localHelicopter: HelicopterObject? {
+        return gameManager?.getHelicopter(for: myself)
+    }
+    
     func update(yValue: Float,  velocity: SIMD3<Float>, angular: Float, stickNum: Int) {
         let v = GameVelocity(vector: velocity)
         if stickNum == 2 {
@@ -14,16 +19,24 @@ extension GameViewController: JoystickSceneDelegate {
                 angular: angular,
                 direction: .forward
             )
-            realityKitView.helicopter.moveForward(value: (velocity.y * 0.95))
-            gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
+            // Move local helicopter through GameManager (unified with multiplayer)
+            gameManager?.moveHelicopter(player: myself, movement: shouldBeSent)
+            // Send movement to network only if in multiplayer mode
+            if let gameManager = gameManager, gameManager.isNetworked {
+                gameManager.send(gameAction: .joyStickMoved(shouldBeSent))
+            }
         } else if stickNum == 1 {
             let shouldBeSent = MoveData(
                 velocity: v,
                 angular: angular,
                 direction: .altitude
             )
-            realityKitView.helicopter.changeAltitude(value: velocity.y)
-            gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
+            // Move local helicopter through GameManager (unified with multiplayer)
+            gameManager?.moveHelicopter(player: myself, movement: shouldBeSent)
+            // Send movement to network only if in multiplayer mode
+            if let gameManager = gameManager, gameManager.isNetworked {
+                gameManager.send(gameAction: .joyStickMoved(shouldBeSent))
+            }
         }
     }
     
@@ -36,20 +49,26 @@ extension GameViewController: JoystickSceneDelegate {
                 angular: angular,
                 direction: .side
             )
-            realityKitView.helicopter.moveSides(value: velocity.x)
+            // Move local helicopter through GameManager (unified with multiplayer)
+            gameManager?.moveHelicopter(player: myself, movement: shouldBeSent)
         } else if stickNum == 2 {
             shouldBeSent = MoveData(
                 velocity: v,
                 angular: angular,
                 direction: .rotation
             )
-            realityKitView.helicopter.rotate(yaw: velocity.x)
+            // Move local helicopter through GameManager (unified with multiplayer)
+            gameManager?.moveHelicopter(player: myself, movement: shouldBeSent)
         }
-        gameManager?.send(gameAction: .joyStickMoved(shouldBeSent))
+        // Send movement to network only if in multiplayer mode
+        if let gameManager = gameManager, gameManager.isNetworked {
+            gameManager.send(gameAction: .joyStickMoved(shouldBeSent))
+        }
     }
     
     func tapped() {
-        guard realityKitView.helicopter.missilesArmed else { return }
+        // Check missiles armed through HelicopterObject system
+        guard let localHeli = localHelicopter, localHeli.missilesArmed() else { return }
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             missileManager?.fire(game: game)

@@ -11,14 +11,15 @@ import simd
 import UIKit
 
 @MainActor
-class Ship: @unchecked Sendable {
+class Ship {
     
     var entity: Entity
     var targeted: Bool = false
     var velocity: SIMD3<Float> = SIMD3<Float>(0.01, 0.01, 0.01)
     var prevDir: SIMD3<Float> = SIMD3<Float>(0, 1, 0)
+    var smoothedVelocity: SIMD3<Float> = SIMD3<Float>(0, 0, 1)  // Smoothed velocity for rotation
     
-    private static var shipRegistry: [Entity: Ship] = [:]
+    @MainActor private static var shipRegistry: [Entity: Ship] = [:]
     
     var isDestroyed: Bool = false
     var square: TargetNode?
@@ -35,10 +36,8 @@ class Ship: @unchecked Sendable {
     }
     
     deinit {
-        let entityToRemove = entity
-        Task { @MainActor in
-            Ship.shipRegistry.removeValue(forKey: entityToRemove)
-        }
+        // Registry cleanup will happen through explicit removeShip() calls
+        // Avoid async cleanup in deinit to prevent race conditions
     }
     
     private func setupPhysics() {
@@ -69,22 +68,57 @@ class Ship: @unchecked Sendable {
     
     @MainActor
     func boundPositions(_ ship: Ship) -> SIMD3<Float> {
-        var rebound = SIMD3<Float>(0, 0, 0)
-        let minBounds = SIMD3<Float>(-30, -30, -100)
-        let maxBounds = SIMD3<Float>(50, 50, 50)
         let pos = ship.entity.transform.translation
-        if pos.x < minBounds.x { rebound.x = 1 }
-        if pos.x > maxBounds.x { rebound.x = -1 }
-        if pos.y < minBounds.y { rebound.y = 1 }
-        if pos.y > maxBounds.y { rebound.y = -1 }
-        if pos.z < minBounds.z { rebound.z = 1 }
-        if pos.z > maxBounds.z { rebound.z = -1 }
-        return rebound
+        let minBounds = SIMD3<Float>(-15, -15, -25)
+        let maxBounds = SIMD3<Float>(15, 15, 25)
+        let boundaryBuffer: Float = 5.0  // Larger buffer for smoother avoidance
+        
+        var avoidanceForce = SIMD3<Float>(0, 0, 0)
+        
+        // Smoother boundary avoidance with quadratic falloff
+        if pos.x < minBounds.x + boundaryBuffer {
+            let distance = pos.x - minBounds.x
+            let normalizedDistance = max(0, distance / boundaryBuffer)
+            let strength = (1.0 - normalizedDistance * normalizedDistance) * 0.5  // Gentler force
+            avoidanceForce.x += strength
+        }
+        if pos.x > maxBounds.x - boundaryBuffer {
+            let distance = maxBounds.x - pos.x
+            let normalizedDistance = max(0, distance / boundaryBuffer)
+            let strength = (1.0 - normalizedDistance * normalizedDistance) * 0.5
+            avoidanceForce.x -= strength
+        }
+        if pos.y < minBounds.y + boundaryBuffer {
+            let distance = pos.y - minBounds.y
+            let normalizedDistance = max(0, distance / boundaryBuffer)
+            let strength = (1.0 - normalizedDistance * normalizedDistance) * 0.5
+            avoidanceForce.y += strength
+        }
+        if pos.y > maxBounds.y - boundaryBuffer {
+            let distance = maxBounds.y - pos.y
+            let normalizedDistance = max(0, distance / boundaryBuffer)
+            let strength = (1.0 - normalizedDistance * normalizedDistance) * 0.5
+            avoidanceForce.y -= strength
+        }
+        if pos.z < minBounds.z + boundaryBuffer {
+            let distance = pos.z - minBounds.z
+            let normalizedDistance = max(0, distance / boundaryBuffer)
+            let strength = (1.0 - normalizedDistance * normalizedDistance) * 0.5
+            avoidanceForce.z += strength
+        }
+        if pos.z > maxBounds.z - boundaryBuffer {
+            let distance = maxBounds.z - pos.z
+            let normalizedDistance = max(0, distance / boundaryBuffer)
+            let strength = (1.0 - normalizedDistance * normalizedDistance) * 0.5
+            avoidanceForce.z -= strength
+        }
+        
+        return avoidanceForce
     }
     
     func limitVelocity(_ ship: Ship) {
         let mag = simd_length(ship.velocity)
-        let limit: Float = 0.8
+        let limit: Float = 0.5  // Exact SceneKit limit
         if mag > limit {
             ship.velocity = (ship.velocity / mag) * limit
         }
@@ -108,7 +142,7 @@ class Ship: @unchecked Sendable {
                     otherShip.entity.transform.translation,
                     ship.entity.transform.translation
                 )
-                if distance < 40 {
+                if distance < 5 {  // Exact SceneKit distance threshold
                     forceAway = forceAway - (otherShip.entity.transform.translation - ship.entity.transform.translation)
                 }
             }
@@ -118,45 +152,80 @@ class Ship: @unchecked Sendable {
     
     @MainActor
     func updateShipPosition(perceivedCenter: SIMD3<Float>, perceivedVelocity: SIMD3<Float>, otherShips: [Ship], obstacles: [Entity]) {
-        var v1 = flyCenterOfMass(
-            otherShips.count,
-            perceivedCenter
-        )
-        var v2 = keepASmallDistance(
-            self,
-            ships: otherShips
-        )
-        var v3 = matchSpeedWithOtherShips(
-            otherShips.count,
-            perceivedVelocity
-        )
+        // Fighter jet physics: add forward thrust in current direction
+        let currentDirection = entity.transform.rotation.act(SIMD3<Float>(0, 0, 1))
+        let forwardThrust: Float = 0.02  // Very gentle forward momentum for ultra-smooth movement
+        
+        // Calculate boids forces
+        var v1 = flyCenterOfMass(otherShips.count, perceivedCenter)
+        var v2 = keepASmallDistance(self, ships: otherShips)
+        var v3 = matchSpeedWithOtherShips(otherShips.count, perceivedVelocity)
         var v4 = boundPositions(self)
         
-        v1 *= 0.1
-        v2 *= 0.1
-        v3 *= 0.1
-        v4 *= 1.0
+        // Scale forces much more gently for ultra-smooth movement
+        v1 *= 0.005  // Cohesion (halved again)
+        v2 *= 0.01   // Separation (halved for much gentler avoidance)
+        v3 *= 0.002  // Alignment (reduced further)
+        v4 *= 0.3    // Boundary avoidance (much gentler)
         
-        velocity = velocity + v1 + v2 + v3 + v4
+        // Log force calculations every 60 frames
+        let frameNumber = Int(CACurrentMediaTime() * 60) % 60
+        if frameNumber == 0 {
+            print("🛩️ Ship \(id.prefix(8)): Forces - cohesion:\(v1) separation:\(v2) alignment:\(v3) boundary:\(v4)")
+        }
+        
+        // Apply forces and forward thrust with smoothing
+        let oldVelocity = velocity
+        let totalForce = v1 + v2 + v3 + v4 + (currentDirection * forwardThrust)
+        
+        // Much more aggressive smoothing to eliminate jerkiness
+        let smoothingFactor: Float = 0.9  // Smooth out 90% of force changes
+        let newVelocity = velocity * smoothingFactor + (velocity + totalForce) * (1.0 - smoothingFactor)
+        velocity = newVelocity
         limitVelocity(self)
+        
+        // Log smoothing effects
+        if frameNumber == 0 {
+            let velocityChange = simd_length(newVelocity - oldVelocity)
+            let forceStrength = simd_length(totalForce)
+            print("📊 Ship \(id.prefix(8)): Smoothing - oldVel:\(simd_length(oldVelocity)) newVel:\(simd_length(newVelocity)) velChange:\(velocityChange) forceStr:\(forceStrength)")
+        }
+        
         // Update position
         entity.transform.translation = entity.transform.translation + velocity
-        // Update rotation to face movement direction
-        if simd_length(velocity) > 0.001 {
-            let direction = simd_normalize(velocity)
-            entity.look(
-                at: entity.transform.translation + direction,
-                from: entity.transform.translation,
-                relativeTo: nil
-            )
+        
+        // Much more stable rotation system with hysteresis and damping
+        if simd_length(velocity) > 0.02 {
+            let targetDirection = simd_normalize(velocity)
+            let currentForward = entity.transform.rotation.act(SIMD3<Float>(0, 0, 1))
+            
+            // Smooth the target direction to reduce oscillation
+            smoothedVelocity = smoothedVelocity * 0.9 + velocity * 0.1
+            let smoothedTargetDirection = simd_normalize(smoothedVelocity)
+            
+            // Much stricter rotation criteria for ultra-smooth movement
+            let alignment = simd_dot(currentForward, smoothedTargetDirection)
+            let velocityChange = simd_length(velocity - oldVelocity)
+            
+            // Only rotate if direction change is VERY significant (> 45 degrees) and very stable
+            if alignment < 0.7 && velocityChange < 0.02 {  // ~45 degrees, very stable velocity
+                let oldRotation = entity.transform.rotation
+                // Smoothly interpolate rotation instead of instant change
+                let targetRotation = simd_quatf(from: SIMD3<Float>(0, 0, 1), to: smoothedTargetDirection)
+                entity.transform.rotation = simd_slerp(oldRotation, targetRotation, 0.1)  // 10% interpolation
+                
+                let rotationChange = simd_length(oldRotation.vector - entity.transform.rotation.vector)
+                if frameNumber == 0 {
+                    print("🔄 Ship \(id.prefix(8)): Rotating - alignment:\(alignment) velChange:\(velocityChange) rotChange:\(rotationChange)")
+                }
+            } else if frameNumber == 0 {
+                print("🚫 Ship \(id.prefix(8)): No rotation - alignment:\(alignment) velChange:\(velocityChange)")
+            }
         }
+        
         // Update target square if present
         if targetAdded, let square = square {
-            square.transform.translation = SIMD3<Float>(
-                entity.transform.translation.x,
-                entity.transform.translation.y,
-                entity.transform.translation.z
-            )
+            square.transform.translation = entity.transform.translation
         }
     }
     
