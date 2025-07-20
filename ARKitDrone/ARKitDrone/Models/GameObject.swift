@@ -23,7 +23,7 @@ class GameObject: NSObject {
     @MainActor static var indexCounter = 0
     var index = 0
     
-    // RealityKit initializer
+    // Initializer
     @MainActor
     init(entity: Entity, index: Int?, alive: Bool, owner: Player?) {
         objectRootEntity = entity
@@ -41,14 +41,14 @@ class GameObject: NSObject {
     
     @MainActor
     func apply(movementData nodeData: MovementData, isHalfway: Bool) {
-        // Apply movement data to RealityKit Entity
+        // Apply movement data to Entity
         guard nodeData.isAlive else { return }
         if isHalfway {
             // Smooth interpolation for halfway positioning
             let currentPos = objectRootEntity.transform.translation
             let currentRot = objectRootEntity.transform.rotation.eulerAngles
             objectRootEntity.transform.translation = (nodeData.position + currentPos) * 0.5
-            // Convert euler angles to quaternion for RealityKit
+            // Convert euler angles to quaternion
             let newEuler = (nodeData.eulerAngles + currentRot) * 0.5
             objectRootEntity.transform.rotation = simd_quatf(
                 angle: newEuler.y,
@@ -65,7 +65,7 @@ class GameObject: NSObject {
         } else {
             // Direct positioning
             objectRootEntity.transform.translation = nodeData.position
-            // Convert euler angles to quaternion for RealityKit
+            // Convert euler angles to quaternion f
             objectRootEntity.transform.rotation = simd_quatf(
                 angle: nodeData.eulerAngles.y,
                 axis: SIMD3(0, 1, 0)

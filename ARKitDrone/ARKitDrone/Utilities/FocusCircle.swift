@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 /**
- A RealityKit `Entity` that displays a focus circle with animated segments.
+ A `Entity` that displays a focus circle with animated segments.
  */
 class FocusCircle: Entity, HasModel {
     

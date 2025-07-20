@@ -10,13 +10,12 @@ import RealityKit
 import ARKit
 import simd
 
-// MARK: - RealityKit Entity Loading Extensions
+// MARK: - Entity Loading Extensions
 
 extension Entity {
     
-    /// Load entity from model file (RealityKit equivalent of SCNScene.nodeWithModelName)
+    /// Load entity from model file
     static func entityWithModelName(_ modelName: String, in bundle: Bundle = .main) async throws -> Entity {
-        // Try common RealityKit file extensions
         let extensions = ["usdz", "reality", "rcproject"]
         for ext in extensions {
             if let url = bundle.url(
@@ -89,7 +88,7 @@ extension simd_float4x4 {
     }
 }
 
-// MARK: - ARView Extensions (RealityKit equivalent of ARSCNView)
+// MARK: - ARView Extensions
 
 extension ARView {
     

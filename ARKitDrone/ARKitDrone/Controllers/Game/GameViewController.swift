@@ -49,7 +49,7 @@ class GameViewController: UIViewController, MissileManagerDelegate {
     private struct LocalConstants {
         static let joystickSize = CGSize(width: 190, height: 190)
         static let joystickPoint = CGPoint(x: 0, y: 0)
-        static let environmentalMap = "Models.scnassets/sharedImages/environment_blur.exr"
+        static let environmentalMap = "environment_blur.exr"
         static let buttonTitle = "Arm Missiles".uppercased()
         static let disarmTitle = "Disarm Missiles".uppercased()
     }
@@ -200,7 +200,7 @@ class GameViewController: UIViewController, MissileManagerDelegate {
     var overlayView: UIView?
     
     
-    // MARK: - RealityKit Properties
+    // MARK: - Properties
     lazy var realityKitView: GameSceneView = {
         let arView = GameSceneView(frame: view.bounds)
         return arView
@@ -280,7 +280,7 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         realityKitView.session.run(config, options: [.resetTracking, .removeExistingAnchors])
         realityKitView.session.delegate = self
         
-        // Setup RealityKit view async
+        // Setup view async
         await realityKitView.setup()
         
         await MainActor.run {
@@ -327,12 +327,12 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         realityKitView.session.run(config, options: [.resetTracking, .removeExistingAnchors])
         realityKitView.session.delegate = self
         
-        // Setup the RealityKit view
+        // Setup the view
         Task {
             await realityKitView.setup()
         }
         
-        // Setup RealityKit managers
+        // Setup managers
         missileManager = MissileManager(
             game: game,
             sceneView: realityKitView,
@@ -459,7 +459,7 @@ class GameViewController: UIViewController, MissileManagerDelegate {
             }
         }
         
-        // Run session on the RealityKit ARView
+        // Run session on the ARView
         realityKitView.automaticallyConfigureSession = false
         realityKitView.environment.sceneUnderstanding.options = []
         

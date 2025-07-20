@@ -11,7 +11,7 @@ import RealityKit
 import ARKit
 import simd
 
-// MARK: - RealityKit M1 Abrams Tank
+// MARK: - M1 Abrams Tank
 @MainActor
 class M1AbramsTank {
     
@@ -97,7 +97,7 @@ class M1AbramsTank {
     
 }
 
-// MARK: - RealityKit Tank Operations
+// MARK: - Tank Operations
 
 extension M1AbramsTank {
     

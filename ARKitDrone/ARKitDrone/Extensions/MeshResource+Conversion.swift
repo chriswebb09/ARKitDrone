@@ -7,120 +7,10 @@
 //
 
 import RealityKit
-import SceneKit
 import ARKit
 import MetalKit
 
-extension MeshResource {
-    
-    /// Create MeshResource from SCNGeometry
-    static func from(_ scnGeometry: SCNGeometry) throws -> MeshResource {
-        // Extract vertices, normals, and indices from SCNGeometry
-        guard let geometrySource = scnGeometry.sources(for: .vertex).first,
-              let normalSource = scnGeometry.sources(for: .normal).first,
-              let element = scnGeometry.elements.first else {
-            throw ConversionError.invalidGeometry
-        }
-        
-        // Extract vertex data
-        let vertexData = geometrySource.data
-        let vertexCount = geometrySource.vectorCount
-        let vertexStride = geometrySource.dataStride
-        
-        // Extract normal data
-        let normalData = normalSource.data
-        
-        // Extract index data
-        let indexData = element.data
-        
-        // Create MeshDescriptor
-        var meshDescriptor = MeshDescriptor(name: "ConvertedMesh")
-        
-        // Set up positions
-        var positions: [SIMD3<Float>] = []
-        positions.reserveCapacity(vertexCount)
-        
-        for i in 0..<vertexCount {
-            let offset = i * vertexStride
-            let x = vertexData.withUnsafeBytes {
-                $0.load(
-                    fromByteOffset: offset,
-                    as: Float.self
-                )
-            }
-            let y = vertexData.withUnsafeBytes {
-                $0.load(
-                    fromByteOffset: offset + 4,
-                    as: Float.self
-                )
-            }
-            let z = vertexData.withUnsafeBytes {
-                $0.load(
-                    fromByteOffset: offset + 8,
-                    as: Float.self
-                )
-            }
-            positions.append(SIMD3<Float>(x, y, z))
-        }
-        meshDescriptor.positions = MeshBuffers.Positions(positions)
-        // Set up normals
-        var normals: [SIMD3<Float>] = []
-        normals.reserveCapacity(vertexCount)
-        
-        let normalStride = normalSource.dataStride
-        for i in 0..<vertexCount {
-            let offset = i * normalStride
-            let x = normalData.withUnsafeBytes {
-                $0.load(
-                    fromByteOffset: offset,
-                    as: Float.self
-                )
-            }
-            let y = normalData.withUnsafeBytes {
-                $0.load(
-                    fromByteOffset: offset + 4,
-                    as: Float.self
-                )
-            }
-            let z = normalData.withUnsafeBytes {
-                $0.load(
-                    fromByteOffset: offset + 8,
-                    as: Float.self
-                )
-            }
-            normals.append(SIMD3<Float>(x, y, z))
-        }
-        meshDescriptor.normals = MeshBuffers.Normals(normals)
-        // Set up indices
-        var indices: [UInt32] = []
-        let indexCount = element.primitiveCount * 3 // Assuming triangles
-        indices.reserveCapacity(indexCount)
-        
-        let bytesPerIndex = element.bytesPerIndex
-        for i in 0..<indexCount {
-            let offset = i * bytesPerIndex
-            if bytesPerIndex == 2 {
-                let index = indexData.withUnsafeBytes {
-                    $0.load(
-                        fromByteOffset: offset,
-                        as: UInt16.self
-                    )
-                }
-                indices.append(UInt32(index))
-            } else {
-                let index = indexData.withUnsafeBytes {
-                    $0.load(
-                        fromByteOffset: offset,
-                        as: UInt32.self
-                    )
-                }
-                indices.append(index)
-            }
-        }
-        meshDescriptor.primitives = .triangles(indices)
-        return try MeshResource.generate(from: [meshDescriptor])
-    }
-    
+extension MeshResource {  
     /// Create MeshResource from ARMeshGeometry
     static func from(_ arGeometry: ARMeshGeometry) throws -> MeshResource {
         // Extract vertices
@@ -213,7 +103,7 @@ extension MeshResource {
         meshDescriptor.primitives = .triangles(remappedIndices)
         return try MeshResource.generate(from: [meshDescriptor])
     }
-    // Note: Use RealityKit's built-in MeshResource.generateBox, generateSphere, etc. methods directly
+    // Note: Use built-in MeshResource.generateBox, generateSphere, etc. methods directly
     // No need to wrap them since they're already available
 }
 

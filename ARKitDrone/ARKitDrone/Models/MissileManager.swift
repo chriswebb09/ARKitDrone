@@ -134,7 +134,7 @@ class MissileManager {
         
         // Initialize missile position at helicopter's gun position
         guard let helicopterEntity = helicopterApache.helicopter else {
-            print("No helicopter RealityKit entity found")
+            print("No helicopter entity found")
             return
         }
         // Get helicopter's world position (through its anchor)

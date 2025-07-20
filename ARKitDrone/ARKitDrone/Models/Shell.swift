@@ -52,7 +52,7 @@ class Shell {
         entity.name = name
         // Set initial position
         entity.transform.translation = position
-        // Apply force using RealityKit physics
+        // Apply force using physics
         if let physicsBody = entity.components[PhysicsBodyComponent.self] {
             let mass = physicsBody.massProperties.mass
             _ = force / mass

@@ -32,7 +32,7 @@ struct MovementData: CustomStringConvertible {
 extension MovementData {
     @MainActor init(entity: Entity, alive: Bool) {
         let newPosition = entity.transform.translation
-        // Convert quaternion to euler angles for RealityKit
+        // Convert quaternion to euler angles
         let quaternion = entity.transform.rotation
         let newEulerAngles = quaternion.eulerAngles
         

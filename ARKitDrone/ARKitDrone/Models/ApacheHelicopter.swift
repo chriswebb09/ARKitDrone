@@ -225,7 +225,7 @@ class ApacheHelicopter {
             timing: .linear,
             bindTarget: .transform
         )
-        // Create repeating animation using correct RealityKit API
+        // Create repeating animation
         let animationResource = try? AnimationResource.generate(with: anim)
         return animationResource
     }

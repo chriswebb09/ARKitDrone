@@ -9,7 +9,7 @@
 import RealityKit
 import UIKit
 
-// MARK: - RealityKit Material Extensions
+// MARK: - Material Extensions
 
 extension SimpleMaterial {
     

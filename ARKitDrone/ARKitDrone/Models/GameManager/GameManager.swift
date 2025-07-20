@@ -17,7 +17,6 @@ import RealityKit
 /// - Tag: GameManager
 @MainActor
 class GameManager: NSObject {
-    // don't execute any code from SCNView renderer until this is true
     private(set) var isInitialized = false
     
     private let session: NetworkSession?

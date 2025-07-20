@@ -11,10 +11,10 @@ import Foundation
 
 extension ParticleEmitterComponent {
     
-    /// Create an explosion particle effect using RealityKit
+    /// Create an explosion particle effect
     static func createExplosion() -> ParticleEmitterComponent {
         // Create particle emitter with simple configuration
-        // Note: RealityKit's ParticleEmitterComponent has limited customization compared to SceneKit
+        // Note: ParticleEmitterComponent has limited customization compared to SceneKit
         // Create basic particle emitter component
         let particles = ParticleEmitterComponent()
         return particles
@@ -22,10 +22,10 @@ extension ParticleEmitterComponent {
     
     /// Create an optimized missile exhaust particle effect
     static func createMissileExhaust() -> ParticleEmitterComponent {
-        // RealityKit's ParticleEmitterComponent has very limited configuration
+        // ParticleEmitterComponent has very limited configuration
         // We'll create a basic emitter and rely on distance culling for optimization
         let particles = ParticleEmitterComponent()
-        // Note: RealityKit doesn't support custom textures on ParticleEmitterComponent
+        // Note doesn't support custom textures on ParticleEmitterComponent
         // For custom particle effects, you'd need to create a custom Material/Shader
         return particles
     }
@@ -33,8 +33,7 @@ extension ParticleEmitterComponent {
     /// Create a simple spark texture programmatically
     @MainActor
     private static func createSparkTexture() -> MaterialColorParameter? {
-        // Load spark texture from art.scnassets
-        if let sparkTexture = try? TextureResource.load(named: "art.scnassets/spark") {
+        if let sparkTexture = try? TextureResource.load(named: "spark") {
             return MaterialColorParameter.texture(sparkTexture)
         }
         return nil
@@ -42,7 +41,6 @@ extension ParticleEmitterComponent {
     
     /// Create a fade-out opacity curve
     private static func createFadeOutCurve() -> Float {
-        // RealityKit doesn't have the same curve system as SceneKit
         // Return a simple fade value instead
         return 0.0
     }
@@ -72,7 +70,7 @@ extension Entity {
     }
 }
 
-// MARK: - RealityKit Explosion Helper
+// MARK: - Explosion Helper
 
 class Explosion {
     

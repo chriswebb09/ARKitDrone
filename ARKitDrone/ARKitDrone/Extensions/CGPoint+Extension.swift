@@ -13,7 +13,7 @@ import simd
 // MARK: - CGPoint extensions
 
 extension CGPoint {
-    /// Create CGPoint from SIMD3<Float> (RealityKit equivalent)
+    /// Create CGPoint from SIMD3<Float>
     init(_ vector: SIMD3<Float>) {
         self.init(x: CGFloat(vector.x), y: CGFloat(vector.y))
     }
@@ -71,7 +71,7 @@ extension CGPoint {
         return sqrt(x * x + y * y)
     }
     
-    /// Convert CGPoint to SIMD2<Float> for RealityKit calculations
+    /// Convert CGPoint to SIMD2<Float> 
     var simd2: SIMD2<Float> {
         return SIMD2<Float>(
             Float(x),

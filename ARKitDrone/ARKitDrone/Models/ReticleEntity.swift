@@ -270,7 +270,7 @@ class ReticleEntity: Entity {
     }
 }
 
-// MARK: - FocusSquareSegment for RealityKit
+// MARK: - FocusSquareSegment
 
 class FocusSquareSegment: Entity {
     

@@ -275,7 +275,7 @@ extension CollisionComponent {
     /// Create cylinder collision (using box as approximation)
     @MainActor
     static func cylinder(height: Float, radius: Float) -> CollisionComponent {
-        // Note: RealityKit ShapeResource only has generateBox and generateSphere
+        // Note: ShapeResource only has generateBox and generateSphere
         // Using a box as cylinder approximation for collision
         let size = SIMD3<Float>(radius * 2, height, radius * 2)
         let shape = ShapeResource.generateBox(size: size)
@@ -312,7 +312,7 @@ enum EntityError: Error {
 import RealityKit
 import UIKit
 
-// MARK: - RealityKit Entity Extension
+// MARK: - Entity Extension
 
 extension Entity {
     
@@ -323,7 +323,6 @@ extension Entity {
     }
     
     func centerAlign() {
-        // RealityKit equivalent of SCNNode centerAlign
         if let modelComponent = self.components[ModelComponent.self] {
             let bounds = modelComponent.mesh.bounds
             let extents = bounds.extents
@@ -397,7 +396,7 @@ extension Entity {
             let currentPos = self.transform.translation
             let currentRot = self.transform.rotation.eulerAngles
             self.transform.translation = (nodeData.position + currentPos) * 0.5
-            // Convert euler angles to quaternion for RealityKit
+            // Convert euler angles to quaternion
             let newEuler = (nodeData.eulerAngles + currentRot) * 0.5
             self.transform.rotation = simd_quatf(
                 angle: newEuler.y,
@@ -414,7 +413,7 @@ extension Entity {
         } else {
             // Direct positioning using SIMD types
             self.transform.translation = nodeData.position
-            // Convert euler angles to quaternion for RealityKit
+            // Convert euler angles to quaternion
             self.transform.rotation = simd_quatf(
                 angle: nodeData.eulerAngles.y,
                 axis: SIMD3(0, 1, 0)

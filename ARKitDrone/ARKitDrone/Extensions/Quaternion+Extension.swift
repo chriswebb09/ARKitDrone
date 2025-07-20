@@ -46,7 +46,7 @@ extension simd_quatf {
         )
     }
     
-    /// Create quaternion from individual components (RealityKit uses ix, iy, iz, r)
+    /// Create quaternion from individual components (uses ix, iy, iz, r)
     init(x: Float, y: Float, z: Float, w: Float) {
         self.init(
             ix: x,
