@@ -2,7 +2,7 @@
 //  simd_float4x4+Extension.swift
 //  ARKitDrone
 //
-//  Created by Claude on 7/13/25.
+//  Created on 7/13/25.
 //  Copyright © 2025 Christopher Webb-Orenstein. All rights reserved.
 //
 
