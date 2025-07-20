@@ -12,7 +12,6 @@ import ARKit
 import simd
 import os.log
 
-/// Multiplayer helicopter object similar to Tom & Jerry GameObject pattern
 /// Each helicopter belongs to a specific player and syncs across all clients
 @MainActor
 class HelicopterObject: ObservableObject {
@@ -51,7 +50,7 @@ class HelicopterObject: ObservableObject {
     /// Timer for smooth rotor speed interpolation
     private var animationTimer: Timer?
     
-    // MARK: - Movement Properties (matching Tom & Jerry smoothing)
+    // MARK: - Movement Properties
     
     /// Target position for smooth movement interpolation
     private var targetTranslation = SIMD3<Float>(0, 0, 0)
@@ -122,7 +121,7 @@ class HelicopterObject: ObservableObject {
         }
     }
     
-    // MARK: - Movement Methods (matching Tom & Jerry pattern)
+    // MARK: - Movement Methods
     
     /// Update helicopter position from network or local input
     func updateMovement(moveData: MoveData) {
@@ -183,9 +182,9 @@ class HelicopterObject: ObservableObject {
         lastNetworkUpdate = CACurrentMediaTime()
     }
     
-    // MARK: - Animation Synchronization (matching Tom & Jerry pattern)
+    // MARK: - Animation Synchronization
     
-    /// Switch between idle and moving animations (like Tom & Jerry switchBetweenIdleAndRunning)
+    /// Switch between idle and moving animations
     func updateMovementState(isMoving: Bool) {
         guard self.isMoving != isMoving else { return }
         

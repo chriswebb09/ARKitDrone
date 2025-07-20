@@ -65,7 +65,7 @@
 		947691CC2E2B80E600F22DE4 /* MissileManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947691CB2E2B80E200F22DE4 /* MissileManagerDelegate.swift */; };
 		94874EB02E258A3900453E04 /* Missile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94874EAF2E258A3900453E04 /* Missile.swift */; };
 		94874EB42E25C95700453E04 /* heli.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 94874EB32E25C95700453E04 /* heli.usdz */; };
-		9488F2032D657BA6001C08D9 /* TargetNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9488F2022D657BA2001C08D9 /* TargetNode.swift */; };
+		9488F2032D657BA6001C08D9 /* ReticleEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9488F2022D657BA2001C08D9 /* ReticleEntity.swift */; };
 		94A68F722C8797070059CD82 /* Matrix4+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F712C8797070059CD82 /* Matrix4+Extension.swift */; };
 		94A68F742C87972E0059CD82 /* Quaternion+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F732C87972E0059CD82 /* Quaternion+Extension.swift */; };
 		94A68F762C8797550059CD82 /* Vector3+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F752C8797550059CD82 /* Vector3+Extension.swift */; };
@@ -173,7 +173,7 @@
 		947691CB2E2B80E200F22DE4 /* MissileManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissileManagerDelegate.swift; sourceTree = "<group>"; };
 		94874EAF2E258A3900453E04 /* Missile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Missile.swift; sourceTree = "<group>"; };
 		94874EB32E25C95700453E04 /* heli.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = heli.usdz; sourceTree = "<group>"; };
-		9488F2022D657BA2001C08D9 /* TargetNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetNode.swift; sourceTree = "<group>"; };
+		9488F2022D657BA2001C08D9 /* ReticleEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReticleEntity.swift; sourceTree = "<group>"; };
 		94A68F712C8797070059CD82 /* Matrix4+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Matrix4+Extension.swift"; sourceTree = "<group>"; };
 		94A68F732C87972E0059CD82 /* Quaternion+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Quaternion+Extension.swift"; sourceTree = "<group>"; };
 		94A68F752C8797550059CD82 /* Vector3+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Vector3+Extension.swift"; sourceTree = "<group>"; };
@@ -400,7 +400,7 @@
 				941706DB2972A5F400CB0309 /* HelicopterObject.swift */,
 				94316FAE2DAB56BE0002BAF8 /* Missiles */,
 				94F968A72AD7337F00D7B418 /* OcclusionNode.swift */,
-				9488F2022D657BA2001C08D9 /* TargetNode.swift */,
+				9488F2022D657BA2001C08D9 /* ReticleEntity.swift */,
 				9467A30A2BB918EE0023EA62 /* M1Tank.swift */,
 				9467A30E2BB93A840023EA62 /* Shell.swift */,
 			);
@@ -655,7 +655,7 @@
 				94CF99172E24597000E780DE /* Entity+Conversion.swift in Sources */,
 				94CF99182E24597000E780DE /* simd_float4x4+Extension.swift in Sources */,
 				94B6E8462D7B60BA0064ABD7 /* NotificationName+Extension.swift in Sources */,
-				9488F2032D657BA6001C08D9 /* TargetNode.swift in Sources */,
+				9488F2032D657BA6001C08D9 /* ReticleEntity.swift in Sources */,
 				94A68F722C8797070059CD82 /* Matrix4+Extension.swift in Sources */,
 				94B173F52DAA34A70015DC0D /* MovementSyncSceneDataDelegate.swift in Sources */,
 				94423DDA2DAB42C1007B5945 /* BoardSetupAction.swift in Sources */,

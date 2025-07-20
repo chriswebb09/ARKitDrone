@@ -11,7 +11,6 @@ import RealityKit
 import simd
 
 /// RealityKit compatibility layer for SceneKit-style physics
-/// Note: RealityKit has a fundamentally different physics architecture than SceneKit
 /// This extension provides compatibility shims for legacy code
 extension PhysicsBodyComponent {
     
@@ -115,15 +114,10 @@ extension PhysicsMaterialResource {
     /// Create material with restitution and friction (RealityKit compatible)
     static func create(restitution: Float = 0.5, friction: Float = 0.5) -> PhysicsMaterialResource {
         // RealityKit requires different initialization approach
-        do {
-            return try PhysicsMaterialResource.generate(
-                friction: friction,
-                restitution: restitution
-            )
-        } catch {
-            // Fallback to default material if generation fails
-            return PhysicsMaterialResource.default
-        }
+        return PhysicsMaterialResource.generate(
+            friction: friction,
+            restitution: restitution
+        )
     }
     
     /// High bounce material

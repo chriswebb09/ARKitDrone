@@ -74,7 +74,7 @@ extension GameViewController: GameManagerDelegate {
         // Helicopter creation is now handled by manager(_:createdHelicopter:for:)
         Task { @MainActor in
             // Create targeting system (if needed)
-            let targetEntity = TargetNode()
+            let targetEntity = ReticleEntity()
             targetEntity.transform.translation = SIMD3<Float>(
                 tappedPosition.x,
                 tappedPosition.y + 1,

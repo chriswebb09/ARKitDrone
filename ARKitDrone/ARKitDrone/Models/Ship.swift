@@ -22,7 +22,7 @@ class Ship {
     @MainActor private static var shipRegistry: [Entity: Ship] = [:]
     
     var isDestroyed: Bool = false
-    var square: TargetNode?
+    var square: ReticleEntity?
     var targetAdded = false
     var fired = false
     var id: String

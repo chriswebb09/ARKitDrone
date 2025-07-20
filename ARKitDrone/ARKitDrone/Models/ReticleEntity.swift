@@ -1,5 +1,5 @@
 //
-//  TargetNode.swift
+//  ReticleEntity.swift
 //  ARKitDrone
 //
 //  Created by Christopher Webb on 2/18/25.
@@ -9,7 +9,7 @@
 import RealityKit
 import ARKit
 
-class TargetNode: Entity {
+class ReticleEntity: Entity {
     
     let positioningEntity = Entity()
     
@@ -56,7 +56,7 @@ class TargetNode: Entity {
         
         // Create material
         var material = UnlitMaterial()
-        material.color = .init(tint: TargetNode.primaryColor)
+        material.color = .init(tint: ReticleEntity.primaryColor)
         
         // Top-left corner (L-shape)
         let tlHoriz = Entity()
@@ -181,7 +181,7 @@ class TargetNode: Entity {
         fillPlane.name = "fillPlane"
         
         var material = UnlitMaterial()
-        material.color = .init(tint: TargetNode.fillColor.withAlphaComponent(0.0))
+        material.color = .init(tint: ReticleEntity.fillColor.withAlphaComponent(0.0))
         
         fillPlane.components.set(
             ModelComponent(
@@ -255,13 +255,13 @@ class TargetNode: Entity {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.525) {
             if var model = self.fillPlane.components[ModelComponent.self] {
                 var material = UnlitMaterial()
-                material.color = .init(tint: TargetNode.fillColor.withAlphaComponent(0.25))
+                material.color = .init(tint: ReticleEntity.fillColor.withAlphaComponent(0.25))
                 model.materials = [material]
                 self.fillPlane.components.set(model)
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.0875) {
                     var material = UnlitMaterial()
-                    material.color = .init(tint: TargetNode.fillColor.withAlphaComponent(0.0))
+                    material.color = .init(tint: ReticleEntity.fillColor.withAlphaComponent(0.0))
                     model.materials = [material]
                     self.fillPlane.components.set(model)
                 }

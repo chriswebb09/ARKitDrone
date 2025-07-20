@@ -7,19 +7,8 @@
 //
 
 import simd
-import SceneKit
 
 extension SIMD3<Float> {
-    
-    /// Convert to SCNVector3 for backwards compatibility
-    public func toSCNVector3() -> SCNVector3 {
-        return SCNVector3(self.x, self.y, self.z)
-    }
-    
-    /// Initialize from SCNVector3
-    public init(_ vector: SCNVector3) {
-        self.init(vector.x, vector.y, vector.z)
-    }
     
     /// Rotate vector by quaternion
     func rotate(by quaternion: simd_quatf) -> SIMD3<Float> {
@@ -138,5 +127,5 @@ extension SIMD4<Float> {
     }
     
     /// Zero vector
-    static let zero = SIMD4<Float>(0.0)
+    static let zero = SIMD4<Float>(repeating: 0.0)
 }

@@ -73,7 +73,7 @@ class ShipManager {
             }
             // Setup first target
             if !ships.isEmpty {
-                let square = TargetNode()
+                let square = ReticleEntity()
                 ships[0].square = square
                 if let parent = ships[0].entity.parent {
                     parent.addChild(square)
@@ -97,7 +97,7 @@ class ShipManager {
             if targetIndex < ships.count {
                 if !ships[targetIndex].isDestroyed && !ships[targetIndex].targetAdded {
                     guard targetIndex < ships.count else { return }
-                    let square = TargetNode()
+                    let square = ReticleEntity()
                     ships[targetIndex].square = square
                     // Add to ship's anchor
                     if let parent = ships[targetIndex].entity.parent {

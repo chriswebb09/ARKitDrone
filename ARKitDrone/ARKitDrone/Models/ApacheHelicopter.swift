@@ -94,7 +94,6 @@ class ApacheHelicopter {
         guard let helicopter = helicopter else {
             return
         }
-        // Find all helicopter components matching SceneKit version
         self.hudEntity = helicopter.findEntity(named: "hud")
         self.rotor = helicopter.findEntity(named: "FrontRotor")
         self.tailRotor = helicopter.findEntity(named: "TailRotor")
@@ -139,7 +138,6 @@ class ApacheHelicopter {
                     mode: .kinematic
                 ))
                 missileEntities.append(missileEntity)
-                // Create Missile wrapper like SceneKit
                 let missile = Missile()
                 missile.setupEntity(
                     entity: missileEntity,

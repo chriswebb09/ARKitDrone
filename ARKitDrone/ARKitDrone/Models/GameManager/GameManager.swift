@@ -129,16 +129,18 @@ class GameManager: NSObject {
         )
     }
     
-    // MARK: - Helicopter Management (Tom & Jerry Pattern)
-    
-    /// Create a helicopter object for multiplayer synchronization
+    // MARK: - Helicopter Management
     func createHelicopter(addNodeAction: AddNodeAction, owner: Player) async {
         os_log(.info, "Creating helicopter object for player %s", owner.username)
         
-        // Create HelicopterObject instance
+        // Offset the world transform upward by 5 units
+        var modifiedTransform = addNodeAction.simdWorldTransform
+        modifiedTransform.columns.3.y += 5.0
+        
+        // Create HelicopterObject instance with modified transform
         let helicopterObject = await HelicopterObject(
             owner: owner,
-            worldTransform: addNodeAction.simdWorldTransform
+            worldTransform: modifiedTransform
         )
         
         // Store in helicopters collection
@@ -155,8 +157,7 @@ class GameManager: NSObject {
             self.delegate?.manager(self, createdHelicopter: helicopterObject, for: owner)
         }
     }
-    
-    /// Move helicopter based on joystick input (Tom & Jerry pattern)  
+
     func moveHelicopter(player: Player, movement: MoveData) {
         guard let helicopter = helicopters[player] else {
             os_log(.error, "No helicopter found for player %s", player.username)
@@ -252,7 +253,6 @@ class GameManager: NSObject {
                 }
             }
             
-            // Handle helicopter animation synchronization like Tom & Jerry
             if case let .helicopterStartMoving(isMoving) = gameAction {
                 Task { @MainActor in
                     self.switchHelicopterAnimation(player: player, isMoving: isMoving)

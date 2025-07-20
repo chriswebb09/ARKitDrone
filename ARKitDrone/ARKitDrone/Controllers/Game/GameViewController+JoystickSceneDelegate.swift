@@ -78,7 +78,7 @@ extension GameViewController: JoystickSceneDelegate {
                     let canAddTarget = !realityKitView.ships[realityKitView.targetIndex].isDestroyed && !realityKitView.ships[realityKitView.targetIndex].targetAdded
                     if canAddTarget {
                         guard realityKitView.targetIndex < realityKitView.ships.count else { return }
-                        let square = TargetNode()
+                        let square = ReticleEntity()
                         realityKitView.ships[realityKitView.targetIndex].square = square
                         // Add to ship's anchor
                         if let parent = realityKitView.ships[realityKitView.targetIndex].entity.parent {
