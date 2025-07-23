@@ -278,20 +278,25 @@ extension Ship {
             entity.transform.translation,
             target.transform.translation
         )
-        let attackRange: Float = 50.0
+        let attackRange: Float = 15.0 // Reduced range for more balanced gameplay
+        
         // Look at target
         entity.look(
             at: target.transform.translation,
             from: entity.transform.translation,
             relativeTo: nil
         )
+        
         if distanceToTarget <= attackRange {
             if !isDestroyed {
                 if !fired {
                     fired = true
+                    print("🎯 Ship \(id.prefix(8)) attacking helicopter at distance \(distanceToTarget)")
                     self.fireAt(target)
+                    
+                    // Longer cooldown for ship attacks
                     _ = Timer.scheduledTimer(
-                        withTimeInterval: 0.5,
+                        withTimeInterval: 2.0, // 2 second cooldown
                         repeats: false
                     ) { [weak self] timer in
                         guard let self = self else { return }
@@ -307,7 +312,18 @@ extension Ship {
     
     private func fireAt(_ target: Entity) {
         Task { @MainActor in
-            // Create missile entity
+            print("🚢 Ship \(id.prefix(8)) firing at helicopter")
+            
+            // Deal direct damage to helicopter
+            if let helicopterObject = findHelicopterObject(from: target) {
+                let damage: Float = Float.random(in: 8.0...15.0) // Random damage between 8-15
+                helicopterObject.takeDamage(damage, from: "ship-attack")
+                print("💥 Ship dealt \(damage) damage to helicopter")
+            } else {
+                print("⚠️ Could not find helicopter object to damage")
+            }
+            
+            // Create visual missile effect (optional)
             let missile = createMissile()
             missile.transform.translation = self.entity.transform.translation
             let targetPos = target.transform.translation
@@ -318,11 +334,37 @@ extension Ship {
                 from: currentPos,
                 relativeTo: nil
             )
-            // Add physics force simulation
-            _ = direction * 1000
-            // Add to scene (you'll need to pass the scene reference)
-            // scene.addAnchor(AnchorEntity(world: missile.transform.translation))
+            
+            // Create temporary anchor for visual effect
+            let missileAnchor = AnchorEntity(world: currentPos)
+            missileAnchor.addChild(missile)
+            
+            // Add to scene temporarily (you'll need scene reference)
+            if let scene = target.scene {
+                scene.addAnchor(missileAnchor)
+                
+                // Remove missile visual after short time
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    missileAnchor.removeFromParent()
+                }
+            }
         }
+    }
+    
+    private func findHelicopterObject(from entity: Entity) -> HelicopterObject? {
+        // Search for helicopter object through GameManager
+        // This is a simplified approach - in practice you'd pass references
+        let players = [UserDefaults.standard.myself] // Add other players if multiplayer
+        
+        // For now, we'll use notification to deal damage since we don't have direct access
+        // Post notification that helicopter should take damage
+        NotificationCenter.default.post(
+            name: NSNotification.Name("HelicopterTakeDamage"),
+            object: nil,
+            userInfo: ["damage": Float.random(in: 8.0...15.0), "source": "ship-attack"]
+        )
+        
+        return nil // Will be handled by notification
     }
     
     private func createMissile() -> Entity {

@@ -8,8 +8,16 @@
 
 import Foundation
 
+@MainActor
 class Game {
-    var playerScore: Int = 0
+    var playerScore: Int = 0 {
+        didSet {
+            if playerScore != oldValue {
+                scoreUpdated = true
+                updateScoreText()
+            }
+        }
+    }
     var playerName: String!
     var playerWonGame: Bool = false
     var playerWonRound: Bool = false
@@ -21,8 +29,40 @@ class Game {
     var destoryedTextString: String = ""
     var scoreTextString: String = ""
     
+    // Reference to state manager for integration
+    weak var stateManager: GameStateManager?
+    
+    // Computed property that syncs with state manager
+    var score: Int {
+        get { return stateManager?.score ?? playerScore }
+        set {
+            playerScore = newValue
+            stateManager?.score = newValue
+        }
+    }
+    
     func updateScoreText() {
         destoryedTextString = "Enemy Destroyed!"
         scoreTextString = "Score: \(self.playerScore)"
+    }
+    
+    func reset() {
+        playerScore = 0
+        playerWonGame = false
+        playerWonRound = false
+        currentLevel = 0
+        enemiesLeft = 0
+        scoreUpdated = false
+        placed = false
+        valueReached = false
+        destoryedTextString = ""
+        scoreTextString = ""
+        
+        // Reset state manager if connected (async)
+        if let stateManager = stateManager {
+            Task { @MainActor in
+                await stateManager.resetGameState()
+            }
+        }
     }
 }

@@ -18,27 +18,21 @@ extension NSNotification.Name {
 
 class GameViewController: UIViewController, MissileManagerDelegate {
     
-    enum SessionState {
-        case setup
-        case lookingForSurface
-        case adjustingBoard
-        case placingBoard
-        case waitingForBoard
-        case localizingToBoard
-        case setupLevel
-        case gameInProgress
-    }
+    // MARK: - State Management
+    
+    @MainActor let stateManager = GameStateManager()
+    private var stateObservationTask: Task<Void, Never>?
     
     var gameManager: GameManager? {
         didSet {
             guard let manager = gameManager else {
-                sessionState = .setup
+                stateManager.transitionTo(SessionState.setup)
                 return
             }
             if manager.isNetworked && !manager.isServer {
-                sessionState = .waitingForBoard
+                stateManager.setupNetworkedGame(asServer: false, connectedPlayers: [])
             } else {
-                sessionState = .lookingForSurface
+                stateManager.setupNetworkedGame(asServer: true, connectedPlayers: [])
             }
             manager.delegate = self
         }
@@ -108,10 +102,10 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         )
         button.frame = CGRect(
             origin: CGPoint(
-                x: UIScreen.main.bounds.width - 200,
-                y: 100
+                x: UIScreen.main.bounds.width - 230,
+                y: 220
             ),
-            size: CGSize(width: 180, height: 60)
+            size: CGSize(width: 160, height: 40)
         )
         button.layer.borderColor = UIColor(
             red: 1.00,
@@ -146,7 +140,7 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         label.backgroundColor = .clear
         label.font = UIFont(
             name: "AvenirNext-Bold",
-            size: 30
+            size: 26
         )
         let bounds = UIScreen.main.bounds
         let origin = CGPoint(
@@ -186,11 +180,53 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         return label
     }()
     
+    // MARK: - Health Bar UI
+    
+    lazy var healthBarBackground: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.8)
+        view.layer.borderColor = UIColor.white.cgColor
+        view.layer.borderWidth = 2
+        view.layer.cornerRadius = 5
+        view.frame = CGRect(
+            origin: CGPoint(x: 40, y: UIScreen.main.bounds.origin.y + 110),
+            size: CGSize(width: 200, height: 30)
+        )
+        return view
+    }()
+    
+    lazy var healthBarFill: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.green
+        view.layer.cornerRadius = 3
+        view.frame = CGRect(
+            origin: CGPoint(x: 2, y: 2),
+            size: CGSize(width: 196, height: 26)
+        )
+        return view
+    }()
+    
+    lazy var healthBarLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 14, weight: .bold)
+        label.textColor = .white
+        label.text = "Health: 100/100"
+        label.frame = CGRect(
+            origin: CGPoint(x: 0, y: 0),
+            size: CGSize(width: 200, height: 30)
+        )
+        return label
+    }()
+    
     let coachingOverlay = ARCoachingOverlayView()
     
-    var sessionState: SessionState = .setup
-    
     let game = Game()
+    
+    // Connect game to state manager after initialization
+    private func connectGameToStateManager() {
+        game.stateManager = stateManager
+    }
     
     var focusSquare: FocusSquare! = FocusSquare()
     
@@ -208,6 +244,7 @@ class GameViewController: UIViewController, MissileManagerDelegate {
     
     var missileManager: MissileManager?
     var shipManager: ShipManager?
+    var targetingManager: TargetingManager?
     
     // MARK: - Common Properties
     var addsMesh = false
@@ -223,12 +260,65 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         super.viewDidLoad()
         DeviceOrientation.shared.set(orientation: .landscapeRight)
         
+        // Setup state management
+        setupStateManagement()
+        connectGameToStateManager()
+        
         // Start async setup immediately
         Task {
             await setupRealityKitAsync()
         }
         
         // Setup notifications
+        setupNotifications()
+        
+        overlayView = gameStartViewContoller.view
+        gameStartViewContoller.delegate = self
+        view.addSubview(overlayView!)
+        view.bringSubviewToFront(overlayView!)
+    }
+    
+    deinit {
+        stateObservationTask?.cancel()
+    }
+    
+    // MARK: - State Management Setup
+    
+    private func setupStateManagement() {
+        // Use modern Swift concurrency for state observation
+        stateObservationTask = Task { @MainActor [weak self] in
+            guard let self = self else { return }
+            
+            var lastSessionState: SessionState?
+            var lastScore: Int?
+            
+            while !Task.isCancelled {
+                // Check for session state changes
+                let currentSessionState = self.stateManager.sessionState
+                if lastSessionState != currentSessionState {
+                    lastSessionState = currentSessionState
+                    self.handleSessionStateChange(currentSessionState)
+                }
+                
+                // Check for score changes (throttled)
+                let currentScore = self.stateManager.score
+                if lastScore != currentScore {
+                    lastScore = currentScore
+                    self.scoreText.text = "Score: \(currentScore)"
+                }
+                
+                // Sleep for 250ms to reduce polling overhead
+                do {
+                    try await Task.sleep(nanoseconds: 250_000_000) // 250ms
+                } catch {
+                    // Task was cancelled, exit gracefully
+                    break
+                }
+            }
+        }
+    }
+    
+    @MainActor private func setupNotifications() {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(missileCanHit),
@@ -243,15 +333,58 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         )
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(updateScoreUI),
+            selector: #selector(updateGameStateText),
             name: .updateScore,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleHealthChanged),
+            name: .helicopterHealthChanged,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleHelicopterDestroyed),
+            name: .helicopterDestroyed,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleHelicopterTakeDamage),
+            name: NSNotification.Name("HelicopterTakeDamage"),
+            object: nil
+        )
+    }
+    
+    private func handleSessionStateChange(_ newState: SessionState) {
+        os_log(.info, "🎮 Handling session state change: %@", newState.description)
         
-        overlayView = gameStartViewContoller.view
-        gameStartViewContoller.delegate = self
-        view.addSubview(overlayView!)
-        view.bringSubviewToFront(overlayView!)
+        switch newState {
+        case SessionState.setup:
+            game.placed = false
+            game.scoreUpdated = false
+            game.valueReached = false
+            // Clear any game over messages
+            destoryedText.text = ""
+            
+        case SessionState.lookingForSurface:
+            // Clear game over messages when starting to look for surface
+            destoryedText.text = ""
+            
+        case SessionState.gameInProgress:
+            // Clear any lingering messages when game starts
+            destoryedText.text = ""
+            
+        default:
+            break
+        }
+    }
+    
+    private func updateControlsState(enabled: Bool) {
+        armMissilesButton.isEnabled = enabled
+        padView1.isUserInteractionEnabled = enabled
+        padView2.isUserInteractionEnabled = enabled
     }
     
     private func setupRealityKitAsync() async {
@@ -288,6 +421,10 @@ class GameViewController: UIViewController, MissileManagerDelegate {
             missileManager = MissileManager(game: game, sceneView: realityKitView, gameManager: gameManager, localPlayer: myself)
             missileManager?.delegate = self
             shipManager = ShipManager(game: game, arView: realityKitView)
+            targetingManager = TargetingManager()
+            
+            // Connect targeting manager to missile manager
+            missileManager?.targetingManager = targetingManager
             
             // Add UI elements
             realityKitView.addSubview(padView1)
@@ -295,6 +432,11 @@ class GameViewController: UIViewController, MissileManagerDelegate {
             realityKitView.addSubview(destoryedText)
             realityKitView.addSubview(armMissilesButton)
             realityKitView.addSubview(scoreText)
+            
+            // Add health bar
+            realityKitView.addSubview(healthBarBackground)
+            healthBarBackground.addSubview(healthBarFill)
+            healthBarBackground.addSubview(healthBarLabel)
             
             focusSquareAnchor = AnchorEntity(world: SIMD3<Float>(0, 0, -1))
             focusSquareAnchor!.addChild(focusSquare)
@@ -361,9 +503,10 @@ class GameViewController: UIViewController, MissileManagerDelegate {
     func setupGameSession() {
         setupRealityKit()
         
-        // Reset game state for new session
-        game.scoreUpdated = false
-        game.valueReached = false
+        // Reset game state for new session through state manager (async)
+        Task { @MainActor in
+            await stateManager.resetGameState()
+        }
         
         // Sync ship managers
         if let shipManager = shipManager {
@@ -418,11 +561,48 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         focusSquareAnchor!.addChild(focusSquare)
         realityKitView.scene.addAnchor(focusSquareAnchor!)
         focusSquare.unhide()
+        
+        // Add target switching gestures
+        setupTargetSwitchingGestures()
     }
     
     func setupPlayerNode() {
         // Player node setup not needed in RealityKit mode
         // RealityKit uses camera tracking directly
+    }
+    
+    // MARK: - Target Switching Gestures
+    
+    private func setupTargetSwitchingGestures() {
+        // Left swipe for next target
+        let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(switchToNextTarget))
+        leftSwipe.direction = .left
+        realityKitView.addGestureRecognizer(leftSwipe)
+        
+        // Right swipe for previous target
+        let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(switchToPreviousTarget))
+        rightSwipe.direction = .right
+        realityKitView.addGestureRecognizer(rightSwipe)
+        
+        // Double tap to enable auto-targeting
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(enableAutoTargeting))
+        doubleTap.numberOfTapsRequired = 2
+        realityKitView.addGestureRecognizer(doubleTap)
+    }
+    
+    @objc private func switchToNextTarget() {
+        targetingManager?.switchToNextTarget()
+        print("🎯 Switched to next target")
+    }
+    
+    @objc private func switchToPreviousTarget() {
+        targetingManager?.switchToPreviousTarget()
+        print("🎯 Switched to previous target")
+    }
+    
+    @objc private func enableAutoTargeting() {
+        targetingManager?.enableAutoTargeting()
+        print("🎯 Auto-targeting enabled")
     }
     
     
@@ -439,6 +619,10 @@ class GameViewController: UIViewController, MissileManagerDelegate {
             arView: realityKitView,
             session: gameSession
         )
+        
+        // Setup networked game state
+        stateManager.setupNetworkedGame(asServer: true, connectedPlayers: [myself])
+        
         gameManager?.start()
     }
     
@@ -518,6 +702,10 @@ class GameViewController: UIViewController, MissileManagerDelegate {
     }
     
     func updateFiredButton() {
+        // Update state through state manager
+        stateManager.toggleMissileArmed()
+        
+        // Update UI
         let currentTitle = armMissilesButton.title(for: .normal)
         let newTitle = currentTitle == LocalConstants.buttonTitle ? LocalConstants.disarmTitle : LocalConstants.buttonTitle
         armMissilesButton.setTitle(newTitle, for: .normal)
@@ -530,11 +718,14 @@ class GameViewController: UIViewController, MissileManagerDelegate {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
-        // Don't place helicopter if it's already placed
         let tapLocation: CGPoint = touch.location(in: realityKitView)
-        if game.placed {
+        
+        // Simple, direct check to avoid state manager overhead
+        guard !game.placed else {
             return
         }
+        
+        print("👆 Tap detected at \(tapLocation) - processing placement")
         // Perform raycast from tap location - only allow horizontal planes
         let raycastQuery = realityKitView.makeRaycastQuery(
             from: tapLocation,
@@ -554,11 +745,11 @@ class GameViewController: UIViewController, MissileManagerDelegate {
                 return
             }
         }
-        let tappedPosition = SIMD3<Float>(
-            firstResult.worldTransform.columns.3.x,
-            firstResult.worldTransform.columns.3.y,
-            firstResult.worldTransform.columns.3.z
-        )
+//        let tappedPosition = SIMD3<Float>(
+//            firstResult.worldTransform.columns.3.x,
+//            firstResult.worldTransform.columns.3.y,
+//            firstResult.worldTransform.columns.3.z
+//        )
         // Create helicopter through HelicopterObject system (unified single/multiplayer)
         let angles = SIMD3<Float>(0, 0, 0)
         let worldTransform = firstResult.worldTransform
@@ -573,10 +764,25 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         Task { @MainActor in
             await gameManager?.createHelicopter(addNodeAction: addNode, owner: myself)
             
-            // Hide focus square and mark game as placed
+            // Hide focus square and update state efficiently
             focusSquare.hide()
-            game.placed = true
             focusSquare.isEnabled = false
+            
+            // Update game state immediately for responsive feedback
+            game.placed = true
+            
+            print("🚁 Helicopter placed successfully")
+            
+            // Update state manager in background without blocking UI
+            DispatchQueue.global(qos: .userInitiated).async {
+                DispatchQueue.main.async {
+                    self.stateManager.helicopterPlaced = true
+                    // Delayed state transition to allow helicopter setup
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        self.stateManager.transitionTo(SessionState.gameInProgress)
+                    }
+                }
+            }
             
             // Setup tank positioning (legacy compatibility)
             realityKitView.placeTankOnSurface(at: tapLocation)
@@ -586,6 +792,17 @@ class GameViewController: UIViewController, MissileManagerDelegate {
                let helicopterEntity = localHelicopter.helicopterEntity?.helicopter {
                 shipManager?.helicopterEntity = helicopterEntity
                 await shipManager?.setupShips()
+                
+                // Setup targeting manager with helicopter and ships
+                if let ships = shipManager?.ships {
+                    targetingManager?.setup(helicopterEntity: helicopterEntity, ships: ships)
+                }
+                
+                // Start ship movement and targeting updates
+                startShipMovementLoop()
+                
+                // Start periodic missile cleanup
+                startMissileCleanupTimer()
             }
             
             // Only send to network if we have a network session (multiplayer mode)
@@ -603,6 +820,24 @@ class GameViewController: UIViewController, MissileManagerDelegate {
             }
             Task { @MainActor in
                 self.shipManager?.moveShips(placed: self.game.placed)
+                
+                // Update targeting system
+                if let ships = self.shipManager?.ships {
+                    self.targetingManager?.updateShips(ships)
+                    self.targetingManager?.updateTargetIndicators()
+                }
+            }
+        }
+    }
+    
+    private func startMissileCleanupTimer() {
+        Timer.scheduledTimer(withTimeInterval: 30.0, repeats: true) { [weak self] timer in // Every 30 seconds
+            guard let self = self else {
+                timer.invalidate()
+                return
+            }
+            Task { @MainActor in
+                self.missileManager?.cleanupExpiredMissiles()
             }
         }
     }
@@ -657,7 +892,7 @@ class GameViewController: UIViewController, MissileManagerDelegate {
             ) else {
                 os_log(.error, "The WorldMap received couldn't be read")
                 DispatchQueue.main.async {
-                    self.sessionState = .setup
+                    self.stateManager.transitionTo(SessionState.setup)
                 }
                 return
             }
@@ -705,7 +940,7 @@ class GameViewController: UIViewController, MissileManagerDelegate {
         } catch {
             os_log(.error, "The WorldMap received couldn't be decompressed")
             DispatchQueue.main.async {
-                self.sessionState = .setup
+                self.stateManager.transitionTo(SessionState.setup)
             }
         }
     }
@@ -758,14 +993,125 @@ class GameViewController: UIViewController, MissileManagerDelegate {
     }
     
     @objc func updateScoreUI() {
+        // Use async Task for better performance
+        Task { @MainActor in
+            print("📊 updateScoreUI called - game.score: \(self.game.score), scoreUpdated: \(self.game.scoreUpdated)")
+            
+            // Always update the state manager score to ensure consistency
+            self.stateManager.score = self.game.score
+            
+            // Update UI text
+            let newScoreText = self.stateManager.scoreText
+            print("📊 Updating score UI text to: \(newScoreText)")
+            self.scoreText.text = newScoreText
+            
+            // Reset the scoreUpdated flag
+            self.game.scoreUpdated = false
+        }
+    }
+    
+    // MARK: - Health UI Updates
+    
+    func updateHealthBar(currentHealth: Float, maxHealth: Float) {
         DispatchQueue.main.async {
-            self.scoreText.text = self.game.scoreTextString
+            let percentage = currentHealth / maxHealth
+            let newWidth = CGFloat(196 * percentage) // Max width is 196
+            
+            // Update health bar fill width
+            UIView.animate(withDuration: 0.3) {
+                self.healthBarFill.frame.size.width = newWidth
+            }
+            
+            // Update health bar color based on health percentage
+            let healthColor: UIColor
+            if percentage > 0.6 {
+                healthColor = .green
+            } else if percentage > 0.3 {
+                healthColor = .orange
+            } else {
+                healthColor = .red
+            }
+            
+            UIView.animate(withDuration: 0.3) {
+                self.healthBarFill.backgroundColor = healthColor
+            }
+            // Update health text
+            self.healthBarLabel.text = "Health: \(Int(currentHealth))/\(Int(maxHealth))"
+        }
+    }
+    
+    @objc func handleHealthChanged(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let currentHealth = userInfo["currentHealth"] as? Float,
+              let maxHealth = userInfo["maxHealth"] as? Float else {
+            print("❌ Invalid health notification data")
+            return
+        }
+        
+        print("🏥 Health notification received: \(currentHealth)/\(maxHealth)")
+        
+        // Update health through state manager (throttled)
+        stateManager.updateHelicopterHealth(currentHealth)
+        
+        // Update UI directly to avoid binding overhead
+        updateHealthBar(currentHealth: currentHealth, maxHealth: maxHealth)
+    }
+    
+    @objc func handleHelicopterDestroyed(_ notification: Notification) {
+        print("💀 Helicopter destroyed notification received")
+        
+        // Only show game over if the game has actually started
+        guard stateManager.gameInProgress || stateManager.helicopterPlaced else {
+            print("⚠️ Ignoring helicopter destroyed - game not started yet")
+            return
+        }
+        
+        DispatchQueue.main.async {
+            // Show game over screen
+            self.destoryedText.text = "HELICOPTER DESTROYED"
+            self.destoryedText.textColor = UIColor.red
+            
+            // Disable controls
+            self.armMissilesButton.isEnabled = false
+            self.padView1.isUserInteractionEnabled = false
+            self.padView2.isUserInteractionEnabled = false
+            
+            // Set health bar to zero
+            self.updateHealthBar(currentHealth: 0, maxHealth: 100)
+            
+            // Could add restart button or return to menu logic here
+        }
+    }
+    
+    @objc func handleHelicopterTakeDamage(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let damage = userInfo["damage"] as? Float,
+              let source = userInfo["source"] as? String else {
+            print("❌ Invalid helicopter damage notification data")
+            return
+        }
+        
+        print("💥 Helicopter damage notification: \(damage) from \(source)")
+        
+        // Apply damage through state manager
+        stateManager.damageHelicopter(damage, from: source)
+        
+        // Also apply to helicopter object for visual effects
+        if let localHelicopter = gameManager?.getHelicopter(for: myself) {
+            print("✅ Found local helicopter in GameViewController - applying damage")
+            localHelicopter.takeDamage(damage, from: source)
+        } else {
+            print("❌ No local helicopter found in GameViewController for damage")
+            print("🔍 GameManager exists: \(gameManager != nil)")
+            print("🔍 Local player: \(myself.username)")
         }
     }
     
     // MARK: - MissileManagerDelegate
     
     func missileManager(_ manager: MissileManager, didUpdateScore score: Int) {
+        // Update score through state manager
+        stateManager.destroyShip(worth: 100) // Standard ship destruction points
         updateScoreUI()
     }
     

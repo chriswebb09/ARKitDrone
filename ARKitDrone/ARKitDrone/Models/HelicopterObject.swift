@@ -36,6 +36,9 @@ class HelicopterObject: ObservableObject {
     /// The anchor entity that holds the helicopter in AR space
     var anchorEntity: AnchorEntity?
     
+    /// Health system for this helicopter
+    var healthSystem: HelicopterHealthSystem?
+    
     // MARK: - Animation Properties
     
     /// Current rotor speed (0.0 = stopped, 1.0 = max speed)
@@ -117,7 +120,46 @@ class HelicopterObject: ObservableObject {
             targetTranslation = translation
             targetRotation = helicopter.transform.rotation
             
+            // Initialize health system
+            healthSystem = HelicopterHealthSystem(maxHealth: 100.0, helicopterEntity: helicopter)
+            setupHealthSystemCallbacks()
+            
             os_log(.info, "Helicopter setup complete for player %s", owner?.username ?? "unknown")
+        }
+    }
+    
+    // MARK: - Health System Setup
+    
+    private func setupHealthSystemCallbacks() {
+        guard let healthSystem = healthSystem else { return }
+        
+        healthSystem.onHealthChanged = { [weak self] currentHealth, maxHealth in
+            let percentage = (currentHealth / maxHealth) * 100
+            print("🏥 Helicopter \(self?.index ?? -1) health: \(Int(currentHealth))/\(Int(maxHealth)) (\(Int(percentage))%)")
+            
+            // Post notification for UI updates (only for local player)
+            if let owner = self?.owner, owner == UserDefaults.standard.myself {
+                NotificationCenter.default.post(
+                    name: .helicopterHealthChanged,
+                    object: nil,
+                    userInfo: ["currentHealth": currentHealth, "maxHealth": maxHealth]
+                )
+            }
+        }
+        
+        healthSystem.onDamageTaken = { [weak self] damage in
+            print("💥 Helicopter \(self?.index ?? -1) took \(damage) damage")
+            // Could trigger screen shake or other effects here
+        }
+        
+        healthSystem.onCriticalHealth = { [weak self] in
+            print("🚨 Helicopter \(self?.index ?? -1) is in critical condition!")
+            // Could trigger warning sounds or red screen overlay
+        }
+        
+        healthSystem.onHelicopterDestroyed = { [weak self] in
+            print("💀 Helicopter \(self?.index ?? -1) has been destroyed!")
+            // Could trigger game over or respawn logic
         }
     }
     
@@ -325,6 +367,41 @@ class HelicopterObject: ObservableObject {
         os_log(.info, "Removed helicopter %d from scene", index)
     }
     
+    // MARK: - Health Management
+    
+    /// Make the helicopter take damage
+    func takeDamage(_ damage: Float, from source: String = "enemy") {
+        print("🚁 HelicopterObject takeDamage called: \(damage) from \(source)")
+        print("🏥 Health system exists: \(healthSystem != nil)")
+        if let health = healthSystem?.currentHealth {
+            print("🩺 Current health before damage: \(health)")
+        }
+        healthSystem?.takeDamage(damage, from: source)
+        if let health = healthSystem?.currentHealth {
+            print("🩺 Current health after damage: \(health)")
+        }
+    }
+    
+    /// Heal the helicopter
+    func heal(_ amount: Float) {
+        healthSystem?.heal(amount)
+    }
+    
+    /// Check if helicopter is alive
+    func isAlive() -> Bool {
+        return healthSystem?.isAlive ?? true
+    }
+    
+    /// Get current health percentage
+    func getHealthPercentage() -> Float {
+        return healthSystem?.getHealthPercentage() ?? 100.0
+    }
+    
+    /// Check if helicopter can take damage (not in immunity period)
+    func canTakeDamage() -> Bool {
+        return healthSystem?.canTakeDamage() ?? true
+    }
+    
     // MARK: - Cleanup
     
     @MainActor
@@ -332,6 +409,8 @@ class HelicopterObject: ObservableObject {
         animationTimer?.invalidate()
         anchorEntity?.removeFromParent()
         helicopterEntity?.stopRotorRotation()
+        healthSystem?.cleanup()
+        healthSystem = nil
     }
 }
 //    deinit {

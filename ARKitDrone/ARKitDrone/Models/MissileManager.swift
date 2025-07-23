@@ -11,7 +11,7 @@ import simd
 import UIKit
 
 // MARK: - MissileManager
-
+@MainActor
 class MissileManager {
     
     // MARK: - Properties
@@ -19,11 +19,20 @@ class MissileManager {
     var activeMissileTrackers: [String: MissileTrackingInfo] = [:]
     var game: Game
     var sceneView: GameSceneView
-    let missileSpeed: Float = 5
+    let missileSpeed: Float = 12 // Increased speed for better targeting
     weak var delegate: MissileManagerDelegate?
+    
+    // Rate limiting for missile firing
+    private var lastFireTime: TimeInterval = 0
+    private let minimumFireInterval: TimeInterval = 1.0 // 1 second between missiles
+    private let maxActiveMissiles: Int = 3 // Maximum missiles in flight at once
+    private let missileLifetime: TimeInterval = 90.0 // 90 seconds before missile auto-cleanup
     
     // Reference to game manager for accessing helicopter objects
     weak var gameManager: GameManager?
+    
+    // Reference to targeting manager for getting current target
+    weak var targetingManager: TargetingManager?
     
     // Local player reference - passed in to ensure consistency
     private let localPlayer: Player
@@ -62,16 +71,24 @@ class MissileManager {
             return false
         }
         
-        if helicopterEntity.missiles.isEmpty || game.scoreUpdated {
-            print("Fire failed: no missiles or score updated")
+        if helicopterEntity.missiles.isEmpty {
+            print("Fire failed: no missiles available")
             return false
         }
-        guard sceneView.targetIndex < sceneView.ships.count else {
-            print("Fire failed: no ships or invalid target index")
+        
+        // Check if there are any available (unfired) missiles
+        let availableMissiles = helicopterEntity.missiles.filter { !$0.fired }
+        if availableMissiles.isEmpty {
+            print("Fire failed: no available missiles (all \(helicopterEntity.missiles.count) missiles are fired)")
             return false
         }
-        if sceneView.ships[sceneView.targetIndex].isDestroyed {
-            print("Fire failed: target ship is destroyed")
+        
+        print("🚀 Available missiles: \(availableMissiles.count)/\(helicopterEntity.missiles.count)")
+        
+        // Check if we have a valid target through targeting manager
+        guard let targetingManager = targetingManager,
+              targetingManager.hasValidTarget() else {
+            print("Fire failed: no valid target available")
             return false
         }
         return true
@@ -112,11 +129,31 @@ class MissileManager {
     
     @MainActor
     func fire(game: Game) {
+        // Rate limiting check
+        let currentTime = CACurrentMediaTime()
+        if currentTime - lastFireTime < minimumFireInterval {
+            print("🚫 Missile fire blocked - too soon after last fire (wait \(minimumFireInterval - (currentTime - lastFireTime))s)")
+            return
+        }
+        
+        // Check maximum active missiles
+        if activeMissileTrackers.count >= maxActiveMissiles {
+            print("🚫 Missile fire blocked - too many active missiles (\(activeMissileTrackers.count)/\(maxActiveMissiles))")
+            return
+        }
+        
         if !canFire(game: game) { return }
         
-        let ships = sceneView.ships
-        let ship = ships[sceneView.targetIndex]
+        lastFireTime = currentTime
+        
+        // Get current target from targeting manager
+        guard let ship = targetingManager?.getCurrentTarget() else {
+            print("No valid target available for missile")
+            return
+        }
         ship.targeted = true
+        
+        print("🚀 Firing missile at target ship \(ship.id.prefix(8)) - Active missiles: \(activeMissileTrackers.count)")
         
         // Get missile through HelicopterObject system
         guard let localHelicopter = gameManager?.getHelicopter(for: localPlayer),
@@ -202,17 +239,34 @@ class MissileManager {
             return
         }
         
-        let deltaTime = displayLink.timestamp - trackingInfo.lastUpdateTime
-        let speed: Float = 5  // Much slower for 10+ second missile flight
-        let targetPos = ship.entity.transform.translation
-        // Get missile's world position by combining anchor and entity positions
-        let missileWorldPos: SIMD3<Float>
-        if let parent = missile.entity.parent {
-            missileWorldPos = parent.transform.translation + missile.entity.transform.translation
-        } else {
-            missileWorldPos = missile.entity.transform.translation
+        // Check if missile has exceeded its lifetime (90 seconds)
+        let currentTime = CACurrentMediaTime()
+        if currentTime - trackingInfo.startTime > missileLifetime {
+            print("⏰ Missile \(missile.id.prefix(8)) expired after \(missileLifetime) seconds - cleaning up")
+            cleanupMissile(displayLink: displayLink, missileID: missile.id)
+            return
         }
-        let currentPos = missileWorldPos
+        
+        let deltaTime = displayLink.timestamp - trackingInfo.lastUpdateTime
+        let speed: Float = missileSpeed // Use class property for consistent speed
+        // Get missile's world position by combining anchor and entity positions
+        let currentPos: SIMD3<Float>
+        if let parent = missile.entity.parent {
+            currentPos = parent.transform.translation + missile.entity.transform.translation
+        } else {
+            currentPos = missile.entity.transform.translation
+        }
+        
+        // Get ship position with predictive targeting for moving targets
+        let currentShipPos = ship.entity.transform.translation
+        let shipVelocity = ship.velocity
+        
+        // Predict where the ship will be based on missile travel time
+        let distanceToShip = simd_distance(currentPos, currentShipPos)
+        let timeToImpact = distanceToShip / max(speed, 0.1) // Avoid division by zero
+        
+        // Add prediction for moving targets (scaled for better accuracy)
+        let targetPos = currentShipPos + (shipVelocity * timeToImpact * 15.0)
         
         if trackingInfo.frameCount < 3 {
             print("Frame \(trackingInfo.frameCount): Current pos: \(currentPos), Target pos: \(targetPos)")
@@ -226,10 +280,19 @@ class MissileManager {
         }
         
         let distance = simd_distance(currentPos, targetPos)
-        print("Missile \(missile.id) distance to target: \(distance)")
-        print("Current pos: \(currentPos), Target pos: \(targetPos)")
         
-        if distance < 1.0 {
+        // Only print missile tracking info every 30 frames (1 second at 30fps) to reduce spam
+        if trackingInfo.frameCount % 30 == 0 {
+            print("🚀 Missile \(missile.id.prefix(8)) tracking:")
+            print("  Distance to target: \(distance)")
+            print("  Current pos: \(currentPos)")
+            print("  Target pos: \(targetPos)")
+            print("  Ship velocity: \(ship.velocity)")
+            print("  Ship destroyed: \(ship.isDestroyed)")
+        }
+        
+        if distance < 3.5 {  // Further increased hit detection range for better success rate
+            print("🎯 HIT DETECTED! Distance: \(distance)")
             handleMissileHit(missile: missile, ship: ship, at: targetPos)
             cleanupMissile(displayLink: displayLink, missileID: missile.id)
             return
@@ -351,14 +414,18 @@ class MissileManager {
         missile.hit = true
         ship.isDestroyed = true
         DispatchQueue.main.async {
+            print("🎯 Before score update: \(self.game.playerScore)")
             self.game.playerScore += 1
+            print("🎯 After score update: \(self.game.playerScore)")
             ApacheHelicopter.speed = 0
             self.game.updateScoreText()
+            print("🎯 Score text updated: \(self.game.scoreTextString)")
             NotificationCenter.default.post(
                 name: .updateScore,
                 object: self,
                 userInfo: nil
             )
+            print("🎯 Score update notification sent")
         }
         DispatchQueue.main.async {
             ship.removeShip()
@@ -370,6 +437,14 @@ class MissileManager {
     
     private func cleanupMissile(displayLink: CADisplayLink, missileID: String) {
         displayLink.invalidate()
+        
+        // Reset missile flags if we still have reference to it
+        if let trackingInfo = activeMissileTrackers[missileID] {
+            trackingInfo.missile.fired = false
+            trackingInfo.missile.hit = false
+            print("🔄 Missile \(missileID.prefix(8)) reset for reuse")
+        }
+        
         activeMissileTrackers[missileID] = nil
     }
     
@@ -377,6 +452,55 @@ class MissileManager {
     private func cleanupMissile(_ missile: Missile) {
         missile.particleEntity?.isEnabled = false
         missile.entity.removeFromParent()
+        
+        // Reset missile flags for reuse
+        missile.fired = false
+        missile.hit = false
+        
         activeMissileTrackers[missile.id] = nil
+        print("🔄 Missile \(missile.id.prefix(8)) reset for reuse")
+    }
+    
+    // MARK: - Missile Reset/Cleanup
+    
+    /// Reset all active missiles (useful for game restart or emergency cleanup)
+    @MainActor
+    func resetAllMissiles() {
+        print("🧹 Resetting all \(activeMissileTrackers.count) active missiles")
+        
+        for (missileId, trackingInfo) in activeMissileTrackers {
+            trackingInfo.displayLink.invalidate()
+            trackingInfo.missile.particleEntity?.isEnabled = false
+            trackingInfo.missile.entity.removeFromParent()
+            trackingInfo.missile.hit = true
+            trackingInfo.missile.fired = false // Reset for reuse
+        }
+        
+        activeMissileTrackers.removeAll()
+        print("✅ All missiles reset")
+    }
+    
+    /// Cleanup expired missiles (called periodically)
+    @MainActor
+    func cleanupExpiredMissiles() {
+        let currentTime = CACurrentMediaTime()
+        var expiredMissiles: [String] = []
+        
+        for (missileId, trackingInfo) in activeMissileTrackers {
+            if currentTime - trackingInfo.startTime > missileLifetime {
+                expiredMissiles.append(missileId)
+            }
+        }
+        
+        for missileId in expiredMissiles {
+            if let trackingInfo = activeMissileTrackers[missileId] {
+                print("⏰ Cleaning up expired missile \(missileId.prefix(8))")
+                cleanupMissile(displayLink: trackingInfo.displayLink, missileID: missileId)
+            }
+        }
+        
+        if !expiredMissiles.isEmpty {
+            print("🧹 Cleaned up \(expiredMissiles.count) expired missiles")
+        }
     }
 }

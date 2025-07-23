@@ -69,27 +69,15 @@ extension GameViewController: JoystickSceneDelegate {
     func tapped() {
         // Check missiles armed through HelicopterObject system
         guard let localHeli = localHelicopter, localHeli.missilesArmed() else { return }
+        
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+            
+            // Fire missile at current target
             missileManager?.fire(game: game)
-            if realityKitView.ships.count > realityKitView.targetIndex {
-                realityKitView.targetIndex += 1
-                if realityKitView.targetIndex < realityKitView.ships.count {
-                    let canAddTarget = !realityKitView.ships[realityKitView.targetIndex].isDestroyed && !realityKitView.ships[realityKitView.targetIndex].targetAdded
-                    if canAddTarget {
-                        guard realityKitView.targetIndex < realityKitView.ships.count else { return }
-                        let square = ReticleEntity()
-                        realityKitView.ships[realityKitView.targetIndex].square = square
-                        // Position the reticle at the ship's location
-                        square.transform.translation = realityKitView.ships[realityKitView.targetIndex].entity.transform.translation
-                        // Add to ship's anchor
-                        if let parent = realityKitView.ships[realityKitView.targetIndex].entity.parent {
-                            parent.addChild(square)
-                        }
-                        realityKitView.ships[realityKitView.targetIndex].targetAdded = true
-                    }
-                }
-            }
+            
+            // Switch to next target automatically after firing
+            targetingManager?.switchToNextTarget()
         }
     }
 }

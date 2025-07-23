@@ -11,6 +11,8 @@ import Foundation
 extension Notification.Name {
     static let missileCanHit = Notification.Name("MissileCanHit")
     static let updateScore = Notification.Name("UpdateScore")
+    static let helicopterHealthChanged = Notification.Name("HelicopterHealthChanged")
+    static let helicopterDestroyed = Notification.Name("HelicopterDestroyed")
 }
 
 

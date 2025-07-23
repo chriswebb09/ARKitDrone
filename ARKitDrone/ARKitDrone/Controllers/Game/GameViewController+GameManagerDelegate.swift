@@ -61,7 +61,7 @@ extension GameViewController: GameManagerDelegate {
     
     func manager(_ manager: GameManager, completed: CompletedAction) {
         print("completed")
-        self.sessionState = .gameInProgress
+        self.stateManager.transitionTo(SessionState.gameInProgress)
     }
     
     private func process(boardAction: BoardSetupAction, from peer: Player) {
@@ -73,10 +73,10 @@ extension GameViewController: GameManagerDelegate {
             case .worldMapData(let data):
                 os_log(.info, "Received WorldMap data. Size: %d", data.count)
                 self.loadWorldMap(from: data)
-                self.sessionState = .lookingForSurface
+                self.stateManager.transitionTo(SessionState.lookingForSurface)
             case .manual:
                 os_log(.info, "Received a manual board placement")
-                self.sessionState = .lookingForSurface
+                self.stateManager.transitionTo(SessionState.lookingForSurface)
             }
         case .requestBoardLocation:
             os_log(.info, "sending world to peer")
@@ -125,7 +125,7 @@ extension GameViewController: GameManagerDelegate {
         // MARK: request worldmap when joining the host
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            if self.sessionState == .waitingForBoard {
+            if self.stateManager.sessionState == SessionState.waitingForBoard {
                 manager.send(boardAction: .requestBoardLocation)
             }
             //guard !UserDefaults.standard.disableInGameUI else { return }

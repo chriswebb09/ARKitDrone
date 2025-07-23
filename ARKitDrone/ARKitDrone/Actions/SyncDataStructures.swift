@@ -38,8 +38,8 @@ struct ShipSyncData: BitStreamCodable {
     
     func encode(to bitStream: inout WritableBitStream) throws {
         try shipId.encode(to: &bitStream)
-        try position.encode(to: &bitStream)
-        try velocity.encode(to: &bitStream)
+        position.encode(to: &bitStream)
+        velocity.encode(to: &bitStream)
         try rotation.encode(to: &bitStream)
         bitStream.appendBool(isDestroyed)
         bitStream.appendBool(targeted)
@@ -85,7 +85,7 @@ struct MissileFireData: BitStreamCodable {
     func encode(to bitStream: inout WritableBitStream) throws {
         try missileId.encode(to: &bitStream)
         try playerId.encode(to: &bitStream)
-        try startPosition.encode(to: &bitStream)
+        startPosition.encode(to: &bitStream)
         try startRotation.encode(to: &bitStream)
         try targetShipId.encode(to: &bitStream)
         bitStream.appendFloat64(fireTime)
@@ -139,7 +139,7 @@ struct MissileSyncData: BitStreamCodable {
     
     func encode(to bitStream: inout WritableBitStream) throws {
         try missileId.encode(to: &bitStream)
-        try position.encode(to: &bitStream)
+        position.encode(to: &bitStream)
         try rotation.encode(to: &bitStream)
         bitStream.appendFloat64(timestamp)
     }
@@ -177,7 +177,7 @@ struct MissileHitData: BitStreamCodable {
     func encode(to bitStream: inout WritableBitStream) throws {
         try missileId.encode(to: &bitStream)
         try shipId.encode(to: &bitStream)
-        try hitPosition.encode(to: &bitStream)
+        hitPosition.encode(to: &bitStream)
         try playerId.encode(to: &bitStream)
         bitStream.appendFloat64(timestamp)
     }

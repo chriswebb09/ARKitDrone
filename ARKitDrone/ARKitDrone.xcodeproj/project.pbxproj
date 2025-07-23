@@ -68,6 +68,8 @@
 		94874EB42E25C95700453E04 /* heli.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 94874EB32E25C95700453E04 /* heli.usdz */; };
 		9488F2032D657BA6001C08D9 /* ReticleEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9488F2022D657BA2001C08D9 /* ReticleEntity.swift */; };
 		949602D72E2CCAB90021B8E7 /* TestPlan.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 949602D62E2CCAB90021B8E7 /* TestPlan.xctestplan */; };
+		949603562E30A0060021B8E7 /* GameStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949603552E30A0060021B8E7 /* GameStateManager.swift */; };
+		949603582E30A05A0021B8E7 /* SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949603572E30A05A0021B8E7 /* SessionState.swift */; };
 		94A68F722C8797070059CD82 /* Matrix4+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F712C8797070059CD82 /* Matrix4+Extension.swift */; };
 		94A68F742C87972E0059CD82 /* Quaternion+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A68F732C87972E0059CD82 /* Quaternion+Extension.swift */; };
 		94B173E32DA9CC420015DC0D /* GameViewController+GameManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B173E22DA9CC390015DC0D /* GameViewController+GameManagerDelegate.swift */; };
@@ -113,6 +115,8 @@
 		94E5448F29672EE200158DA2 /* JoystickSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E5448E29672EE200158DA2 /* JoystickSceneDelegate.swift */; };
 		94F5D19C2D5CAEA000019569 /* MinimapScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F5D19B2D5CAE9B00019569 /* MinimapScene.swift */; };
 		94F968A82AD7337F00D7B418 /* OcclusionNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F968A72AD7337F00D7B418 /* OcclusionNode.swift */; };
+		94HEALTH32D657BA6001C08D9 /* HelicopterHealthSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94HEALTH12D657BA2001C08D9 /* HelicopterHealthSystem.swift */; };
+		94TARGETING32D657BA6001C08D9 /* TargetingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94TARGETING12D657BA2001C08D9 /* TargetingManager.swift */; };
 		A7AE72C21F888EF500B015D3 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7AE72C11F888EF500B015D3 /* GameViewController.swift */; };
 		A7AE72C71F888EF500B015D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A7AE72C61F888EF500B015D3 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
@@ -189,6 +193,8 @@
 		94874EB32E25C95700453E04 /* heli.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = heli.usdz; sourceTree = "<group>"; };
 		9488F2022D657BA2001C08D9 /* ReticleEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReticleEntity.swift; sourceTree = "<group>"; };
 		949602D62E2CCAB90021B8E7 /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
+		949603552E30A0060021B8E7 /* GameStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStateManager.swift; sourceTree = "<group>"; };
+		949603572E30A05A0021B8E7 /* SessionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionState.swift; sourceTree = "<group>"; };
 		94A68F712C8797070059CD82 /* Matrix4+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Matrix4+Extension.swift"; sourceTree = "<group>"; };
 		94A68F732C87972E0059CD82 /* Quaternion+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Quaternion+Extension.swift"; sourceTree = "<group>"; };
 		94B173E22DA9CC390015DC0D /* GameViewController+GameManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameViewController+GameManagerDelegate.swift"; sourceTree = "<group>"; };
@@ -235,6 +241,8 @@
 		94E6B99D2E2CCA00008392FF /* ARKitDroneTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ARKitDroneTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		94F5D19B2D5CAE9B00019569 /* MinimapScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimapScene.swift; sourceTree = "<group>"; };
 		94F968A72AD7337F00D7B418 /* OcclusionNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OcclusionNode.swift; sourceTree = "<group>"; };
+		94HEALTH12D657BA2001C08D9 /* HelicopterHealthSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelicopterHealthSystem.swift; sourceTree = "<group>"; };
+		94TARGETING12D657BA2001C08D9 /* TargetingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingManager.swift; sourceTree = "<group>"; };
 		A7AE72BA1F888EF500B015D3 /* ARKitDrone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARKitDrone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7AE72C11F888EF500B015D3 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		A7AE72C61F888EF500B015D3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -409,6 +417,8 @@
 		94CCC8F32972E36100F7D17F /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				949603572E30A05A0021B8E7 /* SessionState.swift */,
+				949603552E30A0060021B8E7 /* GameStateManager.swift */,
 				94B173F02DAA32440015DC0D /* GameManager */,
 				946690AB2D9E3D7A00343B1B /* GameObject.swift */,
 				946690AD2D9E3D8B00343B1B /* Player.swift */,
@@ -429,6 +439,8 @@
 				94316FAE2DAB56BE0002BAF8 /* Missiles */,
 				94F968A72AD7337F00D7B418 /* OcclusionNode.swift */,
 				9488F2022D657BA2001C08D9 /* ReticleEntity.swift */,
+				94TARGETING12D657BA2001C08D9 /* TargetingManager.swift */,
+				94HEALTH12D657BA2001C08D9 /* HelicopterHealthSystem.swift */,
 				9467A30A2BB918EE0023EA62 /* M1Tank.swift */,
 				9467A30E2BB93A840023EA62 /* Shell.swift */,
 			);
@@ -700,6 +712,7 @@
 				94396BD82D7B46F000A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift in Sources */,
 				946690C52D9E3FB700343B1B /* NetworkGameBrowserViewController.swift in Sources */,
 				94CCC9122972FFB500F7D17F /* DeviceOrientation.swift in Sources */,
+				949603562E30A0060021B8E7 /* GameStateManager.swift in Sources */,
 				94C881A82D5D05C20050119D /* Game.swift in Sources */,
 				94CB148E2C8793BF0065E1B0 /* UIColor+Extension.swift in Sources */,
 				94423DD22DAB41BC007B5945 /* BoardAnchor.swift in Sources */,
@@ -722,6 +735,7 @@
 				946690B42D9E3DB400343B1B /* NetworkSession.swift in Sources */,
 				94423DDC2DAB42F6007B5945 /* GameVelocity.swift in Sources */,
 				94CF992A2E24B79300E780DE /* GameViewController+ARSessionDelegate.swift in Sources */,
+				949603582E30A05A0021B8E7 /* SessionState.swift in Sources */,
 				94396BD62D7B469600A83CF4 /* GameViewController+JoystickSceneDelegate.swift in Sources */,
 				94B173EF2DAA321B0015DC0D /* GameManagerDelegate.swift in Sources */,
 				94CF99122E24597000E780DE /* MeshResource+Conversion.swift in Sources */,
@@ -734,6 +748,8 @@
 				94CF99182E24597000E780DE /* simd_float4x4+Extension.swift in Sources */,
 				94B6E8462D7B60BA0064ABD7 /* NotificationName+Extension.swift in Sources */,
 				9488F2032D657BA6001C08D9 /* ReticleEntity.swift in Sources */,
+				94TARGETING32D657BA6001C08D9 /* TargetingManager.swift in Sources */,
+				94HEALTH32D657BA6001C08D9 /* HelicopterHealthSystem.swift in Sources */,
 				94A68F722C8797070059CD82 /* Matrix4+Extension.swift in Sources */,
 				94B173F52DAA34A70015DC0D /* MovementSyncSceneDataDelegate.swift in Sources */,
 				94D182A52E2C9172001201FE /* AppDelegate.swift in Sources */,

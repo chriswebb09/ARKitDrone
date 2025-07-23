@@ -71,15 +71,7 @@ class ShipManager {
                     }
                 }
             }
-            // Setup first target
-            if !ships.isEmpty {
-                let square = ReticleEntity()
-                ships[0].square = square
-                if let parent = ships[0].entity.parent {
-                    parent.addChild(square)
-                }
-                ships[0].targetAdded = true
-            }
+            // Target setup now handled by TargetingManager
             self.shipsSetup = true
             // Sync to GameSceneView
             if let gameRealityView = self.arView as? GameSceneView {
