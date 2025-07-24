@@ -85,6 +85,10 @@
 		94C42D892E32314D00C59B3B /* EntityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C42D882E32314D00C59B3B /* EntityManager.swift */; };
 		94C42D8B2E32315400C59B3B /* ARSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C42D8A2E32315400C59B3B /* ARSessionManager.swift */; };
 		94C42D8D2E32323000C59B3B /* Weapons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C42D8C2E32323000C59B3B /* Weapons.swift */; };
+		94C42DB62E3262CE00C59B3B /* MissileHitData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C42DB52E3262CC00C59B3B /* MissileHitData.swift */; };
+		94C42DB82E3262E600C59B3B /* ShipSyncData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C42DB72E3262E500C59B3B /* ShipSyncData.swift */; };
+		94C42DBA2E3262FF00C59B3B /* MissileFireData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C42DB92E3262FC00C59B3B /* MissileFireData.swift */; };
+		94C42DBC2E32631A00C59B3B /* MissileSyncData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C42DBB2E32631800C59B3B /* MissileSyncData.swift */; };
 		94C881A82D5D05C20050119D /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C881A72D5D05B50050119D /* Game.swift */; };
 		94CB148E2C8793BF0065E1B0 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CB148D2C8793BF0065E1B0 /* UIColor+Extension.swift */; };
 		94CCC8EB2972D14600F7D17F /* audio.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 94CCC8EA2972D14600F7D17F /* audio.m4a */; };
@@ -212,6 +216,10 @@
 		94C42D882E32314D00C59B3B /* EntityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityManager.swift; sourceTree = "<group>"; };
 		94C42D8A2E32315400C59B3B /* ARSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSessionManager.swift; sourceTree = "<group>"; };
 		94C42D8C2E32323000C59B3B /* Weapons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weapons.swift; sourceTree = "<group>"; };
+		94C42DB52E3262CC00C59B3B /* MissileHitData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissileHitData.swift; sourceTree = "<group>"; };
+		94C42DB72E3262E500C59B3B /* ShipSyncData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShipSyncData.swift; sourceTree = "<group>"; };
+		94C42DB92E3262FC00C59B3B /* MissileFireData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissileFireData.swift; sourceTree = "<group>"; };
+		94C42DBB2E32631800C59B3B /* MissileSyncData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissileSyncData.swift; sourceTree = "<group>"; };
 		94C881A72D5D05B50050119D /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		94CB148D2C8793BF0065E1B0 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		94CCC8EA2972D14600F7D17F /* audio.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = audio.m4a; sourceTree = "<group>"; };
@@ -295,6 +303,10 @@
 				94423DE52DAB43EB007B5945 /* Action.swift */,
 				94423DE32DAB43B8007B5945 /* GameAction.swift */,
 				94423DEF2DAB44A7007B5945 /* SyncDataStructures.swift */,
+				94C42DBB2E32631800C59B3B /* MissileSyncData.swift */,
+				94C42DB92E3262FC00C59B3B /* MissileFireData.swift */,
+				94C42DB72E3262E500C59B3B /* ShipSyncData.swift */,
+				94C42DB52E3262CC00C59B3B /* MissileHitData.swift */,
 				94423DE12DAB4388007B5945 /* AddNodeAction.swift */,
 				94423DDF2DAB435F007B5945 /* MoveData.swift */,
 				94423DDD2DAB433C007B5945 /* CompletedAction.swift */,
@@ -731,12 +743,14 @@
 				94396BD22D7B36A300A83CF4 /* CGPoint+Extension.swift in Sources */,
 				946690C92D9E3FF400343B1B /* GameStartViewController.swift in Sources */,
 				94B173E72DAA30540015DC0D /* GameStartViewControllerDelegate.swift in Sources */,
+				94C42DB82E3262E600C59B3B /* ShipSyncData.swift in Sources */,
 				94423DED2DAB45C7007B5945 /* WritableBitStream.swift in Sources */,
 				947691CA2E2B80BF00F22DE4 /* MissileTrackingInfo.swift in Sources */,
 				94F968A82AD7337F00D7B418 /* OcclusionEntity.swift in Sources */,
 				941706D92972A5F400CB0308 /* ApacheHelicopter.swift in Sources */,
 				941706DA2972A5F400CB0309 /* HelicopterObject.swift in Sources */,
 				946690BB2D9E3DFA00343B1B /* Action+Signposts.swift in Sources */,
+				94C42DBC2E32631A00C59B3B /* MissileSyncData.swift in Sources */,
 				946690BC2D9E3DFA00343B1B /* SignpostData.swift in Sources */,
 				A7AE72C21F888EF500B015D3 /* GameViewController.swift in Sources */,
 				94423DE02DAB4360007B5945 /* MoveData.swift in Sources */,
@@ -762,9 +776,11 @@
 				94F5D19C2D5CAEA000019569 /* MinimapScene.swift in Sources */,
 				94423DD82DAB425A007B5945 /* GameBoardLocation.swift in Sources */,
 				94396BD82D7B46F000A83CF4 /* GameViewController+ARCoachingOverlayViewDelegate.swift in Sources */,
+				94C42DB62E3262CE00C59B3B /* MissileHitData.swift in Sources */,
 				94C42D8D2E32323000C59B3B /* Weapons.swift in Sources */,
 				946690C52D9E3FB700343B1B /* NetworkGameBrowserViewController.swift in Sources */,
 				94CCC9122972FFB500F7D17F /* DeviceOrientation.swift in Sources */,
+				94C42DBA2E3262FF00C59B3B /* MissileFireData.swift in Sources */,
 				949603562E30A0060021B8E7 /* GameStateManager.swift in Sources */,
 				94C881A82D5D05C20050119D /* Game.swift in Sources */,
 				94CB148E2C8793BF0065E1B0 /* UIColor+Extension.swift in Sources */,
