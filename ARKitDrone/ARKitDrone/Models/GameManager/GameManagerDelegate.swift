@@ -11,7 +11,7 @@ import Foundation
 import RealityKit
 
 @MainActor
-protocol GameManagerDelegate: AnyObject {
+protocol GameManagerDelegate: AnyObject, Sendable {
     func manager(_ manager: GameManager, received: BoardSetupAction, from: Player)
     func manager(_ manager: GameManager, joiningPlayer player: Player)
     func manager(_ manager: GameManager, leavingPlayer player: Player)

@@ -63,7 +63,7 @@ class Shell {
                 centerOfMass: physicsBody.massProperties.centerOfMass
             )
             entity.components.set(updatedPhysics)
-            // TODO: Apply velocity via custom motion system if needed
+            // Physics velocity applied via PhysicsBodyComponent
         }
     }
 

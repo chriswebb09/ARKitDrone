@@ -8,6 +8,7 @@
 
 import simd
 import Testing
+import RealityKit
 @testable import ARKitDrone
 
 struct ARKitDroneTests {
@@ -59,8 +60,14 @@ struct ARKitDroneTests {
         
         // Only test transform if the helicopter model was successfully loaded
         if let model = await helicopter.helicopterEntity?.helicopter {
-            await model.setTransformMatrix(transform, relativeTo: nil)
-            await #expect(model.transform.translation.z == -5)
+            // Capture transform value before MainActor.run to avoid Swift 6 concurrency issue
+            let capturedTransform = transform
+            // Set the transform using RealityKit's correct API on MainActor
+            await MainActor.run {
+                model.transform = Transform(matrix: capturedTransform)
+            }
+            let translation = await MainActor.run { model.transform.translation }
+            #expect(translation.z == -5)
         } else {
             // In test environment, model loading might fail - this is expected
             await #expect(helicopter.helicopterEntity?.helicopter == nil)

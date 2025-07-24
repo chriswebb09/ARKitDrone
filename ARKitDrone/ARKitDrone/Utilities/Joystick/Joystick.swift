@@ -16,7 +16,7 @@ class Joystick: SKNode {
         static let kThumbSpringBack: Double =  0.2
         static let imageJoystickName: String = "joystick.png"
         static let imageDpadName: String = "dpad.png"
-        static let velocityMultiplier: CGFloat = 2
+        static let velocityMultiplier: CGFloat = 8
     }
     
     private let backdropNode, thumbNode: SKSpriteNode
@@ -67,7 +67,7 @@ class Joystick: SKNode {
         // Check if movement is significant enough to consider it movement vs tap
         let distanceFromStart = sqrt(pow(touchPoint.x - touchStartLocation.x, 2) + pow(touchPoint.y - touchStartLocation.y, 2))
         // Only update joystick position if movement is significant enough
-        if distanceFromStart > 30 { // 30 points threshold - prevent accidental movement on taps
+        if distanceFromStart > 5 { // 5 points threshold - responsive but prevents accidental taps
             hasMovedSignificantly = true
             self.updateJoystick(touchPoint: touchPoint)
         }
@@ -152,7 +152,7 @@ class Joystick: SKNode {
         )
         // Only update velocity if movement is significant enough to prevent tiny movements
         let velocityMagnitude = sqrt(newVelocity.x * newVelocity.x + newVelocity.y * newVelocity.y)
-        if velocityMagnitude > 10.0 { // Minimum velocity threshold - much higher to prevent tap movement
+        if velocityMagnitude > 0.5 { // Minimum velocity threshold - low for responsiveness
             velocity = newVelocity
             angularVelocity = atan2(velocity.y, velocity.x)
         } else {

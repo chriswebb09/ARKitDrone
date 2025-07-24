@@ -14,7 +14,7 @@ import os.log
 
 /// Each helicopter belongs to a specific player and syncs across all clients
 @MainActor
-class HelicopterObject: ObservableObject {
+class HelicopterObject: GameEntity {
     
     // MARK: - Core Properties (matching GameObject pattern)
     
@@ -39,6 +39,26 @@ class HelicopterObject: ObservableObject {
     /// Health system for this helicopter
     var healthSystem: HelicopterHealthSystem?
     
+    /// Cached reference to the anchor entity for nonisolated access
+    private var _cachedAnchorEntity: Entity?
+    
+    // MARK: - GameEntity Protocol Properties
+    
+    /// Unique identifier for EntityManager
+    nonisolated var id: String {
+        return "helicopter_\(index)"
+    }
+    
+    /// The main RealityKit entity for this helicopter  
+    @MainActor var entity: Entity {
+        // For EntityManager compatibility, return the cached anchor entity
+        // The anchor entity is the root entity in the AR scene hierarchy
+        return _cachedAnchorEntity ?? Entity()
+    }
+    
+    /// Whether this helicopter is destroyed
+    var isDestroyed: Bool = false
+    
     // MARK: - Animation Properties
     
     /// Current rotor speed (0.0 = stopped, 1.0 = max speed)
@@ -53,30 +73,13 @@ class HelicopterObject: ObservableObject {
     /// Timer for smooth rotor speed interpolation
     private var animationTimer: Timer?
     
-    // MARK: - Movement Properties
-    
-    /// Target position for smooth movement interpolation
-    private var targetTranslation = SIMD3<Float>(0, 0, 0)
-    
-    /// Target rotation for smooth rotation interpolation
-    private var targetRotation = simd_quatf()
-    
-    /// How fast to interpolate towards target (matching ApacheHelicopter)
-    private var smoothingFactor: Float = 0.15
-    
-    // MARK: - Network Sync Properties
+    // MARK: - Simplified Properties
     
     /// Whether this helicopter is owned by the local player
     var isLocalPlayer: Bool {
         guard let owner = owner else { return false }
         return owner == UserDefaults.standard.myself
     }
-    
-    /// Last known network position for dead reckoning
-    private var lastNetworkTransform: simd_float4x4?
-    
-    /// Timestamp of last network update
-    private var lastNetworkUpdate: TimeInterval = 0
     
     // MARK: - Initialization
     
@@ -107,25 +110,25 @@ class HelicopterObject: ObservableObject {
         )
         
         anchorEntity = AnchorEntity(world: translation)
+        // Ensure the anchor's transform matches our expected position
+        anchorEntity?.transform.translation = translation
+        _cachedAnchorEntity = anchorEntity
         
         // Create helicopter instance
         helicopterEntity = await ApacheHelicopter()
+        
+        // Initialize health system (always initialize regardless of helicopter entity state)
+        healthSystem = HelicopterHealthSystem(maxHealth: 100.0)
+        setupHealthSystemCallbacks()
         
         // Add helicopter to anchor
         if let helicopter = helicopterEntity?.helicopter,
            let anchor = anchorEntity {
             anchor.addChild(helicopter)
-            
-            // Initialize target transforms
-            targetTranslation = translation
-            targetRotation = helicopter.transform.rotation
-            
-            // Initialize health system
-            healthSystem = HelicopterHealthSystem(maxHealth: 100.0, helicopterEntity: helicopter)
-            setupHealthSystemCallbacks()
-            
-            os_log(.info, "Helicopter setup complete for player %s", owner?.username ?? "unknown")
-        }
+            os_log(.info, "Helicopter entity added to anchor for player %s", owner?.username ?? "unknown")
+        } 
+        
+        os_log(.info, "Helicopter setup complete for player %s", owner?.username ?? "unknown")
     }
     
     // MARK: - Health System Setup
@@ -165,27 +168,27 @@ class HelicopterObject: ObservableObject {
     
     // MARK: - Movement Methods
     
-    /// Update helicopter position from network or local input
+    /// Update helicopter position from network or local input (simplified)
     func updateMovement(moveData: MoveData) {
         guard let helicopter = helicopterEntity else { return }
         
+        let speed: Float = 0.008
         switch moveData.direction {
         case .forward:
-            helicopter.moveForward(value: moveData.velocity.vector.y * 0.008)
+            helicopter.moveForward(value: moveData.velocity.vector.y * speed)
         case .side:
-            helicopter.moveSides(value: moveData.velocity.vector.x * 0.008)
+            helicopter.moveSides(value: moveData.velocity.vector.x * speed)
         case .altitude:
-            helicopter.changeAltitude(value: moveData.velocity.vector.y * 0.008)
+            helicopter.changeAltitude(value: moveData.velocity.vector.y * speed)
         case .rotation:
-            helicopter.rotate(yaw: moveData.velocity.vector.x * 0.008)
+            helicopter.rotate(yaw: moveData.velocity.vector.x * speed)
         case .none:
-            // No specific direction, apply general movement
-            helicopter.moveForward(value: moveData.velocity.vector.y * 0.008)
+            helicopter.moveForward(value: moveData.velocity.vector.y * speed)
         @unknown default:
-            os_log(.error, "Unknown movement direction in HelicopterObject.updateMovement")
+            break
         }
         
-        // Update movement state for animation sync
+        // Update animation state
         let hasMovement = simd_length(moveData.velocity.vector) > 0.001
         updateMovementState(isMoving: hasMovement)
     }
@@ -194,95 +197,56 @@ class HelicopterObject: ObservableObject {
     func setWorldTransform(_ transform: simd_float4x4) {
         guard let anchor = anchorEntity else { return }
         
-        let translation = SIMD3<Float>(
-            transform.columns.3.x,
-            transform.columns.3.y,
-            transform.columns.3.z
-        )
-        
-        // Extract rotation from transform matrix
-        let rotationMatrix = simd_float3x3(
-            transform.columns.0.xyz,
-            transform.columns.1.xyz,
-            transform.columns.2.xyz
-        )
+        let translation = SIMD3<Float>(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
+        let rotationMatrix = simd_float3x3(transform.columns.0.xyz, transform.columns.1.xyz, transform.columns.2.xyz)
         let rotation = simd_quatf(rotationMatrix)
         
-        // Update anchor position
         anchor.transform.translation = translation
-        
-        // Update helicopter rotation if it exists
-        if let helicopter = helicopterEntity?.helicopter {
-            helicopter.transform.rotation = rotation
-        }
-        
-        // Update targets for smooth interpolation
-        targetTranslation = translation
-        targetRotation = rotation
-        
-        lastNetworkTransform = transform
-        lastNetworkUpdate = CACurrentMediaTime()
+        helicopterEntity?.helicopter?.transform.rotation = rotation
     }
     
     // MARK: - Animation Synchronization
     
-    /// Switch between idle and moving animations
+    /// Switch between idle and moving animations (simplified)
     func updateMovementState(isMoving: Bool) {
         guard self.isMoving != isMoving else { return }
         
         self.isMoving = isMoving
-        
-        // Update rotor speed based on movement
         targetRotorSpeed = isMoving ? 1.0 : 0.3
         
-        // Start animation timer for smooth transitions
         if abs(targetRotorSpeed - rotorSpeed) > 0.05 {
             startAnimationTimer()
         }
-        
-        os_log(.info, "Helicopter %d movement state changed to: %@", 
-               index, isMoving ? "moving" : "idle")
     }
     
-    /// Update rotor animation based on movement state
+    /// Update rotor animation (simplified)
     private func updateRotorAnimation() {
-        // Smoothly interpolate rotor speed
-        let previousSpeed = rotorSpeed
         rotorSpeed = rotorSpeed + (targetRotorSpeed - rotorSpeed) * 0.15
         
-        // Enable/disable rotors based on speed
         if rotorSpeed > 0.1 && !rotorsActive {
             startRotors()
         } else if rotorSpeed < 0.1 && rotorsActive {
             stopRotors()
         }
         
-        // Stop animation timer when transition is complete
         if abs(targetRotorSpeed - rotorSpeed) < 0.01 {
             stopAnimationTimer()
-            os_log(.debug, "Helicopter %d rotor speed transition complete: %.2f", index, rotorSpeed)
         }
     }
     
     /// Start rotor animations
     private func startRotors() {
         guard let helicopter = helicopterEntity else { return }
-        
         rotorsActive = true
         helicopter.startRotorRotation()
-        
-        os_log(.info, "Started rotors for helicopter %d", index)
     }
     
     /// Stop rotor animations
     private func stopRotors() {
         guard let helicopter = helicopterEntity else { return }
-        
         rotorsActive = false
         helicopter.stopRotorRotation()
         stopAnimationTimer()
-        
-        os_log(.info, "Stopped rotors for helicopter %d", index)
     }
     
     /// Start animation timer for smooth rotor speed transitions
@@ -304,28 +268,17 @@ class HelicopterObject: ObservableObject {
     
     // MARK: - Network Synchronization
     
-    /// Get current world transform for network transmission
+    /// Get current world transform (simplified)
     func getWorldTransform() -> simd_float4x4? {
-        guard let anchor = anchorEntity,
-              let helicopter = helicopterEntity?.helicopter else { return nil }
-        
-        var transform = anchor.transform.matrix
-        
-        // Apply helicopter's local rotation
-        let helicopterRotation = simd_float4x4(helicopter.transform.rotation)
-        transform = transform * helicopterRotation
-        
-        return transform
+        guard let anchor = anchorEntity, let helicopter = helicopterEntity?.helicopter else { return nil }
+        return anchor.transform.matrix * simd_float4x4(helicopter.transform.rotation)
     }
     
     /// Update from received network data (for remote players)
     func updateFromNetwork(transform: simd_float4x4, isMoving: Bool) {
         guard !isLocalPlayer else { return }
-        
         setWorldTransform(transform)
         updateMovementState(isMoving: isMoving)
-        
-        os_log(.info, "Updated helicopter %d from network data", index)
     }
     
     // MARK: - Weapon Systems
@@ -344,8 +297,15 @@ class HelicopterObject: ObservableObject {
     func fireMissile() -> Bool {
         guard missilesArmed() else { return false }
         
-        // TODO: Implement missile firing logic
         os_log(.info, "Helicopter %d fired missile", index)
+        
+        // Create missile firing notification
+        NotificationCenter.default.post(
+            name: NSNotification.Name("HelicopterFiredMissile"),
+            object: nil,
+            userInfo: ["helicopterObject": self]
+        )
+        
         return true
     }
     
@@ -363,6 +323,7 @@ class HelicopterObject: ObservableObject {
     func removeFromScene() {
         anchorEntity?.removeFromParent()
         helicopterEntity?.stopRotorRotation()
+        _cachedAnchorEntity = nil
         
         os_log(.info, "Removed helicopter %d from scene", index)
     }
@@ -405,12 +366,36 @@ class HelicopterObject: ObservableObject {
     // MARK: - Cleanup
     
     @MainActor
-    func cleanup() {
+    // MARK: - GameEntity Protocol Implementation
+    
+    func update(deltaTime: TimeInterval) {
+        // Update helicopter animations and systems
+        if !isDestroyed {
+            updateRotorAnimation()
+            // Health system is event-driven, no periodic updates needed
+        }
+    }
+    
+    @MainActor
+    func cleanup() async {
+        // Enhanced cleanup for GameEntity protocol
+        isDestroyed = true
+        _cachedAnchorEntity = nil
+        
         animationTimer?.invalidate()
         anchorEntity?.removeFromParent()
         helicopterEntity?.stopRotorRotation()
         healthSystem?.cleanup()
         healthSystem = nil
+    }
+    
+    @MainActor
+    func onDestroy() {
+        // Called when helicopter is destroyed (e.g., health reaches zero)
+        Task { @MainActor in
+            os_log(.info, "Helicopter %d destroyed", index)
+        }
+        cleanup()
     }
 }
 //    deinit {
@@ -436,5 +421,5 @@ extension HelicopterObject: Hashable {
 }
 
 extension HelicopterObject: Identifiable {
-    nonisolated var id: Int { return index }
+    // Note: GameEntity.id is a String, Identifiable.id should also be String for consistency
 }

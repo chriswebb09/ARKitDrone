@@ -77,7 +77,8 @@ extension GameViewController: JoystickSceneDelegate {
             missileManager?.fire(game: game)
             
             // Switch to next target automatically after firing
-            targetingManager?.switchToNextTarget()
+            shipManager?.switchToNextTarget()
+//            targetingManager?.switchToNextTarget()
         }
     }
 }

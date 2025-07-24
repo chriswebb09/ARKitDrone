@@ -196,8 +196,7 @@ class ShipSynchronizationTest {
         
         for i in 0..<count {
             let mockEntity = Entity()
-            let ship = Ship(entity: mockEntity)
-            ship.id = "test_ship_\(i)"
+            let ship = Ship(entity: mockEntity, id: "test_ship_\(i)")
             ship.entity.transform.translation = SIMD3<Float>(Float(i), 0, Float(i))
             ship.velocity = SIMD3<Float>(0.1, 0, 0.1)
             ship.entity.transform.rotation = simd_quatf(ix: 0, iy: 0, iz: 0, r: 1)

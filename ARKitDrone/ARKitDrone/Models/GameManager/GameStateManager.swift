@@ -18,9 +18,6 @@ class GameStateManager {
         didSet {
             if sessionState != oldValue {
                 os_log(.info, "🎮 Game session state changed: %@ -> %@", oldValue.description, sessionState.description)
-                Task { @MainActor in
-                    await self.handleStateTransition(from: oldValue, to: self.sessionState)
-                }
             }
         }
     }
@@ -33,11 +30,14 @@ class GameStateManager {
         }
     }
     
-    var gameInProgress: Bool = false {
-        didSet {
-            if gameInProgress != oldValue {
-                os_log(.info, "⚡ Game in progress: %@", gameInProgress ? "true" : "false")
-            }
+    private var _gameInProgress: Bool = false
+    
+    var gameInProgress: Bool {
+        get {
+            return _gameInProgress
+        }
+        set {
+            _gameInProgress = newValue
         }
     }
     
@@ -122,8 +122,8 @@ class GameStateManager {
     // MARK: - State Validation
     
     private let validTransitions: [SessionState: Set<SessionState>] = [
-        SessionState.setup: [SessionState.lookingForSurface, SessionState.waitingForBoard],
-        SessionState.lookingForSurface: [SessionState.adjustingBoard, SessionState.placingBoard, SessionState.setup],
+        SessionState.setup: [SessionState.lookingForSurface, SessionState.waitingForBoard, SessionState.gameInProgress],
+        SessionState.lookingForSurface: [SessionState.adjustingBoard, SessionState.placingBoard, SessionState.setup, SessionState.gameInProgress],
         SessionState.adjustingBoard: [SessionState.placingBoard, SessionState.lookingForSurface],
         SessionState.placingBoard: [SessionState.setupLevel, SessionState.lookingForSurface],
         SessionState.waitingForBoard: [SessionState.localizingToBoard, SessionState.setup],
@@ -191,7 +191,39 @@ class GameStateManager {
             return
         }
         
+        let oldState = sessionState
         sessionState = newState
+        
+        os_log(.info, "🎮 Session state transition: %@ -> %@", oldState.description, newState.description)
+        
+        // Handle state transition synchronously for immediate effects
+        Task { @MainActor in
+            await handleStateTransition(from: oldState, to: newState)
+        }
+        
+        // For critical states, handle key properties immediately and synchronously
+        if newState == .gameInProgress {
+            os_log(.info, "🎮 Setting up gameInProgress state immediately")
+            gameInProgress = true
+            controlsEnabled = true
+            overlayVisible = false
+            
+            // Verify the state is correct
+            os_log(.info, "🎮 After setting: sessionState=%@, gameInProgress property=%@", 
+                   sessionState.description, gameInProgress ? "true" : "false")
+            
+            // Double-check the value was set correctly
+            if !gameInProgress {
+                os_log(.error, "❌ gameInProgress getter returned false! sessionState=%@, _gameInProgress=%@", 
+                       sessionState.description, _gameInProgress ? "true" : "false")
+            }
+        } else if newState == .setup {
+            // Immediately reset gameInProgress when transitioning to setup
+            os_log(.info, "🎮 Resetting gameInProgress state immediately for setup")
+            gameInProgress = false
+            controlsEnabled = false
+            overlayVisible = true
+        }
     }
     
     private func isValidTransition(from current: SessionState, to new: SessionState) -> Bool {
@@ -226,6 +258,9 @@ class GameStateManager {
     // MARK: - Game Lifecycle Methods
     
     func resetGameState() async {
+        // Reset session state back to setup
+        sessionState = .setup
+        
         helicopterPlaced = false
         gameInProgress = false
         score = 0
@@ -239,7 +274,7 @@ class GameStateManager {
         accuracy = 0.0
         gameOverMessage = ""
         
-        os_log(.info, "🔄 Game state reset")
+        os_log(.info, "🔄 Game state reset to setup")
     }
     
     private func prepareForGameplay() async {
@@ -259,7 +294,7 @@ class GameStateManager {
         gameInProgress = true
         controlsEnabled = true
         overlayVisible = false
-        os_log(.info, "🚀 Gameplay started")
+        os_log(.info, "🚀 Gameplay started - gameInProgress set to true in startGameplay")
     }
     
     private func handleGameOver() async {
@@ -345,8 +380,10 @@ class GameStateManager {
     
     func destroyShip(worth points: Int = 100) {
         shipsDestroyed += 1
-        score += points
-        recordHit()
+        // Ensure score never goes negative
+        score = max(0, score + points)
+        // Don't automatically record hit - hits should be tracked separately
+        // recordHit() should be called only when a missile actually hits
     }
     
     private func updateScore() async {

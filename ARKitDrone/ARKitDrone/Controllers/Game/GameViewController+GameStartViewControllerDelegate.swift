@@ -24,10 +24,7 @@ extension GameViewController: GameStartViewControllerDelegate {
         // Update MissileManager with the new GameManager reference
         missileManager?.gameManager = gameManager
         
-        // Setup views after manager is created
-        DispatchQueue.main.async {
-            self.setupViews()
-        }
+        // Views are already setup in viewDidAppear
     }
     
     func gameStartViewController(_ _: UIViewController, didPressStartSoloGameButton: UIButton) {

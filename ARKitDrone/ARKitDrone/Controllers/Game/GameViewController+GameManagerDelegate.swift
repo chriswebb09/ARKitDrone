@@ -13,27 +13,27 @@ import ARKit
 
 extension GameViewController: GameManagerDelegate {
     func manager(_ manager: GameManager, shipsUpdated ships: [ShipSyncData]) {
-        
+        shipManager?.updateShipsFromNetwork(ships)
     }
     
     func manager(_ manager: GameManager, shipDestroyed shipId: String) {
-        
+        shipManager?.destroyShip(withId: shipId)
     }
     
     func manager(_ manager: GameManager, shipTargeted shipId: String, targeted: Bool) {
-        
+        shipManager?.setShipTargeted(shipId: shipId, targeted: targeted)
     }
     
     func manager(_ manager: GameManager, missileFired data: MissileFireData) {
-        
+        missileManager?.handleNetworkMissileFired(data)
     }
     
     func manager(_ manager: GameManager, missilePositionUpdated data: MissileSyncData) {
-        
+        missileManager?.handleNetworkMissilePosition(data)
     }
     
     func manager(_ manager: GameManager, missileHit data: MissileHitData) {
-        
+        missileManager?.handleNetworkMissileHit(data)
     }
     
     
@@ -72,7 +72,7 @@ extension GameViewController: GameManagerDelegate {
             switch location {
             case .worldMapData(let data):
                 os_log(.info, "Received WorldMap data. Size: %d", data.count)
-                self.loadWorldMap(from: data)
+                // TODO: Implement world map loading or remove if not needed
                 self.stateManager.transitionTo(SessionState.lookingForSurface)
             case .manual:
                 os_log(.info, "Received a manual board placement")
@@ -80,7 +80,7 @@ extension GameViewController: GameManagerDelegate {
             }
         case .requestBoardLocation:
             os_log(.info, "sending world to peer")
-            self.sendWorldTo(peer: peer)
+            // TODO: Implement world map sending or remove if not needed
         }
     }
     
@@ -102,9 +102,7 @@ extension GameViewController: GameManagerDelegate {
                 y: tappedPosition.y,
                 z: tappedPosition.z
             )
-            gameManager?.send(
-                completed: CompletedAction.init(position: endPos)
-            )
+            // TODO: Implement completed action sending or remove if not needed
         }
     }
     

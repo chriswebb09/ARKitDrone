@@ -58,7 +58,7 @@ extension GameViewController: ARCoachingOverlayViewDelegate {
             focusSquare.unhide()
         }
 
-        guard let currentFrame = session.currentFrame else { return }
+        guard let currentFrame = realityKitView.session.currentFrame else { return }
         let camera = currentFrame.camera
 
         guard case .normal = camera.trackingState else { return }

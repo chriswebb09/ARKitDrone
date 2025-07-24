@@ -49,7 +49,7 @@ extension GameViewController: ARSessionDelegate {
         )
         
         Task { @MainActor in
-            if let gameManager = self.gameManager, gameManager.isInitialized {
+            if let gameManager = self.gameManager {
                 GameTime.updateAtTime(time: frame.timestamp)
                 self.gameManager?.update(timeDelta: GameTime.deltaTime)
             }

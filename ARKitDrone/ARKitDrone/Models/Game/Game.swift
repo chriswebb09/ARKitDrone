@@ -42,8 +42,11 @@ class Game {
     }
     
     func updateScoreText() {
-        destoryedTextString = "Enemy Destroyed!"
         scoreTextString = "Score: \(self.playerScore)"
+    }
+    
+    func setEnemyDestroyed() {
+        destoryedTextString = "Enemy Destroyed!"
     }
     
     func reset() {

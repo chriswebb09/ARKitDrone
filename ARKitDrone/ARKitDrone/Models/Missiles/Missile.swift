@@ -6,30 +6,32 @@
 //  Copyright © 2023 Christopher Webb-Orenstein. All rights reserved.
 //
 
+import Foundation
 import RealityKit
 import simd
 import UIKit
 
 // MARK: - Missile
 @MainActor
-class Missile {
+class Missile: GameEntity {
     
     var entity: Entity
     var particleEntity: Entity?
     var fired: Bool = false
     var exhaustEntity: Entity?
     var hit: Bool = false
-    var id: String
+    nonisolated let id: String
     var num: Int = -1
+    var isDestroyed: Bool = false
     
     @MainActor private static var missileRegistry: [Entity: Missile] = [:]
     
     private static let maxParticleDistance: Float = 50.0  // Max distance for particles
     private static let maxActiveParticles: Int = 5  // Limit active particle systems
     
-    init() {
+    init(id: String? = nil) {
         self.entity = Entity()
-        self.id = UUID().uuidString
+        self.id = id ?? UUID().uuidString
     }
     
     func setupEntity(entity: Entity, number: Int) {
@@ -102,7 +104,7 @@ class Missile {
         if let animationResource = try? AnimationResource.generate(with: moveAnimation) {
             entity.playAnimation(animationResource)
             DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-                self.cleanup()
+                self.cleanupAfterAnimation()
             }
         }
     }
@@ -112,7 +114,7 @@ class Missile {
         fire(direction: simd_normalize(direction))
     }
     
-    private func cleanup() {
+    private func cleanupAfterAnimation() {
         particleEntity?.isEnabled = false
         // Remove after brief delay to let particles fade
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -121,7 +123,13 @@ class Missile {
     }
     
     func addCollision() {
-        // Collision is already set up in setupEntity, but we can modify it here if needed
+        // Add collision component
+        let collisionComponent = CollisionComponent(shapes: [
+            .generateSphere(radius: 0.1)
+        ])
+        entity.components.set(collisionComponent)
+        
+        // Add physics component
         let physicsComponent = PhysicsBodyComponent(
             massProperties: PhysicsMassProperties(mass: 0.5),
             material: PhysicsMaterialResource.default,
@@ -162,5 +170,49 @@ class Missile {
             let shouldEnable = index < maxActiveParticles && item.distance < maxParticleDistance
             item.missile.particleEntity?.isEnabled = shouldEnable
         }
+    }
+    
+    // MARK: - GameEntity Protocol Implementation
+    
+    func update(deltaTime: TimeInterval) {
+        // Missiles update their tracking and movement
+        // This will be called by EntityManager during update cycles
+        if fired && !hit && !isDestroyed {
+            // Update particle effects based on distance to camera
+            // This logic is currently in optimizeParticleEffects but could be moved here
+        }
+    }
+    
+    @MainActor
+    func cleanup() {
+        // Enhanced cleanup for missiles
+        isDestroyed = true
+        hit = true
+        fired = false
+        
+        Task { @MainActor in
+            // Clean up particle systems
+            particleEntity?.isEnabled = false
+            particleEntity?.removeFromParent()
+            particleEntity = nil
+            
+            // Clean up exhaust entity
+            exhaustEntity?.isEnabled = false
+            exhaustEntity?.removeFromParent()
+            exhaustEntity = nil
+            
+            // Clean up main entity
+            entity.isEnabled = false
+            entity.removeFromParent()
+            
+            // Remove from static registry (legacy support during transition)
+            Missile.missileRegistry.removeValue(forKey: entity)
+        }
+    }
+    
+    @MainActor
+    func onDestroy() {
+        // Called when missile hits target or expires
+        cleanup()
     }
 }
